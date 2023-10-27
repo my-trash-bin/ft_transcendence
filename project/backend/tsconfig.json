@@ -10,7 +10,8 @@
     "strictPropertyInitialization": true,
     "skipLibCheck": true,
     "emitDecoratorMetadata": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "moduleResolution": "Node",
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts"],
 }

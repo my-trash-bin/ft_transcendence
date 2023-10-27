@@ -1,10 +1,10 @@
 import { Server } from 'node:http';
 
-import { NestFactory } from '@nestjs/core';
 import { INestApplication } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
 
-import { AppModule } from './frontend/v1/app.module';
 import { GraphQLModule } from './frontend/graphql/graphql.module';
+import { AppModule } from './frontend/v1/app.module';
 
 let app: INestApplication;
 
@@ -29,7 +29,7 @@ export async function getV1Listener() {
 export async function getGraphQLApp() {
   if (!app) {
     app = await NestFactory.create(GraphQLModule, { bodyParser: false });
-    app.setGlobalPrefix('api/graphQL');
+    app.setGlobalPrefix('api/graphql');
     await app.init();
   }
 

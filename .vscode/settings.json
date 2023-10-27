@@ -1,0 +1,19 @@
+{
+  "files.exclude": {
+    "node_modules": true,
+  },
+  "[typescript][typescriptreact]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": true,
+  },
+  "tailwindCSS.experimental.classRegex": [
+    ["(?:clsx|twMerge|c)\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"],
+  ],
+  "[rust]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "rust-lang.rust-analyzer",
+  },
+}
