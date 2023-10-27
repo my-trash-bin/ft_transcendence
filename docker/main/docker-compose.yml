@@ -1,70 +1,70 @@
-version: "3"
+version: '3'
 
 volumes:
-    wordpress:
-        name: wordpress
-        driver: local
-        driver_opts:
-            type: none
-            o: bind
-            device: ${DATA_DIR_ABSOLUTE}/wordpress
-    db:
-        name: db
-        driver: local
-        driver_opts:
-            type: none
-            o: bind
-            device: ${DATA_DIR_ABSOLUTE}/db
+  wordpress:
+    name: wordpress
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATA_DIR_ABSOLUTE}/wordpress
+  db:
+    name: db
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATA_DIR_ABSOLUTE}/db
 
 networks:
-    inception:
-        name: inception
+  ft_transcendence:
+    name: ft_transcendence
 
 services:
-    http:
-        container_name: http
-        build:
-            context: ./service/http/.
-            args:
-                INTRA_LOGIN: ${INTRA_LOGIN}
-        image: http
-        ports:
-            - "443:443"
-        depends_on:
-            - wp
-        volumes:
-            - wordpress:/app
-        networks:
-            - inception
-        env_file:
-            - ../srcs/.env
-        restart: always
-    wp:
-        container_name: wp
-        build: ./service/wp/.
-        image: wp
-        depends_on:
-            - db
-        volumes:
-            - wordpress:/app
-        env_file:
-            - ../srcs/.env
-        networks:
-            - inception
-        restart: always
-    db:
-        container_name: db
-        build:
-            context: ./service/db/.
-            args:
-                MARIADB_DATABASE: ${MARIADB_DATABASE}
-                MARIADB_USER: ${MARIADB_USER}
-                MARIADB_PASSWORD: ${MARIADB_PASSWORD}
-        image: db
-        volumes:
-            - mariadb:/app
-        env_file:
-            - ../srcs/.env
-        networks:
-            - inception
-        restart: always
+  http:
+    container_name: http
+    build:
+      context: ./service/http/.
+      args:
+        INTRA_LOGIN: ${INTRA_LOGIN}
+    image: http
+    ports:
+      - '443:443'
+    depends_on:
+      - wp
+    volumes:
+      - wordpress:/app
+    networks:
+      - ft_transcendence
+    env_file:
+      - ../srcs/.env
+    restart: always
+  wp:
+    container_name: wp
+    build: ./service/wp/.
+    image: wp
+    depends_on:
+      - db
+    volumes:
+      - wordpress:/app
+    env_file:
+      - ../srcs/.env
+    networks:
+      - ft_transcendence
+    restart: always
+  db:
+    container_name: db
+    build:
+      context: ./service/db/.
+      args:
+        MARIADB_DATABASE: ${MARIADB_DATABASE}
+        MARIADB_USER: ${MARIADB_USER}
+        MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+    image: db
+    volumes:
+      - mariadb:/app
+    env_file:
+      - ../srcs/.env
+    networks:
+      - inception
+    restart: always

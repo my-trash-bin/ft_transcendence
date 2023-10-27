@@ -18,11 +18,11 @@ re:
 
 .PHONY: up
 up: prelude
-	docker compose --env-file .env up -d
+	docker compose --env-file .env -f docker/main/docker-compose.yml up -d
 
 .PHONY: down
 down: prelude
-	docker compose --env-file .env $@
+	docker compose --env-file .env -f docker/main/docker-compose.yml $@
 
 .PHONY: prelude
 prelude: .env
@@ -33,5 +33,5 @@ prelude: .env
 
 .PHONY: dev
 dev: prelude
-	@docker compose --env-file .env down -v
-	@docker compose --env-file .env up -d --build
+	@docker compose --env-file .env -f docker/main/docker-compose.yml down -v
+	@docker compose --env-file .env -f docker/main/docker-compose.yml up -d --build

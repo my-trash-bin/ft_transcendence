@@ -8,9 +8,5 @@ export default {
     dir: 'dist',
     format: 'cjs',
   },
-  plugins: [
-    terser(),
-    commonjs(),
-    peerDepsExternal(),
-  ],
+  plugins: [terser(), commonjs(), peerDepsExternal()],
 };

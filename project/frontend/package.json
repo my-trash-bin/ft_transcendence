@@ -8,7 +8,7 @@
     "dev": "next dev"
   },
   "dependencies": {
-    "@-ft/mode-next": "^0.1.1",
+    "@-ft/mode-next": "^0.1.2",
     "@apollo/client": "^3.8.6",
     "@ft_transcendence/backend": "file:../backend/dist",
     "@types/apollo-upload-client": "^17.0.4",
