@@ -1,0 +1,3 @@
+      "graphql.vscode-graphql",
+      "graphql.vscode-graphql-syntax",
+      "bradlc.vscode-tailwindcss",

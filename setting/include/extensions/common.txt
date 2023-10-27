@@ -1,0 +1,3 @@
+      "editorconfig.editorconfig",
+      "sonarsource.sonarlint-vscode",
+      "timonwong.shellcheck",

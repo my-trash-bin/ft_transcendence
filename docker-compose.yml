@@ -1,0 +1,14 @@
+version: "3"
+
+volumes:
+  web:
+    name: web
+  db:
+    name: db
+
+networks:
+  ft_transcendence:
+    name: ft_transcendence
+
+services:
+  # TODO:

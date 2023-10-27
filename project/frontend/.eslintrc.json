@@ -1,0 +1,16 @@
+{
+  "extends": "next/core-web-vitals",
+  "rules": {
+    "no-restricted-imports": [
+      "error",
+      {
+        "patterns": [
+          "next/router",
+          "next/navigation",
+          "next-intl/client",
+          "next-intl/server"
+        ]
+      }
+    ]
+  }
+}
