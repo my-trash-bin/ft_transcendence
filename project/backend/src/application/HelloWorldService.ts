@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { GraphQLHelloWorld } from '../graphql/type/GraphQLHelloWorld';
+import { GraphQLHelloWorld } from '../frontend/graphql/helloworld/helloworld.type';
 
 @Injectable()
 export class HelloWorldService {

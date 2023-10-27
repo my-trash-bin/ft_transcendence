@@ -11,6 +11,8 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "moduleResolution": "Node",
+    "target": "ES2020",
+    "module": "ESNext",
     "outDir": "build",
     "declaration": true,
   },

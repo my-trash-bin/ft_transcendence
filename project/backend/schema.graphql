@@ -1,0 +1,19 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type GraphQLAuthor {
+  id: ID!
+  name: String!
+}
+
+type HelloWorld {
+  author: GraphQLAuthor!
+  id: ID!
+  message: String
+}
+
+type Query {
+  author(id: ID!): HelloWorld!
+  helloWorld(id: ID!): HelloWorld!
+}

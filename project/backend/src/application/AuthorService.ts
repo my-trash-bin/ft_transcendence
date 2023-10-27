@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { GraphQLHelloWorld } from '../graphql/type/GraphQLHelloWorld';
-import { GraphQLAuthor } from '../graphql/type/GraphQLAuthor';
+import { GraphQLAuthor } from '../frontend/graphql/author/author.type';
 
 @Injectable()
 export class AuthorService {

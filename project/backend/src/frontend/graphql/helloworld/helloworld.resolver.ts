@@ -6,10 +6,10 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql';
-import { GraphQLHelloWorld } from '../type/GraphQLHelloWorld';
-import { GraphQLAuthor } from '../type/GraphQLAuthor';
-import { HelloWorldService } from '../../service/HelloWorldService';
-import { AuthorService } from '../../service/AuthorService';
+import { AuthorService } from '../../../application/AuthorService';
+import { HelloWorldService } from '../../../application/HelloWorldService';
+import { GraphQLAuthor } from '../author/author.type';
+import { GraphQLHelloWorld } from './helloworld.type';
 
 @Resolver((of: any) => GraphQLHelloWorld)
 export class HelloWorldResolver {

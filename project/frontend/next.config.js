@@ -4,14 +4,6 @@ const nextConfig = {
   images: {
     domains: ['localhost', '127.0.0.1'],
   },
-  webpack(config) {
-    config.module.rules.push({
-      test: /.node$/,
-      loader: 'node-loader',
-    });
-
-    return config;
-  },
 };
 
 module.exports = nextConfig;

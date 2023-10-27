@@ -1,9 +1,11 @@
 {
   "private": true,
-  "name": "@ft_transcendence/backend",
   "license": "UNLICENSED",
+  "type": "module",
   "scripts": {
-    "build": "rimraf build dist && tsc -p tsconfig.build.json && rollup -c && dts-bundle-generator --no-banner -o dist/index.d.ts build/index.d.ts && package-json-minifier"
+    "start": "node dist",
+    "build": "rimraf build dist && tsc -p tsconfig.build.json && rollup -c && dts-bundle-generator --no-banner -o dist/index.d.ts build/index.d.ts && package-json-minifier",
+    "dev": "nodemon --verbose"
   },
   "dependencies": {
     "@apollo/server": "^4.9.5",
@@ -20,6 +22,7 @@
     "apollo-server-express": "^3.12.1",
     "class-transformer": "^0.3.1",
     "class-validator": "0.14.0",
+    "dotenv": "^16.3.1",
     "graphql": "^16.8.1",
     "subscriptions-transport-ws": "^0.11.0"
   },
@@ -28,10 +31,12 @@
     "@rollup/plugin-terser": "^0.4.4",
     "@types/node": "^20.8.9",
     "dts-bundle-generator": "^8.1.2",
+    "nodemon": "^3.0.1",
     "package.json-minifier": "^0.0.4",
     "rimraf": "^5.0.5",
     "rollup": "^4.1.4",
     "rollup-plugin-peer-deps-external": "^2.2.4",
+    "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
   }
 }

@@ -5,48 +5,6 @@ networks:
     name: ft_transcendence
 
 services:
-  http:
-    container_name: http
-    build:
-      context: ../..
-      dockerfile: docker/dev/http.Dockerfile
-    image: ft_transcendence-http-production
-    ports:
-      - 8080:80
-    depends_on:
-      - backend
-      - frontend
-    networks:
-      - ft_transcendence
-    restart: always
-  backend:
-    container_name: backend
-    build:
-      context: ../..
-      dockerfile: docker/dev/backend.Dockerfile
-    image: ft_transcendence-backend-production
-    depends_on:
-      - db
-      - redis
-      - azurite
-    volumes:
-      - ./volume/redis:/data
-    networks:
-      - ft_transcendence
-    env_file:
-      - ../../.env
-    restart: always
-  frontend:
-    container_name: frontend
-    build:
-      context: ../..
-      dockerfile: docker/main/frontend.Dockerfile
-    image: ft_transcendence-frontend-production
-    networks:
-      - ft_transcendence
-    env_file:
-      - ../../.env
-    restart: always
   db:
     container_name: db
     image: postgres
@@ -55,10 +13,10 @@ services:
     environment:
       POSTGRES_USER: kiwi
       POSTGRES_PASSWORD: kiwipassword
-    networks:
-      - ft_transcendence
     volumes:
       - ./volume/db:/var/lib/postgresql/data
+    networks:
+      - ft_transcendence
     restart: always
   redis:
     container_name: redis

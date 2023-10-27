@@ -28,10 +28,10 @@ down: prelude
 prelude: .env
 
 .env:
+	sh docker/env-validator/validate.sh .env.sample
 	cp .env.sample .env
-	sh docker/env-validator/validate.sh .env || mv .env .env.invalid
 
 .PHONY: dev
 dev: prelude
-	@docker compose --env-file .env -f docker/main/docker-compose.yml down -v
-	@docker compose --env-file .env -f docker/main/docker-compose.yml up -d --build
+	@docker compose --env-file .env -f docker/dev/docker-compose.yml down -v
+	@docker compose --env-file .env -f docker/dev/docker-compose.yml up -d --build

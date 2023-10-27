@@ -4,6 +4,8 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
 import { GraphQLModule as NestGraphQLModule } from '@nestjs/graphql';
+import { AuthorModule } from './author/author.model';
+import { HelloWorldModule } from './helloworld/helloworld.module';
 
 @Module({
   imports: [
@@ -14,17 +16,19 @@ import { GraphQLModule as NestGraphQLModule } from '@nestjs/graphql';
       subscriptions: {
         'subscriptions-transport-ws': { keepAlive: 3600 },
       },
-      include: [],
+      playground: false,
 
       ...(process.env.NODE_ENV === 'production'
         ? {
             debug: false,
-            playground: false,
           }
         : {
             plugins: [ApolloServerPluginLandingPageLocalDefault()],
           }),
     }),
+
+    AuthorModule,
+    HelloWorldModule,
   ],
 })
 export class GraphQLModule {}
