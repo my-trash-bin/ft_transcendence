@@ -1,0 +1,2 @@
+schema: project/backend/schema.graphql
+documents: project/frontend/src/**/*.gql

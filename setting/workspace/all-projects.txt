@@ -16,6 +16,7 @@ extensions.end
 settings.start
 settings/typescript
 settings/frontend
+settings/backend
 settings/rust
 settings.end
 common.end

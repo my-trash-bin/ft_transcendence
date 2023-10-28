@@ -10,5 +10,6 @@ extensions/backend
 extensions.end
 settings.start
 settings/typescript
+settings/backend
 settings.end
 common.end
