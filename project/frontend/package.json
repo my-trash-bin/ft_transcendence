@@ -6,6 +6,7 @@
     "build": "next build",
     "lint": "next lint",
     "dev": "next dev",
+    "generate:css": "node script/generateColors.cjs > src/color.generated.css",
     "generate:graphql": "del '**/*.generated.ts' && graphql-codegen"
   },
   "dependencies": {

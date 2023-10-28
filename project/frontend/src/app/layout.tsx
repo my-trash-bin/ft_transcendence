@@ -2,6 +2,8 @@ import { ModeContextProvider } from '@-ft/mode-next';
 import { cookies } from 'next/headers';
 import React from 'react';
 
+import './tailwind.css';
+
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html
@@ -15,12 +17,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         {/* eslint-disable-next-line @next/next/no-sync-scripts */}
         <script src="/script/mode.js" />
       </head>
-      <body className="bg-background text-md text-text-primary h-screen m-[0] p-[0]">
-        <div className="relative w-full h-full">
-          <ModeContextProvider variableName="npm:@-ft/mode-codegen">
-            {children}
-          </ModeContextProvider>
-        </div>
+      <body className="bg-background text-text">
+        <ModeContextProvider variableName="npm:@-ft/mode-codegen">
+          {children}
+        </ModeContextProvider>
       </body>
     </html>
   );
