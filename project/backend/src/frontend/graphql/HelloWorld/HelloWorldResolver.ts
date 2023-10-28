@@ -5,7 +5,9 @@ import {
   Query,
   ResolveField,
   Resolver,
+  Subscription,
 } from '@nestjs/graphql';
+import { PubSub } from 'graphql-subscriptions';
 import { AuthorService } from '../../../application/AuthorService';
 import { HelloWorldService } from '../../../application/HelloWorldService';
 import { GraphQLAuthor } from '../Author/GraphQLAuthor';
@@ -18,8 +20,13 @@ export class HelloWorldResolver {
     private readonly authorService: AuthorService,
   ) {}
 
+  private readonly pubSub = new PubSub();
+
   @Query((returns) => GraphQLHelloWorld)
   async helloWorld(@Args('id', { type: () => ID }) id: string) {
+    this.pubSub.publish('helloworld', {
+      commentAdded: `Hello world from ${id}!`,
+    });
     return this.helloWorldService.findOneById(id);
   }
 
@@ -30,5 +37,10 @@ export class HelloWorldResolver {
     const id = helloWorld.authorId;
     if (!id) return null;
     return this.authorService.findOneById(id);
+  }
+
+  @Subscription((returns) => String)
+  commentAdded() {
+    return this.pubSub.asyncIterator('helloworld');
   }
 }

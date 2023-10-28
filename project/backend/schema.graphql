@@ -17,3 +17,7 @@ type Query {
   author(id: ID!): HelloWorld!
   helloWorld(id: ID!): HelloWorld!
 }
+
+type Subscription {
+  commentAdded: String!
+}

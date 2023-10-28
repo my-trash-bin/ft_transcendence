@@ -13,8 +13,11 @@ import { HelloWorldModule } from './HelloWorld/HelloWorldModule';
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'schema.graphql'),
       sortSchema: true,
+      installSubscriptionHandlers: true,
       subscriptions: {
-        'subscriptions-transport-ws': { keepAlive: 3600 },
+        'graphql-ws': {
+          path: '/graphql',
+        },
       },
       playground: false,
 
