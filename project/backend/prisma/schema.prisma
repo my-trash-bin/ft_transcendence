@@ -26,29 +26,27 @@ model User {
   channelInvitations ChannelInvitation[] @relation("ChannelInvitation_member")
   PongUser           PongUser?           @relation("PongUser_user")
 
-  @@index([isLeaved, joinedAt])
   @@index([isLeaved, nickname])
 }
 
 model UserFollow {
-  followerId       String   @db.Uuid
-  followeeId       String   @db.Uuid
-  is_bidirectional Boolean
-  is_block         Boolean
-  followedAt       DateTime
+  followerId        String   @db.Uuid
+  followeeId        String   @db.Uuid
+  isBlock           Boolean
+  followOrBlockedAt DateTime @updatedAt
 
   follower User @relation("UserFollow_follower", fields: [followerId], references: [id])
   followee User @relation("UserFollow_followee", fields: [followeeId], references: [id])
 
   @@id([followerId, followeeId])
-  @@index([followerId, is_block, followedAt])
+  @@index([followerId, isBlock, followOrBlockedAt])
 }
 
 model Achievement {
   id          String @id @db.Uuid
   title       String
   imageUrl    String
-  contentJson String
+  description String
 
   achievedUsers UserAchievement[] @relation("UserAchievement_achievement")
 }
@@ -77,16 +75,17 @@ model Notifications {
 }
 
 model Channel {
-  id          String   @id @db.Uuid
-  title       String
-  isPublic    Boolean
-  password    String?
-  createdAt   DateTime
-  lastChatAt  DateTime
-  ownerId     String   @db.Uuid
-  memberCount Int
+  id                 String   @id @db.Uuid
+  title              String
+  isPublic           Boolean
+  password           String?
+  createdAt          DateTime
+  lastChatAt         DateTime
+  ownerId            String?  @db.Uuid
+  memberCount        Int
+  maximumMemberCount Int
 
-  owner             User                @relation("Channel_owner", fields: [ownerId], references: [id])
+  owner             User?               @relation("Channel_owner", fields: [ownerId], references: [id])
   members           ChannelMember[]     @relation("ChannelMember_channel")
   messages          ChannelMessage[]    @relation("ChannelMessage_channel")
   ChannelInvitation ChannelInvitation[] @relation("ChannelInvitation_channel")
@@ -116,10 +115,11 @@ model ChannelMember {
 }
 
 model ChannelMessage {
-  id        String   @id @db.Uuid
-  channelId String   @db.Uuid
-  memberId  String   @db.Uuid
-  sentAt    DateTime
+  id          String   @id @db.Uuid
+  channelId   String   @db.Uuid
+  memberId    String   @db.Uuid
+  sentAt      DateTime
+  messageJson String
 
   channel Channel @relation("ChannelMessage_channel", fields: [channelId], references: [id])
   member  User    @relation("ChannelMessage_member", fields: [memberId], references: [id])
@@ -146,6 +146,7 @@ model DirectMessage {
   member2Id     String   @db.Uuid
   sentByMember1 Boolean
   sentAt        DateTime
+  messageJson   String
 
   member1 User @relation("DirectMessage_member1", fields: [member1Id], references: [id])
   member2 User @relation("DirectMessage_member2", fields: [member2Id], references: [id])

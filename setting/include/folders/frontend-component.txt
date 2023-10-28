@@ -1,4 +1,0 @@
-    {
-      "path": "project/frontend-component/base/overlay",
-      "name": "base/overlay",
-    },

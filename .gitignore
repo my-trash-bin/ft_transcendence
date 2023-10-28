@@ -7,4 +7,3 @@ Cargo.lock
 target
 build
 dist
-*.code-workspace

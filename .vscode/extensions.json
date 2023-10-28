@@ -1,6 +1,17 @@
 {
   "recommendations": [
+    "editorconfig.editorconfig",
+    "sonarsource.sonarlint-vscode",
+    "timonwong.shellcheck",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "prisma.prisma",
+    "graphql.vscode-graphql",
+    "graphql.vscode-graphql-syntax",
+    "bradlc.vscode-tailwindcss",
+    "rust-lang.rust-analyzer",
+    "tamasfe.even-better-toml",
     "ms-azuretools.vscode-docker",
-    "ahmadalli.vscode-nginx-conf"
+    "ahmadalli.vscode-nginx-conf",
   ],
 }

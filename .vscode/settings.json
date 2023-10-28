@@ -16,7 +16,6 @@
   "tailwindCSS.experimental.classRegex": [
     ["(?:clsx|twMerge|c)\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"],
   ],
-  "graphql-config.load.filePath": "${workspaceFolder}/project/frontend/.graphqlrc.yml",
   "[rust]": {
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "rust-lang.rust-analyzer",
