@@ -4,7 +4,7 @@ WORKDIR /usr/src/app
 
 COPY project/backend .
 
-RUN npm install
+RUN npm install --omit=dev
 
 EXPOSE 8080
 

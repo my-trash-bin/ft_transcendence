@@ -2,14 +2,12 @@ version: '3'
 
 networks:
   ft_transcendence:
-    name: ft_transcendence
 
 services:
   http:
-    container_name: http
     build:
-      context: ../..
-      dockerfile: docker/dev/http.Dockerfile
+      context: .
+      dockerfile: http.Dockerfile
     image: ft_transcendence-http-production
     ports:
       - 8080:80
@@ -20,10 +18,9 @@ services:
       - ft_transcendence
     restart: always
   backend:
-    container_name: backend
     build:
       context: ../..
-      dockerfile: docker/dev/backend.Dockerfile
+      dockerfile: docker/main/backend.Dockerfile
     image: ft_transcendence-backend-production
     depends_on:
       - db
@@ -37,7 +34,6 @@ services:
       - ../../.env
     restart: always
   frontend:
-    container_name: frontend
     build:
       context: ../..
       dockerfile: docker/main/frontend.Dockerfile
@@ -48,10 +44,7 @@ services:
       - ../../.env
     restart: always
   db:
-    container_name: db
     image: postgres
-    ports:
-      - 5432:5432
     environment:
       POSTGRES_USER: kiwi
       POSTGRES_PASSWORD: kiwipassword
@@ -61,7 +54,6 @@ services:
       - ./volume/db:/var/lib/postgresql/data
     restart: always
   redis:
-    container_name: redis
     image: redis/redis-stack-server
     environment:
       # use REDIS_ARGS for redis-stack-server instead of command arguments
@@ -70,12 +62,8 @@ services:
       - ./volume/redis:/data
     networks:
       - ft_transcendence
-    ports:
-      - 6379:6379
-      - 6380:6380
     restart: always
   azurite:
-    container_name: azurite
     image: mcr.microsoft.com/azure-storage/azurite
     command: "azurite --loose --blobHost 0.0.0.0 --blobPort 10000 --queueHost 0.0.0.0 --queuePort 10001 --tableHost 0.0.0.0 --tablePort 10002 --location /workspace --debug /workspace/debug.log"
     ports:

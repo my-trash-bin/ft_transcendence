@@ -4,7 +4,7 @@ WORKDIR /usr/src/app
 
 COPY project/frontend .
 
-RUN npm install && npm run build
+RUN npm install --omit=dev && npm run build
 
 EXPOSE 80
 

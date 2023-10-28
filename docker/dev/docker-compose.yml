@@ -1,12 +1,7 @@
 version: '3'
 
-networks:
-  ft_transcendence:
-    name: ft_transcendence
-
 services:
   db:
-    container_name: db
     image: postgres
     ports:
       - 5432:5432
@@ -15,25 +10,19 @@ services:
       POSTGRES_PASSWORD: kiwipassword
     volumes:
       - ./volume/db:/var/lib/postgresql/data
-    networks:
-      - ft_transcendence
     restart: always
   redis:
-    container_name: redis
     image: redis/redis-stack-server
     environment:
       # use REDIS_ARGS for redis-stack-server instead of command arguments
       - REDIS_ARGS=--save 1200 32
     volumes:
       - ./volume/redis:/data
-    networks:
-      - ft_transcendence
     ports:
       - 6379:6379
       - 6380:6380
     restart: always
   azurite:
-    container_name: azurite
     image: mcr.microsoft.com/azure-storage/azurite
     command: "azurite --loose --blobHost 0.0.0.0 --blobPort 10000 --queueHost 0.0.0.0 --queuePort 10001 --tableHost 0.0.0.0 --tablePort 10002 --location /workspace --debug /workspace/debug.log"
     ports:
@@ -42,6 +31,4 @@ services:
       - 10002:10002
     volumes:
       - ./volume/azurite:/workspace
-    networks:
-      - ft_transcendence
     restart: always
