@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AuthorService } from '../../../application/AuthorService';
-import { AuthorResolver } from './author.resolver';
+import { AuthorResolver } from './AuthorResolver';
 
 @Module({
   providers: [AuthorService, AuthorResolver],

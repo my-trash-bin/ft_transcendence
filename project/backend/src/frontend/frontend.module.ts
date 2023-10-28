@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { GraphQLModule } from './graphql/graphql.module';
+import { GraphQLModule } from './graphql/GraphQLModule';
 import { V1Module } from './v1/v1.module';
 
 @Module({

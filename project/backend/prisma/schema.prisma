@@ -16,8 +16,8 @@ model User {
   id              String    @id @db.Uuid
   nickname        String    @unique
   profileImageUrl String?
-  joinedAt        DateTime
-  isLeaved        Boolean
+  joinedAt        DateTime  @default(now())
+  isLeaved        Boolean   @default(false)
   leavedAt        DateTime?
 
   following          UserFollow[]        @relation("UserFollow_follower")
@@ -59,7 +59,7 @@ model Achievement {
 model UserAchievement {
   userId        String   @db.Uuid
   achievementId String   @db.Uuid
-  achievedAt    DateTime
+  achievedAt    DateTime @default(now())
 
   user        User        @relation("UserAchievement_user", fields: [userId], references: [id])
   achievement Achievement @relation("UserAchievement_achievement", fields: [achievementId], references: [id])
@@ -72,8 +72,8 @@ model UserAchievement {
 model Notifications {
   id          String   @id @db.Uuid
   userId      String   @db.Uuid
-  isRead      Boolean
-  createdAt   DateTime
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
   contentJson String
 
   @@index([userId, createdAt])
@@ -84,7 +84,7 @@ model Channel {
   title              String
   isPublic           Boolean
   password           String?
-  createdAt          DateTime
+  createdAt          DateTime @default(now())
   lastChatAt         DateTime
   ownerId            String?  @db.Uuid
   memberCount        Int
@@ -111,7 +111,7 @@ model ChannelMember {
   channelId  String            @db.Uuid
   memberId   String            @db.Uuid
   memberType ChannelMemberType
-  mutedUntil DateTime
+  mutedUntil DateTime          @default(now())
 
   channel Channel @relation("ChannelMember_channel", fields: [channelId], references: [id])
   member  User    @relation("ChannelMember_member", fields: [memberId], references: [id])
@@ -124,7 +124,7 @@ model ChannelMessage {
   id          String   @id @db.Uuid
   channelId   String   @db.Uuid
   memberId    String   @db.Uuid
-  sentAt      DateTime
+  sentAt      DateTime @default(now())
   messageJson String
 
   channel Channel @relation("ChannelMessage_channel", fields: [channelId], references: [id])
@@ -136,7 +136,7 @@ model ChannelMessage {
 model ChannelInvitation {
   channelId String   @db.Uuid
   memberId  String   @db.Uuid
-  invitedAt DateTime
+  invitedAt DateTime @default(now())
 
   channel Channel @relation("ChannelInvitation_channel", fields: [channelId], references: [id])
   member  User    @relation("ChannelInvitation_member", fields: [memberId], references: [id])
@@ -151,7 +151,7 @@ model DirectMessage {
   member1Id     String   @db.Uuid
   member2Id     String   @db.Uuid
   sentByMember1 Boolean
-  sentAt        DateTime
+  sentAt        DateTime @default(now())
   messageJson   String
 
   member1 User @relation("DirectMessage_member1", fields: [member1Id], references: [id])

@@ -4,8 +4,8 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
 import { GraphQLModule as NestGraphQLModule } from '@nestjs/graphql';
-import { AuthorModule } from './author/author.model';
-import { HelloWorldModule } from './helloworld/helloworld.module';
+import { AuthorModule } from './Author/AuthorModule';
+import { HelloWorldModule } from './HelloWorld/HelloWorldModule';
 
 @Module({
   imports: [

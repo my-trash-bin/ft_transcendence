@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "rootDir": "src",
-    "noEmit": true,
     "noImplicitAny": true,
     "strict": true,
     "strictNullChecks": true,
@@ -12,9 +11,9 @@
     "skipLibCheck": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "moduleResolution": "Node",
-    "target": "ES2020",
-    "module": "ESNext",
+    "module": "commonjs",
+    "removeComments": true,
+    "outDir": "./dist",
   },
   "include": ["src/**/*.ts"],
 }

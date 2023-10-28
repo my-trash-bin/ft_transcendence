@@ -8,8 +8,8 @@ import {
 } from '@nestjs/graphql';
 import { AuthorService } from '../../../application/AuthorService';
 import { HelloWorldService } from '../../../application/HelloWorldService';
-import { GraphQLAuthor } from '../author/author.type';
-import { GraphQLHelloWorld } from './helloworld.type';
+import { GraphQLAuthor } from '../Author/GraphQLAuthor';
+import { GraphQLHelloWorld } from './GraphQLHelloWorld';
 
 @Resolver((of: any) => GraphQLHelloWorld)
 export class HelloWorldResolver {
@@ -23,8 +23,10 @@ export class HelloWorldResolver {
     return this.helloWorldService.findOneById(id);
   }
 
-  @ResolveField((of) => GraphQLAuthor)
-  async author(@Parent() helloWorld: GraphQLHelloWorld) {
+  @ResolveField((of) => GraphQLAuthor, { nullable: true })
+  async author(
+    @Parent() helloWorld: GraphQLHelloWorld,
+  ): Promise<GraphQLAuthor | null> {
     const id = helloWorld.authorId;
     if (!id) return null;
     return this.authorService.findOneById(id);

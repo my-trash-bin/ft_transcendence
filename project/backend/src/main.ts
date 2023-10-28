@@ -1,13 +1,11 @@
 import 'dotenv/config';
+import 'reflect-metadata';
 
 import { NestFactory } from '@nestjs/core';
-
 import { FrontendModule } from './frontend/frontend.module';
 
-async function main() {
+async function bootstrap() {
   const app = await NestFactory.create(FrontendModule);
-  await app.init();
   await app.listen(80);
 }
-
-main();
+bootstrap();
