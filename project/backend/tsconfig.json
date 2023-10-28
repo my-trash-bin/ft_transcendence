@@ -12,6 +12,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "module": "commonjs",
+    "target": "ES2019",
     "removeComments": true,
     "outDir": "./dist",
   },

@@ -2,7 +2,13 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Author {
+  id: ID!
+  name: String!
+}
+
 type HelloWorld {
+  author: Author
   id: ID!
   message: String
 }
