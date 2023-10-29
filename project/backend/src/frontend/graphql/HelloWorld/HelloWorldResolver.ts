@@ -1,3 +1,4 @@
+import { I } from '@-ft/i';
 import {
   Args,
   ID,
@@ -7,9 +8,9 @@ import {
   Resolver,
   Subscription,
 } from '@nestjs/graphql';
-import { PubSub } from 'graphql-subscriptions';
 import { AuthorService } from '../../../application/AuthorService';
 import { HelloWorldService } from '../../../application/HelloWorldService';
+import { PubSubService } from '../../../base/PubSubService';
 import { GraphQLAuthor } from '../Author/GraphQLAuthor';
 import { GraphQLHelloWorld } from './GraphQLHelloWorld';
 
@@ -18,19 +19,16 @@ export class HelloWorldResolver {
   constructor(
     private readonly helloWorldService: HelloWorldService,
     private readonly authorService: AuthorService,
+    private readonly pubSubService: PubSubService,
   ) {}
-
-  private readonly pubSub = new PubSub();
 
   @Query((returns) => GraphQLHelloWorld)
   async helloWorld(@Args('id', { type: () => ID }) id: string) {
-    this.pubSub.publish('helloworld', {
-      commentAdded: `Hello world from ${id}!`,
-    });
+    this.pubSubService.pub('helloworld', id);
     return this.helloWorldService.findOneById(id);
   }
 
-  @ResolveField((of) => GraphQLAuthor, { nullable: true })
+  @ResolveField((returns) => GraphQLAuthor, { nullable: true })
   async author(
     @Parent() helloWorld: GraphQLHelloWorld,
   ): Promise<GraphQLAuthor | null> {
@@ -39,8 +37,16 @@ export class HelloWorldResolver {
     return this.authorService.findOneById(id);
   }
 
-  @Subscription((returns) => String)
-  commentAdded() {
-    return this.pubSub.asyncIterator('helloworld');
+  @Subscription((returns) => String, { resolve: I })
+  commentAdded(): AsyncIterator<string> {
+    const idIterator = this.pubSubService.sub('helloworld');
+    const sub = {
+      [Symbol.asyncIterator]: () => idIterator,
+    };
+    return (async function* (): AsyncGenerator<string> {
+      for await (const id of sub) {
+        yield `Hello world from ${id}!`;
+      }
+    })();
   }
 }

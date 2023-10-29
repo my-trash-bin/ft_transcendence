@@ -46,22 +46,12 @@ services:
   db:
     image: postgres
     environment:
-      POSTGRES_USER: kiwi
-      POSTGRES_PASSWORD: kiwipassword
+      POSTGRES_USER: ft_transcendence
+      POSTGRES_PASSWORD: "supersecretpassword"
     networks:
       - ft_transcendence
     volumes:
       - ./volume/db:/var/lib/postgresql/data
-    restart: always
-  redis:
-    image: redis/redis-stack-server
-    environment:
-      # use REDIS_ARGS for redis-stack-server instead of command arguments
-      - REDIS_ARGS=--save 1200 32
-    volumes:
-      - ./volume/redis:/data
-    networks:
-      - ft_transcendence
     restart: always
   azurite:
     image: mcr.microsoft.com/azure-storage/azurite
