@@ -40,11 +40,10 @@ export class HelloWorldResolver {
   @Subscription((returns) => String, { resolve: I })
   commentAdded(): AsyncIterator<string> {
     const idIterator = this.pubSubService.sub('helloworld');
-    const sub = {
-      [Symbol.asyncIterator]: () => idIterator,
-    };
     return (async function* (): AsyncGenerator<string> {
-      for await (const id of sub) {
+      for await (const id of {
+        [Symbol.asyncIterator]: () => idIterator,
+      }) {
         yield `Hello world from ${id}!`;
       }
     })();
