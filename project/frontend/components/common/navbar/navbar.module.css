@@ -1,44 +1,52 @@
 .navbar {
   display: flex;
   flex-direction: column;
-  width: 200px;
-  height: 100%;
+  width: 80px;
+  height: 1024px;
   margin: 0rem;
-  background-color: #e2f1c2;
-  justify-content: center;
+  background-color: #e7e1f3;
+  align-items: center;
 }
 
-.grid {
+.active_card {
+  width: 50px;
+  height: 50px;
+  border: 3px solid #5b3f9a;
+  border-radius: 100%;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-top: 1rem;
-  margin-bottom: 5rem;
+  margin-bottom: 40px;
 }
-
+.active_card:hover,
+.active_card:focus,
+.active_card:active {
+  background-color: #f8f5fd;
+  border: 3px;
+  border-radius: 100%;
+  border-style: solid;
+  border-color: #5b3f9a;
+}
 .card {
-  margin: 0.2rem;
-  flex-basis: 20%;
-  padding: 1rem;
-  width: 150px;
-  text-align: left;
-  color: inherit;
+  width: 50px;
+  height: 50px;
+  border: 3px solid #e7e1f3;
   text-decoration: none;
-  border: 2px solid green;
   border-radius: 10px;
   display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 40px;
 }
 
 .card:hover,
 .card:focus,
 .card:active {
-  color: #0070f3;
-  border-color: #0070f3;
-}
-.card h3 {
-  margin: 0 0 1rem 0;
-  font-size: 1rem;
+  background-color: #f8f5fd;
+  border: 3px;
+  border-radius: 100%;
+  border-style: solid;
+  border-color: #545459;
 }
 
 @media (max-width: 300px) {
