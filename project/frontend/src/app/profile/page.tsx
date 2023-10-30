@@ -1,4 +1,4 @@
-import Navbar from '../../../components/navbar';
+import Navbar from '../../../components/common/navbar/navbar';
 import Head from 'next/head';
 import styles from '../../../styles/Home.module.css';
 

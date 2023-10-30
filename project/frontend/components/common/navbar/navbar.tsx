@@ -1,5 +1,5 @@
 import styles from '../styles/Home.module.css';
-import Logo from './logo/logo';
+import Logo from '../logo/logo';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -15,7 +15,7 @@ const Navbar = () => {
             width={50}
             height={50}
           />
-          <h3>friend</h3>
+          {/* <h3>friend</h3> */}
         </Link>
         <Link href="/dm" className={styles.card}>
           <h3>dm</h3>
