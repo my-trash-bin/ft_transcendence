@@ -1,15 +1,30 @@
 @layer utilities {
-.border-background { @apply border-[#FAFAFA] dark:border-[#000000]; }
+  /* .border-background { @apply border-[#FAFAFA] dark:border-[#000000]; }
 .bg-background { @apply bg-[#FAFAFA] dark:bg-[#000000]; }
 .text-background { @apply text-[#FAFAFA] dark:text-[#000000]; }
-.caret-background { @apply caret-[#FAFAFA] dark:caret-[#000000]; }
-.border-text { @apply border-[#000000] dark:border-[#FFFFFF]; }
-.bg-text { @apply bg-[#000000] dark:bg-[#FFFFFF]; }
-.text-text { @apply text-[#000000] dark:text-[#FFFFFF]; }
-.caret-text { @apply caret-[#000000] dark:caret-[#FFFFFF]; }
-.border-primary { @apply border-[#BBFF88] dark:border-[#668844]; }
-.bg-primary { @apply bg-[#BBFF88] dark:bg-[#668844]; }
-.text-primary { @apply text-[#BBFF88] dark:text-[#668844]; }
-.caret-primary { @apply caret-[#BBFF88] dark:caret-[#668844]; }
-
+.caret-background { @apply caret-[#FAFAFA] dark:caret-[#000000]; } */
+  /* .border-text {
+    @apply border-[#000000] dark:border-[#FFFFFF];
+  }
+  .bg-text {
+    @apply bg-[#000000] dark:bg-[#FFFFFF];
+  }
+  .text-text {
+    @apply text-[#000000] dark:text-[#FFFFFF];
+  }
+  .caret-text {
+    @apply caret-[#000000] dark:caret-[#FFFFFF];
+  }
+  .border-primary {
+    @apply border-[#BBFF88] dark:border-[#668844];
+  }
+  .bg-primary {
+    @apply bg-[#BBFF88] dark:bg-[#668844];
+  }
+  .text-primary {
+    @apply text-[#BBFF88] dark:text-[#668844];
+  }
+  .caret-primary {
+    @apply caret-[#BBFF88] dark:caret-[#668844];
+  } */
 }

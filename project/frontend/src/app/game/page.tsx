@@ -1,5 +1,5 @@
-import Navbar from '../../../components/navbar';
 import Head from 'next/head';
+import Navbar from '../../../components/navbar';
 import styles from '../../../styles/Home.module.css';
 
 export default function gameHome() {
@@ -10,7 +10,6 @@ export default function gameHome() {
       </Head>
       <nav className={styles.layout}>
         <Navbar />
-        <div> This is game page </div>
       </nav>
     </div>
   );
