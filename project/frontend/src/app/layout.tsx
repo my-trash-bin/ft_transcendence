@@ -1,15 +1,11 @@
 import { ModeContextProvider } from '@-ft/mode-next';
-import { cookies } from 'next/headers';
 import React from 'react';
 
 import './tailwind.css';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      className={cookies().get('theme')?.value === 'dark' ? 'dark' : undefined}
-      suppressHydrationWarning
-    >
+    <html>
       <head>
         <title>ft_transcendence</title>
         <link rel="icon" href="/favicon.ico" />

@@ -1,0 +1,36 @@
+.dm-user {
+  width: 370px;
+  height: 100px;
+  position: relative;
+  border-bottom: solid 1px #f7f0ff;
+  padding-bottom: 3px;
+}
+
+.dm-user-image {
+  width: 55px;
+  height: 65px;
+  position: absolute;
+  left: 3%;
+  bottom: 16%;
+}
+
+.dm-user-name {
+  position: absolute;
+  left: 21%;
+  bottom: 50%;
+  font-size: 22px;
+}
+
+.dm-user-message {
+  position: absolute;
+  left: 21%;
+  bottom: 20%;
+  font-size: 14px;
+}
+
+.dm-user-date {
+  position: absolute;
+  font-size: 9px;
+  left: 85%;
+  bottom: 70%;
+}

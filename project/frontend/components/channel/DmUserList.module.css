@@ -1,0 +1,13 @@
+.dm-users {
+  display: flex;
+  flex-direction: column;
+  width: inherit;
+}
+
+.dm-users-alt {
+  width: 83px;
+  height: 23px;
+  font-size: 12px;
+  color: #979da2;
+  padding-bottom: 15px;
+}
