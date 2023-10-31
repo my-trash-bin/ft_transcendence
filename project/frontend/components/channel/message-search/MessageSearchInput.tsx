@@ -1,6 +1,6 @@
 import styles from './MessageSearchInput.module.css';
 
-export default function MessageSearchInput() {
+export function MessageSearchInput() {
   return (
     <div className={styles['message-search-input']}>
       <button className={styles['search-icon']}></button>

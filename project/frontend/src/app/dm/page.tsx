@@ -1,17 +1,18 @@
-import DmUserList from '../../../components/channel/DmUserList';
-import MessageSearch from '../../../components/channel/MessageSearch';
-import layout from './DmLayout.module.css';
+import { DmUserList } from '../../../components/channel/dm-user/DmUserList';
+import { MessageSearch } from '../../../components/channel/message-search/MessageSearch';
 
 export default function dmHome() {
   return (
     <>
-      <div className={layout.dm}>
-        {/* <nav className={styles.layout}>
+      {/* <nav className={styles.layout}>
           <Navbar />
         </nav> */}
+
+      <div className={`${'layout.dm-left'}`}>
         <MessageSearch />
         <DmUserList />
       </div>
+      <div className={`${'layout.dm-right'}`}></div>
     </>
   );
 }

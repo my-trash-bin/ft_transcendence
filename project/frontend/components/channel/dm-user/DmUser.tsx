@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import styles from './DmUser.module.css';
 
-export default function DmUser({
+export function DmUser({
   imageUri,
   username,
   messageShortcut,
