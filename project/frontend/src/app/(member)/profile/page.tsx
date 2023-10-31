@@ -1,5 +1,6 @@
 import Head from 'next/head';
-import Navbar from '../../../../components/navbar';
+
+import { NavBar } from '@/app/_internal/component/ui/layout/NavBar';
 import styles from '../../../styles/Home.module.css';
 
 export default function profileHome() {
@@ -9,7 +10,7 @@ export default function profileHome() {
         <title>profile-pong</title>
       </Head>
       <nav className={styles.layout}>
-        <Navbar />
+        <NavBar />
         <div> This is profile page </div>
       </nav>
     </div>
