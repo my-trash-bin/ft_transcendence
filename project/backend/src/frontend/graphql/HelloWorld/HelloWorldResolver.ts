@@ -11,10 +11,10 @@ import {
 import { AuthorService } from '../../../application/AuthorService';
 import { HelloWorldService } from '../../../application/HelloWorldService';
 import { PubSubService } from '../../../base/PubSubService';
-import { GraphQLAuthor } from '../Author/GraphQLAuthor';
-import { GraphQLHelloWorld } from './GraphQLHelloWorld';
+import { GraphqlAuthor } from '../Author/GraphqlAuthor';
+import { GraphqlHelloWorld } from './GraphqlHelloWorld';
 
-@Resolver((of: any) => GraphQLHelloWorld)
+@Resolver((of: any) => GraphqlHelloWorld)
 export class HelloWorldResolver {
   constructor(
     private readonly helloWorldService: HelloWorldService,
@@ -22,16 +22,16 @@ export class HelloWorldResolver {
     private readonly pubSubService: PubSubService,
   ) {}
 
-  @Query((returns) => GraphQLHelloWorld)
+  @Query((returns) => GraphqlHelloWorld)
   async helloWorld(@Args('id', { type: () => ID }) id: string) {
     this.pubSubService.pub('helloworld', id);
     return this.helloWorldService.findOneById(id);
   }
 
-  @ResolveField((returns) => GraphQLAuthor, { nullable: true })
+  @ResolveField((returns) => GraphqlAuthor, { nullable: true })
   async author(
-    @Parent() helloWorld: GraphQLHelloWorld,
-  ): Promise<GraphQLAuthor | null> {
+    @Parent() helloWorld: GraphqlHelloWorld,
+  ): Promise<GraphqlAuthor | null> {
     const id = helloWorld.authorId;
     if (!id) return null;
     return this.authorService.findOneById(id);

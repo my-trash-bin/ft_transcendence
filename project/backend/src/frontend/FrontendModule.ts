@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { GraphQLModule } from './graphql/GraphQLModule';
+import { GraphqlModule } from './graphql/GraphqlModule';
 import { V1Module } from './v1/V1Module';
 
 @Module({
-  imports: [V1Module, GraphQLModule],
+  imports: [V1Module, GraphqlModule],
 })
 export class FrontendModule {}

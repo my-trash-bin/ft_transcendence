@@ -6,6 +6,7 @@ import { Module } from '@nestjs/common';
 import { GraphQLModule as NestGraphQLModule } from '@nestjs/graphql';
 import { AuthorModule } from './Author/AuthorModule';
 import { HelloWorldModule } from './HelloWorld/HelloWorldModule';
+import { UserModule } from './User/UserModule';
 
 @Module({
   imports: [
@@ -32,6 +33,8 @@ import { HelloWorldModule } from './HelloWorld/HelloWorldModule';
 
     AuthorModule,
     HelloWorldModule,
+
+    UserModule,
   ],
 })
-export class GraphQLModule {}
+export class GraphqlModule {}

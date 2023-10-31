@@ -7,6 +7,5 @@ export interface UserView {
   nickname: string;
   profileImageUrl: string | undefined;
   joinedAt: Date;
-  isLeabed: boolean;
   leavedAt: Date | undefined;
 }

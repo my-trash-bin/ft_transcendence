@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { GraphQLAuthor } from '../frontend/graphql/Author/GraphQLAuthor';
+import { GraphqlAuthor } from '../frontend/graphql/Author/GraphqlAuthor';
 
 @Injectable()
 export class AuthorService {
-  findOneById(id: string): GraphQLAuthor | null {
+  findOneById(id: string): GraphqlAuthor | null {
     return id === 'jmaing' ? { id, name: 'Juyeong Maing' } : null;
   }
 }
