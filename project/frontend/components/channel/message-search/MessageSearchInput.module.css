@@ -26,7 +26,7 @@
 }
 
 .search-icon {
-  background-image: url(../../public/icon/search.svg);
+  background-image: url(/icon/search.svg);
   background-size: contain;
   background-repeat: no-repeat;
   position: absolute;
@@ -40,7 +40,7 @@
 }
 
 .cross-icon {
-  background-image: url(../../public/icon/cross-circle.svg);
+  background-image: url(/icon/cross-circle.svg);
   background-size: contain;
   background-repeat: no-repeat;
   position: absolute;
