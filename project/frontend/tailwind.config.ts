@@ -21,7 +21,7 @@ export default <Config>{
       sm: '12px',
       md: '14px',
       lg: '16px',
-      h4: '18px',
+      xl: '18px',
       h3: '20px',
       h2: '22px',
       h1: '24px',
@@ -33,6 +33,7 @@ export default <Config>{
       md: '12px',
       lg: '16px',
       xl: '20px',
+      '2xl': '24px',
     },
     colors: {},
     dropShadow: {

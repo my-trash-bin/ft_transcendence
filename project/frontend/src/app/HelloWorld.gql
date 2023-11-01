@@ -1,5 +1,0 @@
-query HelloWorld($authorId: ID!) {
-  author(id: $authorId) {
-    id
-  }
-}
