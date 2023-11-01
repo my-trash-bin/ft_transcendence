@@ -1,4 +1,4 @@
-import { IUserService } from './interface/User/IUserService';
+import { IUserService } from './application/interface/User/IUserService';
 
 export interface Exports {
   userService: IUserService;

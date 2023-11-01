@@ -1,8 +1,8 @@
-import { Container, asClass } from '../util/di/Container';
-import { Merge } from '../util/type/object/Merge';
 import { Exports } from './Exports';
 import { Imports } from './Imports';
-import { UserService } from './implementation/User/UserService';
+import { UserService } from './application/implementation/User/UserService';
+import { Container, asClass } from './util/di/Container';
+import { Merge } from './util/type/object/Merge';
 
 export function register<T extends Imports>(
   container: Container<T>,

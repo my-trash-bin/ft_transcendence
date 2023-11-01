@@ -1,4 +1,4 @@
-import { InvalidIdException } from '../../exception/InvalidIdException';
+import { InvalidIdException } from '../../../exception/InvalidIdException';
 import { UserId, UserView } from './view/UserView';
 
 export interface IUserService {
