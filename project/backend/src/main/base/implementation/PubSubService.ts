@@ -1,6 +1,8 @@
 import { PubSub } from 'graphql-subscriptions';
 
-export class PubSubService {
+import { IPubSubService } from '../interface/IPubSubService';
+
+export class PubSubService implements IPubSubService {
   private readonly pubSub: PubSub;
 
   constructor() {

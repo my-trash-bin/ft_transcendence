@@ -6,9 +6,10 @@ import {
   Query,
   Resolver,
 } from '@nestjs/graphql';
-import { idOf } from '../../../../main/util/id/idOf';
-import { Context } from '../../../Context';
-import { MiddlewareSymbol } from '../../../Middleware';
+
+import { idOf } from '../../../main/util/id/idOf';
+import { Context } from '../../Context';
+import { MiddlewareSymbol } from '../../Middleware';
 import { GraphqlUser } from './GraphqlUser';
 import { mapUserViewToGraphqlUser } from './mapUserViewToGraphqlUser';
 import { userLoader } from './userLoader';
