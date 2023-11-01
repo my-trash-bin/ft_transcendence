@@ -2,13 +2,12 @@ import { DmUserList } from '../../../components/channel/dm-user/DmUserList';
 import { MessageSearch } from '../../../components/channel/message-search/MessageSearch';
 import { UserInfo } from '../../../components/channel/message/UserInfo';
 
-export default function dmHome() {
+export default function FriendHome() {
   return (
     <>
       {/* <nav className={styles.layout}>
-          <Navbar />
-        </nav> */}
-
+        <Navbar />
+      </nav> */}
       <div className="flex flex-row">
         <div className="w-5/12 h-full">
           <MessageSearch />
