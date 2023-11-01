@@ -1,11 +1,11 @@
 import { v4 } from 'uuid';
-import { invalidId } from '../../../../nest/base/common/invalidId';
-import { isUniqueConstraintError } from '../../../../nest/base/common/isUniqueConstraintError';
 import { Imports } from '../../../Imports';
 import { Repository } from '../../../base/Repository';
 import { InvalidIdException } from '../../../exception/InvalidIdException';
+import { invalidId } from '../../../exception/invalidId';
 import { Resolver } from '../../../util/di/Container';
 import { getId } from '../../../util/id/getId';
+import { isUniqueConstraintError } from '../../../util/isUniqueConstraintError';
 import { sortAs } from '../../../util/sortAs';
 import { IUserService } from '../../interface/User/IUserService';
 import { DuplicateNicknameException } from '../../interface/User/exception/DuplicateNicknameException';

@@ -30,10 +30,6 @@ type Query {
   user(id: ID!): User!
 }
 
-type Subscription {
-  commentAdded: String!
-}
-
 type User {
   id: ID!
   joinedAt: DateTime!

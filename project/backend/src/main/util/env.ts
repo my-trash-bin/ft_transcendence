@@ -3,5 +3,5 @@ export function env(name: string): string {
   if (result === undefined) {
     throw new Error(`Missing environment variable: ${name}`);
   }
-  return result!;
+  return result;
 }
