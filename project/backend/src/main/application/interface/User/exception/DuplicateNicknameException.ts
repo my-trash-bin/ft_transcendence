@@ -1,4 +1,4 @@
-import { Exception } from '../../../exception/Exception';
+import { Exception } from '../../../../exception/Exception';
 
 export class DuplicateNicknameException extends Exception {
   constructor(nickname: string) {

@@ -2,8 +2,8 @@ import 'dotenv/config';
 import 'reflect-metadata';
 
 import { NestFactory } from '@nestjs/core';
+import { env } from './main/util/env';
 import { FrontendModule } from './nest/frontend/FrontendModule';
-import { env } from './util/env';
 
 async function bootstrap() {
   const app = await NestFactory.create(FrontendModule);

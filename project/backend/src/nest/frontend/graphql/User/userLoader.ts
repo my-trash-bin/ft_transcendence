@@ -1,9 +1,9 @@
 import DataLoader = require('dataloader');
-import { UserService } from '../../../../main/implementation/User/UserService';
+import { UserService } from '../../../../main/application/implementation/User/UserService';
 import {
   UserId,
   UserView,
-} from '../../../../main/interface/User/view/UserView';
+} from '../../../../main/application/interface/User/view/UserView';
 
 export function userLoader(
   context: any,
