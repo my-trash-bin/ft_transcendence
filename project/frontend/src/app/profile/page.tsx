@@ -1,17 +1,11 @@
 import Navbar from '../../../components/common/navbar/navbar';
-import Head from 'next/head';
 import styles from '../../../styles/Home.module.css';
 
-export default function profileHome() {
+export default function FriendHome() {
   return (
-    <div>
-      <Head>
-        <title>profile-pong</title>
-      </Head>
-      <nav className={styles.layout}>
-        <Navbar />
-        <div> This is profile page </div>
-      </nav>
-    </div>
+    <nav className={styles.layout}>
+      <Navbar />
+      <div> This is profile page </div>
+    </nav>
   );
 }
