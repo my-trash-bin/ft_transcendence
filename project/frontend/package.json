@@ -22,6 +22,7 @@
     "autoprefixer": "^10.4.16",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
+    "graphql-ws": "^5.14.2",
     "next": "^14.0.0",
     "postcss": "^8.4.31",
     "react": "^18.2.0",
