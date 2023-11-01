@@ -1,4 +1,4 @@
-import { Id } from './Id';
+import { Id } from '../../interface/Id';
 
 export function idOf<T extends string>(id: string): Id<T> {
   return { value: id } as Id<T>;

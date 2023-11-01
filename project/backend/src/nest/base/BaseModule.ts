@@ -1,9 +1,8 @@
 import { Module } from '@nestjs/common';
-import { PrismaService } from './PrismaService';
-import { PubSubService } from './PubSubService';
+import { PubSubService } from '../../main/base/PubSubService';
 
 @Module({
-  providers: [PubSubService, PrismaService],
-  exports: [PubSubService, PrismaService],
+  providers: [PubSubService],
+  exports: [PubSubService],
 })
 export class BaseModule {}

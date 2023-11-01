@@ -1,5 +1,5 @@
 import { ObjectType, createUnionType } from '@nestjs/graphql';
-import { Exception } from './Exception';
+import { Exception } from '../../../main/exception/Exception';
 import { ExceptionHandler } from './ExceptionHandler';
 import { GraphqlIException } from './GraphqlIException';
 

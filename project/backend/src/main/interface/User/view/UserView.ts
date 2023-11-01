@@ -1,4 +1,4 @@
-import { Id } from '../../util/id/Id';
+import { Id } from '../../Id';
 
 export type UserId = Id<'user'>;
 

@@ -1,6 +1,6 @@
+import { UserView } from '../../interface/User/view/UserView';
 import { idOf } from '../../util/id/idOf';
 import { PrismaUser } from './PrismaUser';
-import { UserView } from './UserView';
 
 export function mapPrismaUserToUserView({
   id,

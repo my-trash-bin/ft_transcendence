@@ -1,4 +1,4 @@
-import { UserView } from '../../../application/basic/User/UserView';
+import { UserView } from '../../../../main/interface/User/view/UserView';
 import { GraphqlUser } from './GraphqlUser';
 
 export function mapUserViewToGraphqlUser(userView: UserView): GraphqlUser {

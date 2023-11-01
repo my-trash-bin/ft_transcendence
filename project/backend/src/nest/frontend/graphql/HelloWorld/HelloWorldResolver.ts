@@ -8,9 +8,9 @@ import {
   Resolver,
   Subscription,
 } from '@nestjs/graphql';
+import { PubSubService } from '../../../../main/base/PubSubService';
 import { AuthorService } from '../../../application/AuthorService';
 import { HelloWorldService } from '../../../application/HelloWorldService';
-import { PubSubService } from '../../../base/PubSubService';
 import { GraphqlAuthor } from '../Author/GraphqlAuthor';
 import { GraphqlHelloWorld } from './GraphqlHelloWorld';
 

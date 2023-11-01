@@ -1,25 +1,29 @@
-import { Injectable } from '@nestjs/common';
 import { v4 } from 'uuid';
-import { PrismaService } from '../../../base/PrismaService';
-import { InvalidIdException } from '../../../base/common/InvalidIdException';
-import { invalidId } from '../../../base/common/invalidId';
-import { isUniqueConstraintError } from '../../../base/common/isUniqueConstraintError';
+import { invalidId } from '../../../nest/base/common/invalidId';
+import { isUniqueConstraintError } from '../../../nest/base/common/isUniqueConstraintError';
+import { Resolver } from '../../../util/di/Container';
+import { Imports } from '../../Imports';
+import { Repository } from '../../base/Repository';
+import { InvalidIdException } from '../../exception/InvalidIdException';
+import { IUserService } from '../../interface/User/IUserService';
+import { DuplicateNicknameException } from '../../interface/User/exception/DuplicateNicknameException';
+import { UserId, UserView } from '../../interface/User/view/UserView';
 import { getId } from '../../util/id/getId';
 import { sortAs } from '../../util/sortAs';
-import { UserId, UserView } from './UserView';
-import { DuplicateNicknameException } from './exception/DuplicateNicknameException';
 import { mapPrismaUserToUserView } from './mapPrismaUserToUserView';
 import { prismaUserSelect } from './prismaUserSelect';
 
-@Injectable()
-export class UserService {
-  constructor(private readonly prismaService: PrismaService) {}
+export class UserService implements IUserService {
+  private readonly repository: Repository;
+  constructor(resolve: Resolver<Imports>) {
+    this.repository = resolve('repository');
+  }
 
   async getMany(
     ids: readonly UserId[],
   ): Promise<(UserView | InvalidIdException)[]> {
     const stringIds = ids.map(({ value }) => value);
-    const prismaUsers = await this.prismaService.user.findMany({
+    const prismaUsers = await this.repository.client.user.findMany({
       where: { id: { in: stringIds } },
     });
     return sortAs(
@@ -33,7 +37,7 @@ export class UserService {
   async create(nickname: string): Promise<UserView> {
     try {
       const id = v4();
-      const prismaUser = await this.prismaService.user.create({
+      const prismaUser = await this.repository.client.user.create({
         data: { id, nickname },
         select: prismaUserSelect,
       });
@@ -48,7 +52,7 @@ export class UserService {
 
   async updateNickname(id: UserId, nickname: string): Promise<UserView> {
     try {
-      const prismaUser = await this.prismaService.user.update({
+      const prismaUser = await this.repository.client.user.update({
         where: { id: id.value },
         data: { nickname },
         select: prismaUserSelect,
@@ -66,7 +70,7 @@ export class UserService {
     id: UserId,
     profileImageUrl: string | null,
   ): Promise<UserView> {
-    const prismaUser = await this.prismaService.user.update({
+    const prismaUser = await this.repository.client.user.update({
       where: { id: id.value },
       data: { profileImageUrl },
       select: prismaUserSelect,
@@ -75,7 +79,7 @@ export class UserService {
   }
 
   async delete(id: UserId): Promise<void> {
-    await this.prismaService.user.update({
+    await this.repository.client.user.update({
       where: { id: id.value },
       data: { isLeaved: true, leavedAt: new Date(), nickname: v4() },
       select: { id: true },
