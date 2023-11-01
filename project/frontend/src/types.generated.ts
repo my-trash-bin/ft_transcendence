@@ -15,15 +15,15 @@ export type Scalars = {
   Float: { input: number; output: number; }
 };
 
-export type GraphQlAuthor = {
-  __typename?: 'GraphQLAuthor';
+export type Author = {
+  __typename?: 'Author';
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
 };
 
 export type HelloWorld = {
   __typename?: 'HelloWorld';
-  author: GraphQlAuthor;
+  author?: Maybe<Author>;
   id: Scalars['ID']['output'];
   message?: Maybe<Scalars['String']['output']>;
 };
@@ -42,4 +42,9 @@ export type QueryAuthorArgs = {
 
 export type QueryHelloWorldArgs = {
   id: Scalars['ID']['input'];
+};
+
+export type Subscription = {
+  __typename?: 'Subscription';
+  commentAdded: Scalars['String']['output'];
 };
