@@ -1,13 +1,5 @@
-import Head from 'next/head';
-import Navbar from '../../components/navbar';
+import FriendHome from './friend/page';
 
 export default function Page() {
-  return (
-    <>
-      <Head>
-        <title>happy next</title>
-      </Head>
-      <Navbar />
-    </>
-  );
+  return <FriendHome />;
 }
