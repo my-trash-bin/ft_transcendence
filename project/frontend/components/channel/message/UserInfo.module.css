@@ -1,0 +1,53 @@
+.user-info {
+  height: 15%;
+  width: 100%;
+  border-bottom: 1px solid #e7e1f3;
+  position: relative;
+}
+
+.user-info-image {
+  width: 50px;
+  height: 63px;
+  position: absolute;
+  left: 5%;
+  top: 15%;
+}
+
+.user-info-username {
+  position: absolute;
+  top: 10%;
+  left: 17%;
+  bottom: 50%;
+  font-size: 25px;
+}
+
+.user-info-active {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  top: 60%;
+  left: 17%;
+  transform: translateY(50%);
+}
+
+.user-info-active-dis {
+  position: absolute;
+  left: 20%;
+  top: 60%;
+  font-size: 12px;
+}
+
+.active {
+  background-color: #2fd236;
+}
+
+.inactive {
+  background-color: #8a8a8e;
+}
+
+.user-info-setting {
+  position: absolute;
+  right: 5%;
+  top: 30%;
+}

@@ -1,8 +1,9 @@
 .dm-users {
   display: flex;
   flex-direction: column;
-  width: 430px;
+  width: 100%;
   height: 75vh;
+  padding-left: 5%;
 }
 
 .dm-users-element {
