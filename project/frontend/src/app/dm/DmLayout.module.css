@@ -1,8 +1,0 @@
-.layout.dm-left {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-}
-
-.layout.dm-right {
-}
