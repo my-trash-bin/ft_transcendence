@@ -1,43 +1,40 @@
+'use client';
+
 import { Logo } from '@/app/_internal/component/ui/layout/Logo';
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import styles from './navbar.module.css';
+
+interface CreateIconProps {
+  type: string;
+}
+const CreateIcon = (props: CreateIconProps) => {
+  const path = usePathname();
+  const isActive = path === `/${props.type}`;
+  const className = isActive ? styles.active_card : styles.card;
+  return (
+    <Link href={`/${props.type}`} className={className}>
+      <Image
+        className={styles.icon}
+        src={`/icon/${props.type}.svg`}
+        alt={`${props.type}-icon`}
+        width={30}
+        height={30}
+      />
+    </Link>
+  );
+};
 
 const Navbar = () => {
   return (
     <nav className={styles.navbar}>
       <Logo />
-      <Link href="/friend" className={styles.active_card}>
-        <Image
-          className={styles.icon}
-          src="/icon/friend.svg"
-          alt="friend-icon"
-          width={30}
-          height={30}
-        />
-      </Link>
-      <Link href="/dm" className={styles.card}>
-        <Image src="/icon/dm.svg" alt="chat-icon" width={30} height={30} />
-      </Link>
-      <Link href="/channel" className={styles.card}>
-        <Image
-          src="/icon/channel.svg"
-          alt="channel-icon"
-          width={30}
-          height={30}
-        />
-      </Link>
-      <Link href="/game" className={styles.card}>
-        <Image src="/icon/game.svg" alt="game-icon" width={30} height={30} />
-      </Link>
-      <Link href="/profile" className={styles.card}>
-        <Image
-          src="/icon/profile.svg"
-          alt="profile-icon"
-          width={30}
-          height={30}
-        />
-      </Link>
+      <CreateIcon type="friend" />
+      <CreateIcon type="dm" />
+      <CreateIcon type="channel" />
+      <CreateIcon type="game" />
+      <CreateIcon type="profile" />
     </nav>
   );
 };
