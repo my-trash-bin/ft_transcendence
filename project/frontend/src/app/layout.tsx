@@ -1,9 +1,12 @@
-import { ModeContextProvider } from '@-ft/mode-next';
-import { cookies } from 'next/headers';
-
 import './style.css';
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+import { ModeContextProvider } from '@-ft/mode-next';
+import { cookies } from 'next/headers';
+import { PropsWithChildren } from 'react';
+
+import { ApolloClientProvider } from './_internal/provider/ApolloClientProvider';
+
+export default function Layout({ children }: PropsWithChildren) {
   return (
     <html
       className={cookies().get('theme')?.value === 'dark' ? 'dark' : undefined}
@@ -18,7 +21,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body className="bg-background text-text">
         <ModeContextProvider variableName="npm:@-ft/mode-codegen">
-          {children}
+          <ApolloClientProvider>{children}</ApolloClientProvider>
         </ModeContextProvider>
       </body>
     </html>
