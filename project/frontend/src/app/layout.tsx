@@ -1,4 +1,5 @@
 import '../../styles/global.css';
+import './tailwind.css';
 
 export const metadata = {
   title: 'Next.js',
@@ -12,6 +13,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <title>ft_transcendence</title>
+        <link rel="icon" href="/favicon.ico" />
+        <meta content="width=device-width, initial-scale=1" name="viewport" />
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+        <script src="/script/mode.js" />
+      </head>
       <body>{children}</body>
     </html>
   );
