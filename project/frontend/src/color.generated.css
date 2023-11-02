@@ -1,4 +1,4 @@
-@layer utilities {
+/* @layer utilities {
 .border-background { @apply border-[#FAFAFA] dark:border-[#000000]; }
 .bg-background { @apply bg-[#FAFAFA] dark:bg-[#000000]; }
 .text-background { @apply text-[#FAFAFA] dark:text-[#000000]; }
@@ -12,4 +12,4 @@
 .text-primary { @apply text-[#BBFF88] dark:text-[#668844]; }
 .caret-primary { @apply caret-[#BBFF88] dark:caret-[#668844]; }
 
-}
+} */
