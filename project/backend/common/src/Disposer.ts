@@ -1,5 +1,3 @@
-import { AssertionException } from './exception/AssertionException';
-
 export type Disposable = (() => void) | null | undefined | Disposable[];
 
 function dispose(...disposables: Disposable[]) {
@@ -13,8 +11,7 @@ export class Disposer {
   private running = false;
 
   public dispose(): void {
-    if (this.running)
-      throw new AssertionException('Disposer::dispose() called recursively');
+    if (this.running) throw new Error('Disposer::dispose() called recursively');
     this.running = true;
     dispose(this.items);
     this.items = [];

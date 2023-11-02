@@ -1,4 +1,5 @@
-import { Merge } from '../type/object/Merge';
+import { Merge } from '@ft_transcendence/common/type/object/Merge';
+
 import { CircularDependencyException } from './CircularDependencyException';
 import { InvalidDependencyException } from './InvalidDependencyException';
 import { InvalidOverrideException } from './InvalidOverrideException';
@@ -100,12 +101,6 @@ type RegistrationMap<T extends {}> = {
 };
 type InitializeMap<T extends {}> = Partial<Record<keyof T, boolean>>;
 
-function isTransient(type: RegistrationInternalType) {
-  return type === 'transient-class' || type === 'transient-function';
-}
-function isScoped(type: RegistrationInternalType) {
-  return type === 'scoped-class' || type === 'scoped-function';
-}
 function isSingleton(type: RegistrationInternalType) {
   return type === 'singleton-class' || type === 'singleton-function';
 }

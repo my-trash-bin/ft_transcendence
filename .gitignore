@@ -6,4 +6,5 @@ package-lock.json
 Cargo.lock
 target
 build
+compile
 dist
