@@ -4,8 +4,6 @@ import { ModeContextProvider } from '@-ft/mode-next';
 import { cookies } from 'next/headers';
 import { PropsWithChildren } from 'react';
 
-import { ApolloClientProvider } from './_internal/provider/ApolloClientProvider';
-
 export default function Layout({ children }: PropsWithChildren) {
   return (
     <html
@@ -21,7 +19,7 @@ export default function Layout({ children }: PropsWithChildren) {
       </head>
       <body className="bg-background text-text">
         <ModeContextProvider variableName="npm:@-ft/mode-codegen">
-          <ApolloClientProvider>{children}</ApolloClientProvider>
+          {children}
         </ModeContextProvider>
       </body>
     </html>
