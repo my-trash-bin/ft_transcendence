@@ -26,6 +26,11 @@ if (
 )
   throw new Error('Missing environment variables! check source code');
 
+async function getAccessToken(): Promise<string | undefined> {
+  // TODO: return accses token if logged in
+  return undefined;
+}
+
 export function createApolloClient(): ApolloClient<NormalizedCacheObject> {
   const errorLink = onError(({ graphQLErrors, networkError }) => {
     if (graphQLErrors)
