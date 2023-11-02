@@ -1,4 +1,4 @@
 export interface Id<T extends string> {
-  type: T;
+  'No value here, Just for type check.': T;
   value: string;
 }
