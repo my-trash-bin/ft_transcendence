@@ -5,7 +5,7 @@ export default function Page() {
     <>
       <h1>Here is starting page</h1>
       <LinkButton text="go to friend" href="/friend" />
-      <LinkButton text="go to login page" href="/login" />
+      <LinkButton text="go to login page" href="/sign-in" />
     </>
   );
 }
