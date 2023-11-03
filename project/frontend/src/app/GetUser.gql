@@ -1,8 +1,0 @@
-query GetUser($id: ID!) {
-  user(id: $id) {
-    __typename
-    id
-    nickname
-    joinedAt
-  }
-}

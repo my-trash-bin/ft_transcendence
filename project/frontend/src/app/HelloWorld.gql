@@ -1,0 +1,11 @@
+query HelloWorld {
+  helloWorld {
+    world
+  }
+  helloChat {
+    chat
+  }
+  helloGame {
+    game
+  }
+}
