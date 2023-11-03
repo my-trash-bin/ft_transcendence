@@ -1,3 +1,5 @@
+import 'dotenv/config';
+
 import { env } from '@ft_transcendence/common/env';
 import { NestFactory } from '@nestjs/core';
 

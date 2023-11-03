@@ -2,6 +2,7 @@
   "name": "@ft_transcendence/common",
   "private": "true",
   "scripts": {
+    "test": "vitest run",
     "build": "rimraf dist && tsc -p tsconfig.build.json && package-json-minifier"
   },
   "license": "UNLICENSED",
@@ -16,6 +17,7 @@
   "devDependencies": {
     "package.json-minifier": "^0.0.4",
     "rimraf": "^5.0.1",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "vitest": "^0.34.6"
   }
 }

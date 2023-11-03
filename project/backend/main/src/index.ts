@@ -1,8 +1,8 @@
 import 'dotenv/config';
 import 'reflect-metadata';
 
+import { Container } from '@ft_transcendence/common/di/Container';
 import { env } from '@ft_transcendence/common/env';
-import { Container } from '@ft_transcendence/di/Container';
 import { start } from './api/start';
 
 (async () => {
