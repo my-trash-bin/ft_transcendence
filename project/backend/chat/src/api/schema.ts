@@ -3,7 +3,7 @@ import { GraphQLError } from 'graphql';
 import { MiddlewareFn } from 'type-graphql';
 
 import { Context } from './Context';
-import { HelloWorldResolver } from './HelloWorld/HelloWorldResolver';
+import { HelloChatResolver } from './HelloChat/HelloChatResolver';
 import { isTypegraphqlError } from './isTypegraphqlError';
 
 const errorInterceptor: MiddlewareFn<Context> = async ({ context }, next) => {
@@ -24,6 +24,6 @@ const errorInterceptor: MiddlewareFn<Context> = async ({ context }, next) => {
 
 export const schema = buildFederatedSchema({
   globalMiddlewares: [errorInterceptor],
-  resolvers: [HelloWorldResolver],
+  resolvers: [HelloChatResolver],
   validate: true,
 });

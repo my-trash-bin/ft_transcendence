@@ -5,7 +5,7 @@ import { HelloWorld } from './HelloWorld';
 @Resolver((of) => HelloWorld)
 export class HelloWorldResolver {
   @Query((returns) => HelloWorld)
-  async hello(): Promise<HelloWorld> {
+  async helloWorld(): Promise<HelloWorld> {
     return { world: 'Hello world!' };
   }
 }
