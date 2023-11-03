@@ -7,11 +7,11 @@
 }
 
 .dm-user-image {
-  width: 55px;
-  height: 65px;
+  width: 7%;
+  height: 7%;
   position: absolute;
-  left: 3%;
-  bottom: 16%;
+  left: 5%;
+  bottom: 70%;
 }
 
 .dm-user-name {

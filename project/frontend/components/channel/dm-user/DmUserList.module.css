@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 75vh;
+  height: 80%;
   padding-left: 5%;
 }
 
@@ -16,10 +16,10 @@
 }
 
 .dm-users-alt {
-  width: 83px;
-  height: 5vh;
-  font-size: 12px;
+  width: 25%;
+  height: 3%;
+  font-size: 0.7rem;
   color: #979da2;
-  margin-top: 9px;
-  margin-bottom: 12px;
+  margin-top: 1%;
+  margin-bottom: 2%;
 }

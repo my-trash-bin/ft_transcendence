@@ -53,7 +53,7 @@ const dummyMessage = [
   },
   {
     key: '8',
-    imageUri: '/avatar/avatar-big.svg',
+    imageUri: '/avatar/avatar-black.svg',
     username: 'user3',
     messageShortcut: 'hello2',
     date: new Date(),

@@ -1,7 +1,7 @@
 .message-search-input {
   position: relative;
-  width: 370px;
-  height: 40px;
+  width: 60%;
+  height: 28%;
   border: solid;
   border-color: #545459;
   border-radius: 10px;
@@ -9,8 +9,8 @@
 
 .message-search-input input {
   position: absolute;
-  width: 280px;
-  height: 25px;
+  width: 75%;
+  height: 75%;
   top: 50%;
   transform: translateY(-47%);
   left: 13%;

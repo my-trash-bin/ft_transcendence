@@ -15,7 +15,13 @@ export function UserInfo({
   return (
     <div className={`${styles['user-info']}`}>
       <div className={`${styles['user-info-image']}`}>
-        <Image alt="userImage" src={imageUri} width={45} height={62} />
+        <Image
+          alt="userImage"
+          src={imageUri}
+          width={45}
+          height={62}
+          layout="relative"
+        />
       </div>
       <p className={`${styles['user-info-username']}`}>{username}</p>
       <div
@@ -30,6 +36,7 @@ export function UserInfo({
           src={'/icon/message-setting.svg'}
           width={35}
           height={50}
+          layout="relative"
         ></Image>
       </button>
     </div>

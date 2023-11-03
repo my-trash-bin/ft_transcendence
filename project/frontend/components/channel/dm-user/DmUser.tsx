@@ -21,6 +21,7 @@ export function DmUser({
           src={imageUri}
           width="51"
           height="60"
+          layout="relative"
         />
       </div>
       <p className={`${styles['dm-user-name']}`}>{username}</p>
