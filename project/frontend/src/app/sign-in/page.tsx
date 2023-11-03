@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import ChooseAvatar from '../../../components/sign-in/chooseAvatar';
 import ChooseNickname from '../../../components/sign-in/chooseNickname';
+import Avatar from '../../../components/sign-in/avatar';
 
 const avatars: string[] = [
   'avatar-blue.svg',
@@ -13,36 +14,33 @@ const avatars: string[] = [
 
 export default function SignIn() {
   const [nickname, setNickname] = useState<string>('');
-  const [avatar, setAvatar] = useState<string | null>(null);
+  const [avatar, setAvatar] = useState<string>('');
 
   const handleNicknameSubmit = (newNickname: string) => {
     setNickname(newNickname);
   };
 
-  const handleAvatarSelect = (avatar: string) => {
-    setAvatar(avatar);
+  const handleChooseClick = (selectedAvatar: string) => {
+    setAvatar(selectedAvatar);
   };
 
-  const handleChooseClick = () => {
-    // Handle the logic when the "Choose" button is clicked
-    // You can, for example, proceed to the next step or perform other actions.
-  };
+  const getNickname = (
+    <ChooseNickname onNicknameSubmit={handleNicknameSubmit} />
+  );
+
+  const getAvatar =
+    avatar === '' ? (
+      <ChooseAvatar avatars={avatars} onChooseClick={handleChooseClick} />
+    ) : (
+      <div>
+        {nickname}
+        <Avatar name={avatar} isSelected={true} />
+      </div>
+    );
 
   return (
     <div className="min-h-screen flex items-center justify-center">
-      {nickname === '' ? (
-        <ChooseNickname onNicknameSubmit={handleNicknameSubmit} />
-      ) : (
-        <>
-          <div>{`Nickname: ${nickname}`}</div>
-          <ChooseAvatar
-            avatars={avatars}
-            selectedAvatar={avatar}
-            onAvatarSelect={handleAvatarSelect}
-            onChooseClick={handleChooseClick} // Pass the onChooseClick function
-          />
-        </>
-      )}
+      {nickname === '' ? getNickname : getAvatar}
     </div>
   );
 }
