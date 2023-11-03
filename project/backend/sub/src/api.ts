@@ -8,14 +8,26 @@ import {
 import { ApolloServerPluginLandingPageDisabled } from '@apollo/server/plugin/disabled';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
+import { buildSubgraphSchema } from '@apollo/subgraph';
+import {
+  printSchemaWithDirectives,
+  type IResolvers,
+} from '@graphql-tools/utils';
 import cors from 'cors';
 import express, { json } from 'express';
+import gql from 'graphql-tag';
 import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.mjs';
 import { SubscribeMessage } from 'graphql-ws';
 import { Context } from 'graphql-ws/lib/server';
 import { useServer } from 'graphql-ws/lib/use/ws';
 import { ExecutionArgs } from 'graphql/execution/execute';
 import { GraphQLSchema } from 'graphql/type/schema';
+import deepMerge from 'lodash.merge';
+import {
+  buildSchema,
+  createResolversMap,
+  type BuildSchemaOptions,
+} from 'type-graphql';
 import { WebSocketServer } from 'ws';
 
 export async function start<TContext extends BaseContext>(
@@ -75,4 +87,21 @@ export async function start<TContext extends BaseContext>(
   return async () => {
     await Promise.all([httpServer.close(), server.stop()]);
   };
+}
+
+export async function buildFederatedSchema(
+  options: Omit<BuildSchemaOptions, 'skipCheck'>,
+  referenceResolvers?: IResolvers,
+) {
+  const schema = await buildSchema({
+    ...options,
+    skipCheck: true,
+  });
+
+  const federatedSchema = buildSubgraphSchema({
+    typeDefs: gql(printSchemaWithDirectives(schema)),
+    resolvers: deepMerge(createResolversMap(schema) as any, referenceResolvers),
+  });
+
+  return federatedSchema;
 }
