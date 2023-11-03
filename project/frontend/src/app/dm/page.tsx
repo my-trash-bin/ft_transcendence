@@ -6,7 +6,7 @@ import styles from '../../../styles/Home.module.css';
 
 export default function DmPage() {
   return (
-    <div className="flex flex-row overflow-scroll">
+    <div className="flex flex-row h-full">
       <nav className={styles.layout}>
         <Navbar />
       </nav>
@@ -15,7 +15,7 @@ export default function DmPage() {
           <MessageSearch />
           <DmUserList />
         </div>
-        <div className="w-7/12 h-full border-l  border-color6 overflow-scroll">
+        <div className="w-7/12 h-full border-l  border-color6">
           <MessageBox />
         </div>
       </div>
