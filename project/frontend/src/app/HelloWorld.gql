@@ -1,5 +1,11 @@
-query HelloWorld($authorId: ID!) {
-  author(id: $authorId) {
-    id
+query HelloWorld {
+  helloWorld {
+    world
+  }
+  helloChat {
+    chat
+  }
+  helloGame {
+    game
   }
 }
