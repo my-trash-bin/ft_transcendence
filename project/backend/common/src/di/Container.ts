@@ -1,4 +1,4 @@
-import { Merge } from '@ft_transcendence/common/type/object/Merge';
+import { Merge } from '../type/object/Merge';
 
 import { CircularDependencyException } from './CircularDependencyException';
 import { InvalidDependencyException } from './InvalidDependencyException';
