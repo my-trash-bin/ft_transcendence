@@ -3,7 +3,7 @@ import 'dotenv/config';
 import type { CodegenConfig } from '@graphql-codegen/cli';
 
 const config: CodegenConfig = {
-  schema: '../backend/schema.graphql',
+  schema: '../backend/schema.graphqls',
   documents: 'src/**/*.gql',
   generates: {
     'src/types.generated.ts': {

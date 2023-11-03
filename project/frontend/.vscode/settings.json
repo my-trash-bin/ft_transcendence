@@ -10,19 +10,11 @@
   "editor.codeActionsOnSave": {
     "source.organizeImports": true,
   },
-  "[prisma]": {
-    "editor.formatOnSave": true,
-    "editor.defaultFormatter": "Prisma.prisma",
-  },
   "tailwindCSS.experimental.classRegex": [
     ["(?:clsx|twMerge|c)\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"],
   ],
   "[graphql]": {
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-  },
-  "[rust]": {
-    "editor.formatOnSave": true,
-    "editor.defaultFormatter": "rust-lang.rust-analyzer",
   },
 }
