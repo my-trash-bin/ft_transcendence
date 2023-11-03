@@ -7,10 +7,13 @@
     "lint": "next lint",
     "dev": "next dev",
     "generate:css": "node script/generateColors.cjs > src/color.generated.css",
-    "generate:graphql": "del '**/*.generated.ts' && graphql-codegen"
+    "generate:api": "del '**/*.generated.ts' && graphql-codegen"
   },
   "dependencies": {
     "@-ft/mode-next": "^0.1.2",
+    "@-ft/noop": "^0.1.0",
+    "@-ft/watch-target": "^0.1.1",
+    "@-ft/watch-target-react": "^0.0.7",
     "@apollo/client": "^3.8.6",
     "@types/graphql": "^14.5.0",
     "@types/graphql-fields": "^1.3.8",
@@ -22,6 +25,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "graphql-ws": "^5.14.2",
+    "framer-motion": "^10.16.4",
     "next": "^14.0.0",
     "postcss": "^8.4.31",
     "react": "^18.2.0",

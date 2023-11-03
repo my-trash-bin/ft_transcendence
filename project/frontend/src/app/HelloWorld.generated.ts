@@ -4,18 +4,22 @@ import * as Types from '../types.generated';
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 const defaultOptions = {} as const;
-export type HelloWorldQueryVariables = Types.Exact<{
-  authorId: Types.Scalars['ID']['input'];
-}>;
+export type HelloWorldQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type HelloWorldQuery = { __typename?: 'Query', author: { __typename?: 'HelloWorld', id: string } };
+export type HelloWorldQuery = { __typename?: 'Query', helloWorld: { __typename?: 'HelloWorld', world: string }, helloChat: { __typename?: 'HelloChat', chat: string }, helloGame: { __typename?: 'HelloGame', game: string } };
 
 
 export const HelloWorldDocument = gql`
-    query HelloWorld($authorId: ID!) {
-  author(id: $authorId) {
-    id
+    query HelloWorld {
+  helloWorld {
+    world
+  }
+  helloChat {
+    chat
+  }
+  helloGame {
+    game
   }
 }
     `;
@@ -32,11 +36,10 @@ export const HelloWorldDocument = gql`
  * @example
  * const { data, loading, error } = useHelloWorldQuery({
  *   variables: {
- *      authorId: // value for 'authorId'
  *   },
  * });
  */
-export function useHelloWorldQuery(baseOptions: Apollo.QueryHookOptions<HelloWorldQuery, HelloWorldQueryVariables>) {
+export function useHelloWorldQuery(baseOptions?: Apollo.QueryHookOptions<HelloWorldQuery, HelloWorldQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<HelloWorldQuery, HelloWorldQueryVariables>(HelloWorldDocument, options);
       }

@@ -4,20 +4,10 @@ services:
   db:
     image: postgres
     ports:
-      - 5432:5432
+      - 55432:5432
     environment:
       POSTGRES_USER: ft_transcendence
       POSTGRES_PASSWORD: "supersecretpassword"
     volumes:
       - ./volume/db:/var/lib/postgresql/data
-    restart: always
-  azurite:
-    image: mcr.microsoft.com/azure-storage/azurite
-    command: "azurite --loose --blobHost 0.0.0.0 --blobPort 10000 --queueHost 0.0.0.0 --queuePort 10001 --tableHost 0.0.0.0 --tablePort 10002 --location /workspace --debug /workspace/debug.log"
-    ports:
-      - 10000:10000
-      - 10001:10001
-      - 10002:10002
-    volumes:
-      - ./volume/azurite:/workspace
     restart: always
