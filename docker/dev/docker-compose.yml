@@ -1,13 +1,33 @@
 version: '3'
 
 services:
-  db:
+  db-main:
     image: postgres
     ports:
-      - 55432:5432
+      - 50011:5432
     environment:
       POSTGRES_USER: ft_transcendence
       POSTGRES_PASSWORD: "supersecretpassword"
     volumes:
-      - ./volume/db:/var/lib/postgresql/data
+      - ./volume/db-main:/var/lib/postgresql/data
+    restart: always
+  db-chat:
+    image: postgres
+    ports:
+      - 50012:5432
+    environment:
+      POSTGRES_USER: ft_transcendence
+      POSTGRES_PASSWORD: "supersecretpassword"
+    volumes:
+      - ./volume/db-chat:/var/lib/postgresql/data
+    restart: always
+  db-pong:
+    image: postgres
+    ports:
+      - 50013:5432
+    environment:
+      POSTGRES_USER: ft_transcendence
+      POSTGRES_PASSWORD: "supersecretpassword"
+    volumes:
+      - ./volume/db-pong:/var/lib/postgresql/data
     restart: always

@@ -4,6 +4,10 @@ directive @specifiedBy(
   url: String!
 ) on SCALAR
 
+type HelloAuth {
+  auth: String!
+}
+
 type HelloChat {
   chat: String!
 }
@@ -17,8 +21,9 @@ type HelloWorld {
 }
 
 type Query {
+  helloAuth: HelloAuth!
   helloChat: HelloChat!
-  helloGame: HelloGame!
   helloWorld: HelloWorld!
+  helloGame: HelloGame!
 }
 

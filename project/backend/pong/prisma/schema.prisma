@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model PongUser {
+  id         String @id @default(uuid()) @db.Uuid
+  authUserId String @unique @db.Uuid
+
+  game1 PongLiveGame? @relation("PongLiveGame_player1")
+  game2 PongLiveGame? @relation("PongLiveGame_player2")
+}
+
+model PongSeasonLog {
+  season             Int
+  userId             String @db.Uuid
+  consecutiveWin     Int
+  maxConsecutiveWin  Int
+  maxConsecutiveLose Int
+  win                Int
+  lose               Int
+  total              Int
+  winRate            Float
+
+  @@id([userId, season])
+  @@index([season, consecutiveWin, userId])
+  @@index([season, win, userId])
+  @@index([season, total, userId])
+  @@index([season, winRate, total, userId])
+}
+
+model PongLiveGame {
+  id        String  @id @db.Uuid
+  startedAt String
+  isEnd     Boolean
+  player1Id String  @unique @db.Uuid
+  player2Id String  @unique @db.Uuid
+
+  player1 PongUser @relation("PongLiveGame_player1", fields: [player1Id], references: [id])
+  player2 PongUser @relation("PongLiveGame_player2", fields: [player2Id], references: [id])
+
+  @@index([isEnd, startedAt])
+  @@index([startedAt])
+}
