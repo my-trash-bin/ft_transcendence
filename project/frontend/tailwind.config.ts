@@ -6,20 +6,6 @@ export default <Config>{
   content: ['./src/**/*.{js,ts,jsx,tsx}'],
   darkMode: 'class',
   theme: {
-    extend: {
-      colors: {
-        color1: '#4662B0',
-        color2: '#3A89C0',
-        color3: '#545459',
-        color4: '#443183',
-        color5: '#5B3F9A',
-        color6: '#E7E1F3',
-        color7: '#F8F5FD',
-        color8: '#8E8CDC',
-        color9: '#FAF9FD',
-        color10: '#EAEAFB',
-      },
-    },
     screens,
     borderRadius: {
       sm: '6px',
@@ -48,7 +34,18 @@ export default <Config>{
       lg: '16px',
       xl: '20px',
     },
-    colors: {},
+    colors: {
+      color1: '#4662B0',
+      color2: '#3A89C0',
+      color3: '#545459',
+      color4: '#443183',
+      color5: '#5B3F9A',
+      color6: '#E7E1F3',
+      color7: '#F8F5FD',
+      color8: '#8E8CDC',
+      colorNine: '#FAF9FD',
+      color10: '#EAEAFB',
+    },
     dropShadow: {
       none: '0 0 #0000',
       md: '0px 10px 30px #00000020',

@@ -5,11 +5,11 @@ export function UserInfo({
   imageUri,
   username,
   onActive,
-}: {
+}: Readonly<{
   imageUri: string;
   username: string;
   onActive: boolean;
-}) {
+}>) {
   const active = onActive ? 'Active' : 'Inavtice';
 
   return (
