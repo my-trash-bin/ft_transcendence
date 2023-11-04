@@ -1,4 +1,4 @@
-@layer utilities {
+/* @layer utilities {
 .border-background { @apply border-[#FAFAFA] dark:border-[#000000]; }
 .bg-background { @apply bg-[#FAFAFA] dark:bg-[#000000]; }
 .text-background { @apply text-[#FAFAFA] dark:text-[#000000]; }
@@ -16,4 +16,4 @@
 .text-example { @apply text-[#E7E1F3] dark:text-[#E7E1F3]; }
 .caret-example { @apply caret-[#E7E1F3] dark:caret-[#E7E1F3]; }
 
-}
+} */

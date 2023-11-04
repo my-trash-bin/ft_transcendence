@@ -1,0 +1,29 @@
+{
+  "private": "true",
+  "scripts": {
+    "build": "rimraf compile dist && tsc -p tsconfig.build.json && rollup -c",
+    "start": "node --experimental-specifier-resolution=node dist"
+  },
+  "license": "UNLICENSED",
+  "resolutions": {
+    "graphql": "^16.8.1"
+  },
+  "dependencies": {
+    "@ft_transcendence/common": "file:../common/dist",
+    "@ft_transcendence/sub": "file:../sub/dist",
+    "dotenv": "^16.3.1",
+    "graphql": "^16.8.1",
+    "reflect-metadata": "^0.1.13",
+    "type-graphql": "^2.0.0-beta.3"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-json": "^6.0.1",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@types/node": "^20.8.10",
+    "rimraf": "^5.0.5",
+    "rollup": "^4.2.0",
+    "typescript": "^5.2.2"
+  }
+}
