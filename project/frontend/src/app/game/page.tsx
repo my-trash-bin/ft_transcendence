@@ -1,6 +1,6 @@
 'use client';
 import styles from '../../../styles/Home.module.css';
-import Navbar from '../../components/common/navbar/navbar';
+import Navbar from '../../components/common/navbar';
 import Button from '../../components/game/Button.js';
 import pageStyles from './page.module.css';
 

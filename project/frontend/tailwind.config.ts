@@ -48,5 +48,14 @@ export default <Config>{
       none: '0 0 #0000',
       md: '0px 10px 30px #00000020',
     },
+    borderWidth: {
+      DEFAULT: '1px',
+      '0': '0',
+      '2': '2px',
+      '3': '3px',
+      '4': '4px',
+      '6': '6px',
+      '8': '8px',
+    },
   },
 };
