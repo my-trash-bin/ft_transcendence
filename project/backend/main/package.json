@@ -11,6 +11,7 @@
   "dependencies": {
     "@ft_transcendence/common": "file:../common/dist",
     "@ft_transcendence/sub": "file:../sub/dist",
+    "@prisma/client": "^5.5.2",
     "dotenv": "^16.3.1",
     "graphql": "^16.8.1",
     "reflect-metadata": "^0.1.13",
