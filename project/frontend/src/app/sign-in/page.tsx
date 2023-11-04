@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import ChooseAvatar from '../../../components/sign-in/chooseAvatar';
-import ChooseNickname from '../../../components/sign-in/chooseNickname';
-import Avatar from '../../../components/sign-in/avatar';
+import ChooseAvatar from '../../components/sign-in/chooseAvatar';
+import ChooseNickname from '../../components/sign-in/chooseNickname';
+import Avatar from '../../components/sign-in/avatar';
 
 const avatars: string[] = [
   'avatar-blue.svg',
