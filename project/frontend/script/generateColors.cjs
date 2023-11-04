@@ -21,7 +21,7 @@ ${Object.entries(colors)
     ([key]) =>
       colors[`${key}-dark`] &&
       colors[`${key}-hover`] &&
-      colors[`${key}-hover-dark`] &&
+      colors[`${key}-hover-dark`],
   )
   .flatMap(([key, value]) =>
     properties.map(
@@ -34,7 +34,7 @@ ${Object.entries(colors)
           `active:${property}-[${colors[`${key}-hover`]}]`,
           `active:dark:${property}-[${colors[`${key}-hover-dark`]}]`,
           `focus:${property}-[${colors[`${key}-hover`]}]`,
-          `focus:dark:${property}-[${colors[`${key}-hover-dark`]}]`
+          `focus:dark:${property}-[${colors[`${key}-hover-dark`]}]`,
         )}; }`,
     ),
   )
