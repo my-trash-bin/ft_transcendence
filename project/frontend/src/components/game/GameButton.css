@@ -1,26 +1,26 @@
 .button {
   background-color: #E7E1F3;
   color: #5B3F9A;
-  font-size: 3vw;
+  font-size: 30.72px;
   font-weight: bold;
   font-family: Verdana;
-  padding: 1vw 2vw;
-  border-radius: 1vw;
+  padding: 10.24px 20.48px;
+  border-radius: 10.24px;
   cursor: pointer;
-  margin: 2vw;
-  margin-top: 5vw;
-  width: 30vw;
-  height: 5vw;
+  margin: 20.48px;
+  margin-top: 51.2px;
+  width: 307.2px;
+  height: 51.2px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 0.1vw solid #5B3F9A;
+  border: 1.024px solid #5B3F9A;
   white-space: nowrap;
   transition: all 0.3s ease;
 }
 
 .button:hover {
   background-color: #D3C1EA;
-  box-shadow: 0.4vw 0.4vw 0.8vw rgba(0, 0, 0, 0.2);
-  transform: translateY(-0.2vw);
+  box-shadow: 4.096px 4.096px 8.192px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2.048px);
 }
