@@ -1,19 +1,17 @@
-
 import { Resolver } from '@ft_transcendence/common/di/Container';
-import { invalidId } from "../../../exception/invalidId";
-import { getId } from "../../../util/id/getId";
-import { isUniqueConstraintError } from '../../../util/isUniqueConstraintError';
+import { getId } from '../../../util/id/getId';
 import { sortAs } from '../../../util/sortAs';
 import { ApplicationImports } from '../../ApplicationImports';
+import { RequestContext } from '../../RequestContext';
 import { InvalidIdException } from '../../exception/InvalidIdException';
 import { IRepository } from '../../interface/IRepository';
-import { DuplicateNicknameException } from "../../interface/User/exception/DuplicateNicknameException";
-import { IUserService } from "../../interface/User/IUserService";
-import { UserId, UserView } from "../../interface/User/view/UserView";
-import { RequestContext } from '../../RequestContext';
-import { mapPrismaUserToUserView } from "./mapPrismaUserToUserView";
-import { prismaUserSelect } from "./prismaUserSelect";
-
+import { IUserService } from '../../interface/User/IUserService';
+import { DuplicateNicknameException } from '../../interface/User/exception/DuplicateNicknameException';
+import { UserId, UserView } from '../../interface/User/view/UserView';
+import { invalidId } from '../../util/exception/invalidId';
+import { isUniqueConstraintError } from '../../util/isUniqueConstraintError';
+import { mapPrismaUserToUserView } from './mapPrismaUserToUserView';
+import { prismaUserSelect } from './prismaUserSelect';
 
 export class UserService implements IUserService {
   private readonly repository: IRepository;
@@ -25,7 +23,7 @@ export class UserService implements IUserService {
   }
 
   async getMany(
-    ids: readonly UserId[]
+    ids: readonly UserId[],
   ): Promise<(UserView | InvalidIdException)[]> {
     const stringIds = ids.map(({ value }) => value);
     const prismaUsers = await this.repository.client.mainUser.findMany({
@@ -35,13 +33,13 @@ export class UserService implements IUserService {
       prismaUsers.map(mapPrismaUserToUserView),
       stringIds,
       getId,
-      invalidId
+      invalidId,
     );
   }
 
   async create(nickname: string): Promise<UserView> {
     try {
-      const tempAuthUserId = "123";
+      const tempAuthUserId = '123';
       const prismaUser = await this.repository.client.mainUser.create({
         data: { nickname, authUserId: tempAuthUserId },
         select: prismaUserSelect,
@@ -73,7 +71,7 @@ export class UserService implements IUserService {
 
   async updateProfileImageUrl(
     id: UserId,
-    profileImageUrl: string | null
+    profileImageUrl: string | null,
   ): Promise<UserView> {
     const prismaUser = await this.repository.client.mainUser.update({
       where: { id: id.value },
