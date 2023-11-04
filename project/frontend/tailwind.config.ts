@@ -36,13 +36,14 @@ export default <Config>{
       '2xl': '60px',
     },
     width: {
-      xs: '10px',
+      xs: '30px',
       sm: '50px',
       md: '75px',
       lg: '100px',
+      xl: '300px',
     },
     height: {
-      xs: '10px',
+      xs: '30px',
       sm: '50px',
       md: '75px',
       lg: '100px',
