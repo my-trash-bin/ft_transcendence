@@ -35,6 +35,14 @@ export default <Config>{
       xl: '20px',
       '2xl': '24px',
     },
+    width: {
+      sm: '50px',
+      md: '100px',
+    },
+    height: {
+      sm: '50px',
+      md: '100px',
+    },
     colors: {},
     dropShadow: {
       none: '0 0 #0000',
