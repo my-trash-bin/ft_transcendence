@@ -1,5 +1,5 @@
-import { InvalidIdException } from "../../exception/InvalidIdException";
-import { UserId, UserView } from "./view/UserView";
+import { InvalidIdException } from '../../exception/InvalidIdException';
+import { UserId, UserView } from './view/UserView';
 
 // 1. 서비스 인터페이스 작성
 // - 얘네만 쓰는 Exception => 같은 폴더내에서 작성
@@ -13,10 +13,10 @@ export interface IUserService {
   // 리졸버 => 각각에 대해서 호출 => 겟을 써버리면 => N개의 요청.
   // N+1 문제 해결을 위해서. => getMany만 쓰겠다.
   getMany(ids: readonly UserId[]): Promise<(UserView | InvalidIdException)[]>;
-  create(nickname: string): Promise<UserView>;
+  create(nickname: string, authUserId: string): Promise<UserView>;
   updateNickname(id: UserId, nickname: string): Promise<UserView>;
   updateProfileImageUrl(
     id: UserId,
-    profileImageUrl: string | null
+    profileImageUrl: string | null,
   ): Promise<UserView>;
 }

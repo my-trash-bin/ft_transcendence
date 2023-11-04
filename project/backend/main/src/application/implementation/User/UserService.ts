@@ -2,12 +2,12 @@ import { Resolver } from '@ft_transcendence/common/di/Container';
 import { getId } from '../../../util/id/getId';
 import { sortAs } from '../../../util/sortAs';
 import { ApplicationImports } from '../../ApplicationImports';
-import { RequestContext } from '../../RequestContext';
 import { InvalidIdException } from '../../exception/InvalidIdException';
 import { IRepository } from '../../interface/IRepository';
-import { IUserService } from '../../interface/User/IUserService';
 import { DuplicateNicknameException } from '../../interface/User/exception/DuplicateNicknameException';
+import { IUserService } from '../../interface/User/IUserService';
 import { UserId, UserView } from '../../interface/User/view/UserView';
+import { RequestContext } from '../../RequestContext';
 import { invalidId } from '../../util/exception/invalidId';
 import { isUniqueConstraintError } from '../../util/isUniqueConstraintError';
 import { mapPrismaUserToUserView } from './mapPrismaUserToUserView';
@@ -37,11 +37,10 @@ export class UserService implements IUserService {
     );
   }
 
-  async create(nickname: string): Promise<UserView> {
+  async create(nickname: string, authUserId: string): Promise<UserView> {
     try {
-      const tempAuthUserId = '123';
       const prismaUser = await this.repository.client.mainUser.create({
-        data: { nickname, authUserId: tempAuthUserId },
+        data: { nickname, authUserId },
         select: prismaUserSelect,
       });
       return mapPrismaUserToUserView(prismaUser);
