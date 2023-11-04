@@ -11,16 +11,18 @@ const screens = {
 
 /** @type {Record<string, `#${string}`>}  */
 const colors = {
-  "background": "#FAFAFA",
-  "background-dark": "#000000",
-  "text": "#000000",
-  "text-dark": "#FFFFFF",
-  "primary": "#BBFF88",
-  "primary-dark": "#668844",
-  "link": "#0070f3",
-  "link-hover": "#0070f3",
-  "link-active": "#0070f3",
-  "link-focus": "#0070f3",
+  background: '#FAFAFA',
+  'background-dark': '#000000',
+  text: '#000000',
+  'text-dark': '#FFFFFF',
+  primary: '#BBFF88',
+  'primary-dark': '#668844',
+  link: '#0070f3',
+  'link-hover': '#0070f3',
+  'link-active': '#0070f3',
+  'link-focus': '#0070f3',
+  example: '#E7E1F3',
+  'example-dark': '#E7E1F3',
 };
 
 module.exports = {
