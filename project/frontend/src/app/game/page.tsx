@@ -9,8 +9,8 @@ export default function FriendHome() {
     <nav className={styles.layout}>
       <Navbar />
       <div className={pageStyles.buttonContainer}>
-        <Button mode="normal" />
-        <Button mode="item" />
+        <Button mode="일반" />
+        <Button mode="아이템" />
       </div>
     </nav>
   );
