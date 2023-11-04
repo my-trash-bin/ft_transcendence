@@ -1,7 +1,6 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import Modal from 'react-modal';
-import './MatchingModal.css';
+import './ModalMatch.css';
 
 const MatchingModal = ({ isOpen, onClose, mode }) => {
   if (!isOpen) {
@@ -27,7 +26,7 @@ const MatchingModal = ({ isOpen, onClose, mode }) => {
           <p>{mode} 매칭이 진행중입니다.</p>
         </div>
         <button className="matching-modal-close-button" onClick={onClose}>
-          Close
+          닫기
         </button>
       </div>
     </Modal>
