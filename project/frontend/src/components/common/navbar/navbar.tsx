@@ -1,9 +1,10 @@
 'use client';
-import styles from './navbar.module.css';
-import Logo from '../logo/logo';
-import Link from 'next/link';
+
+import { Logo } from '@/app/_internal/component/ui/layout/Logo';
 import Image from 'next/image';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import styles from './navbar.module.css';
 
 interface CreateIconProps {
   type: string;

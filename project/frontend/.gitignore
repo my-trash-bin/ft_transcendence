@@ -1,6 +1,5 @@
 /.next/
 .next
 next-env.d.ts
-.env.*
 tsconfig.tsbuildinfo
 .DS_Store

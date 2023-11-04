@@ -15,36 +15,24 @@ export type Scalars = {
   Float: { input: number; output: number; }
 };
 
-export type Author = {
-  __typename?: 'Author';
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
+export type HelloChat = {
+  __typename?: 'HelloChat';
+  chat: Scalars['String']['output'];
+};
+
+export type HelloGame = {
+  __typename?: 'HelloGame';
+  game: Scalars['String']['output'];
 };
 
 export type HelloWorld = {
   __typename?: 'HelloWorld';
-  author?: Maybe<Author>;
-  id: Scalars['ID']['output'];
-  message?: Maybe<Scalars['String']['output']>;
+  world: Scalars['String']['output'];
 };
 
 export type Query = {
   __typename?: 'Query';
-  author: HelloWorld;
+  helloChat: HelloChat;
+  helloGame: HelloGame;
   helloWorld: HelloWorld;
-};
-
-
-export type QueryAuthorArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type QueryHelloWorldArgs = {
-  id: Scalars['ID']['input'];
-};
-
-export type Subscription = {
-  __typename?: 'Subscription';
-  commentAdded: Scalars['String']['output'];
 };
