@@ -22,7 +22,9 @@ export default function ChooseNickname({
         value={nickname}
         onChange={(e) => setNickname(e.target.value)}
       />
-      <button onClick={handleNicknameSubmit}>Confirm</button>
+      <button className="bg-example text-h1" onClick={handleNicknameSubmit}>
+        Confirm
+      </button>
     </div>
   );
 }
