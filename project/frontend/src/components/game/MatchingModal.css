@@ -1,0 +1,41 @@
+.matching-modal-content {
+  background-color: #E7E1F3;
+  color: #5B3F9A;
+  padding: 2vw;
+  border-radius: 1vw;
+  font-family: Verdana, Arial, sans-serif;
+  box-shadow: 0.2vw 0.2vw 0.4vw rgba(0, 0, 0, 0.2);
+  width: 45vw;
+  height: 30vw;
+}
+
+.text-center {
+  font-size: 3vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50%;
+}
+
+.matching-modal-close-button {
+  background-color: #5B3F9A;
+  color: #E7E1F3;
+  font-size: 2vw;
+  font-weight: bold;
+  font-family: Verdana, Arial, sans-serif;
+  padding: 0.5vw 1vw;
+  border-radius: 0.5vw;
+  cursor: pointer;
+  border: 0.1vw solid #B4A2D6;
+  margin-top: 2vw;
+  position: relative;
+  left: 32vw;
+  top: 7vw;
+  transition: all 0.3s ease-in-out;
+}
+
+.matching-modal-close-button:hover {
+  background-color: #4A3E7A;
+  color: #D3CCE3;
+  border: 0.1vw solid #5B3F9A;
+}

@@ -1,6 +1,6 @@
 .button {
-  background-color: #e7e1f3;
-  color: #5b3f9a;
+  background-color: #E7E1F3;
+  color: #5B3F9A;
   font-size: 3vw;
   font-weight: bold;
   font-family: Verdana;
@@ -15,13 +15,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 0.1vw solid #b4a2d6;
+  border: 0.1vw solid #B4A2D6;
   white-space: nowrap;
   transition: all 0.3s ease;
 }
 
 .button:hover {
-  background-color: #d3c1ea;
+  background-color: #D3C1EA;
   box-shadow: 0.4vw 0.4vw 0.8vw rgba(0, 0, 0, 0.2);
   transform: translateY(-0.2vw);
 }
