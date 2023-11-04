@@ -3,6 +3,9 @@
     "**/node_modules": true,
     "**/*.generated.ts": true,
   },
+  "files.associations": {
+    "**/*.env.*": "dotenv",
+  },
   "[typescript][typescriptreact]": {
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode",
