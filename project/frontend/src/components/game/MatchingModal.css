@@ -19,6 +19,7 @@
 
 .matching-modal-close-button {
   background-color: #5B3F9A;
+  /* 8E8CDC */
   color: #E7E1F3;
   font-size: 2vw;
   font-weight: bold;
@@ -36,6 +37,6 @@
 
 .matching-modal-close-button:hover {
   background-color: #4A3E7A;
-  color: #D3CCE3;
-  border: 0.1vw solid #5B3F9A;
+  color: #E7E1F3;
+  border: 0.1vw solid #4A3E7A;
 }

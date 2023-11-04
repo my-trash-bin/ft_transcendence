@@ -1,4 +1,3 @@
-// Button.js
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import MatchingModal from './MatchingModal';
@@ -17,10 +16,10 @@ const ButtonComponent = ({ mode }) => {
 
   let content;
 
-  if (mode === 'normal') {
-    content = 'Normal Mode';
+  if (mode === '일반') {
+    content = '일반 게임';
   } else {
-    content = 'Item Mode';
+    content = '아이템 게임';
   }
 
   return (
