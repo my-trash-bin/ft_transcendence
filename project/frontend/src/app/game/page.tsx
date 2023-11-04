@@ -1,7 +1,7 @@
 'use client';
 import styles from '../../../styles/Home.module.css';
 import Navbar from '../../components/common/navbar/navbar';
-import Button from '../../components/game/Button.js';
+import GameButton from '../../components/game/Gamebutton.js';
 import pageStyles from './page.module.css';
 
 export default function FriendHome() {
@@ -9,8 +9,8 @@ export default function FriendHome() {
     <nav className={styles.layout}>
       <Navbar />
       <div className={pageStyles.buttonContainer}>
-        <Button mode="일반" />
-        <Button mode="아이템" />
+        <GameButton mode="일반" />
+        <GameButton mode="아이템" />
       </div>
     </nav>
   );

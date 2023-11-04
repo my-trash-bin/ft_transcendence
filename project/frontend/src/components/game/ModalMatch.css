@@ -19,7 +19,6 @@
 
 .matching-modal-close-button {
   background-color: #5B3F9A;
-  /* 8E8CDC */
   color: #E7E1F3;
   font-size: 2vw;
   font-weight: bold;
@@ -30,7 +29,7 @@
   border: 0.1vw solid #B4A2D6;
   margin-top: 2vw;
   position: relative;
-  left: 32vw;
+  left: 35vw;
   top: 7vw;
   transition: all 0.3s ease-in-out;
 }

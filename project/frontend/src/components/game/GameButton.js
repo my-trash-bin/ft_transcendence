@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import MatchingModal from './MatchingModal';
-import './Button.css';
+import MatchingModal from './ModalMatch';
+import './GameButton.css';
 
 const ButtonComponent = ({ mode }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
