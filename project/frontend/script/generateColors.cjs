@@ -22,8 +22,6 @@ ${Object.entries(colors)
       colors[`${key}-dark`] &&
       colors[`${key}-hover`] &&
       colors[`${key}-hover-dark`] &&
-      colors[`${key}-active`] &&
-      colors[`${key}-active-dark`],
   )
   .flatMap(([key, value]) =>
     properties.map(
@@ -33,11 +31,10 @@ ${Object.entries(colors)
           `dark:${property}-[${colors[`${key}-dark`]}]`,
           `hover:${property}-[${colors[`${key}-hover`]}]`,
           `hover:dark:${property}-[${colors[`${key}-hover-dark`]}]`,
-          `active:${property}-[${colors[`${key}-active`]}]`,
-          `active:dark:${property}-[${colors[`${key}-active-dark`]}]`,
-          // if you want to make focus color, activate this
-          // `focus:${property}-[${colors[`${key}-active`]}]`,
-          // `focus:dark:${property}-[${colors[`${key}-active-dark`]}]`
+          `active:${property}-[${colors[`${key}-hover`]}]`,
+          `active:dark:${property}-[${colors[`${key}-hover-dark`]}]`,
+          `focus:${property}-[${colors[`${key}-hover`]}]`,
+          `focus:dark:${property}-[${colors[`${key}-hover-dark`]}]`
         )}; }`,
     ),
   )
