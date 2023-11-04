@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Button from '../common/button';
 
 type ChooseNicknameProps = {
   onNicknameSubmit: (nickname: string) => void;
@@ -15,16 +16,15 @@ export default function ChooseNickname({
 
   return (
     <div>
-      <h2>Step 1: Choose a Nickname</h2>
+      <h2 className="font-bold">1. 사용하실 닉네님을 입력하세요.</h2>
       <input
         type="text"
         placeholder="Enter your nickname"
         value={nickname}
         onChange={(e) => setNickname(e.target.value)}
       />
-      <button className="bg-example text-h1" onClick={handleNicknameSubmit}>
-        Confirm
-      </button>
+      <Button onClick={() => onNicknameSubmit(nickname)}>Confirm</Button>
+      {/* <button onClick={() => onNicknameSubmit(nickname)}>Confirm</button> */}
     </div>
   );
 }

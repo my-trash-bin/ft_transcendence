@@ -15,7 +15,7 @@ export default <Config>{
     },
     fontWeight: {
       normal: '400',
-      bold: '900',
+      bold: '700',
     },
     fontSize: {
       sm: '12px',
