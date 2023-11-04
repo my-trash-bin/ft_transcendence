@@ -11,12 +11,14 @@ const screens = {
 
 /** @type {Record<string, `#${string}`>}  */
 const colors = {
-  "background": "#FAFAFA",
-  "background-dark": "#000000",
-  "text": "#000000",
-  "text-dark": "#FFFFFF",
-  "primary": "#BBFF88",
-  "primary-dark": "#668844",
+  background: '#FAFAFA',
+  'background-dark': '#000000',
+  text: '#000000',
+  'text-dark': '#FFFFFF',
+  primary: '#BBFF88',
+  'primary-dark': '#668844',
+  example: '#E7E1F3',
+  'example-dark': '#E7E1F3',
 };
 
 module.exports = {
