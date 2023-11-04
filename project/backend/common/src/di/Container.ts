@@ -1,5 +1,3 @@
-import { Merge } from '../type/object/Merge';
-
 import { CircularDependencyException } from './CircularDependencyException';
 import { InvalidDependencyException } from './InvalidDependencyException';
 import { InvalidOverrideException } from './InvalidOverrideException';
@@ -135,26 +133,26 @@ export class Container<T extends {}> {
     return new Container<T>(this.registrationMap, this.singletonMap, true);
   }
 
-  public static empty(): Container<{}> {
-    return new Container<{}>({}, {}, false);
+  public static empty<T extends {}>(): Container<T> {
+    return new Container({} as any, {}, false);
   }
 
-  public static register<TName extends string, TType>(
+  public static register<T extends {}, TName extends string & keyof T, TType>(
     name: TName,
     registration: Registration<TType, {}>,
-  ): Container<Record<TName, TType>> {
-    return new Container<Record<TName, TType>>(
+  ): Container<T> {
+    return new Container<T>(
       { [name]: registration.internal } as any,
       {},
       false,
     );
   }
 
-  public register<TName extends string, TType>(
+  public register<TName extends string & keyof T, TType>(
     name: TName,
     registration: Registration<TType, T>,
     override?: boolean,
-  ): Container<Merge<[T, Record<TName, TType>]>> {
+  ): Container<T> {
     if (this.registered) throw new UseAfterRegisterException();
     if (name in this.registrationMap && !override)
       throw new InvalidOverrideException(name);
@@ -168,7 +166,7 @@ export class Container<T extends {}> {
       );
     // TODO: prevent invalid registration
     this.registered = true;
-    return new Container<Merge<[T, Record<TName, TType>]>>(
+    return new Container(
       { ...this.registrationMap, [name]: registration.internal } as any,
       this.singletonMap as any,
       this.scoped,

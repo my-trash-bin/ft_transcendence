@@ -8,10 +8,10 @@ export type AuthTypeToAuthView<T extends AuthType> = {
 
 export interface IAuthService {
   get(type: AuthType, id: string): Promise<AuthView>;
-  getOrCreate<T extends AuthType>(
+  upsert<T extends AuthType>(
     type: T,
     id: string,
     metadataJson: string,
   ): Promise<AuthTypeToAuthView<T>>;
-  getOrCreateFT(ftId: Id<'FT'>, metadataJson: string): Promise<AuthViewFT>;
+  upsertFT(ftId: Id<'FT'>, metadataJson: string): Promise<AuthViewFT>;
 }

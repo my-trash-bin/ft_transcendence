@@ -5,7 +5,10 @@ export interface ApplicationImportsFromInfrastructure {
   repository: IRepository;
 }
 
-export interface ApplicationImports
-  extends ApplicationImportsFromInfrastructure {
+export interface ApplicationImportsFromApi {
   requestContext: RequestContext;
 }
+
+export interface ApplicationImports
+  extends ApplicationImportsFromInfrastructure,
+    ApplicationImportsFromApi {}
