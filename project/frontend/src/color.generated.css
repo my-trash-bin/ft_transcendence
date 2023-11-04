@@ -3,10 +3,22 @@
 .bg-dark-purple { @apply bg-[#5B3F9A] dark:bg-[#5B3F9A]; }
 .text-dark-purple { @apply text-[#5B3F9A] dark:text-[#5B3F9A]; }
 .caret-dark-purple { @apply caret-[#5B3F9A] dark:caret-[#5B3F9A]; }
+.border-dark { @apply border-[#4A3E7A] dark:border-[#4A3E7A]; }
+.bg-dark { @apply bg-[#4A3E7A] dark:bg-[#4A3E7A]; }
+.text-dark { @apply text-[#4A3E7A] dark:text-[#4A3E7A]; }
+.caret-dark { @apply caret-[#4A3E7A] dark:caret-[#4A3E7A]; }
 .border-dark-hover { @apply border-[#4A3E7A] dark:border-[#4A3E7A]; }
 .bg-dark-hover { @apply bg-[#4A3E7A] dark:bg-[#4A3E7A]; }
 .text-dark-hover { @apply text-[#4A3E7A] dark:text-[#4A3E7A]; }
 .caret-dark-hover { @apply caret-[#4A3E7A] dark:caret-[#4A3E7A]; }
+.border-dark-focus { @apply border-[#4A3E7A] dark:border-[#4A3E7A]; }
+.bg-dark-focus { @apply bg-[#4A3E7A] dark:bg-[#4A3E7A]; }
+.text-dark-focus { @apply text-[#4A3E7A] dark:text-[#4A3E7A]; }
+.caret-dark-focus { @apply caret-[#4A3E7A] dark:caret-[#4A3E7A]; }
+.border-dark-active { @apply border-[#4A3E7A] dark:border-[#4A3E7A]; }
+.bg-dark-active { @apply bg-[#4A3E7A] dark:bg-[#4A3E7A]; }
+.text-dark-active { @apply text-[#4A3E7A] dark:text-[#4A3E7A]; }
+.caret-dark-active { @apply caret-[#4A3E7A] dark:caret-[#4A3E7A]; }
 .border-default { @apply border-[#E7E1F3] dark:border-[#E7E1F3]; }
 .bg-default { @apply bg-[#E7E1F3] dark:bg-[#E7E1F3]; }
 .text-default { @apply text-[#E7E1F3] dark:text-[#E7E1F3]; }
@@ -51,5 +63,8 @@
 .bg-live { @apply bg-[#2FD236] dark:bg-[#2FD236]; }
 .text-live { @apply text-[#2FD236] dark:text-[#2FD236]; }
 .caret-live { @apply caret-[#2FD236] dark:caret-[#2FD236]; }
-
+.border-dark-interactive { @apply border-[#4A3E7A] dark:border-[#4A3E7A] hover:border-[#4A3E7A] hover:dark:border-[#4A3E7A] active:border-[#4A3E7A] active:dark:border-[#4A3E7A]; }
+.bg-dark-interactive { @apply bg-[#4A3E7A] dark:bg-[#4A3E7A] hover:bg-[#4A3E7A] hover:dark:bg-[#4A3E7A] active:bg-[#4A3E7A] active:dark:bg-[#4A3E7A]; }
+.text-dark-interactive { @apply text-[#4A3E7A] dark:text-[#4A3E7A] hover:text-[#4A3E7A] hover:dark:text-[#4A3E7A] active:text-[#4A3E7A] active:dark:text-[#4A3E7A]; }
+.caret-dark-interactive { @apply caret-[#4A3E7A] dark:caret-[#4A3E7A] hover:caret-[#4A3E7A] hover:dark:caret-[#4A3E7A] active:caret-[#4A3E7A] active:dark:caret-[#4A3E7A]; }
 }
