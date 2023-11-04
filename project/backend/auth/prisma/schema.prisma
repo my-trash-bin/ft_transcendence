@@ -12,6 +12,8 @@ model User {
   joinedAt DateTime  @default(now())
   isLeaved Boolean   @default(false)
   leavedAt DateTime?
+
+  Auth Auth? @relation("Auth_user")
 }
 
 enum AuthType {
@@ -22,6 +24,9 @@ model Auth {
   type         AuthType
   id           String
   metadataJson String
+  userId       String   @unique @db.Uuid
+
+  user User @relation("Auth_user", fields: [userId], references: [id])
 
   @@id([type, id])
 }
