@@ -14,7 +14,7 @@ import {
   type IResolvers,
 } from '@graphql-tools/utils';
 import cors from 'cors';
-import express, { json } from 'express';
+import express, { Express, json } from 'express';
 import gql from 'graphql-tag';
 import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.mjs';
 import { SubscribeMessage } from 'graphql-ws';
@@ -39,6 +39,7 @@ export async function start<TContext extends BaseContext>(
     args: ExecutionArgs,
   ) => Promise<TContext>,
   httpContext?: ContextFunction<[ExpressContextFunctionArgument], TContext>,
+  registerMiddlewares?: (express: Express) => void,
 ) {
   const app = express();
   const httpServer = createServer(app);
@@ -73,6 +74,7 @@ export async function start<TContext extends BaseContext>(
   });
   await server.start();
 
+  registerMiddlewares?.(app);
   app.use(
     '/graphql',
     cors(),

@@ -2,10 +2,10 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "start": "next start",
+    "start": "next start --port 80",
     "build": "next build",
     "lint": "next lint",
-    "dev": "next dev",
+    "dev": "next dev --port 53000",
     "generate:css": "node script/generateColors.cjs > src/color.generated.css",
     "generate:api": "del '**/*.generated.ts' && graphql-codegen"
   },

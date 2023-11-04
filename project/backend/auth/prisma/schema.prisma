@@ -13,3 +13,15 @@ model User {
   isLeaved Boolean   @default(false)
   leavedAt DateTime?
 }
+
+enum AuthType {
+  FT
+}
+
+model Auth {
+  type         AuthType
+  id           String
+  metadataJson String
+
+  @@id([type, id])
+}
