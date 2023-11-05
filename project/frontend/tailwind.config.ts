@@ -40,6 +40,7 @@ export default <Config>{
       sm: '50px',
       md: '75px',
       lg: '100px',
+      xl: '300px',
     },
     height: {
       xs: '30px',
