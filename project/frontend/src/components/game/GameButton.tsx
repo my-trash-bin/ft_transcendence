@@ -21,7 +21,7 @@ const ButtonComponent: React.FC<ButtonComponentProps> = ({ mode }) => {
   return (
     <div>
       <button
-        className="bg-default text-dark-purple font-bold text-30 p-5.12 rounded-5.12 cursor-pointer mx-10.24 mt-25.6 w-76.8 h-12.8 flex items-center justify-center border border-dark-purple transition-all duration-300 ease-in-out hover:bg-background-hover hover:shadow-custom hover:-translate-y-2.048"
+        className="bg-default-interactive text-dark-purple font-bold text-h2 py-sm px-lg rounded-md cursor-pointer mx-sm mt-xl w-xl h-sm flex items-center justify-center border border-dark-purple transition-all duration-300 ease-in-out hover:shadow-custom hover:-translate-y-2.048"
         onClick={handleButtonClick}
       >
         {content}

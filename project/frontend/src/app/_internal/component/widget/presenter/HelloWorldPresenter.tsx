@@ -5,5 +5,5 @@ export interface HelloWorldPresenterProps {
 }
 
 export function HelloWorldPresenter({ data }: HelloWorldPresenterProps) {
-  return <div>{data.message}</div>;
+  return <div>{data.world}</div>;
 }

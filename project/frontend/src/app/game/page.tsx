@@ -1,6 +1,5 @@
 'use client';
 import Navbar from '../../components/common/navbar';
-// import GameButton from '../../components/game/Gamebutton.js';
 import GameButton from '../../components/game/GameButton';
 import pageStyles from './page.module.css';
 
