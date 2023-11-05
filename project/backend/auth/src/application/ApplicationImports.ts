@@ -1,4 +1,4 @@
-import { RequestContext } from 'node-fetch';
+import { RequestContext } from './RequestContext';
 import { IRepository } from './interface/IRepository';
 
 export interface ApplicationImportsFromInfrastructure {

@@ -13,5 +13,6 @@
     "tamasfe.even-better-toml",
     "ms-azuretools.vscode-docker",
     "ahmadalli.vscode-nginx-conf",
+    "dotenv.dotenv-vscode",
   ],
 }

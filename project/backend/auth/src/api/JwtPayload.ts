@@ -1,3 +1,7 @@
-import { RequestContextForUser } from '../application/RequestContext';
+import { RequestContextUser } from '../application/RequestContext';
 
-export interface JwtPayload extends RequestContextForUser {}
+import { JwtPayload as BaseJwtPayload } from 'jsonwebtoken';
+
+export interface JwtPayload extends BaseJwtPayload {
+  user: RequestContextUser;
+}

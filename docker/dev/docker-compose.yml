@@ -1,6 +1,16 @@
 version: '3'
 
 services:
+  db-auth:
+    image: postgres
+    ports:
+      - 50010:5432
+    environment:
+      POSTGRES_USER: ft_transcendence
+      POSTGRES_PASSWORD: "supersecretpassword"
+    volumes:
+      - ./volume/db-auth:/var/lib/postgresql/data
+    restart: always
   db-main:
     image: postgres
     ports:
