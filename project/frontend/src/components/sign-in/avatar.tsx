@@ -9,9 +9,9 @@ export default function Avatar({ name, isSelected }: AvatarProps) {
   const src = `/avatar/${name}`;
 
   const activeClass: string = isSelected
-    ? 'border-3 border-dark-purple hover:bg-light-background'
+    ? 'border-3 border-dark-purple bg-light-background'
     : 'border-3 border-default hover:border-dark-gray hover:bg-light-background';
-  const className = `w-sm h-sm rounded-full flex items-center justify-center mb-[40px] ${activeClass}`;
+  const className = `w-lg h-lg flex items-center justify-center ${activeClass}`;
   return (
     <Image
       src={src}
