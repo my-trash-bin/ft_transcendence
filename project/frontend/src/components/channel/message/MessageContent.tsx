@@ -1,25 +1,19 @@
-import styles from './MessageContent.module.css';
 import { MyChat } from './MyChat';
 import { OtherChat } from './OtherChat';
 
 export function MessageContent() {
   return (
-    <div className={`${styles['message-content']}`}>
+    <div className="w-[100%] h-[70%] pt-[5%] bg-light-background flex flex-col overflow-y-scroll">
+      <MyChat content="sdassdfljsdaf" time={new Date()} />
       <MyChat
-        content="hasdasdsaasdasdasdassdfljsdaf"
+        content="sdassdfljsdafsdassdfljsdafsdassdfljsdaf"
         time={new Date()}
-        isFirst={true}
       />
       <MyChat
-        content="hasdasdsaasdasdasdassdfljsdaf"
+        content="sdassdfljsdafsdassdfljsdafsdassdfljsdafsdassdfljsdaf"
         time={new Date()}
-        isFirst={false}
       />
-      <MyChat
-        content="hasdasdsaasdasdasdassdfljsdaf"
-        time={new Date()}
-        isFirst={false}
-      />
+
       <OtherChat
         content="h"
         time={new Date()}
