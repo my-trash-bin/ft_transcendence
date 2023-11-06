@@ -62,7 +62,7 @@ const dummyMessage = [
 export function DmUserList() {
   return (
     <div className="flex flex-col w-[100%] h-[80%] pl-[5%] ">
-      <p className="w-[25%] h-[3%] text-[0.7rem] text-dark-gray">All Message</p>
+      <p className="w-[25%] h-[5%] text-[0.7rem] text-dark-gray">All Message</p>
       <div className="h-[inherit] overflow-y-scroll">
         {dummyMessage.map((val) => {
           return (
