@@ -70,7 +70,7 @@ export function DmUserList() {
             <DmUser
               key={val.key}
               imageUri={val.imageUri}
-              username={val.username}
+              nickname={val.username}
               messageShortcut={val.messageShortcut}
               date={val.date}
             />
