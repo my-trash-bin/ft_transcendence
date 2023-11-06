@@ -1,8 +1,8 @@
 'use client';
 import { useState } from 'react';
 import Navbar from '../../components/common/navbar';
-import BlockList from '../../components/friend/BlockList';
-import FriendList from '../../components/friend/FriendCardList';
+import BlockCardList from '../../components/friend/BlockCardList';
+import FriendCardList from '../../components/friend/FriendCardList';
 
 export default function FriendHome() {
   const [activeScreen, setActiveScreen] = useState('friend');
@@ -43,8 +43,8 @@ export default function FriendHome() {
               </button>
             </div>
           </div>
-          {activeScreen === 'friend' && <FriendList />}
-          {activeScreen === 'block' && <BlockList />}
+          {activeScreen === 'friend' && <FriendCardList />}
+          {activeScreen === 'block' && <BlockCardList />}
         </div>
       </div>
     </div>
