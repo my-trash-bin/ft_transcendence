@@ -1,6 +1,6 @@
-import { DmUserList } from '../../../components/channel/dm-user/DmUserList';
-import { MessageSearch } from '../../../components/channel/message-search/MessageSearch';
-import { MessageBox } from '../../../components/channel/message/MessageBox';
+import { DmUserList } from '../../components/channel/dm-user/DmUserList';
+import { MessageSearch } from '../../components/channel/message-search/MessageSearch';
+import { MessageBox } from '../../components/channel/message/MessageBox';
 import Navbar from '../../components/common/navbar';
 
 export default function DmPage() {

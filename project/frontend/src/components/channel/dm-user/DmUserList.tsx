@@ -1,5 +1,4 @@
 import { DmUser } from './DmUser';
-import styles from './DmUserList.module.css';
 
 const dummyMessage = [
   {
@@ -62,9 +61,9 @@ const dummyMessage = [
 
 export function DmUserList() {
   return (
-    <div className={`${styles['dm-users']}`}>
-      <p className={`${styles['dm-users-alt']}`}>All Message</p>
-      <div className={`${styles['dm-users-element']}`}>
+    <div className="flex flex-col w-[100%] h-[80%] pl-[5%] ">
+      <p className="w-[25%] h-[3%] text-[0.7rem] text-dark-gray">All Message</p>
+      <div className="h-[inherit] overflow-y-scroll">
         {dummyMessage.map((val) => {
           return (
             <DmUser
