@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { classButton } from './classButton';
 
 type ChooseNicknameProps = {
-  onNicknameSubmit: (nickname: string) => void;
+  readonly onNicknameSubmit: (nickname: string) => void;
 };
 
 export default function ChooseNickname({
