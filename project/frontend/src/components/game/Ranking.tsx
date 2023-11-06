@@ -19,7 +19,7 @@ const Ranking: React.FC<IRankingProps> = ({ rankings, className, isUser }) => {
     <div className={`max-w-[620px] mx-auto ${className}`}>
       <ul>
         {rankings.map((item, index) => {
-          const bgCSS = isUser ? 'bg-light-background-interactive rounded-md' : 'bg-white-interactive';
+          const bgCSS = isUser ? 'bg-default-interactive rounded-md' : 'bg-white-interactive';
           const size = isUser ? 'py-sm px-lg my-xl w-full h-ms' : 'py-sm px-lg mx-auto my-lg w-[600px] h-[60px]';
           const borderCSS = isUser ? 'border-dark-purple-interactive border-3' : 'border-gray-interactive border-3';
           return (
