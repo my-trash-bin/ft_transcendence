@@ -10,7 +10,7 @@ export default function FriendHome() {
   return (
     <div className="flex">
       <Navbar />
-      <div>
+      <div className="flex flex-col items-center">
         <section className={pageStyles.buttonContainer}>
           <GameButton mode="normal" />
           <GameButton mode="item" />
