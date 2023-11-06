@@ -1,19 +1,134 @@
 @layer utilities {
-.border-background { @apply border-[#FAFAFA] dark:border-[#000000]; }
-.bg-background { @apply bg-[#FAFAFA] dark:bg-[#000000]; }
-.text-background { @apply text-[#FAFAFA] dark:text-[#000000]; }
-.caret-background { @apply caret-[#FAFAFA] dark:caret-[#000000]; }
-.border-text { @apply border-[#000000] dark:border-[#FFFFFF]; }
-.bg-text { @apply bg-[#000000] dark:bg-[#FFFFFF]; }
-.text-text { @apply text-[#000000] dark:text-[#FFFFFF]; }
-.caret-text { @apply caret-[#000000] dark:caret-[#FFFFFF]; }
-.border-primary { @apply border-[#BBFF88] dark:border-[#668844]; }
-.bg-primary { @apply bg-[#BBFF88] dark:bg-[#668844]; }
-.text-primary { @apply text-[#BBFF88] dark:text-[#668844]; }
-.caret-primary { @apply caret-[#BBFF88] dark:caret-[#668844]; }
-.border-example { @apply border-[#E7E1F3] dark:border-[#E7E1F3]; }
-.bg-example { @apply bg-[#E7E1F3] dark:bg-[#E7E1F3]; }
-.text-example { @apply text-[#E7E1F3] dark:text-[#E7E1F3]; }
-.caret-example { @apply caret-[#E7E1F3] dark:caret-[#E7E1F3]; }
-
+.border-dark-purple { @apply border-[#5B3F9A] dark:border-[#5B3F9A]; }
+.bg-dark-purple { @apply bg-[#5B3F9A] dark:bg-[#5B3F9A]; }
+.text-dark-purple { @apply text-[#5B3F9A] dark:text-[#5B3F9A]; }
+.caret-dark-purple { @apply caret-[#5B3F9A] dark:caret-[#5B3F9A]; }
+.border-dark-purple-hover { @apply border-[#4A3E7A] dark:border-[#4A3E7A]; }
+.bg-dark-purple-hover { @apply bg-[#4A3E7A] dark:bg-[#4A3E7A]; }
+.text-dark-purple-hover { @apply text-[#4A3E7A] dark:text-[#4A3E7A]; }
+.caret-dark-purple-hover { @apply caret-[#4A3E7A] dark:caret-[#4A3E7A]; }
+.border-default { @apply border-[#E7E1F3] dark:border-[#E7E1F3]; }
+.bg-default { @apply bg-[#E7E1F3] dark:bg-[#E7E1F3]; }
+.text-default { @apply text-[#E7E1F3] dark:text-[#E7E1F3]; }
+.caret-default { @apply caret-[#E7E1F3] dark:caret-[#E7E1F3]; }
+.border-default-hover { @apply border-[#D3C1EA] dark:border-[#D3C1EA]; }
+.bg-default-hover { @apply bg-[#D3C1EA] dark:bg-[#D3C1EA]; }
+.text-default-hover { @apply text-[#D3C1EA] dark:text-[#D3C1EA]; }
+.caret-default-hover { @apply caret-[#D3C1EA] dark:caret-[#D3C1EA]; }
+.border-light-background { @apply border-[#F8F5FD] dark:border-[#F8F5FD]; }
+.bg-light-background { @apply bg-[#F8F5FD] dark:bg-[#F8F5FD]; }
+.text-light-background { @apply text-[#F8F5FD] dark:text-[#F8F5FD]; }
+.caret-light-background { @apply caret-[#F8F5FD] dark:caret-[#F8F5FD]; }
+.border-light-background-hover { @apply border-[#F8F5FD] dark:border-[#F8F5FD]; }
+.bg-light-background-hover { @apply bg-[#F8F5FD] dark:bg-[#F8F5FD]; }
+.text-light-background-hover { @apply text-[#F8F5FD] dark:text-[#F8F5FD]; }
+.caret-light-background-hover { @apply caret-[#F8F5FD] dark:caret-[#F8F5FD]; }
+.border-chat-color1 { @apply border-[#8E8CDC] dark:border-[#8E8CDC]; }
+.bg-chat-color1 { @apply bg-[#8E8CDC] dark:bg-[#8E8CDC]; }
+.text-chat-color1 { @apply text-[#8E8CDC] dark:text-[#8E8CDC]; }
+.caret-chat-color1 { @apply caret-[#8E8CDC] dark:caret-[#8E8CDC]; }
+.border-chat-color1-hover { @apply border-[#8E8CDC] dark:border-[#8E8CDC]; }
+.bg-chat-color1-hover { @apply bg-[#8E8CDC] dark:bg-[#8E8CDC]; }
+.text-chat-color1-hover { @apply text-[#8E8CDC] dark:text-[#8E8CDC]; }
+.caret-chat-color1-hover { @apply caret-[#8E8CDC] dark:caret-[#8E8CDC]; }
+.border-chat-color2 { @apply border-[#EAEAFB] dark:border-[#EAEAFB]; }
+.bg-chat-color2 { @apply bg-[#EAEAFB] dark:bg-[#EAEAFB]; }
+.text-chat-color2 { @apply text-[#EAEAFB] dark:text-[#EAEAFB]; }
+.caret-chat-color2 { @apply caret-[#EAEAFB] dark:caret-[#EAEAFB]; }
+.border-chat-color2-hover { @apply border-[#EAEAFB] dark:border-[#EAEAFB]; }
+.bg-chat-color2-hover { @apply bg-[#EAEAFB] dark:bg-[#EAEAFB]; }
+.text-chat-color2-hover { @apply text-[#EAEAFB] dark:text-[#EAEAFB]; }
+.caret-chat-color2-hover { @apply caret-[#EAEAFB] dark:caret-[#EAEAFB]; }
+.border-black { @apply border-[#000000] dark:border-[#000000]; }
+.bg-black { @apply bg-[#000000] dark:bg-[#000000]; }
+.text-black { @apply text-[#000000] dark:text-[#000000]; }
+.caret-black { @apply caret-[#000000] dark:caret-[#000000]; }
+.border-black-hover { @apply border-[#000000] dark:border-[#000000]; }
+.bg-black-hover { @apply bg-[#000000] dark:bg-[#000000]; }
+.text-black-hover { @apply text-[#000000] dark:text-[#000000]; }
+.caret-black-hover { @apply caret-[#000000] dark:caret-[#000000]; }
+.border-dark-gray { @apply border-[#545459] dark:border-[#545459]; }
+.bg-dark-gray { @apply bg-[#545459] dark:bg-[#545459]; }
+.text-dark-gray { @apply text-[#545459] dark:text-[#545459]; }
+.caret-dark-gray { @apply caret-[#545459] dark:caret-[#545459]; }
+.border-dark-gray-hover { @apply border-[#545459] dark:border-[#545459]; }
+.bg-dark-gray-hover { @apply bg-[#545459] dark:bg-[#545459]; }
+.text-dark-gray-hover { @apply text-[#545459] dark:text-[#545459]; }
+.caret-dark-gray-hover { @apply caret-[#545459] dark:caret-[#545459]; }
+.border-gray { @apply border-[#A9A9A9] dark:border-[#A9A9A9]; }
+.bg-gray { @apply bg-[#A9A9A9] dark:bg-[#A9A9A9]; }
+.text-gray { @apply text-[#A9A9A9] dark:text-[#A9A9A9]; }
+.caret-gray { @apply caret-[#A9A9A9] dark:caret-[#A9A9A9]; }
+.border-gray-hover { @apply border-[#A9A9A9] dark:border-[#A9A9A9]; }
+.bg-gray-hover { @apply bg-[#A9A9A9] dark:bg-[#A9A9A9]; }
+.text-gray-hover { @apply text-[#A9A9A9] dark:text-[#A9A9A9]; }
+.caret-gray-hover { @apply caret-[#A9A9A9] dark:caret-[#A9A9A9]; }
+.border-light-gray { @apply border-[#F2F2F2] dark:border-[#F2F2F2]; }
+.bg-light-gray { @apply bg-[#F2F2F2] dark:bg-[#F2F2F2]; }
+.text-light-gray { @apply text-[#F2F2F2] dark:text-[#F2F2F2]; }
+.caret-light-gray { @apply caret-[#F2F2F2] dark:caret-[#F2F2F2]; }
+.border-light-gray-hover { @apply border-[#F2F2F2] dark:border-[#F2F2F2]; }
+.bg-light-gray-hover { @apply bg-[#F2F2F2] dark:bg-[#F2F2F2]; }
+.text-light-gray-hover { @apply text-[#F2F2F2] dark:text-[#F2F2F2]; }
+.caret-light-gray-hover { @apply caret-[#F2F2F2] dark:caret-[#F2F2F2]; }
+.border-white { @apply border-[#FFFFFF] dark:border-[#FFFFFF]; }
+.bg-white { @apply bg-[#FFFFFF] dark:bg-[#FFFFFF]; }
+.text-white { @apply text-[#FFFFFF] dark:text-[#FFFFFF]; }
+.caret-white { @apply caret-[#FFFFFF] dark:caret-[#FFFFFF]; }
+.border-white-hover { @apply border-[#FFFFFF] dark:border-[#FFFFFF]; }
+.bg-white-hover { @apply bg-[#FFFFFF] dark:bg-[#FFFFFF]; }
+.text-white-hover { @apply text-[#FFFFFF] dark:text-[#FFFFFF]; }
+.caret-white-hover { @apply caret-[#FFFFFF] dark:caret-[#FFFFFF]; }
+.border-live { @apply border-[#2FD236] dark:border-[#2FD236]; }
+.bg-live { @apply bg-[#2FD236] dark:bg-[#2FD236]; }
+.text-live { @apply text-[#2FD236] dark:text-[#2FD236]; }
+.caret-live { @apply caret-[#2FD236] dark:caret-[#2FD236]; }
+.border-live-hover { @apply border-[#2FD236] dark:border-[#2FD236]; }
+.bg-live-hover { @apply bg-[#2FD236] dark:bg-[#2FD236]; }
+.text-live-hover { @apply text-[#2FD236] dark:text-[#2FD236]; }
+.caret-live-hover { @apply caret-[#2FD236] dark:caret-[#2FD236]; }
+.border-dark-purple-interactive { @apply border-[#5B3F9A] dark:border-[#5B3F9A] hover:border-[#4A3E7A] hover:dark:border-[#4A3E7A] active:border-[#4A3E7A] active:dark:border-[#4A3E7A] focus:border-[#4A3E7A] focus:dark:border-[#4A3E7A]; }
+.bg-dark-purple-interactive { @apply bg-[#5B3F9A] dark:bg-[#5B3F9A] hover:bg-[#4A3E7A] hover:dark:bg-[#4A3E7A] active:bg-[#4A3E7A] active:dark:bg-[#4A3E7A] focus:bg-[#4A3E7A] focus:dark:bg-[#4A3E7A]; }
+.text-dark-purple-interactive { @apply text-[#5B3F9A] dark:text-[#5B3F9A] hover:text-[#4A3E7A] hover:dark:text-[#4A3E7A] active:text-[#4A3E7A] active:dark:text-[#4A3E7A] focus:text-[#4A3E7A] focus:dark:text-[#4A3E7A]; }
+.caret-dark-purple-interactive { @apply caret-[#5B3F9A] dark:caret-[#5B3F9A] hover:caret-[#4A3E7A] hover:dark:caret-[#4A3E7A] active:caret-[#4A3E7A] active:dark:caret-[#4A3E7A] focus:caret-[#4A3E7A] focus:dark:caret-[#4A3E7A]; }
+.border-default-interactive { @apply border-[#E7E1F3] dark:border-[#E7E1F3] hover:border-[#D3C1EA] hover:dark:border-[#D3C1EA] active:border-[#D3C1EA] active:dark:border-[#D3C1EA] focus:border-[#D3C1EA] focus:dark:border-[#D3C1EA]; }
+.bg-default-interactive { @apply bg-[#E7E1F3] dark:bg-[#E7E1F3] hover:bg-[#D3C1EA] hover:dark:bg-[#D3C1EA] active:bg-[#D3C1EA] active:dark:bg-[#D3C1EA] focus:bg-[#D3C1EA] focus:dark:bg-[#D3C1EA]; }
+.text-default-interactive { @apply text-[#E7E1F3] dark:text-[#E7E1F3] hover:text-[#D3C1EA] hover:dark:text-[#D3C1EA] active:text-[#D3C1EA] active:dark:text-[#D3C1EA] focus:text-[#D3C1EA] focus:dark:text-[#D3C1EA]; }
+.caret-default-interactive { @apply caret-[#E7E1F3] dark:caret-[#E7E1F3] hover:caret-[#D3C1EA] hover:dark:caret-[#D3C1EA] active:caret-[#D3C1EA] active:dark:caret-[#D3C1EA] focus:caret-[#D3C1EA] focus:dark:caret-[#D3C1EA]; }
+.border-light-background-interactive { @apply border-[#F8F5FD] dark:border-[#F8F5FD] hover:border-[#F8F5FD] hover:dark:border-[#F8F5FD] active:border-[#F8F5FD] active:dark:border-[#F8F5FD] focus:border-[#F8F5FD] focus:dark:border-[#F8F5FD]; }
+.bg-light-background-interactive { @apply bg-[#F8F5FD] dark:bg-[#F8F5FD] hover:bg-[#F8F5FD] hover:dark:bg-[#F8F5FD] active:bg-[#F8F5FD] active:dark:bg-[#F8F5FD] focus:bg-[#F8F5FD] focus:dark:bg-[#F8F5FD]; }
+.text-light-background-interactive { @apply text-[#F8F5FD] dark:text-[#F8F5FD] hover:text-[#F8F5FD] hover:dark:text-[#F8F5FD] active:text-[#F8F5FD] active:dark:text-[#F8F5FD] focus:text-[#F8F5FD] focus:dark:text-[#F8F5FD]; }
+.caret-light-background-interactive { @apply caret-[#F8F5FD] dark:caret-[#F8F5FD] hover:caret-[#F8F5FD] hover:dark:caret-[#F8F5FD] active:caret-[#F8F5FD] active:dark:caret-[#F8F5FD] focus:caret-[#F8F5FD] focus:dark:caret-[#F8F5FD]; }
+.border-chat-color1-interactive { @apply border-[#8E8CDC] dark:border-[#8E8CDC] hover:border-[#8E8CDC] hover:dark:border-[#8E8CDC] active:border-[#8E8CDC] active:dark:border-[#8E8CDC] focus:border-[#8E8CDC] focus:dark:border-[#8E8CDC]; }
+.bg-chat-color1-interactive { @apply bg-[#8E8CDC] dark:bg-[#8E8CDC] hover:bg-[#8E8CDC] hover:dark:bg-[#8E8CDC] active:bg-[#8E8CDC] active:dark:bg-[#8E8CDC] focus:bg-[#8E8CDC] focus:dark:bg-[#8E8CDC]; }
+.text-chat-color1-interactive { @apply text-[#8E8CDC] dark:text-[#8E8CDC] hover:text-[#8E8CDC] hover:dark:text-[#8E8CDC] active:text-[#8E8CDC] active:dark:text-[#8E8CDC] focus:text-[#8E8CDC] focus:dark:text-[#8E8CDC]; }
+.caret-chat-color1-interactive { @apply caret-[#8E8CDC] dark:caret-[#8E8CDC] hover:caret-[#8E8CDC] hover:dark:caret-[#8E8CDC] active:caret-[#8E8CDC] active:dark:caret-[#8E8CDC] focus:caret-[#8E8CDC] focus:dark:caret-[#8E8CDC]; }
+.border-chat-color2-interactive { @apply border-[#EAEAFB] dark:border-[#EAEAFB] hover:border-[#EAEAFB] hover:dark:border-[#EAEAFB] active:border-[#EAEAFB] active:dark:border-[#EAEAFB] focus:border-[#EAEAFB] focus:dark:border-[#EAEAFB]; }
+.bg-chat-color2-interactive { @apply bg-[#EAEAFB] dark:bg-[#EAEAFB] hover:bg-[#EAEAFB] hover:dark:bg-[#EAEAFB] active:bg-[#EAEAFB] active:dark:bg-[#EAEAFB] focus:bg-[#EAEAFB] focus:dark:bg-[#EAEAFB]; }
+.text-chat-color2-interactive { @apply text-[#EAEAFB] dark:text-[#EAEAFB] hover:text-[#EAEAFB] hover:dark:text-[#EAEAFB] active:text-[#EAEAFB] active:dark:text-[#EAEAFB] focus:text-[#EAEAFB] focus:dark:text-[#EAEAFB]; }
+.caret-chat-color2-interactive { @apply caret-[#EAEAFB] dark:caret-[#EAEAFB] hover:caret-[#EAEAFB] hover:dark:caret-[#EAEAFB] active:caret-[#EAEAFB] active:dark:caret-[#EAEAFB] focus:caret-[#EAEAFB] focus:dark:caret-[#EAEAFB]; }
+.border-black-interactive { @apply border-[#000000] dark:border-[#000000] hover:border-[#000000] hover:dark:border-[#000000] active:border-[#000000] active:dark:border-[#000000] focus:border-[#000000] focus:dark:border-[#000000]; }
+.bg-black-interactive { @apply bg-[#000000] dark:bg-[#000000] hover:bg-[#000000] hover:dark:bg-[#000000] active:bg-[#000000] active:dark:bg-[#000000] focus:bg-[#000000] focus:dark:bg-[#000000]; }
+.text-black-interactive { @apply text-[#000000] dark:text-[#000000] hover:text-[#000000] hover:dark:text-[#000000] active:text-[#000000] active:dark:text-[#000000] focus:text-[#000000] focus:dark:text-[#000000]; }
+.caret-black-interactive { @apply caret-[#000000] dark:caret-[#000000] hover:caret-[#000000] hover:dark:caret-[#000000] active:caret-[#000000] active:dark:caret-[#000000] focus:caret-[#000000] focus:dark:caret-[#000000]; }
+.border-dark-gray-interactive { @apply border-[#545459] dark:border-[#545459] hover:border-[#545459] hover:dark:border-[#545459] active:border-[#545459] active:dark:border-[#545459] focus:border-[#545459] focus:dark:border-[#545459]; }
+.bg-dark-gray-interactive { @apply bg-[#545459] dark:bg-[#545459] hover:bg-[#545459] hover:dark:bg-[#545459] active:bg-[#545459] active:dark:bg-[#545459] focus:bg-[#545459] focus:dark:bg-[#545459]; }
+.text-dark-gray-interactive { @apply text-[#545459] dark:text-[#545459] hover:text-[#545459] hover:dark:text-[#545459] active:text-[#545459] active:dark:text-[#545459] focus:text-[#545459] focus:dark:text-[#545459]; }
+.caret-dark-gray-interactive { @apply caret-[#545459] dark:caret-[#545459] hover:caret-[#545459] hover:dark:caret-[#545459] active:caret-[#545459] active:dark:caret-[#545459] focus:caret-[#545459] focus:dark:caret-[#545459]; }
+.border-gray-interactive { @apply border-[#A9A9A9] dark:border-[#A9A9A9] hover:border-[#A9A9A9] hover:dark:border-[#A9A9A9] active:border-[#A9A9A9] active:dark:border-[#A9A9A9] focus:border-[#A9A9A9] focus:dark:border-[#A9A9A9]; }
+.bg-gray-interactive { @apply bg-[#A9A9A9] dark:bg-[#A9A9A9] hover:bg-[#A9A9A9] hover:dark:bg-[#A9A9A9] active:bg-[#A9A9A9] active:dark:bg-[#A9A9A9] focus:bg-[#A9A9A9] focus:dark:bg-[#A9A9A9]; }
+.text-gray-interactive { @apply text-[#A9A9A9] dark:text-[#A9A9A9] hover:text-[#A9A9A9] hover:dark:text-[#A9A9A9] active:text-[#A9A9A9] active:dark:text-[#A9A9A9] focus:text-[#A9A9A9] focus:dark:text-[#A9A9A9]; }
+.caret-gray-interactive { @apply caret-[#A9A9A9] dark:caret-[#A9A9A9] hover:caret-[#A9A9A9] hover:dark:caret-[#A9A9A9] active:caret-[#A9A9A9] active:dark:caret-[#A9A9A9] focus:caret-[#A9A9A9] focus:dark:caret-[#A9A9A9]; }
+.border-light-gray-interactive { @apply border-[#F2F2F2] dark:border-[#F2F2F2] hover:border-[#F2F2F2] hover:dark:border-[#F2F2F2] active:border-[#F2F2F2] active:dark:border-[#F2F2F2] focus:border-[#F2F2F2] focus:dark:border-[#F2F2F2]; }
+.bg-light-gray-interactive { @apply bg-[#F2F2F2] dark:bg-[#F2F2F2] hover:bg-[#F2F2F2] hover:dark:bg-[#F2F2F2] active:bg-[#F2F2F2] active:dark:bg-[#F2F2F2] focus:bg-[#F2F2F2] focus:dark:bg-[#F2F2F2]; }
+.text-light-gray-interactive { @apply text-[#F2F2F2] dark:text-[#F2F2F2] hover:text-[#F2F2F2] hover:dark:text-[#F2F2F2] active:text-[#F2F2F2] active:dark:text-[#F2F2F2] focus:text-[#F2F2F2] focus:dark:text-[#F2F2F2]; }
+.caret-light-gray-interactive { @apply caret-[#F2F2F2] dark:caret-[#F2F2F2] hover:caret-[#F2F2F2] hover:dark:caret-[#F2F2F2] active:caret-[#F2F2F2] active:dark:caret-[#F2F2F2] focus:caret-[#F2F2F2] focus:dark:caret-[#F2F2F2]; }
+.border-white-interactive { @apply border-[#FFFFFF] dark:border-[#FFFFFF] hover:border-[#FFFFFF] hover:dark:border-[#FFFFFF] active:border-[#FFFFFF] active:dark:border-[#FFFFFF] focus:border-[#FFFFFF] focus:dark:border-[#FFFFFF]; }
+.bg-white-interactive { @apply bg-[#FFFFFF] dark:bg-[#FFFFFF] hover:bg-[#FFFFFF] hover:dark:bg-[#FFFFFF] active:bg-[#FFFFFF] active:dark:bg-[#FFFFFF] focus:bg-[#FFFFFF] focus:dark:bg-[#FFFFFF]; }
+.text-white-interactive { @apply text-[#FFFFFF] dark:text-[#FFFFFF] hover:text-[#FFFFFF] hover:dark:text-[#FFFFFF] active:text-[#FFFFFF] active:dark:text-[#FFFFFF] focus:text-[#FFFFFF] focus:dark:text-[#FFFFFF]; }
+.caret-white-interactive { @apply caret-[#FFFFFF] dark:caret-[#FFFFFF] hover:caret-[#FFFFFF] hover:dark:caret-[#FFFFFF] active:caret-[#FFFFFF] active:dark:caret-[#FFFFFF] focus:caret-[#FFFFFF] focus:dark:caret-[#FFFFFF]; }
+.border-live-interactive { @apply border-[#2FD236] dark:border-[#2FD236] hover:border-[#2FD236] hover:dark:border-[#2FD236] active:border-[#2FD236] active:dark:border-[#2FD236] focus:border-[#2FD236] focus:dark:border-[#2FD236]; }
+.bg-live-interactive { @apply bg-[#2FD236] dark:bg-[#2FD236] hover:bg-[#2FD236] hover:dark:bg-[#2FD236] active:bg-[#2FD236] active:dark:bg-[#2FD236] focus:bg-[#2FD236] focus:dark:bg-[#2FD236]; }
+.text-live-interactive { @apply text-[#2FD236] dark:text-[#2FD236] hover:text-[#2FD236] hover:dark:text-[#2FD236] active:text-[#2FD236] active:dark:text-[#2FD236] focus:text-[#2FD236] focus:dark:text-[#2FD236]; }
+.caret-live-interactive { @apply caret-[#2FD236] dark:caret-[#2FD236] hover:caret-[#2FD236] hover:dark:caret-[#2FD236] active:caret-[#2FD236] active:dark:caret-[#2FD236] focus:caret-[#2FD236] focus:dark:caret-[#2FD236]; }
 }

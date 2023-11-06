@@ -1,0 +1,43 @@
+.matching-modal-content {
+  background-color: #E7E1F3;
+  color: #5B3F9A;
+  padding: 20.48px;
+  border-radius: 10.24px;
+  font-family: Verdana, Arial, sans-serif;
+  box-shadow: 2.048px 2.048px 4.096px rgba(0, 0, 0, 0.2);
+  width: 460.8px;
+  height: 307.2px;
+  position: relative;
+  left: 113.39px;
+}
+
+.text-center {
+  font-size: 30.72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50%;
+}
+
+.matching-modal-close-button {
+  background-color: #5B3F9A;
+  color: #E7E1F3;
+  font-size: 20.48px;
+  font-weight: bold;
+  font-family: Verdana, Arial, sans-serif;
+  padding: 5.12px 10.24px;
+  border-radius: 5.12px;
+  cursor: pointer;
+  border: 1.024px solid #B4A2D6;
+  margin-top: 20.48px;
+  position: relative;
+  left: 358.4px;
+  top: 71.68px;
+  transition: all 0.3s ease-in-out;
+}
+
+.matching-modal-close-button:hover {
+  background-color: #4A3E7A;
+  color: #E7E1F3;
+  border: 1.024px solid #4A3E7A;
+}

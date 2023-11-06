@@ -3,15 +3,15 @@ import { formatAMPM } from '../utils/FromatAmPm';
 import styles from './DmUser.module.css';
 export function DmUser({
   imageUri,
-  username,
+  nickname,
   messageShortcut,
   date,
-}: {
+}: Readonly<{
   imageUri: string;
-  username: string;
+  nickname: string;
   messageShortcut: string;
   date: Date;
-}) {
+}>) {
   const dateView = formatAMPM(date);
   return (
     <button className={`${styles['dm-user']}`}>
@@ -24,7 +24,7 @@ export function DmUser({
           layout="relative"
         />
       </div>
-      <p className={`${styles['dm-user-name']}`}>{username}</p>
+      <p className={`${styles['dm-user-name']}`}>{nickname}</p>
       <p className={`${styles['dm-user-message']}`}>{messageShortcut}</p>
       <p className={`${styles['dm-user-date']}`}>{dateView}</p>
     </button>
