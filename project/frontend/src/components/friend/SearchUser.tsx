@@ -1,4 +1,24 @@
-import BlockCard from './BlockCard';
+import SearchCard from './SearchCard';
+
+function SearchUser() {
+  return (
+    <div>
+      {' '}
+      <div className="w-[700px] h-[500px] mt-2xl grid gap-lg justify-center items-center overflow-y-scroll">
+        {dummyFriend.map((val) => {
+          return (
+            <SearchCard
+              key={val.key}
+              imageUri={val.imageUri}
+              nickname={val.nickname}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+export default SearchUser;
 
 const dummyFriend = [
   {
@@ -32,20 +52,3 @@ const dummyFriend = [
     nickname: 'kyu',
   },
 ];
-
-function BlockCardList() {
-  return (
-    <div className="w-[700px] h-[500px] mt-2xl grid gap-lg justify-center items-center overflow-y-scroll">
-      {dummyFriend.map((val) => {
-        return (
-          <BlockCard
-            key={val.key}
-            imageUri={val.imageUri}
-            nickname={val.nickname}
-          />
-        );
-      })}
-    </div>
-  );
-}
-export default BlockCardList;
