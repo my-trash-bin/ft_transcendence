@@ -1,0 +1,55 @@
+.message-search-input {
+  position: relative;
+  width: 70%;
+  height: 25%;
+  border: solid;
+  border-color: #545459;
+  border-radius: 10px;
+}
+
+.message-search-input input {
+  position: absolute;
+  width: 75%;
+  height: 75%;
+  top: 50%;
+  transform: translateY(-47%);
+  left: 13%;
+  outline: none;
+  border: none;
+  background: none;
+  box-shadow: none;
+}
+
+.message-search-input input::placeholder {
+  text-align: left;
+  padding-left: 40px;
+}
+
+.search-icon {
+  background-image: url(/icon/search.svg);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  left: 4%;
+  top: 50%;
+  transform: translateY(-40%);
+  width: 20px;
+  height: 25px;
+  border: none;
+  cursor: pointer;
+}
+
+.cross-icon {
+  background-image: url(/icon/cross-circle.svg);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+
+  right: 3%;
+  top: 50%;
+  transform: translateY(-40%);
+  width: 20px;
+  height: 25px;
+  border: none;
+  cursor: pointer;
+}
