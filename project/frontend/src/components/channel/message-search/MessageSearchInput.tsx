@@ -3,7 +3,7 @@ import Image from 'next/image';
 export function MessageSearchInput() {
   return (
     <div
-      className={`relative w-[80%] h-[25%] border border-dark-gray rounded-[10px]`}
+      className={`relative w-[270px] h-[40px] border border-dark-gray rounded-[10px]`}
     >
       <button className="absolute left-[4%] top-[50%] translate-y-[-50%] w-[20px] h-[25px] border-none">
         <Image
