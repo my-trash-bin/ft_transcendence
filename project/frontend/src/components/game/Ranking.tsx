@@ -21,7 +21,7 @@ const Ranking: React.FC<IRankingProps> = ({ rankings, className, isUser }) => {
         {rankings.map((item, index) => {
           const bgCSS = isUser ? 'bg-light-background-interactive rounded-md' : 'bg-white-interactive';
           const size = isUser ? 'py-sm px-lg my-xl w-full h-ms' : 'py-sm px-lg mx-auto my-lg w-[600px] h-[60px]';
-          const borderCSS = isUser ? 'border-dark-gray-200' : 'border-gray-200';
+          const borderCSS = isUser ? 'border-dark-gray-interactive-200' : 'border-gray-interactive-200';
           return (
             <li key={item.id}
               className={`text-dark-gray-interactive font-bold text-h2 \
