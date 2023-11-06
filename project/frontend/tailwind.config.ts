@@ -1,5 +1,4 @@
 import { Config } from 'tailwindcss';
-
 import { screens } from './script/constants.cjs';
 
 export default <Config>{
@@ -15,6 +14,7 @@ export default <Config>{
     },
     fontWeight: {
       normal: '400',
+      semibold: '600',
       bold: '700',
     },
     fontSize: {

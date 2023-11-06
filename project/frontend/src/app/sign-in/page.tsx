@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Avatar from '../../components/sign-in/avatar';
+import SelectAvatar from '../../components/sign-in/SelectAvatar';
 import ChooseAvatar from '../../components/sign-in/chooseAvatar';
 import ChooseNickname from '../../components/sign-in/chooseNickname';
 
@@ -34,7 +34,7 @@ export default function SignIn() {
     ) : (
       <div>
         {nickname}
-        <Avatar name={avatar} isSelected={true} />
+        <SelectAvatar name={avatar} isSelected={true} />
       </div>
     );
 
