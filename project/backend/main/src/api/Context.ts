@@ -1,7 +1,6 @@
 import { Container } from '@ft_transcendence/common/di/Container';
-
-import { ApiInput } from './ApiInput';
+import { ApiImports } from './ApiImports';
 
 export interface Context {
-  container: Container<ApiInput>;
+  container: Container<ApiImports>;
 }

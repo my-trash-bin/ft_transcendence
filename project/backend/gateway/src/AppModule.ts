@@ -4,6 +4,7 @@ import { env } from '@ft_transcendence/common/env';
 import { ApolloGatewayDriver, ApolloGatewayDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
+import { sign } from 'jsonwebtoken';
 
 @Module({
   imports: [
@@ -17,6 +18,13 @@ import { GraphQLModule } from '@nestjs/graphql';
             { name: 'chat', url: env('SUBGRAPH_URL_CHAT') },
             { name: 'pong', url: env('SUBGRAPH_URL_PONG') },
           ],
+          introspectionHeaders: () => ({
+            Authorization: `Bearer ${sign(
+              { user: { system: true } },
+              env('JWT_SECRET'),
+              { expiresIn: '1d' },
+            )}`,
+          }),
         }),
       },
 

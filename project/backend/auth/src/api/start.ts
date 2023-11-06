@@ -16,7 +16,7 @@ import FTStrategy from 'passport-42';
 
 import { AuthType } from '@prisma/client';
 import { sign } from 'jsonwebtoken';
-import { Strategy } from 'passport-jwt';
+import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ApplicationExports } from '../application/ApplicationExports';
 import { ApplicationImports } from '../application/ApplicationImports';
 import { RequestContextForSystem } from '../application/RequestContext';
@@ -95,7 +95,9 @@ export async function start(
       use(
         new Strategy(
           {
-            jwtFromRequest: (req) => req?.cookies?.jwt ?? null,
+            jwtFromRequest: (req) =>
+              req?.cookies?.jwt ??
+              ExtractJwt.fromAuthHeaderAsBearerToken()(req),
             secretOrKey: env('JWT_SECRET'),
           },
           (payload: JwtPayload, done) => {

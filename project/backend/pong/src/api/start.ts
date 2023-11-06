@@ -1,4 +1,4 @@
-import { Container, asValue } from '@ft_transcendence/common/di/Container';
+import { Container } from '@ft_transcendence/common/di/Container';
 import { start as commonStart } from '@ft_transcendence/sub/api';
 
 import { ApiInput } from './ApiInput';
@@ -9,7 +9,7 @@ async function makeContext(
   container: Container<ApiInput>,
   authToken?: string,
 ): Promise<Context> {
-  const scope = container.scope().register('authToken', asValue(authToken));
+  const scope = container.scope();
   return { container: scope };
 }
 

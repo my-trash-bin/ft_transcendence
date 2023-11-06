@@ -1,19 +1,24 @@
-import { Container, asValue } from '@ft_transcendence/common/di/Container';
+import { Container } from '@ft_transcendence/common/di/Container';
 import { start as commonStart } from '@ft_transcendence/sub/api';
 
-import { ApiInput } from './ApiInput';
+import { ApplicationExports } from '../application/ApplicationExports';
+import { ApplicationImports } from '../application/ApplicationImports';
 import { Context } from './Context';
 import { schema } from './schema';
 
 async function makeContext(
-  container: Container<ApiInput>,
+  container: Container<ApplicationImports & ApplicationExports>,
   authToken?: string,
 ): Promise<Context> {
-  const scope = container.scope().register('authToken', asValue(authToken));
+  // TODO: jwt
+  const scope = container.scope(); //.register('authToken', asValue(authToken));
   return { container: scope };
 }
 
-export async function start(container: Container<ApiInput>, port: number) {
+export async function start(
+  container: Container<ApplicationImports & ApplicationExports>,
+  port: number,
+) {
   return commonStart(
     port,
     await schema,
