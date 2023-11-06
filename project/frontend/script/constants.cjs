@@ -1,4 +1,3 @@
-// @ts-check
 
 const layoutTabletMinWidth = 768;
 const layoutDesktopMinWidth = 1024;
