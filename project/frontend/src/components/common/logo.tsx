@@ -2,7 +2,7 @@ import Image from 'next/image';
 
 export default function Logo() {
   return (
-    <div className="bg-white p-2 border border-purple-600 rounded-md w-16 h-16 text-center">
+    <div className="w-sm h-sm mt-[30px] mb-[40px]">
       <Image
         src="/avatar/avatar-black.svg"
         priority={true}

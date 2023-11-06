@@ -57,7 +57,6 @@ const colors = {
   'live-hover-dark': '#2FD236',
 };
 
-
 module.exports = {
   screens,
   colors,
