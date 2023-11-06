@@ -5,7 +5,7 @@ type AvatarProps = {
   isSelected: boolean;
 };
 
-export default function Avatar({ name, isSelected }: AvatarProps) {
+export default function SelectAvatar({ name, isSelected }: AvatarProps) {
   const src = `/avatar/${name}`;
 
   const activeClass: string = isSelected
