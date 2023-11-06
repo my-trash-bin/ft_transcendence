@@ -99,7 +99,6 @@ export async function start(
             secretOrKey: env('JWT_SECRET'),
           },
           (payload: JwtPayload, done) => {
-            console.log({ payload });
             (async () => {
               try {
                 const authView = await systemContainer
@@ -110,11 +109,10 @@ export async function start(
                 done(e, false);
               }
             })();
-            done(null, false);
           },
         ),
       );
-      app.get('/api/auth/jwt', authenticate('jwt'));
+      app.use('/graphql', authenticate('jwt', { session: false }));
 
       try {
         use(
@@ -144,13 +142,11 @@ export async function start(
           authenticate('42', { failureRedirect: '/login', session: false }),
           function (req, res) {
             const payload: JwtPayload = {
-              exp: Math.floor(Date.now() / 1000) + 3900,
-              user: { id: idOf((req.user as AuthView).id.value) },
+              user: { id: (req.user as AuthView).userId },
             };
-            const token = sign(payload, env('JWT_SECRET'));
+            const token = sign(payload, env('JWT_SECRET'), { expiresIn: '1d' });
             res.cookie('jwt', token, {
               httpOnly: true,
-              expires: new Date(Date.now() + 3900000),
             });
             res.redirect('/welcome');
           },
