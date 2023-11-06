@@ -6,9 +6,7 @@ import Navbar from '../../components/common/navbar';
 export default function DmPage() {
   return (
     <div className="flex flex-row h-[100%] w-[100%]">
-      <nav className="flex">
-        <Navbar />
-      </nav>
+      <Navbar />
       <div className="flex flex-row w-[100%]">
         <div className=" w-[35%] h-full">
           <MessageSearch />
