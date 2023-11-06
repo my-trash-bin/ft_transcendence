@@ -1,5 +1,5 @@
 interface ButtonProps {
-  onClick: () => void;
+  readonly onClick: () => void;
   readonly children: React.ReactNode;
 }
 
