@@ -47,6 +47,7 @@ export default <Config>{
       sm: '50px',
       md: '75px',
       lg: '100px',
+      xl: '300px',
     },
     colors: {
       color1: '#4662B0',
