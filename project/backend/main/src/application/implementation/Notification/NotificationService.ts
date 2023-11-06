@@ -4,6 +4,10 @@ import { sortAs } from '../../../util/sortAs';
 import { ApplicationImports } from '../../ApplicationImports';
 import { InvalidIdException } from '../../exception/InvalidIdException';
 import { IRepository } from '../../interface/IRepository';
+import {
+  JSONValidationErrorCodes,
+  JSONValidationException,
+} from '../../interface/Notification/exception/JSONValidationException';
 import { INotificationService } from '../../interface/Notification/INotificationService';
 import {
   NotificationId,
@@ -15,7 +19,7 @@ import { invalidId } from '../../util/exception/invalidId';
 import { mapPrismaNotificationToNotificationView } from './mapPrismaNotificationToNotificationView';
 import { prismaUserSelect } from './PrismaNotificationSelect';
 
-export class NotificationService implements INotificationService {
+class NotificationService implements INotificationService {
   private readonly repository: IRepository;
   private readonly requestContext: RequestContext;
 
@@ -42,6 +46,7 @@ export class NotificationService implements INotificationService {
   }
 
   async create(userId: UserId, contentJson: string): Promise<NotificationView> {
+    this.validateJSON(contentJson);
     const prismaNotification = await this.repository.client.notification.create(
       {
         data: { userId: userId.value, contentJson },
@@ -61,5 +66,26 @@ export class NotificationService implements INotificationService {
       },
     );
     return mapPrismaNotificationToNotificationView(prismaNotification);
+  }
+
+  private validateJSON(jsonString: string) {
+    try {
+      const json = JSON.parse(jsonString);
+      if (!this.validateJsonStructure(json)) {
+        throw new JSONValidationException(
+          JSONValidationErrorCodes.InvalidStructure,
+        );
+      }
+    } catch (e) {
+      throw new JSONValidationException(JSONValidationErrorCodes.InvalidFormat);
+    }
+  }
+
+  private validateJsonStructure(json: any): boolean {
+    // JSON이 어떤 형식을 지켜야할 경우 이곳에서 추가적으로 검증을 해준다.
+    // if (!('expectedProperty' in json)) {
+    //   return false;
+    // }
+    return true;
   }
 }
