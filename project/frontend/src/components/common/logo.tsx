@@ -1,11 +1,10 @@
 import Image from 'next/image';
-import styles from './logo.module.css';
 
-function Logo() {
+export default function Logo() {
   return (
-    <div className={styles.logo}>
+    <div className="w-sm h-sm mt-[30px] mb-[40px]">
       <Image
-        src="/images/totoro.png"
+        src="/avatar/avatar-black.svg"
         priority={true}
         alt="totoro"
         width={50}
@@ -14,5 +13,3 @@ function Logo() {
     </div>
   );
 }
-
-export default Logo;
