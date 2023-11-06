@@ -16,8 +16,8 @@ export default function FriendHome() {
           <GameButton mode="item" />
         </section>
         <article>
-        <h1 className="text-dark-gray-interactive font-bold text-h2 \
-        py-sm px-lg mx-auto my-xl w-xl h-sm flex items-center justify-center">순위</h1>
+          <h1 className="text-dark-gray-interactive font-bold text-h2 \
+          py-sm px-lg mx-auto my-xl w-xl h-sm flex items-center justify-center">순위</h1>
           <Ranking rankings={mockUser} isUser={true}/>
           <Ranking rankings={mockRankings}/>
         </article>
