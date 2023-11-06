@@ -1,6 +1,5 @@
-import { MainUser } from "@prisma/client";
-import { UserId } from "../User/view/UserView";
-import { UserRelationView } from "./view/UserRelationView";
+import { UserId } from '../User/view/UserView';
+import { UserRelationView } from './view/UserRelationView';
 
 export interface IUserFollowService {
   // Create & Update
@@ -16,6 +15,6 @@ export interface IUserFollowService {
   unblockUser(followeeId: UserId): Promise<void>;
 
   getFollowers(): Promise<UserRelationView[]>;
-  getFollowing(): Promise<MainUser[]>;
-  getBlockedUsers(): Promise<MainUser[]>
+  getFollowing(): Promise<UserRelationView[]>;
+  getBlockedUsers(): Promise<UserRelationView[]>;
 }
