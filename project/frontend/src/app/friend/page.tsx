@@ -13,7 +13,7 @@ export default function FriendHome() {
 
   function className(isActive: boolean): string {
     return (
-      'w-[150px] h-[60px] border-3 rounded-lg text-h2 font-bold hover:bg-light-background hover:border-dark-gray' +
+      'w-[150px] h-[60px] border-3 rounded-md text-h2 font-bold hover:bg-light-background hover:border-dark-gray' +
       (isActive
         ? ' bg-default border-dark-purple text-dark-purple'
         : ' bg-light-gray border-gray text-gray')
