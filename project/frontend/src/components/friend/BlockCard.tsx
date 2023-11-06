@@ -1,14 +1,12 @@
 import toast, { Toaster } from 'react-hot-toast';
 import Avatar from '../common/Avatar';
-import FriendSetting from './FriendSetting';
 
 interface FriendCardProps {
   readonly nickname: string;
   readonly imageUri: string;
 }
 const profile = () => toast('프로필 모달 호출');
-const game = () => toast('게임 요청하는 함수');
-const dm = () => toast('디엠 요청하는 함수');
+const unblock = () => toast('차단 해제하는 함수 호출');
 
 function FriendCard(props: FriendCardProps) {
   const buttonClass =
@@ -27,13 +25,9 @@ function FriendCard(props: FriendCardProps) {
         {props.nickname}
       </div>
       <div className="absolute right-xl flex">
-        <button onClick={game} className={buttonClass}>
-          게임 하기
+        <button onClick={unblock} className={buttonClass}>
+          차단 풀기
         </button>
-        <button onClick={dm} className={buttonClass}>
-          메세지
-        </button>
-        <FriendSetting nickname={props.nickname} />
       </div>
     </div>
   );
