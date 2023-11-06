@@ -1,0 +1,14 @@
+.message-search-bar {
+  width: 100%;
+  height: 27%;
+  padding-top: 5%;
+  padding-left: 5%;
+}
+
+.message-search-bar h3 {
+  width: 45%;
+  height: 35%;
+  margin-left: 8%;
+  margin-bottom: 5%;
+  font-size: 1.8rem;
+}

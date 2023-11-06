@@ -1,0 +1,37 @@
+.my-chat {
+  padding-right: 3%;
+  margin-bottom: 1.5%;
+  display: flex;
+  flex-direction: column;
+}
+
+.my-chat-content {
+  padding: 2%;
+  text-align: center;
+  border-radius: 20px;
+  display: inline-block;
+  max-width: 35%;
+  word-wrap: break-word;
+  background-color: #eaeafb;
+  align-self: flex-end;
+  min-width: 10%;
+}
+
+.my-chat-content-f {
+  padding: 2%;
+  text-align: center;
+  border-radius: 20px;
+  display: inline-block;
+  max-width: 35%;
+  word-wrap: break-word;
+  position: relative;
+  background-color: #eaeafb;
+  align-self: flex-end;
+  min-width: 10%;
+}
+
+.my-chat-time {
+  padding-right: 1%;
+  font-size: 11px;
+  align-self: flex-end;
+}
