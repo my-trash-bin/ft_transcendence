@@ -1,2 +1,2 @@
-schema: project/backend/schema.graphql
+schema: project/backend/schema.graphqls
 documents: project/frontend/src/**/*.gql

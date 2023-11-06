@@ -11,7 +11,7 @@ import {
 import { onError } from '@apollo/client/link/error';
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 import { getMainDefinition } from '@apollo/client/utilities';
-import { createUploadLink } from 'apollo-upload-client';
+import createUploadLink from 'apollo-upload-client/createUploadLink.mjs';
 import { createClient } from 'graphql-ws';
 import { PropsWithChildren, useMemo } from 'react';
 
@@ -25,6 +25,11 @@ if (
   !NEXT_PUBLIC_GRAPHQL_SERVER_SUBSCRIPTIONS_URL
 )
   throw new Error('Missing environment variables! check source code');
+
+async function getAccessToken(): Promise<string | undefined> {
+  // TODO: return accses token if logged in
+  return undefined;
+}
 
 export function createApolloClient(): ApolloClient<NormalizedCacheObject> {
   const errorLink = onError(({ graphQLErrors, networkError }) => {
