@@ -44,18 +44,6 @@
   min-width: 10%;
 }
 
-.other-chat-content-f::before {
-  content: '';
-  position: absolute;
-  top: 20%;
-  left: -15%;
-  width: 0;
-  height: 0;
-  border-top: 10px solid transparent;
-  border-bottom: 10px solid transparent;
-  border-right: 10px solid #8e8cdc;
-}
-
 .other-chat-time {
   padding-left: 1%;
   font-size: 11px;
