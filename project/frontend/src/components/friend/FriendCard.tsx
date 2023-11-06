@@ -12,9 +12,14 @@ const dm = () => toast('디엠 요청하는 함수');
 
 function FriendCard(props: FriendCardProps) {
   const buttonClass =
-    'w-md h-xs bg-default rounded-full border-2 border-dark-purple text-center text-black text-lg font-bold mr-lg hover:bg-light-background';
+    'w-md h-xs bg-default rounded-sm border-2 border-dark-purple text-center text-black text-lg font-bold mr-lg hover:bg-light-background';
   return (
-    <div className="w-[600px] h-[100px] bg-light-background flex items-center relative">
+    <div className="w-[600px] h-[100px] bg-light-background rounded-md flex items-center relative">
+      <Toaster
+        toastOptions={{
+          duration: 2000,
+        }}
+      />
       <button onClick={profile}>
         <Avatar src={`${props.imageUri}`} />
       </button>
@@ -25,24 +30,15 @@ function FriendCard(props: FriendCardProps) {
         <button onClick={game} className={buttonClass}>
           게임 하기
         </button>
-        <Toaster
-          toastOptions={{
-            duration: 2000,
-          }}
-        />
         <button onClick={dm} className={buttonClass}>
           메세지
         </button>
-        <Toaster
-          toastOptions={{
-            duration: 2000,
-          }}
-        />
         <Image
-          src={`/icon/setting.svg`}
+          src={`/icon/message-setting.svg`}
           alt={`setting-icon`}
-          width={30}
-          height={30}
+          width={20}
+          height={20}
+          className="rotate-90"
         />
       </div>
     </div>
