@@ -1,9 +1,0 @@
-.message-content {
-  width: 100%;
-  height: 70%;
-  padding-top: 5%;
-  background-color: #faf9fd;
-  display: flex;
-  flex-direction: column;
-  overflow-y: scroll;
-}
