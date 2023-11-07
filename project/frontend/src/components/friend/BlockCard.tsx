@@ -1,5 +1,5 @@
 import toast, { Toaster } from 'react-hot-toast';
-import Avatar from '../common/Avatar';
+import FriendAvatar from './FriendAvatar';
 
 interface FriendCardProps {
   readonly nickname: string;
@@ -17,7 +17,7 @@ function FriendCard(props: FriendCardProps) {
         }}
       />
       <button onClick={profile}>
-        <Avatar src={`${props.imageUri}`} />
+        <FriendAvatar src={`${props.imageUri}`} size={50} />
       </button>
       <div className="text-left text-black text-h2 font-semibold ml-2xl">
         {props.nickname}

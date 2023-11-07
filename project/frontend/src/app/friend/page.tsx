@@ -1,11 +1,11 @@
 'use client';
 import { useState } from 'react';
-import Navbar from '../../components/common/navbar';
+import Navbar from '../../components/common/Navbar';
 import BlockCardList from '../../components/friend/BlockCardList';
 import FriendCardList from '../../components/friend/FriendCardList';
 import SearchUser from '../../components/friend/SearchUser';
 
-export default function FriendHome() {
+export default function FriendPage() {
   const [activeScreen, setActiveScreen] = useState('friend');
 
   const changeScreen = (screenName: string) => {
@@ -22,7 +22,7 @@ export default function FriendHome() {
   }
 
   return (
-    <div className="flex w-[100%] h-[100%]">
+    <div className="flex flex-row w-[100%] h-[100%]">
       <Navbar />
       <div className="w-[100%]">
         <div className="flex flex-col items-center mt-2xl ml-2xl mr-2xl">
