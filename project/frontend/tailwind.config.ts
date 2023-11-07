@@ -48,6 +48,7 @@ export default <Config>{
       sm: '50px',
       md: '75px',
       lg: '100px',
+      xl: '300px',
     },
     dropShadow: {
       none: '0 0 #0000',
