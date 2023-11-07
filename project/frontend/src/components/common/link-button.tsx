@@ -1,8 +1,8 @@
 import Link from 'next/link';
 
 interface LinkButtonProps {
-  text: string;
-  href: string;
+  readonly text: string;
+  readonly href: string;
 }
 
 function LinkButton(props: LinkButtonProps) {
