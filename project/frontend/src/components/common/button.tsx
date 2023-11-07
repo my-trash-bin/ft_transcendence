@@ -1,6 +1,6 @@
 interface ButtonProps {
-  onClick: () => void;
-  children: React.ReactNode;
+  readonly onClick: () => void;
+  readonly children: React.ReactNode;
 }
 
 function Button(props: ButtonProps) {
