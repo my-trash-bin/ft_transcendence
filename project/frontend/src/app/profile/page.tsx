@@ -1,7 +1,7 @@
 'use client';
 import Navbar from '../../components/common/Navbar';
-import ArchivementArticle from '../../components/profile/ArchivementArticle';
-import HistoryArticle from '../../components/profile/HistoryArticle';
+import ArchivementArticle from '../../components/profile/achivement/ArchivementArticle';
+import HistoryArticle from '../../components/profile/history/HistoryArticle';
 import ProfileArticle from '../../components/profile/ProfileArticle';
 
 export default function ProfilePage() {
