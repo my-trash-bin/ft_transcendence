@@ -6,3 +6,10 @@ export type PrismaUserFollowWithFollowee = Pick<
 > & {
   followee: MainUser;
 };
+
+export type PrismaUserFollowWithFollower = Pick<
+  UserFollow,
+  'followOrBlockedAt'
+> & {
+  follower: MainUser;
+};
