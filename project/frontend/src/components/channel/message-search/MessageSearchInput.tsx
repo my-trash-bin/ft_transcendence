@@ -1,31 +1,31 @@
 import Image from 'next/image';
 
-export function MessageSearchInput() {
+export function MessageSearchInput({ margin }: Readonly<{ margin: string }>) {
   return (
-    <div className="relative w-[75%] h-[25%] border border-dark-gray rounded-[10px]">
-      <button className="absolute left-[4%] top-[50%] translate-y-[-50%] w-[20px] h-[25px] border-none">
+    <div>
+      <div
+        className={`w-[75%] h-[35px] ${margin} border border-dark-gray rounded-[10px] flex flex-row items-center justify-between`}
+      >
         <Image
+          className="w-[20px] h-[25px] ml-sm"
           src="/icon/search.svg"
           alt="search icon"
           width={30}
           height={30}
-          layout="relative"
         />
-      </button>
-      <input
-        type="text"
-        placeholder="search user"
-        className="absolute w-[70%] h[75%] top-[50%] left-[15%] translate-y-[-47%] border-none bg-none outline-none placeholder:text-center pl-[1%]"
-      ></input>
-      <button className="absolute left-[88%] top-[50%] translate-y-[-50%] w-[20px] h-[25px] border-none">
+        <input
+          type="text"
+          placeholder="search user"
+          className="w-[80%] h-xs border-gray outline-none placeholder-text-left pl-[1%] "
+        />
         <Image
           src="/icon/cross-circle.svg"
           alt="cross icon"
           width={30}
           height={30}
-          layout="relative"
+          className="border-none w-[20px] h-[25px] mr-sm"
         />
-      </button>
+      </div>
     </div>
   );
 }
