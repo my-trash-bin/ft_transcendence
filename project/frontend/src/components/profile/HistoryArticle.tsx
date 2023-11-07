@@ -1,14 +1,19 @@
 import toast, { Toaster } from 'react-hot-toast';
 
 function HistoryArticle() {
-  const history = () => toast(`전적 상세`);
+  const achivement = () => toast(`전적 상세`);
+  const buttonClass =
+    'w-lg h-sm bg-default rounded-sm border-2 border-dark-purple text-center text-black text-lg font-bold hover:bg-light-background ' +
+    'absolute top-xl right-xl';
   return (
-    <div className="w-[600px] h-xl bg-light-background border-5 border-dark-purple mt-xl ml-xl">
-      <Toaster />
-      <div className="mt-lg ml-lg">
-        <h2 className="text-h2 font-bold">최근 전적</h2>
+    <div className="w-[600px] h-xl bg-light-background rounded-lg mt-xl ml-xl relative">
+      <div className="h-[inherit] pt-3xl flex flex-col items-center">
+        <Toaster />
+        <h2 className="text-h2 font-bold absolute top-xl left-xl">최근 전적</h2>
         <p>history information goes here.</p>
-        <button onClick={history}>View history Details</button>
+        <button onClick={achivement} className={buttonClass}>
+          더보기
+        </button>
       </div>
     </div>
   );
