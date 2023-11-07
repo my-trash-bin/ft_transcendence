@@ -6,7 +6,7 @@ export function MessageSearch() {
       <h3 className="w-[45%] h-[35%] ml-[8%] mb-[5%] text-[1.8rem]">
         Messages
       </h3>
-      <MessageSearchInput />
+      <MessageSearchInput margin="ml-md" />
     </div>
   );
 }
