@@ -15,25 +15,23 @@ export function UserInfo({
     : 'bg-gray-interactive';
 
   return (
-    <div className="h-[15%] w-[100%] border-b border-default relative">
-      <div className="w-[7%] h-[70%] absolute left-[5%] top-[20%]">
+    <div className="h-[80px] w-[inherit] border-b border-default relative">
+      <div className="w-[45px] h-[50px] absolute left-[5%] top-[20%]">
         <Image
           alt="userImage"
           src={imageUri}
-          width={45}
-          height={62}
+          width={35}
+          height={40}
           layout="relative"
         />
       </div>
-      <p className="top-[15%] left-[17%] bottom-[50%] text-[25px] absolute">
-        {username}
-      </p>
+      <p className="top-[10px] left-[120px] text-[22px] absolute">{username}</p>
       <div
-        className={`absolute w-[8px] h-[8px] rounded-[50%] top-[60%] left-[17%] translate-y-[50%]
+        className={`absolute w-[8px] h-[8px] rounded-[50px] top-[50px] left-[120px] translate-y-[50%]
         ${activeStyle}`}
       ></div>
-      <p className="absolute left-[20%] top-[60%] text-[12px]">{active}</p>
-      <button className="absolute right-[5%] top-[20%] w-[5%] h-[55%]">
+      <p className="absolute left-[140px] top-[50px] text-[12px]">{active}</p>
+      <button className="absolute right-[15px] top-[25px] w-[25px] h-[30px]">
         <Image
           alt="message-setting"
           src={'/icon/message-setting.svg'}
