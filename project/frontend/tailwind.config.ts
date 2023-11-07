@@ -34,6 +34,7 @@ export default <Config>{
       lg: '20px',
       xl: '25px',
       '2xl': '60px',
+      '3xl': '80px',
     },
     width: {
       xs: '30px',
