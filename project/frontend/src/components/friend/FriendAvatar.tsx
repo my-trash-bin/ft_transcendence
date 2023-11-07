@@ -1,11 +1,11 @@
 import Image from 'next/image';
 
-type AvatarProps = {
+type FriendAvatarProps = {
   readonly src: string;
   readonly size: number;
 };
 
-export default function Avatar(props: AvatarProps) {
+export default function FriendAvatar(props: FriendAvatarProps) {
   const className = `w-md h-md rounded-md
   flex items-center justify-center
   hover:bg-default

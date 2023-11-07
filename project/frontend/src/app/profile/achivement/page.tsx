@@ -1,6 +1,6 @@
 'use client';
 import Navbar from '../../../components/common/Navbar';
-import ArchivementPage from '../../../components/profile/achivement/ArchivementPage';
+import ArchivementArticle from '../../../components/profile/achivement/ArchivementArticle';
 
 export default function ProfilePage() {
   return (
@@ -8,7 +8,7 @@ export default function ProfilePage() {
       <Navbar />
       <div className="w-[100%]">
         <div className="flex flex-col items-center">
-          <ArchivementPage />
+          <ArchivementArticle />
         </div>
       </div>
     </div>

@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import { HistoryCard } from './HistoryCard';
+import { mockData } from './mockDataHistory';
 
 function HistoryArticle() {
   const buttonClass =
@@ -7,13 +9,27 @@ function HistoryArticle() {
     'flex items-center justify-center ' +
     'absolute top-xl right-xl';
   return (
-    <div className="w-[600px] h-xl bg-light-background rounded-lg mt-xl ml-xl relative">
+    <div className="w-[800px] h-2xl bg-light-background rounded-lg mt-xl ml-xl relative">
       <div className="h-[inherit] pt-3xl flex flex-col items-center">
-        <h2 className="text-h2 font-bold absolute top-xl left-xl">최근 전적</h2>
-        <p>history information goes here.</p>
-        <Link href="/profile/history" className={buttonClass}>
-          더보기
+        <h2 className="text-h2 font-bold absolute top-[40px] left-2xl">
+          최근 전적
+        </h2>
+        <Link href="/profile" className={buttonClass}>
+          돌아가기
         </Link>
+        <div className="grid grid-cols-1 pt-2xl gap-sm w-[80%]">
+          {mockData.map((data) => (
+            <HistoryCard
+              key={data.key}
+              user1Name={data.user1Name}
+              user2Name={data.user2Name}
+              user1Avatar={data.user1Avatar}
+              user2Avatar={data.user2Avatar}
+              user1Score={data.user1Score}
+              user2Score={data.user2Score}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
