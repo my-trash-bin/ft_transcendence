@@ -1,14 +1,42 @@
+import Image from 'next/image';
 import toast, { Toaster } from 'react-hot-toast';
+import { TextBox } from './TextBox';
 
-function ProfileArticle() {
+interface ProfileArticleProps {
+  readonly avatar: string;
+  readonly nickname: string;
+  readonly win: number;
+  readonly lose: number;
+  readonly ratio: number;
+  readonly statusMessage: string;
+}
+
+function ProfileArticle(props: ProfileArticleProps) {
   const profile = () => toast(`프로필 수정`);
+  const buttonClass =
+    'w-lg h-sm bg-default rounded-sm border-2 border-dark-purple text-center text-black text-lg font-bold hover:bg-light-background ' +
+    'absolute top-xl right-xl';
   return (
-    <div className="w-[1225px] h-xl bg-light-background border-5 border-dark-purple mt-xl ml-xl">
-      <Toaster />
-      <div className="mt-lg ml-lg">
-        <h2 className="text-h2 font-bold">프로필</h2>
-        <p>hiostory information goes here.</p>
-        <button onClick={profile}>View profile Details</button>
+    <div className="w-[600px] h-xl bg-light-background rounded-lg ml-xl mt-xl mb-xl relative">
+      <div className="h-[inherit] p-2xl flex flex-row items-center">
+        <Toaster />
+        <Image
+          src={props.avatar}
+          priority={true}
+          alt="avatar"
+          width={150}
+          height={200}
+        />
+        <TextBox
+          nickname={props.nickname}
+          win={props.win}
+          lose={props.lose}
+          ratio={props.ratio}
+          statusMessage={props.statusMessage}
+        />
+        <button onClick={profile} className={buttonClass}>
+          프로필 수정
+        </button>
       </div>
     </div>
   );

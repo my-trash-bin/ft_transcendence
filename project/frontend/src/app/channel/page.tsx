@@ -1,4 +1,4 @@
-import Navbar from '../../components/common/navbar';
+import Navbar from '../../components/common/Navbar';
 
 export default function FriendHome() {
   return (
