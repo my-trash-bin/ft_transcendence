@@ -1,10 +1,13 @@
+import { MessageSearchInput } from '../channel/message-search/MessageSearchInput';
 import SearchCard from './SearchCard';
 
 function SearchUser() {
   return (
-    <div>
-      {' '}
-      <div className="w-[700px] h-[500px] mt-2xl grid gap-lg justify-center items-center overflow-y-scroll">
+    <div className="felx flex-col justify-center items-center">
+      <div className="mt-xl mb-xl">
+        <MessageSearchInput margin="m-auto" />
+      </div>
+      <div className="w-[700px] h-[500px] grid gap-lg justify-center items-center overflow-y-scroll">
         {dummyFriend.map((val) => {
           return (
             <SearchCard
