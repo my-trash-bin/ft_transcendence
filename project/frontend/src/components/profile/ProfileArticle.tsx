@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { TextBox } from './TextBox';
 
 interface ProfileArticleProps {
@@ -19,7 +19,6 @@ function ProfileArticle(props: ProfileArticleProps) {
   return (
     <div className="w-[600px] h-xl bg-light-background rounded-lg ml-xl mt-xl mb-xl relative">
       <div className="h-[inherit] p-2xl flex flex-row items-center">
-        <Toaster />
         <Image
           src={props.avatar}
           priority={true}
