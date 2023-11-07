@@ -42,6 +42,7 @@ export default <Config>{
       md: '75px',
       lg: '100px',
       xl: '300px',
+      '2xl': '600px',
     },
     height: {
       xs: '30px',
@@ -49,6 +50,7 @@ export default <Config>{
       md: '75px',
       lg: '100px',
       xl: '300px',
+      '2xl': '600px',
     },
     dropShadow: {
       none: '0 0 #0000',

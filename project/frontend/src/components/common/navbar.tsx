@@ -1,5 +1,5 @@
-import Logo from './logo';
-import NavIcon from './navIcon';
+import Logo from './Logo';
+import NavIcon from './NavIcon';
 
 const Navbar = () => {
   return (
