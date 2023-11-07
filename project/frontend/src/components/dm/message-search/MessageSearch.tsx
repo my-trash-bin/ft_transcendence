@@ -2,11 +2,9 @@ import { MessageSearchInput } from './MessageSearchInput';
 
 export function MessageSearch() {
   return (
-    <div className="w-[100%] h-[27%] pt-[5%] pl-[5%]">
-      <h3 className="w-[45%] h-[35%] ml-[8%] mb-[5%] text-[1.8rem]">
-        Messages
-      </h3>
-      <MessageSearchInput margin="ml-md" />
+    <div className="w-[inherit] mb-[20px] pt-[30px]">
+      <h3 className="mb-[30px] text-[32px]">메세지</h3>
+      <MessageSearchInput width="270px" height="30px" />
     </div>
   );
 }

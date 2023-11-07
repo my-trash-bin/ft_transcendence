@@ -61,21 +61,18 @@ const dummyMessage = [
 
 export function DmUserList() {
   return (
-    <div className="flex flex-col w-[100%] h-[80%] pl-[5%] ">
-      <p className="w-[25%] h-[5%] text-[0.7rem] text-dark-gray">All Message</p>
-      <div className="h-[inherit] overflow-y-scroll">
-        {dummyMessage.map((val) => {
-          return (
-            <DmUser
-              key={val.key}
-              imageUri={val.imageUri}
-              nickname={val.username}
-              messageShortcut={val.messageShortcut}
-              date={val.date}
-            />
-          );
-        })}
-      </div>
+    <div className="w-[inherit] h-[580px] overflow-y-scroll">
+      {dummyMessage.map((val) => {
+        return (
+          <DmUser
+            key={val.key}
+            imageUri={val.imageUri}
+            nickname={val.username}
+            messageShortcut={val.messageShortcut}
+            date={val.date}
+          />
+        );
+      })}
     </div>
   );
 }
