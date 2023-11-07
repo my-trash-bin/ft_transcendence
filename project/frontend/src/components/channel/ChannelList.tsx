@@ -1,5 +1,3 @@
-import { MyChannelButton } from './MyChannelButton';
-
 const dummyChannel = [
   {
     key: '1',
@@ -29,7 +27,6 @@ const dummyChannel = [
   },
   {
     key: '4',
-
     channelName: 'user3',
     messageShortcut: 'hello2',
     date: new Date(),
@@ -70,9 +67,11 @@ const dummyChannel = [
   },
 ];
 
+import { MyChannelButton } from './MyChannelButton';
+
 export function ChannelList() {
   return (
-    <div className="w-[inherit] h-[380px] overflow-y-scroll">
+    <div className="w-[inherit] h-[530px] overflow-y-scroll">
       {dummyChannel.map((data) => {
         return (
           <MyChannelButton
@@ -85,6 +84,16 @@ export function ChannelList() {
           />
         );
       })}
+      {/* {dummyChannel.map((data) => {
+        return (
+          <AllChannelButton
+            key={data.key}
+            channelName={data.channelName}
+            now={data.now}
+            max={data.max}
+          />
+        );
+      })} */}
     </div>
   );
 }

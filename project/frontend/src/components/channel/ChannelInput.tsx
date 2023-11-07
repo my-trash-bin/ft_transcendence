@@ -8,7 +8,7 @@ export function ChannelInput() {
         채널
       </h3>
       <SelectChannel myChannel={true} />
-      <MessageSearchInput />
+      <MessageSearchInput height="30px" width="270px" />
     </>
   );
 }
