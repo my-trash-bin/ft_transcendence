@@ -19,7 +19,7 @@ function SearchCard(props: SearchCardProps) {
         }}
       />
       <button onClick={profile}>
-        <Avatar src={`${props.imageUri}`} />
+        <Avatar src={`${props.imageUri}`} size={50} />
       </button>
       <div className="text-left text-black text-h2 font-semibold ml-2xl">
         {props.nickname}

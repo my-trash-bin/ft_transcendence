@@ -1,6 +1,6 @@
 interface ButtonProps {
   readonly onClick: () => void;
-  readonly children: React.ReactNode;
+  readonly text: string;
 }
 
 function Button(props: ButtonProps) {
@@ -9,7 +9,7 @@ function Button(props: ButtonProps) {
       className="bg-chat-color1-interactive text-white w-md h-xs text-lg"
       onClick={props.onClick}
     >
-      {props.children} {/* Render children prop */}
+      {props.text}
     </button>
   );
 }

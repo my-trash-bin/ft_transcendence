@@ -2,6 +2,7 @@ import Image from 'next/image';
 
 type AvatarProps = {
   readonly src: string;
+  readonly size: number;
 };
 
 export default function Avatar(props: AvatarProps) {
@@ -15,8 +16,8 @@ export default function Avatar(props: AvatarProps) {
         src={props.src}
         priority={true}
         alt="avatar"
-        width={50}
-        height={50}
+        width={props.size}
+        height={props.size}
         className={className}
       />
     </div>
