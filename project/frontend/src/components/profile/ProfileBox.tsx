@@ -11,7 +11,7 @@ interface ProfileArticleProps {
   readonly statusMessage: string;
 }
 
-function ProfileArticle(props: ProfileArticleProps) {
+function ProfileBox(props: ProfileArticleProps) {
   const profile = () => toast(`프로필 수정`);
   const buttonClass =
     'w-lg h-sm bg-default rounded-sm border-2 border-dark-purple text-center text-black text-lg font-bold hover:bg-light-background ' +
@@ -41,4 +41,4 @@ function ProfileArticle(props: ProfileArticleProps) {
   );
 }
 
-export default ProfileArticle;
+export default ProfileBox;

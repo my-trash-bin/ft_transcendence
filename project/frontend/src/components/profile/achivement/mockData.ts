@@ -5,7 +5,7 @@ interface AchivementProps {
   explanation: string;
 }
 
-export const dummyAchivData: AchivementProps[] = [
+export const mockData: AchivementProps[] = [
   {
     key: 1,
     imageURL: '/avatar/avatar-black.svg',

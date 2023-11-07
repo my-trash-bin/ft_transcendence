@@ -1,8 +1,8 @@
 'use client';
 import Navbar from '../../components/common/Navbar';
-import ArchivementArticle from '../../components/profile/achivement/ArchivementArticle';
-import HistoryArticle from '../../components/profile/history/HistoryArticle';
-import ProfileArticle from '../../components/profile/ProfileArticle';
+import ArchivementBox from '../../components/profile/achivement/ArchivementBox';
+import HistoryBox from '../../components/profile/history/HistoryBox';
+import ProfileBox from '../../components/profile/ProfileBox';
 
 export default function ProfilePage() {
   return (
@@ -10,7 +10,7 @@ export default function ProfilePage() {
       <Navbar />
       <div className="w-[100%]">
         <div className="flex flex-col items-center">
-          <ProfileArticle
+          <ProfileBox
             avatar="/avatar/avatar-blue.svg"
             nickname="happy"
             win={3}
@@ -19,8 +19,8 @@ export default function ProfilePage() {
             statusMessage={'I can do it!'}
           />
           <div className="flex flex-row">
-            <ArchivementArticle />
-            <HistoryArticle />
+            <ArchivementBox />
+            <HistoryBox />
           </div>
         </div>
       </div>
