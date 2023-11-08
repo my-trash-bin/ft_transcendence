@@ -1,15 +1,15 @@
 interface ButtonProps {
-  onClick: () => void;
-  children: React.ReactNode;
+  readonly onClick: () => void;
+  readonly text: string;
 }
 
 function Button(props: ButtonProps) {
   return (
     <button
-      className="bg-chat-color1 text-white w-md h-xs text-lg"
+      className="bg-chat-color1-interactive text-white w-md h-xs text-lg"
       onClick={props.onClick}
     >
-      {props.children} {/* Render children prop */}
+      {props.text}
     </button>
   );
 }

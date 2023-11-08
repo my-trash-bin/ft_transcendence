@@ -1,7 +1,5 @@
-import Link from 'next/link';
 import toast, { Toaster } from 'react-hot-toast';
 import FriendAvatar from './FriendAvatar';
-import FriendSetting from './FriendSetting';
 
 interface FriendCardProps {
   readonly nickname: string;
@@ -10,9 +8,7 @@ interface FriendCardProps {
 
 function FriendCard(props: FriendCardProps) {
   const profile = () => toast(`${props.nickname} 프로필 모달`);
-  const game = () => toast(`${props.nickname} 게임 요청`);
-  const buttonClass =
-    'w-md h-xs bg-default rounded-sm border-2 border-dark-purple text-center text-black text-lg font-bold mr-lg hover:bg-light-background';
+  const unblock = () => toast(`${props.nickname} 차단 해제`);
   return (
     <div className="w-[600px] h-[100px] bg-white border-3 border-default rounded-md flex items-center relative">
       <Toaster
@@ -26,14 +22,15 @@ function FriendCard(props: FriendCardProps) {
       <div className="text-left text-black text-h2 font-semibold ml-2xl">
         {props.nickname}
       </div>
-      <div className="absolute right-xl flex items-center">
-        <button onClick={game} className={buttonClass}>
-          게임 하기
+      <div className="absolute right-xl flex">
+        <button
+          onClick={unblock}
+          className={
+            'w-md h-xs bg-default rounded-sm border-2 border-dark-purple text-center text-black text-lg font-bold mr-lg hover:bg-light-background'
+          }
+        >
+          차단 풀기
         </button>
-        <Link href={'/dm'} className={buttonClass}>
-          메세지
-        </Link>
-        <FriendSetting nickname={props.nickname} />
       </div>
     </div>
   );
