@@ -9,14 +9,13 @@ function ArchivementArticle() {
     'flex items-center justify-center ' +
     'absolute top-xl right-2xl';
   return (
-    <div className="w-[800px] h-2xl bg-light-background rounded-lg mt-xl ml-xl relative">
+    <div className="relative">
       <div className="h-[inherit] pt-3xl flex flex-col items-center">
-        <h2 className="text-h2 font-bold absolute top-[40px] left-2xl">업적</h2>
+        <h2 className="text-h2 font-bold absolute top-xl left-2xl">업적</h2>
         <Link href="/profile" className={buttonClass}>
           돌아가기
         </Link>
-
-        <div className="grid grid-cols-3 pt-2xl gap-xl">
+        <div className="grid grid-cols-3 h-[500px] mt-2xl gap-xl overflow-y-scroll">
           {mockData.map((badge) => (
             <Badge
               key={badge.key}
