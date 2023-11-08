@@ -17,4 +17,16 @@ export const mockRankings = [
     name: '포뇨',
     avatar: '/avatar-black.ico',
   },
+  {
+    id: 4,
+    rank: 4,
+    name: 'klew',
+    avatar: '/avatar-black.ico',
+  },
+  {
+    id: 5,
+    rank: 5,
+    name: 'totoro',
+    avatar: '/avatar-black.ico',
+  },
 ];
