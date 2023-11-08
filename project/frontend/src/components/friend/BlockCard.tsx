@@ -10,7 +10,7 @@ function FriendCard(props: FriendCardProps) {
   const profile = () => toast(`${props.nickname} 프로필 모달`);
   const unblock = () => toast(`${props.nickname} 차단 해제`);
   return (
-    <div className="w-[600px] h-[100px] bg-light-background rounded-md flex items-center relative">
+    <div className="w-[600px] h-[100px] bg-white border-3 border-default rounded-md flex items-center relative">
       <Toaster
         toastOptions={{
           duration: 2000,

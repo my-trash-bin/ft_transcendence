@@ -4,19 +4,19 @@ import SearchCard from './SearchCard';
 function SearchUser() {
   return (
     <div className="felx flex-col justify-center items-center">
-      <div className="mt-xl mb-xl flex justify-center">
+      <div className="w-[700px] h-[600px] flex flex-col items-center">
         <MessageSearchInput width="600px" height="25px" />
-      </div>
-      <div className="w-[700px] h-[500px] grid gap-lg justify-center items-center overflow-y-scroll">
-        {dummyFriend.map((val) => {
-          return (
-            <SearchCard
-              key={val.key}
-              imageUri={val.imageUri}
-              nickname={val.nickname}
-            />
-          );
-        })}
+        <div className="w-[700px] h-[580px] grid gap-lg justify-center items-center overflow-y-scroll pt-xl">
+          {dummyFriend.map((val) => {
+            return (
+              <SearchCard
+                key={val.key}
+                imageUri={val.imageUri}
+                nickname={val.nickname}
+              />
+            );
+          })}
+        </div>
       </div>
     </div>
   );

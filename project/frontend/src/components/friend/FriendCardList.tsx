@@ -35,7 +35,7 @@ const dummyFriend = [
 
 function FriendCardList() {
   return (
-    <div className="w-[700px] h-[500px] mt-2xl grid gap-lg justify-center items-center overflow-y-scroll">
+    <div className="w-[700px] h-[600px] pt-xl grid gap-lg justify-center items-center overflow-y-scroll">
       {dummyFriend.map((val) => {
         return (
           <FriendCard

@@ -32,7 +32,7 @@ export default <Config>{
       sm: '10px',
       md: '15px',
       lg: '20px',
-      xl: '25px',
+      xl: '30px',
       '2xl': '60px',
       '3xl': '80px',
     },
