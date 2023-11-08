@@ -7,7 +7,7 @@ function HistoryBox() {
     'flex items-center justify-center ' +
     'absolute top-xl right-xl';
   return (
-    <div className="w-[600px] h-xl bg-light-background rounded-lg mt-xl ml-xl relative">
+    <div className="w-[435px] h-[420px] bg-light-background rounded-lg ml-[30px] relative">
       <div className="h-[inherit] pt-3xl flex flex-col items-center">
         <h2 className="text-h2 font-bold absolute top-xl left-xl">최근 전적</h2>
         <p>history information goes here.</p>
