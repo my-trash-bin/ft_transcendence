@@ -12,7 +12,7 @@ export default function DmPage() {
         </p>
         <DmUserList />
       </div>
-      <div className="w-[650px] h-[768px]">
+      <div className="w-[520px] h-[768px]">
         <MessageBox />
       </div>
     </div>

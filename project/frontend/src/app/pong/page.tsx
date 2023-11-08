@@ -1,5 +1,5 @@
 'use client';
-import Navbar from '../../components/common/navbar';
+import Navbar from '../../components/common/Navbar';
 
 export default function FriendHome() {
   return (
@@ -7,9 +7,7 @@ export default function FriendHome() {
       <Navbar />
       <div className="flex flex-row w-[100%]">
         <div className={`flex flex-col items-center max-w-4xl mx-auto`}>
-          <section>
-            Pong page!
-          </section>
+          <section>Pong page!</section>
         </div>
       </div>
     </div>

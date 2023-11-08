@@ -10,7 +10,7 @@ export default function ChannelHome() {
         <p className="text-[15px] mt-[15px] mb-[15px]">내 채널</p>
         <ChannelList />
       </div>
-      <div className="w-[650px] h-[768px]">
+      <div className="w-[520px] h-[768px]">
         <ChannleMessageBox />
       </div>
     </div>
