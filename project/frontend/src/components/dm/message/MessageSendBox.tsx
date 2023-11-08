@@ -1,7 +1,7 @@
 import Image from 'next/image';
 export function MessageSendBox() {
   return (
-    <div className="w-[inherit] h-[60px] border-1 border-default rounded-[10px] flex justify-center items-center">
+    <div className="w-[95%] h-[60px] border-t border-default flex justify-center items-center">
       <div className="h-[30px] w-[85%] flex flex-row justify-center relative bg-chat-color2 rounded-[10px]">
         <input
           type="text"
