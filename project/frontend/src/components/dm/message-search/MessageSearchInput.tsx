@@ -20,7 +20,7 @@ export function MessageSearchInput({
         <input
           type="text"
           placeholder="search user"
-          className="w-[80%] h-[90%] border-gray outline-none placeholder-text-left pl-[1%] "
+          className="w-[80%] h-[90%] bg-light-background outline-none placeholder-text-left pl-[1%] "
         />
         <Image
           src="/icon/cross-circle.svg"

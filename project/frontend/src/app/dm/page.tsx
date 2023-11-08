@@ -4,15 +4,12 @@ import { MessageBox } from '../../components/dm/message/MessageBox';
 
 export default function DmPage() {
   return (
-    <div className="flex flex-row">
-      <div className="w-[380px] h-[768px] border-r ml-[10px]">
+    <div className="flex flex-row bg-light-background rounded-[20px] w-[inherit]">
+      <div className="w-[380px] h-[750px] border-r flex flex-col items-center">
         <MessageSearch />
-        <p className="w-[inherit] mb-[15px] text-[15px] text-dark-gray">
-          모든 메세지
-        </p>
         <DmUserList />
       </div>
-      <div className="w-[520px] h-[768px]">
+      <div className="w-[520px] h-[750px] flex flex-col items-center">
         <MessageBox />
       </div>
     </div>
