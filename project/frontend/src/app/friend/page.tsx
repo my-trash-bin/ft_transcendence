@@ -1,6 +1,5 @@
 'use client';
 import { useState } from 'react';
-import Navbar from '../../components/common/Navbar';
 import BlockCardList from '../../components/friend/BlockCardList';
 import FriendCardList from '../../components/friend/FriendCardList';
 import SearchUser from '../../components/friend/SearchUser';
@@ -23,7 +22,6 @@ export default function FriendPage() {
 
   return (
     <div className="flex flex-row w-[100%] h-[100%]">
-      <Navbar />
       <div className="w-[100%]">
         <div className="flex flex-col items-center mt-2xl ml-2xl mr-2xl">
           <div className="grid grid-cols-3 grid-flex gap-2xl w-[600px]">
