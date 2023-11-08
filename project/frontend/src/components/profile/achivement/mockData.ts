@@ -42,4 +42,28 @@ export const mockData: AchivementProps[] = [
     name: 'Achievement 6',
     explanation: 'This is the third achievement.',
   },
+  {
+    key: 5,
+    imageURL: '/avatar/avatar-black.svg',
+    name: 'Achievement 5',
+    explanation: 'This is the second achievement.',
+  },
+  {
+    key: 6,
+    imageURL: '/avatar/avatar-black.svg',
+    name: 'Achievement 6',
+    explanation: 'This is the third achievement.',
+  },
+  {
+    key: 5,
+    imageURL: '/avatar/avatar-black.svg',
+    name: 'Achievement 5',
+    explanation: 'This is the second achievement.',
+  },
+  {
+    key: 6,
+    imageURL: '/avatar/avatar-black.svg',
+    name: 'Achievement 6',
+    explanation: 'This is the third achievement.',
+  },
 ];
