@@ -1,5 +1,5 @@
 import { MainLayout } from '@/components/common/MainLayout';
-import Navbar from '../../components/common/navbar';
+import Navbar from '../../components/common/Navbar';
 
 export default function ChannelLayout({
   children,
@@ -7,7 +7,7 @@ export default function ChannelLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-row w-[inherit] max-h-[768px]">
+    <div className="flex flex-row w-[inherit] h-[100%]">
       <Navbar />
       <MainLayout>{children}</MainLayout>
     </div>
