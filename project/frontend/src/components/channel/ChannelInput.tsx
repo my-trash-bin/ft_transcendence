@@ -3,12 +3,10 @@ import { SelectChannel } from './SelectChannel';
 
 export function ChannelInput() {
   return (
-    <>
-      <h3 className="w-[270px] h-[50px] text-[32px] mt-[30px] mb-[10px]">
-        채널
-      </h3>
+    <div className="h-[140px] mt-[30px] pl-[15px] mb-[10px]">
+      <h3 className="text-[32px] pl-[15px]">채널</h3>
       <SelectChannel myChannel={true} />
       <MessageSearchInput height="30px" width="270px" />
-    </>
+    </div>
   );
 }

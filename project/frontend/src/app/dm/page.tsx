@@ -7,6 +7,9 @@ export default function DmPage() {
     <div className="flex flex-row bg-light-background rounded-[20px] w-[inherit]">
       <div className="w-[380px] h-[750px] border-r flex flex-col items-center">
         <MessageSearch />
+        <p className="text-[15px] text-dark-gray mb-[15px] pl-[15px] self-start">
+          모든 메세지
+        </p>
         <DmUserList />
       </div>
       <div className="w-[520px] h-[750px] flex flex-col items-center">

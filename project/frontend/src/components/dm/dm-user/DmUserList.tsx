@@ -61,7 +61,7 @@ const dummyMessage = [
 
 export function DmUserList() {
   return (
-    <div className="w-[350px] flex-grow-1 overflow-y-scroll">
+    <div className="w-[inherit] flex-grow-1 flex flex-col items-center overflow-y-scroll">
       {dummyMessage.map((val) => {
         return (
           <DmUser
