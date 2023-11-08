@@ -10,7 +10,7 @@ export function MyChat({
     <div className=" pr-[3%] mb-[1.5%] flex flex-col">
       <p
         className="p-[2%] text-center inline-block max-w-[35%] rounded-[20px]
-                break-words bg-chat-color2 self-end min-w-[10%]"
+                break-words bg-white self-end min-w-[10%]"
       >
         {content}
       </p>
