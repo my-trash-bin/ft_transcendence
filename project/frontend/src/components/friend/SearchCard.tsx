@@ -12,7 +12,7 @@ function SearchCard(props: SearchCardProps) {
   const buttonClass =
     'w-md h-xs bg-default rounded-sm border-2 border-dark-purple text-center text-black text-lg font-bold mr-lg hover:bg-light-background';
   return (
-    <div className="w-[600px] h-[100px] bg-light-background rounded-md flex items-center relative">
+    <div className="w-[600px] h-[100px] bg-white border-3 border-default rounded-md flex items-center relative">
       <Toaster
         toastOptions={{
           duration: 2000,
