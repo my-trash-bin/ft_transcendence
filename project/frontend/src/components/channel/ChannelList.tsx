@@ -66,10 +66,9 @@ const dummyChannel = [
 ];
 
 import { AllChannelButton } from './AllChannelButton';
-
 export function ChannelList() {
   return (
-    <div className="w-[inherit] h-[530px] overflow-y-scroll">
+    <div className="w-[inherit] h-[530px] flex flex-col items-center overflow-y-scroll">
       {/* {dummyChannel.map((data) => {
         return (
           <MyChannelButton
