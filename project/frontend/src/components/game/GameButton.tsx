@@ -20,11 +20,18 @@ const ButtonComponent: React.FC<ButtonComponentProps> = ({ mode }) => {
 
   let content = mode === 'normal' ? '일반 게임' : '아이템 게임';
 
+  const bgCSS = 'bg-default-interactive rounded-md';
+  const sizeCSS = 'w-xl h-md';
+  const borderCSS = 'border-3 border-dark-purple';
+  const textCSS = 'text-dark-purple font-bold text-h2';
+  const hoverCSS =
+    'cursor-pointer transition-all duration-300 ease-in-out hover:shadow-custom hover:-translate-y-[0.148rem]';
+
   return (
     <div>
       <button
         key={buttonActive}
-        className="bg-default-interactive text-dark-purple font-bold text-h2 py-sm px-lg rounded-md cursor-pointer mx-md mb-2xl mt-3xl w-xl h-md flex items-center justify-center border-3 border-dark-purple transition-all duration-300 ease-in-out hover:shadow-custom hover:-translate-y-[0.148rem]"
+        className={`${textCSS} ${borderCSS} ${hoverCSS} ${sizeCSS} ${bgCSS}`}
         onClick={handleButtonClick}
       >
         {content}
