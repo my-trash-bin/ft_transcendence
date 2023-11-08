@@ -22,9 +22,9 @@ export default function FriendPage() {
 
   return (
     <div className="flex flex-row w-[100%] h-[100%]">
-      <div className="w-[100%]">
-        <div className="flex flex-col items-center mt-2xl ml-2xl mr-2xl">
-          <div className="grid grid-cols-3 grid-flex gap-2xl w-[600px]">
+      <div className="w-[100%] h-[100%] bg-light-background rounded-lg">
+        <div className="flex flex-col items-center w-inherit h-inherit overflow-hidden">
+          <div className="grid grid-cols-3 grid-flex gap-2xl w-[600px] p-xl">
             <div className="flex justify-center">
               <button
                 className={`${className(activeScreen === 'friend')} `}

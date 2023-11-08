@@ -17,7 +17,7 @@ function ProfileBox(props: ProfileArticleProps) {
     'w-lg h-sm bg-default rounded-sm border-2 border-dark-purple text-center text-black text-lg font-bold hover:bg-light-background ' +
     'absolute top-xl right-xl';
   return (
-    <div className="w-[600px] h-xl bg-light-background rounded-lg ml-xl mt-xl mb-xl relative">
+    <div className="w-[900px] h-xl bg-light-background rounded-lg mb-[30px] relative">
       <div className="h-[inherit] p-2xl flex flex-row items-center">
         <Image
           src={props.avatar}
