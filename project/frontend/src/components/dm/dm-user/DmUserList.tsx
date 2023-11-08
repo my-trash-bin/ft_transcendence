@@ -1,6 +1,6 @@
 import { DmUser } from './DmUser';
 
-const dummyMessage = [
+const dmData = [
   {
     key: '1',
     imageUri: '/avatar/avatar-big.svg',
@@ -59,10 +59,18 @@ const dummyMessage = [
   },
 ];
 
-export function DmUserList() {
+export function DmUserList({ searchUsername }: { searchUsername: string }) {
+  let dmRenderData = dmData;
+  if (searchUsername !== '') {
+    dmRenderData = dmData.filter((val) => {
+      if (val.username.includes(searchUsername)) {
+        return val;
+      }
+    });
+  }
   return (
     <div className="w-[inherit] flex-grow-1 flex flex-col items-center overflow-y-scroll">
-      {dummyMessage.map((val) => {
+      {dmRenderData.map((val) => {
         return (
           <DmUser
             key={val.key}
