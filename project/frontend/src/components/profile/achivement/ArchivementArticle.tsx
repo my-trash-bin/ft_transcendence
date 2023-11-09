@@ -9,13 +9,14 @@ function ArchivementArticle() {
       <div className="h-[inherit] pt-3xl flex flex-col items-center">
         <Title location="top-center">업적</Title>
         <ProfileButton href="/profile" text="돌아가기" />
-        <div className="grid grid-cols-3 h-[500px] mt-3xl gap-xl overflow-y-scroll">
+        <div className="grid grid-cols-3 w-[700px] h-[500px] mt-3xl gap-xl p-md overflow-y-scroll">
           {mockData.map((badge) => (
             <Badge
               key={badge.key}
+              // size="default"
+              nameContent={badge.name}
+              commentContent={badge.explanation}
               imageURL={badge.imageURL}
-              name={badge.name}
-              explanation={badge.explanation}
             />
           ))}
         </div>
