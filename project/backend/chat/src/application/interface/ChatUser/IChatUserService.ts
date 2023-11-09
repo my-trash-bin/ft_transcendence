@@ -5,5 +5,5 @@ export interface IChatUserService {
   getMany(
     ids: readonly ChatUserId[],
   ): Promise<(ChatUserView | InvalidIdException)[]>;
-  create(): Promise<ChatUserView | InvalidIdException>;
+  create(): Promise<ChatUserView>;
 }

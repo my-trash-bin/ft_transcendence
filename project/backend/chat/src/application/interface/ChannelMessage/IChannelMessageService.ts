@@ -10,13 +10,13 @@ export interface IChannelMessageService {
   sendMessageToChannel(
     channelId: string,
     messageJson: string
-  ): Promise<ChannelMessageView | InvalidIdException>;
+  ): Promise<ChannelMessageView>;
   
   getMessagesByChannel(
     channelId: string
-  ): Promise<(ChannelMessageView | InvalidIdException)[]>;
+  ): Promise<ChannelMessageView[]>;
   
   getMessagesByMember(
     memberId: string
-  ): Promise<(ChannelMessageView | InvalidIdException)[]>;
+  ): Promise<ChannelMessageView[]>;
 }

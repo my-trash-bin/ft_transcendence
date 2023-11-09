@@ -16,5 +16,5 @@ export interface IChannelService {
   ): Promise<(ChannelView | InvalidIdException)[]>;
   create(
     createChannelInfo: CreateChannelInfo,
-  ): Promise<ChannelView | InvalidIdException>;
+  ): Promise<ChannelView>;
 }

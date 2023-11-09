@@ -38,7 +38,7 @@ export class ChatUserService implements IChatUserService {
     );
   }
 
-  async create(): Promise<ChatUserView | InvalidIdException> {
+  async create(): Promise<ChatUserView> {
     const authUser = this.getAuthUserIdFromContext()
     const prismaUser = await this.repository.client.chatUser.create({
       data: { authUserId: authUser.value },

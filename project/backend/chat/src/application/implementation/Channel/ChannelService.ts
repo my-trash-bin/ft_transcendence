@@ -43,7 +43,7 @@ export class ChannelService implements IChannelService {
     ownerId,
     memberCount,
     maximumMemberCount,
-  }: CreateChannelInfo): Promise<ChannelView | InvalidIdException> {
+  }: CreateChannelInfo): Promise<ChannelView> {
     const prismaUser = await this.repository.client.channel.create({
       data: {
         title,
