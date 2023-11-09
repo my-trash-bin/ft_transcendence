@@ -9,13 +9,13 @@ function ArchivementBox() {
       <div className="h-[inherit] pt-3xl flex flex-col items-center">
         <Title location="top-left">업적</Title>
         <ProfileButton href="/profile/achivement" text="더보기" />
-        <div className="grid grid-cols-3 h-[500px] mt-xl gap-md overflow-y-scroll">
+        <div className="grid grid-cols-3 h-[500px] w-[90%] mt-xl gap-md px-sm overflow-y-scroll">
           {mockData.map((badge) => (
             <Badge
               key={badge.key}
+              size="small"
+              nameContent={badge.name}
               imageURL={badge.imageURL}
-              name={badge.name}
-              explanation={badge.explanation}
             />
           ))}
         </div>
