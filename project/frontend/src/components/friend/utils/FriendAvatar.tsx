@@ -7,19 +7,15 @@ type FriendAvatarProps = {
 
 export default function FriendAvatar(props: FriendAvatarProps) {
   const className = `w-md h-md rounded-md
-  flex items-center justify-center
-  hover:bg-default
-  relative left-md`;
+  flex items-center justify-center hover:bg-default`;
   return (
-    <div>
-      <Image
-        src={props.src}
-        priority={true}
-        alt="avatar"
-        width={props.size}
-        height={props.size}
-        className={className}
-      />
-    </div>
+    <Image
+      src={props.src}
+      priority={true}
+      alt="avatar"
+      width={props.size}
+      height={props.size}
+      className={className}
+    />
   );
 }
