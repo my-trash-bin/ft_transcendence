@@ -6,7 +6,8 @@ const LongCardCVA = cva(
     'font-semibold',
     'rounded-md',
     'border-3',
-    'p-md',
+    'px-sm',
+    'mx-auto',
     'relative',
     'flex',
     'items-center',
@@ -18,13 +19,13 @@ const LongCardCVA = cva(
   {
     variants: {
       size: {
-        small: ['w-[200px] h-[30px]', 'text-md'],
-        medium: ['w-[600px] h-[50px]', 'text-h2', 'mx-auto mb-xl'],
-        big: ['w-[600px] h-[60px]', 'text-h2', 'mx-auto mb-lg '],
+        small: ['w-[350px] h-[40px] ', 'text-xl ', 'mb-md '],
+        medium: ['w-[600px] h-sm ', 'text-h2 ', 'mb-xl '],
+        big: ['w-[600px] h-md ', 'text-h2 ', 'mb-2xl '],
       },
       color: {
-        default: ['bg-white-interactive', 'border-gray-interactive'],
-        color: ['bg-default-interactive', 'border-dark-purple-interactive'],
+        default: ['bg-white-interactive ', 'border-gray-interactive'],
+        color: ['bg-default-interactive ', 'border-dark-purple-interactive'],
       },
     },
     compoundVariants: [
