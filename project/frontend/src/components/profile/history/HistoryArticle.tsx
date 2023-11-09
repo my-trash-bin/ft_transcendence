@@ -10,7 +10,7 @@ function HistoryArticle() {
           최근 전적
         </h2>
         <ProfileButton href="/profile" text="돌아가기" />
-        <div className="flex flex-col h-[500px] mt-3xl w-[80%] overflow-y-scroll">
+        <div className="flex flex-col items-center h-[500px] mt-3xl w-[80%] overflow-y-scroll">
           {mockData.map((data) => (
             <HistoryCard
               key={data.key}
