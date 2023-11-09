@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import LongCard from '../../common/LongCard';
+import { LongCard } from '../../common/LongCard';
 
 interface HistoryCardProps {
   readonly user1Name: string;
@@ -12,7 +12,7 @@ interface HistoryCardProps {
 
 export function HistoryCard(props: HistoryCardProps) {
   return (
-    <LongCard isUser={false}>
+    <LongCard>
       <Image
         src={props.user1Avatar}
         alt="avatar"
@@ -20,12 +20,11 @@ export function HistoryCard(props: HistoryCardProps) {
         height={50}
         className="absolute left-sm"
       />
-      <span className="text-left absolute left-3xl">{props.user1Name}</span>
+      <span className="absolute text-left left-3xl">{props.user1Name}</span>
       <span className="absolute left-1/2 transform -translate-x-1/2 text-center">
         {props.user1Score} : {props.user2Score}
       </span>
       <span className="text-right absolute right-3xl">{props.user2Name}</span>
-
       <Image
         src={props.user2Avatar}
         alt="avatar"
