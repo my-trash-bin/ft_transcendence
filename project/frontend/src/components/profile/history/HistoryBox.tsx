@@ -5,8 +5,8 @@ import { mockData } from './mockDataHistory';
 
 function HistoryBox() {
   return (
-    <div className="w-[435px] h-[420px] bg-light-background rounded-lg ml-[30px] relative">
-      <div className="h-[inherit] pt-3xl flex flex-col items-center">
+    <div className="w-[435px] h-[420px] bg-light-background rounded-lg ml-xl relative">
+      <div className="h-[inherit] pt-3xl pb-xl flex flex-col items-center">
         <Title location="top-left">최근 전적</Title>
         <ProfileButton href="/profile/history" text="더보기" />
         <div className="flex flex-col h-[500px] mt-xl w-[90%] overflow-y-scroll">
