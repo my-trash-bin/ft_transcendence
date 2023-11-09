@@ -21,7 +21,7 @@ const LongCardCVA = cva(
       size: {
         small: ['w-[350px] h-[40px] ', 'text-xl ', 'mb-md '],
         medium: ['w-[600px] h-sm ', 'text-h2 ', 'mb-xl '],
-        big: ['w-[600px] h-md ', 'text-h2 ', 'mb-2xl '],
+        big: ['w-[600px] h-md ', 'text-h2 ', 'mt-xl mb-2xl '],
       },
       color: {
         default: ['bg-white-interactive ', 'border-gray-interactive'],
@@ -55,9 +55,4 @@ export const LongCard: React.FC<LongCardProps> = ({
   size,
   color,
   children,
-  ...props
-}) => (
-  <div className={LongCardCVA({ size, color })} {...props}>
-    {children}
-  </div>
-);
+}) => <div className={LongCardCVA({ size, color })}>{children}</div>;
