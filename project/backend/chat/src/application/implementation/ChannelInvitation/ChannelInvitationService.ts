@@ -6,8 +6,8 @@ import { IChannelInvitationService } from "../../interface/ChannelInvitaion/ICha
 import { ChannelInvitationView } from "../../interface/ChannelInvitaion/view/ChannelInvitationView";
 import { ChatUserId } from "../../interface/ChatUser/view/ChatUserView";
 import { IRepository } from '../../interface/IRepository';
-import { prismaChannelInvitationSelect } from './PrismaChannelInvitationSelect';
 import { mapPrismaChannelInvitationToChannelInvitationView } from './mapPrismaChannelInvitationToChannelInvitationView';
+import { prismaChannelInvitationSelect } from './prismaChannelInvitationSelect';
 
 export class ChannelInvitationService implements IChannelInvitationService {
 
