@@ -6,7 +6,7 @@ export interface ApplicationImportsFromInfrastructure {
 }
 
 export interface ApplicationImportsFromApi {
-  requestContext: RequestContext;
+  requestContext?: RequestContext;
 }
 
 export interface ApplicationImports

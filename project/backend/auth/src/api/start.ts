@@ -16,7 +16,6 @@ import FTStrategy from 'passport-42';
 
 import { AuthType } from '@prisma/client';
 import { sign } from 'jsonwebtoken';
-import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ApplicationExports } from '../application/ApplicationExports';
 import { ApplicationImports } from '../application/ApplicationImports';
 import { RequestContextForSystem } from '../application/RequestContext';
@@ -30,11 +29,14 @@ import { schema } from './schema';
 
 async function makeContext(
   container: Container<ApiImports & ApiExports>,
-  authToken?: string,
+  userHeader?: string,
 ): Promise<Context> {
   const scope = container
     .scope()
-    .register('requestContext', asValue(authToken));
+    .register(
+      'requestContext',
+      asValue(userHeader ? JSON.parse(userHeader) : null),
+    );
   return { container: scope };
 }
 
@@ -61,9 +63,9 @@ export async function start(
     async ({ req }) =>
       await makeContext(
         container,
-        req.headers.authorization?.startsWith('Bearer ')
-          ? req.headers.authorization.slice('Bearer '.length)
-          : undefined,
+        Array.isArray(req.headers.user)
+          ? req.headers.user[0]
+          : req.headers.user,
       ),
     (app) => {
       app.use(json());
@@ -91,30 +93,6 @@ export async function start(
           }
         })();
       });
-
-      use(
-        new Strategy(
-          {
-            jwtFromRequest: (req) =>
-              req?.cookies?.jwt ??
-              ExtractJwt.fromAuthHeaderAsBearerToken()(req),
-            secretOrKey: env('JWT_SECRET'),
-          },
-          (payload: JwtPayload, done) => {
-            (async () => {
-              try {
-                const authView = await systemContainer
-                  .resolve('authService')
-                  .getById(payload.user.id);
-                done(null, authView);
-              } catch (e) {
-                done(e, false);
-              }
-            })();
-          },
-        ),
-      );
-      app.use('/graphql', authenticate('jwt', { session: false }));
 
       try {
         use(

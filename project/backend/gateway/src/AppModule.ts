@@ -1,10 +1,14 @@
-import { IntrospectAndCompose, RemoteGraphQLDataSource } from '@apollo/gateway';
+import { IntrospectAndCompose } from '@apollo/gateway';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { env } from '@ft_transcendence/common/env';
 import { ApolloGatewayDriver, ApolloGatewayDriverConfig } from '@nestjs/apollo';
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
-import { sign } from 'jsonwebtoken';
+import FileUploadDataSource from '@profusion/apollo-federation-upload';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
+import { expressjwt } from 'express-jwt';
+import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.mjs';
 
 @Module({
   imports: [
@@ -12,30 +16,33 @@ import { sign } from 'jsonwebtoken';
       driver: ApolloGatewayDriver,
       gateway: {
         buildService: ({ name, url }) => {
-          return new RemoteGraphQLDataSource({
+          return new FileUploadDataSource({
             url,
             willSendRequest({ request, context }: any) {
-              request.http.headers.set(
-                'Authorization',
-                `Bearer ${context.token}`,
-              );
+              if (!request.http) {
+                request.http = {
+                  headers: Object.entries({
+                    ...(context.user && { user: JSON.stringify(context.user) }),
+                    'apollo-require-preflight': 'Hello world!',
+                  }),
+                };
+              } else {
+                if (context.user)
+                  request.http.headers.append(
+                    'user',
+                    JSON.stringify(context.user),
+                  );
+              }
             },
           });
         },
         supergraphSdl: new IntrospectAndCompose({
           subgraphs: [
             { name: 'auth', url: env('SUBGRAPH_URL_AUTH') },
-            { name: 'main', url: env('SUBGRAPH_URL_MAIN') },
-            { name: 'chat', url: env('SUBGRAPH_URL_CHAT') },
-            { name: 'pong', url: env('SUBGRAPH_URL_PONG') },
+            // { name: 'main', url: env('SUBGRAPH_URL_MAIN') },
+            // { name: 'chat', url: env('SUBGRAPH_URL_CHAT') },
+            // { name: 'pong', url: env('SUBGRAPH_URL_PONG') },
           ],
-          introspectionHeaders: () => ({
-            Authorization: `Bearer ${sign(
-              { user: { system: true } },
-              env('JWT_SECRET'),
-              { expiresIn: '1d' },
-            )}`,
-          }),
         }),
       },
 
@@ -44,10 +51,30 @@ import { sign } from 'jsonwebtoken';
         ...(process.env.NODE_ENV === 'development' && {
           plugins: [ApolloServerPluginLandingPageLocalDefault()],
         }),
+        context: ({ req }: { req: any }) => {
+          const user = req.auth?.user || null;
+          return { user };
+        },
       },
     }),
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(
+        cors(),
+        cookieParser(env('COOKIE_SECRET')),
+        expressjwt({
+          secret: env('JWT_SECRET'),
+          algorithms: ['HS256'],
+          credentialsRequired: false,
+          getToken: (req) => req.cookies?.jwt,
+        }),
+        graphqlUploadExpress(),
+      )
+      .forRoutes('/graphql');
+  }
+}

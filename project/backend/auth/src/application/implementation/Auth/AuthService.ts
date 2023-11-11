@@ -16,7 +16,7 @@ import { prismaAuthSelect } from './prismaAuthSelect';
 
 export class AuthService implements IAuthService {
   private readonly repository: IRepository;
-  private readonly requestContext: RequestContext;
+  private readonly requestContext?: RequestContext;
 
   constructor(resolve: Resolver<ApplicationImports>) {
     this.repository = resolve('repository');

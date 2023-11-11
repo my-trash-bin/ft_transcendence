@@ -1,17 +1,19 @@
 {
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "./dist",
+    "outDir": "./compile",
     "noImplicitAny": true,
     "strict": true,
     "strictNullChecks": true,
     "strictFunctionTypes": true,
     "strictBindCallApply": true,
     "strictPropertyInitialization": true,
+    "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "module": "commonjs",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "esModuleInterop": true,
   },
   "include": ["src/**/*"]
 }
