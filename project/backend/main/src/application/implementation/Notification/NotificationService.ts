@@ -2,22 +2,22 @@ import { Resolver } from '@ft_transcendence/common/di/Container';
 import { getId } from '../../../util/id/getId';
 import { sortAs } from '../../../util/sortAs';
 import { ApplicationImports } from '../../ApplicationImports';
+import { RequestContext } from '../../RequestContext';
 import { InvalidIdException } from '../../exception/InvalidIdException';
 import { IRepository } from '../../interface/IRepository';
+import { INotificationService } from '../../interface/Notification/INotificationService';
 import {
   JSONValidationErrorCodes,
   JSONValidationException,
 } from '../../interface/Notification/exception/JSONValidationException';
-import { INotificationService } from '../../interface/Notification/INotificationService';
 import {
   NotificationId,
   NotificationView,
 } from '../../interface/Notification/view/NotificationView';
 import { UserId } from '../../interface/User/view/UserView';
-import { RequestContext } from '../../RequestContext';
 import { invalidId } from '../../util/exception/invalidId';
-import { mapPrismaNotificationToNotificationView } from './mapPrismaNotificationToNotificationView';
 import { prismaUserSelect } from './PrismaNotificationSelect';
+import { mapPrismaNotificationToNotificationView } from './mapPrismaNotificationToNotificationView';
 
 class NotificationService implements INotificationService {
   private readonly repository: IRepository;
@@ -47,6 +47,7 @@ class NotificationService implements INotificationService {
 
   async create(userId: UserId, contentJson: string): Promise<NotificationView> {
     this.validateJSON(contentJson);
+    // auth
     const prismaNotification = await this.repository.client.notification.create(
       {
         data: { userId: userId.value, contentJson },
