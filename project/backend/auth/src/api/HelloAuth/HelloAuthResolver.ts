@@ -1,8 +1,8 @@
 import GraphQLUpload from 'graphql-upload/GraphQLUpload.mjs';
-import type { FileUpload } from 'graphql-upload/Upload.mjs';
 import { Arg, Ctx, Int, Mutation, Query, Resolver } from 'type-graphql';
 
 import type { Context } from '../Context';
+import { FederatedFileUpload } from '../FederatedFileUpload';
 import { HelloAuth } from './HelloAuth';
 
 @Resolver((of) => HelloAuth)
@@ -16,7 +16,8 @@ export class HelloAuthResolver {
 
   @Mutation((type) => Int)
   async helloFile(
-    @Arg('file', (type) => GraphQLUpload) file: FileUpload,
+    @Arg('file', (type) => GraphQLUpload, { validate: false })
+    file: FederatedFileUpload,
   ): Promise<number> {
     console.log(file);
     return 0;

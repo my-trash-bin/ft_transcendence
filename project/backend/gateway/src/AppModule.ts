@@ -15,7 +15,7 @@ import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.mjs';
     GraphQLModule.forRoot<ApolloGatewayDriverConfig>({
       driver: ApolloGatewayDriver,
       gateway: {
-        buildService: ({ name, url }) => {
+        buildService: ({ url }) => {
           return new FileUploadDataSource({
             url,
             willSendRequest({ request, context }: any) {
@@ -23,7 +23,7 @@ import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.mjs';
                 request.http = {
                   headers: Object.entries({
                     ...(context.user && { user: JSON.stringify(context.user) }),
-                    'apollo-require-preflight': 'Hello world!',
+                    'apollo-require-preflight': '1',
                   }),
                 };
               } else {
@@ -55,6 +55,7 @@ import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.mjs';
           const user = req.auth?.user || null;
           return { user };
         },
+        sortSchema: true,
       },
     }),
   ],
