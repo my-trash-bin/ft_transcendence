@@ -6,8 +6,10 @@ import { ApplicationImports } from '../../ApplicationImports';
 import { RequestContext } from '../../RequestContext';
 import { InvalidAccessException } from '../../exception/InvalidAccessException';
 import { InvalidIdException } from '../../exception/InvalidIdException';
+import { ChannelId } from '../../interface/Channel/view/ChannelView';
 import { IChannelMessageService } from '../../interface/ChannelMessage/IChannelMessageService';
 import { ChannelMessageId, ChannelMessageView } from '../../interface/ChannelMessage/view/ChannelMessageView';
+import { ChatUserId } from '../../interface/ChatUser/view/ChatUserView';
 import { IRepository } from '../../interface/IRepository';
 import { prismaChannelMessageSelect } from './PrismaChannelMessageSelect';
 import { mapPrismaChannelMessageToChannelMessageView } from './mapPrismaChannelMessageToChannelMessageView';
@@ -38,33 +40,33 @@ export class ChannelMessageService implements IChannelMessageService {
     );
   }
 
-  async sendMessageToChannel(
-    channelId: string,
+  async create(
+    channelId: ChannelId,
     messageJson: string
   ): Promise<ChannelMessageView> {
     const authUser = this.getAuthUserIdFromContext();
     const prismaChannelMessage = await this.repository.client.channelMessage.create({
-      data: { channelId, memberId: authUser.value, messageJson },
+      data: { channelId: channelId.value, memberId: authUser.value, messageJson },
       select: prismaChannelMessageSelect
     })
     return mapPrismaChannelMessageToChannelMessageView(prismaChannelMessage);
   }
   
-  async getMessagesByChannel(
-    channelId: string
+  async findByChannel(
+    channelId: ChannelId
   ): Promise<ChannelMessageView[]> {
     const prismaChannelMessagesList = await this.repository.client.channelMessage.findMany({
-      where: { channelId },
+      where: { channelId: channelId.value },
       select: prismaChannelMessageSelect
     })
     return prismaChannelMessagesList.map(mapPrismaChannelMessageToChannelMessageView);
   }
   
-  async getMessagesByMember(
-    memberId: string
+  async findByMember(
+    memberId: ChatUserId
   ): Promise<ChannelMessageView[]> {
     const prismaChannelMessagesList = await this.repository.client.channelMessage.findMany({
-      where: { memberId },
+      where: { memberId: memberId.value },
       select: prismaChannelMessageSelect
     })
     return prismaChannelMessagesList.map(mapPrismaChannelMessageToChannelMessageView);
