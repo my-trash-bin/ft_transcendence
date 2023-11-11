@@ -2,6 +2,7 @@ import { Resolver } from '@ft_transcendence/common/di/Container';
 import { getId } from '../../../util/id/getId';
 import { sortAs } from '../../../util/sortAs';
 import { ApplicationImports } from '../../ApplicationImports';
+import { RequestContext } from '../../RequestContext';
 import { InvalidIdException } from '../../exception/InvalidIdException';
 import { AchievementId } from '../../interface/Achievement/view/AchievementView';
 import { IRepository } from '../../interface/IRepository';
@@ -12,7 +13,6 @@ import {
   UserAchievementDetailView,
   UserAchievementRelationView,
 } from '../../interface/UserAchievement/view/UserAchievementView';
-import { RequestContext } from '../../RequestContext';
 import { invalidId } from '../../util/exception/invalidId';
 import {
   mapPrismaUserAchievementWithMainUserAndAchievementToAchievementUserRelationView,
