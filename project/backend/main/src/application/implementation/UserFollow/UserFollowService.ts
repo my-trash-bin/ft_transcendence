@@ -1,16 +1,19 @@
 import { Resolver } from '@ft_transcendence/common/di/Container';
-import { MainUser } from '@prisma/client';
 import { idOf } from '../../../util/id/idOf';
 import { ApplicationImports } from '../../ApplicationImports';
-import { RequestContext, RequestContextUser } from '../../RequestContext';
+import { RequestContext } from '../../RequestContext';
 import { InvalidAccessException } from '../../exception/InvalidAccessException';
 import { InvalidIdException } from '../../exception/InvalidIdException';
 import { IRepository } from '../../interface/IRepository';
 import { UserId } from '../../interface/User/view/UserView';
 import { IUserFollowService } from '../../interface/UserFollow/IUserFollowService';
 import { UserRelationView } from '../../interface/UserFollow/view/UserRelationView';
-import { mapPrismaUserFollowWithFolloweeToUserRelationView } from './mapPrismaUserFollowWithFolloweeToUserRelationView';
-import { prismaUserFollowWithFolloweeSelect } from './prismaUserFollowFolloweeSelect';
+import { mapPrismaUserFollowWithFolloweeToUserRelationView } from './mapPrismaUserFollowWithFolloweeToUserRelationView copy';
+import { mapPrismaUserFollowWithFollowerToUserRelationView } from './mapPrismaUserFollowWithFollowerToUserRelationView';
+import {
+  prismaUserFollowWithFolloweeSelect,
+  prismaUserFollowWithFollowerSelect,
+} from './prismaUserFollowFolloweeSelect';
 
 export class UserFollowService implements IUserFollowService {
   private readonly repository: IRepository;
@@ -21,7 +24,7 @@ export class UserFollowService implements IUserFollowService {
     this.requestContext = resolve('requestContext');
   }
 
-  async followUser(followeeId: UserId, isBlock = false): Promise<void> {
+  async followUser(followeeId: UserId): Promise<void> {
     await this.followOrBlockUser(followeeId, false);
   }
 
@@ -46,11 +49,33 @@ export class UserFollowService implements IUserFollowService {
   }
 
   async getFollowers(): Promise<UserRelationView[]> {
-    const followerId = await this.getFollowerIdFromContext();
+    const followeeId = await this.getUserIdFromContext();
     const followers = await this.repository.client.userFollow.findMany({
       where: {
-        followeeId: followerId.value,
+        followeeId: followeeId.value,
         isBlock: false,
+      },
+      select: prismaUserFollowWithFollowerSelect,
+    });
+    return followers.map(mapPrismaUserFollowWithFollowerToUserRelationView);
+  }
+
+  async getFollowing(): Promise<UserRelationView[]> {
+    return await this.getFollowingOrBlockedUsers(false);
+  }
+
+  async getBlockedUsers(): Promise<UserRelationView[]> {
+    return await this.getFollowingOrBlockedUsers(true);
+  }
+
+  private async getFollowingOrBlockedUsers(
+    isBlock: boolean,
+  ): Promise<UserRelationView[]> {
+    const followerId = await this.getUserIdFromContext();
+    const followers = await this.repository.client.userFollow.findMany({
+      where: {
+        followerId: followerId.value,
+        isBlock,
       },
       select: prismaUserFollowWithFolloweeSelect,
     });
@@ -58,33 +83,8 @@ export class UserFollowService implements IUserFollowService {
     return followers.map(mapPrismaUserFollowWithFolloweeToUserRelationView);
   }
 
-  async getFollowing(): Promise<MainUser[]> {
-    return await this.getFollowingOrBlockedUsers(false);
-  }
-
-  async getBlockedUsers(): Promise<MainUser[]> {
-    return await this.getFollowingOrBlockedUsers(true);
-  }
-
-  private async getFollowingOrBlockedUsers(
-    isBlock: boolean,
-  ): Promise<MainUser[]> {
-    const followerId = await this.getFollowerIdFromContext();
-    const followers = await this.repository.client.userFollow.findMany({
-      where: {
-        followeeId: followerId.value,
-        isBlock,
-      },
-      include: {
-        followee: true,
-      },
-    });
-
-    return followers.map((f) => f.followee);
-  }
-
   private async followOrBlockUser(followeeId: UserId, isBlock: boolean) {
-    const followerId = await this.getFollowerIdFromContext();
+    const followerId = await this.getUserIdFromContext();
     await this.repository.client.userFollow.upsert({
       where: {
         followerId_followeeId: {
@@ -105,13 +105,13 @@ export class UserFollowService implements IUserFollowService {
   }
 
   private async isFollwingOrIsBlockUsed(followeeId: UserId, isBlock: boolean) {
-    const followerId = await this.getFollowerIdFromContext();
+    const followerId = await this.getUserIdFromContext();
     const follow = await this.getFollow(followerId, followeeId);
     return follow !== null && follow.isBlock === isBlock;
   }
 
   private async unFollowUserOrUnBlockUser(followeeId: UserId) {
-    const followerId = await this.getFollowerIdFromContext();
+    const followerId = await this.getUserIdFromContext();
     await this.repository.client.userFollow.delete({
       where: {
         followerId_followeeId: {
@@ -122,8 +122,11 @@ export class UserFollowService implements IUserFollowService {
     });
   }
 
-  private async getFollowerIdFromContext() {
-    const authUserId = this.user().id;
+  private async getUserIdFromContext() {
+    if (this.requestContext.isSystem) {
+      throw new InvalidAccessException(); // requestContext.user가 없다 === 로그인 상태가 아니다.
+    }
+    const authUserId = this.requestContext.user.id;
     const mainUser = await this.repository.client.mainUser.findUnique({
       where: { id: authUserId.value },
     });
@@ -142,10 +145,5 @@ export class UserFollowService implements IUserFollowService {
         },
       },
     });
-  }
-
-  private user(): RequestContextUser {
-    if (this.requestContext.isSystem) throw new InvalidAccessException();
-    return this.requestContext.user;
   }
 }

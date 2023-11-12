@@ -28,9 +28,9 @@ model Channel {
   isPublic           Boolean
   password           String?
   createdAt          DateTime @default(now())
-  lastChatAt         DateTime
+  lastActiveAt       DateTime @default(now())
   ownerId            String?  @db.Uuid
-  memberCount        Int
+  memberCount        Int      @default(0)
   maximumMemberCount Int
 
   owner ChatUser? @relation("Channel_owner", fields: [ownerId], references: [id])
@@ -42,7 +42,7 @@ model Channel {
   @@index([isPublic, memberCount])
   @@index([isPublic, title])
   @@index([isPublic, createdAt])
-  @@index([isPublic, lastChatAt])
+  @@index([isPublic, lastActiveAt])
 }
 
 enum ChannelMemberType {
@@ -60,7 +60,7 @@ model ChannelMember {
   channel Channel  @relation("ChannelMember_channel", fields: [channelId], references: [id])
   member  ChatUser @relation("ChannelMember_member", fields: [memberId], references: [id])
 
-  @@id([channelId, memberType, memberId])
+  @@id([channelId, memberId]) // @@id([channelId, memberType, memberId])에서 memberType 탈락
   @@index([memberId, channelId])
 }
 

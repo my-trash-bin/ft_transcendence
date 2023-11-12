@@ -23,7 +23,7 @@ model UserFollow {
   followerId        String   @db.Uuid
   followeeId        String   @db.Uuid
   isBlock           Boolean
-  followOrBlockedAt DateTime @updatedAt
+  followOrBlockedAt DateTime @default(now()) @updatedAt
 
   follower MainUser @relation("UserFollow_follower", fields: [followerId], references: [id])
   followee MainUser @relation("UserFollow_followee", fields: [followeeId], references: [id])
