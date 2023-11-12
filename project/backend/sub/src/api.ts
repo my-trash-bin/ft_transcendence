@@ -16,7 +16,7 @@ import {
 import cors from 'cors';
 import express, { Express, json } from 'express';
 import gql from 'graphql-tag';
-import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.mjs';
+import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.js';
 import { SubscribeMessage } from 'graphql-ws';
 import { Context } from 'graphql-ws/lib/server';
 import { useServer } from 'graphql-ws/lib/use/ws';

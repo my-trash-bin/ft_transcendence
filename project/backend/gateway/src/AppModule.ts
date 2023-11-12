@@ -8,7 +8,7 @@ import FileUploadDataSource from '@profusion/apollo-federation-upload';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import { expressjwt } from 'express-jwt';
-import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.mjs';
+import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.js';
 
 @Module({
   imports: [

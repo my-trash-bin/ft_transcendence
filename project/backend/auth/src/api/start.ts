@@ -1,9 +1,11 @@
 import { Container, asValue } from '@ft_transcendence/common/di/Container';
 import { MissingEnvError, env } from '@ft_transcendence/common/env';
 import { start as commonStart } from '@ft_transcendence/sub/api';
+import { AuthType } from '@prisma/client';
 import cookieParser from 'cookie-parser';
 import { json, urlencoded } from 'express';
 import expressSession from 'express-session';
+import { sign } from 'jsonwebtoken';
 import {
   authenticate,
   deserializeUser,
@@ -14,8 +16,6 @@ import {
 } from 'passport';
 import FTStrategy from 'passport-42';
 
-import { AuthType } from '@prisma/client';
-import { sign } from 'jsonwebtoken';
 import { ApplicationExports } from '../application/ApplicationExports';
 import { ApplicationImports } from '../application/ApplicationImports';
 import { RequestContextForSystem } from '../application/RequestContext';

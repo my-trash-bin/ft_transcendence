@@ -17,5 +17,6 @@ export default {
   ],
   external: [
     "graphql",
+    /^graphql-upload\/.*/,
   ],
 };
