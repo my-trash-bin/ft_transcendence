@@ -1,31 +1,32 @@
 import { ChannelMemberType } from '@prisma/client';
+import { ChannelId } from '../Channel/view/ChannelView';
+import { ChatUserId } from '../ChatUser/view/ChatUserView';
 import { ChannelMemberView } from './view/ChannelMemberView';
 
 export interface IChannelMemberService {
 
-  addMemberToChannel(
-    channelId: string,
+  create(
+    channelId: ChannelId,
     memberType: ChannelMemberType
   ): Promise<ChannelMemberView>;
 
-  getMembersByChannel(
-    channelId: string
+  findByChannel(
+    channelId: ChannelId
   ): Promise<ChannelMemberView[]>;
   
-  getChannelsByMember(
-    memberId: string
+  findByMember(
+    memberId: ChatUserId
   ): Promise<ChannelMemberView[]>;
 
-  updateMemberStatus(
-    channelId: string,
-    memberId: string,
+  updateOfCreate(
+    channelId: ChannelId,
+    memberId: ChatUserId,
     memberType: ChannelMemberType,
     mutedUntil: Date
   ): Promise<ChannelMemberView>;
   
-  removeMemberFromChannel(
-    channelId: string,
-    memberId: string,
-    memberType: ChannelMemberType
+  delete(
+    channelId: ChannelId,
+    memberId: ChatUserId,
   ): Promise<ChannelMemberView>;
 }

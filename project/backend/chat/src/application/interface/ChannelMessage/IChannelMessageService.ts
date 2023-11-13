@@ -1,4 +1,6 @@
 import { InvalidIdException } from "../../exception/InvalidIdException";
+import { ChannelId } from "../Channel/view/ChannelView";
+import { ChatUserId } from "../ChatUser/view/ChatUserView";
 import { ChannelMessageId, ChannelMessageView } from "./view/ChannelMessageView";
 
 export interface IChannelMessageService {
@@ -7,16 +9,16 @@ export interface IChannelMessageService {
     ids: ChannelMessageId[]
   ): Promise<(ChannelMessageView | InvalidIdException)[]>
 
-  sendMessageToChannel(
-    channelId: string,
+  create(
+    channelId: ChannelId,
     messageJson: string
   ): Promise<ChannelMessageView>;
   
-  getMessagesByChannel(
-    channelId: string
+  findByChannel(
+    channelId: ChannelId
   ): Promise<ChannelMessageView[]>;
   
-  getMessagesByMember(
-    memberId: string
+  findByMember(
+    memberId: ChatUserId
   ): Promise<ChannelMessageView[]>;
 }
