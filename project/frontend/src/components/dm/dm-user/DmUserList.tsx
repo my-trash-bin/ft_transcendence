@@ -1,83 +1,59 @@
+'use client';
+import { GET_DM_USERS } from '@/api/dm/DmApi';
+import { getClient } from '@/lib/ApolloClient';
+import { useEffect, useState } from 'react';
 import { DmUser } from './DmUser';
 
-const dmData = [
-  {
-    key: '1',
-    imageUri: '/avatar/avatar-big.svg',
-    username: 'user1',
-    messageShortcut: 'hello',
-    date: new Date(),
-  },
-  {
-    key: '2',
-    imageUri: '/avatar/avatar-big.svg',
-    username: 'user2',
-    messageShortcut: 'hello1',
-    date: new Date(),
-  },
-  {
-    key: '3',
-    imageUri: '/avatar/avatar-black.svg',
-    username: 'user3',
-    messageShortcut: 'hello2',
-    date: new Date(),
-  },
-  {
-    key: '4',
-    imageUri: '/avatar/avatar-blue.svg',
-    username: 'user3',
-    messageShortcut: 'hello2',
-    date: new Date(),
-  },
-  {
-    key: '5',
-    imageUri: '/avatar/avatar-big.svg',
-    username: 'user3',
-    messageShortcut: 'hello2',
-    date: new Date(),
-  },
-  {
-    key: '6',
-    imageUri: '/avatar/avatar-small.svg',
-    username: 'user3',
-    messageShortcut: 'hello2',
-    date: new Date(),
-  },
-  {
-    key: '7',
-    imageUri: '/avatar/avatar-big.svg',
-    username: 'user3',
-    messageShortcut: 'hello2',
-    date: new Date(),
-  },
-  {
-    key: '8',
-    imageUri: '/avatar/avatar-black.svg',
-    username: 'user3',
-    messageShortcut: 'hello2',
-    date: new Date(),
-  },
-];
+interface DmUser {
+  nickname: string;
+  profileImageUrl: string;
+  preViewMessage: string;
+  latestTime: Date;
+}
 
-export function DmUserList({ searchUsername }: { searchUsername: string }) {
-  let dmRenderData = dmData;
-  if (searchUsername !== '') {
-    dmRenderData = dmData.filter((val) => {
-      if (val.username.includes(searchUsername)) {
-        return val;
-      }
-    });
-  }
+async function getDmUsers() {
+  const { data }: { data: any } = await getClient().query({
+    query: GET_DM_USERS,
+  });
+  let dmRenderData: DmUser[] = data.dmUser.map((val: any) => {
+    return {
+      nickname: val.nickname,
+      profileImageUrl: val.profileImageUrl,
+      preViewMessage:
+        val.preViewMessage.length > 25
+          ? val.preViewMessage.slice(0, 22) + '...'
+          : val.preViewMessage,
+      latestTime: val.latestTime,
+    };
+  });
+  return dmRenderData;
+}
+
+export function DmUserList({
+  searchUsername,
+}: Readonly<{ searchUsername: string }>) {
+  const [dmRenderData, setDmRenderData] = useState<DmUser[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const dmData = await getDmUsers();
+      setDmRenderData(
+        dmData.filter((val) => val.nickname.includes(searchUsername)),
+      );
+    };
+    fetchData();
+  }, [searchUsername]);
+
   return (
     <div className="w-[inherit] flex-grow-1 flex flex-col items-center overflow-y-scroll">
       {dmRenderData.map((val) => {
         return (
           <DmUser
-            key={val.key}
-            imageUri={val.imageUri}
-            nickname={val.username}
-            messageShortcut={val.messageShortcut}
-            date={val.date}
+            key={val.nickname}
+            imageUri={val.profileImageUrl}
+            nickname={val.nickname}
+            messageShortcut={val.preViewMessage}
+            date={val.latestTime}
           />
         );
       })}
