@@ -6,7 +6,9 @@ import { MessageBox } from '@/components/dm/message/MessageBox';
 import Image from 'next/image';
 import { useState } from 'react';
 
-export default function DmPage({ params }: { params: { username: string } }) {
+export default function DmPage({
+  params,
+}: Readonly<{ params: { username: string } }>) {
   const userSearchCallback = (searchUsername: string) => {
     setSearchUsername(searchUsername);
   };

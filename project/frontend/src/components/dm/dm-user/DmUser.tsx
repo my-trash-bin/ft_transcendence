@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { formatAMPM } from '../utils/FromatAmPm';
+
 export function DmUser({
   imageUri,
   nickname,
@@ -15,7 +16,7 @@ export function DmUser({
   const dateView = formatAMPM(date);
   return (
     <div className="mb-[10px]">
-      <Link href={`/dm/${nickname}`} scroll={false}>
+      <Link href={`/dm/${nickname}`}>
         <button className="w-[340px] h-[100px] relative bg-white border border-default rounded-md shrink-0">
           <div className="w-[40] h-[60px] absolute top-[20px] left-[15px]">
             <Image
