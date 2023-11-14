@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { CommonCard } from './utils/CommonCard';
 
@@ -8,6 +9,9 @@ interface FriendCardProps {
 
 function FriendCard(props: FriendCardProps) {
   const unblock = () => toast(`${props.nickname} 차단 해제`);
+  useEffect(() => {
+    return () => toast.dismiss();
+  }, []);
   return (
     <CommonCard imageURL={props.imageURL} nickname={props.nickname}>
       <Toaster
