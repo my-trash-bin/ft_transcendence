@@ -1,8 +1,8 @@
 import Link from 'next/link';
 
 interface ProfileButtonProps {
-  href: string;
-  text: string;
+  readonly href: string;
+  readonly text: string;
 }
 
 export function ProfileButton(props: ProfileButtonProps) {
