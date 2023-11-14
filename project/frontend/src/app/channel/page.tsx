@@ -2,7 +2,7 @@
 import { ChannelInput } from '@/components/channel/ChannelInput';
 import { ChannelList } from '@/components/channel/ChannelList';
 import { ChannleMessageBox } from '@/components/channel/ChannelMessageBox';
-import { ModalLayout } from '@/components/channel/ModalLayout';
+import { ModalLayout } from '@/components/channel/modals/ModalLayout';
 import { useState } from 'react';
 export default function ChannelHome() {
   const [isOpen, setIsOpen] = useState(true);
@@ -15,7 +15,12 @@ export default function ChannelHome() {
 
   return (
     <>
-      <ModalLayout isOpen={isOpen} closeModal={modalClose} />
+      <ModalLayout
+        isOpen={isOpen}
+        closeModal={modalClose}
+        width="350px"
+        height="500px"
+      />
       <div
         className={`bg-opacity-50 flex flex-row bg-light-background rounded-[20px] w-[inherit]`}
       >
