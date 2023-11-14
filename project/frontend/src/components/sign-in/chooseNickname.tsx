@@ -12,7 +12,7 @@ export default function ChooseNickname({
   const [isUnique, setIsUnique] = useState(false);
 
   function isNicknameValid(nickname: string): boolean {
-    const nicknameRegex = /^[a-zA-Z0-9\-_]{6,20}$/;
+    const nicknameRegex = /^[a-zA-Z0-9\-_]{6,12}$/;
     return nicknameRegex.test(nickname);
   }
 
@@ -39,7 +39,7 @@ export default function ChooseNickname({
             className="ml-md mr-md border-2 border-gray p-[2px]"
           />
           <p className="text-sm text-dark-gray ml-md mt-md">
-            닉네임은 6-20자 이어야 합니다. <br />
+            닉네임은 6-12자 이어야 합니다. <br />
             영문, 숫자, -, _ 중에서 사용하세요.{' '}
           </p>
         </div>

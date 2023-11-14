@@ -1,5 +1,6 @@
 'use client';
 
+import LinkButton from '@/components/sign-in/LinkButton';
 import { useState } from 'react';
 import SelectAvatar from '../../components/sign-in/SelectAvatar';
 import ChooseAvatar from '../../components/sign-in/chooseAvatar';
@@ -35,6 +36,7 @@ export default function SignIn() {
       <div>
         {nickname}
         <SelectAvatar name={avatar} isSelected={true} />
+        <LinkButton text="go to friend" href="/friend" />
       </div>
     );
 
