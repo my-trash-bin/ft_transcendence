@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { MessageSearchInput } from '../dm/message-search/MessageSearchInput';
 import SearchCard from './SearchCard';
 
-interface FriendInfo {
+interface SearchCard {
   nickname: string;
   profileImageUrl: string;
 }
@@ -14,28 +14,38 @@ async function fetchFriends() {
     query: GET_FRIENDS,
   });
 
-  return data.friend;
+  return data.friend as SearchCard[];
 }
 
-function SearchUser() {
-  const [friendData, setFriendData] = useState<FriendInfo[]>([]);
+export function SearchCardList() {
+  const [friendRenderData, setFriendRenderData] = useState<SearchCard[]>([]);
+  const [searchUsername, setSearchUsername] = useState('');
 
-  // Use the useEffect hook to fetch data when the component mounts
+  const userSearchCallback = (searchUsername: string) => {
+    setSearchUsername(searchUsername);
+  };
+
   useEffect(() => {
     const fetchData = async () => {
-      const data = await fetchFriends();
-      setFriendData(data);
+      const friendData = await fetchFriends();
+      setFriendRenderData(
+        friendData.filter((val) => val.nickname.includes(searchUsername)),
+      );
     };
 
     fetchData();
-  }, []); // Empty dependency array ensures the effect runs only once when the component mounts
+  }, [searchUsername]);
 
   return (
     <div className="felx flex-col justify-center items-center">
       <div className="w-[700px] h-[600px] flex flex-col items-center">
-        <MessageSearchInput width="600px" height="25px" />
-        <div className="w-[700px] h-[580px] grid gap-lg justify-center items-center overflow-y-scroll pt-xl">
-          {friendData.map((val, index) => {
+        <MessageSearchInput
+          width="600px"
+          height="25px"
+          eventFunction={userSearchCallback}
+        />
+        <div className="w-[700px] h-[580px] grid gap-lg justify-center items-start overflow-y-scroll pt-xl place-content-start">
+          {friendRenderData.map((val, index) => {
             return (
               <SearchCard
                 key={index}
@@ -49,5 +59,3 @@ function SearchUser() {
     </div>
   );
 }
-
-export default SearchUser;
