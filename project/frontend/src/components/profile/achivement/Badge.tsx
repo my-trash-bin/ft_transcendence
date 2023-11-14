@@ -1,26 +1,51 @@
+import { cva, type VariantProps } from 'class-variance-authority';
 import Image from 'next/image';
 
-interface BadgeProps {
-  readonly imageURL: string;
-  readonly name: string;
-  readonly explanation: string;
+export const badge = cva(
+  [
+    'flex flex-col items-center justify-center',
+    'w-full h-full',
+    'bg-white-interactive rounded-md border-2 border-gray',
+    'py-sm',
+    'transition-all',
+    'duration-300',
+    'ease-in-out',
+    'cursor-pointer',
+  ],
+  {
+    variants: {
+      size: {
+        default: ['font-semibold text-center text-xl'],
+        small: ['font-semibold text-center text-lg'],
+      },
+    },
+    defaultVariants: {
+      size: 'default',
+    },
+  },
+);
+export interface BadgeProps extends VariantProps<typeof badge> {
+  nameContent: string;
+  commentContent: string | null;
+  imageURL: string;
 }
-export function Badge(props: BadgeProps) {
-  const nameClass = 'font-semibold text-center text-xl pt-md pb-md';
-  const commentClass = 'font-normal text-center text-md align-top pb-md';
+
+export const Badge: React.FC<BadgeProps> = ({
+  size,
+  nameContent,
+  commentContent,
+  imageURL,
+}) => {
+  const imageSizeStyles: { width: number; height: number } =
+    size === 'small' ? { width: 75, height: 75 } : { width: 100, height: 100 };
+
   return (
-    <div className="flex flex-col items-center">
-      <div className="w-[100px] h-[100px] bg-white flex items-center justify-center">
-        <Image
-          src={props.imageURL}
-          priority={true}
-          alt="badge"
-          width={100}
-          height={100}
-        />
+    <div className={badge({ size })}>
+      <Image src={imageURL} priority={true} alt="badge" {...imageSizeStyles} />
+      <div className="pt-sm">{nameContent}</div>
+      <div className={'font-normal text-center text-md align-top'}>
+        {commentContent}
       </div>
-      <div className={nameClass}>{props.name}</div>
-      <div className={commentClass}>{props.explanation}</div>
     </div>
   );
-}
+};

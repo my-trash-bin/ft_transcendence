@@ -1,8 +1,6 @@
 'use client';
 import GameButton from '../../components/game/GameButton';
-import Ranking from '../../components/game/Ranking';
-import { mockRankings } from '../../components/game/mockRankings';
-import { mockUser } from '../../components/game/mockUser';
+import { Ranking } from '../../components/game/Ranking';
 
 export default function GamePage() {
   return (
@@ -21,8 +19,7 @@ export default function GamePage() {
               >
                 순위
               </h2>
-              <Ranking rankings={mockUser} isUser={true} />
-              <Ranking rankings={mockRankings} />
+              <Ranking />
             </article>
           </div>
         </div>
