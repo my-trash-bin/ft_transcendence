@@ -1,30 +1,57 @@
-import React from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
 
-interface LongCardProps {
-  children: React.ReactNode;
-  isUser: boolean;
+const LongCardCVA = cva(
+  [
+    'text-dark-gray-interactive',
+    'font-semibold',
+    'rounded-md',
+    'px-sm',
+    'mx-auto',
+    'relative',
+    'flex',
+    'items-center',
+    'transition-all',
+    'duration-300',
+    'ease-in-out',
+    'cursor-pointer',
+  ],
+  {
+    variants: {
+      size: {
+        small: ['w-[350px] h-[40px] ', 'text-xl ', 'border-2'],
+        medium: ['w-[600px] h-sm ', 'text-h2', 'border-3'],
+        big: ['w-[600px] h-md ', 'text-h2 ', 'mt-xl mb-xl ', 'border-3'],
+      },
+      color: {
+        default: ['bg-white-interactive ', 'border-gray-interactive'],
+        color: ['bg-default-interactive ', 'border-dark-purple-interactive'],
+      },
+    },
+    compoundVariants: [
+      {
+        size: 'big',
+        color: 'color',
+        class: 'user',
+      },
+      {
+        size: 'small',
+        color: 'default',
+        class: 'small',
+      },
+    ],
+    defaultVariants: {
+      size: 'medium',
+      color: 'default',
+    },
+  },
+);
+
+export interface LongCardProps extends VariantProps<typeof LongCardCVA> {
+  children?: React.ReactNode;
 }
 
-const LongCard: React.FC<LongCardProps> = ({ children, isUser }) => {
-  const bgCSS = isUser ? 'bg-default-interactive ' : 'bg-white-interactive';
-  const size = isUser ? 'my-xl h-ms' : 'mx-auto mb-lg h-[60px]';
-  const borderCSS = isUser
-    ? 'border-dark-purple-interactive '
-    : 'border-gray-interactive';
-
-  const commonCSS = 'w-[600px] rounded-md p-md border-3 relative';
-  const textCSS = 'text-dark-gray-interactive font-semibold text-h2';
-  const alignCSS = 'flex items-center';
-  const hoverCSS =
-    'cursor-pointer transition-all duration-300 ease-in-out hover:shadow-custom hover:-translate-y-[0.148rem]';
-
-  return (
-    <div
-      className={`${commonCSS} ${textCSS} ${alignCSS} ${borderCSS} ${hoverCSS} ${size} ${bgCSS}`}
-    >
-      {children}
-    </div>
-  );
-};
-
-export default LongCard;
+export const LongCard: React.FC<LongCardProps> = ({
+  size,
+  color,
+  children,
+}) => <div className={LongCardCVA({ size, color })}>{children}</div>;
