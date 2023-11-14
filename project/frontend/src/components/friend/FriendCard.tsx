@@ -12,7 +12,7 @@ interface FriendCardProps {
 function FriendCard(props: FriendCardProps) {
   const game = () => toast(`${props.nickname} 게임 요청`);
   const buttonClass =
-    'w-md h-xs bg-default rounded-sm border-2 border-dark-purple text-center text-black text-lg font-bold mr-lg hover:bg-light-background';
+    'w-md h-xs bg-default rounded-sm border-2 border-dark-purple text-center text-black text-lg font-bold mx-lg hover:bg-light-background';
   return (
     <CommonCard imageURL={props.imageURL} nickname={props.nickname}>
       <Toaster
