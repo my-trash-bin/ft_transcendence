@@ -10,7 +10,7 @@ export default function ChooseNickname({
   onNicknameSubmit,
 }: ChooseNicknameProps) {
   const [nickname, setNickname] = useState('');
-  const [isUnique, setIsUnique] = useState(false);
+  const [isUnique, setIsUnique] = useState<boolean | undefined>(undefined);
   const [isValid, setIsValid] = useState(false);
 
   function isNicknameValid(nickname: string): boolean {
@@ -26,18 +26,25 @@ export default function ChooseNickname({
   function handleNicknameChange(e: React.ChangeEvent<HTMLInputElement>) {
     const newNickname = e.target.value;
     setNickname(newNickname);
-    setIsUnique(false);
+    setIsUnique(undefined);
     setIsValid(isNicknameValid(newNickname));
+  }
+
+  function handleIsUnique(unique: boolean | undefined): void {
+    if (unique !== isUnique) {
+      setIsUnique(unique);
+
+      if (unique === true) {
+        toast.success('Nickname is unique!');
+      } else if (unique === false) {
+        toast.error('Nickname is not unique!');
+      }
+    }
   }
 
   const handleButtonClick = () => {
     if (isValid) {
-      setIsUnique(isNicknameUnique(nickname));
-      if (isUnique) {
-        toast.success('Nickname is unique!');
-      } else {
-        toast.error('Nickname is not unique!');
-      }
+      handleIsUnique(isNicknameUnique(nickname));
     }
   };
 
@@ -82,11 +89,11 @@ export default function ChooseNickname({
         <div className="self-end mt-xl">
           <Button
             onClick={() => {
-              if (isNicknameValid(nickname) && isUnique) {
+              if (isValid && isUnique) {
                 onNicknameSubmit(nickname);
               }
             }}
-            disabled={!isNicknameValid(nickname) || !isUnique}
+            disabled={!isValid || !isUnique}
           >
             다음으로
           </Button>
