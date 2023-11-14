@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import toast, { Toaster } from 'react-hot-toast';
+import { Button } from '../common/Button';
 import FriendSetting from './FriendSetting';
 import { CommonCard } from './utils/CommonCard';
 
@@ -19,9 +20,7 @@ function FriendCard(props: FriendCardProps) {
           duration: 2000,
         }}
       />
-      <button onClick={game} className={buttonClass}>
-        게임 하기
-      </button>
+      <Button onClick={game}>게임하기</Button>
       <Link href={'/dm'} className={buttonClass}>
         메세지
       </Link>
