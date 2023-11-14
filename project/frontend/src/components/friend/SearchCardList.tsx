@@ -41,7 +41,7 @@ export function SearchCardList() {
       <div className="w-[700px] h-[600px] flex flex-col items-center">
         <MessageSearchInput
           width="600px"
-          height="25px"
+          height="30px"
           eventFunction={userSearchCallback}
         />
         <div className="w-[700px] h-[580px] grid gap-lg justify-center items-start overflow-y-scroll pt-xl place-content-start">
