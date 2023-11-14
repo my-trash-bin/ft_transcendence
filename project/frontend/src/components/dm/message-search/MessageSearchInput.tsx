@@ -51,7 +51,7 @@ export function MessageSearchInput({
           value={searchInput}
           onChange={inputChangeEvent}
           placeholder="search user"
-          className="w-[80%] h-[90%] bg-light-background outline-none placeholder-text-left pl-[1%] "
+          className="w-[80%] h-[90%] bg-[inherit] outline-none placeholder-text-left pl-[1%] "
         />
         <button onClick={crossOnClick}>
           <Image
