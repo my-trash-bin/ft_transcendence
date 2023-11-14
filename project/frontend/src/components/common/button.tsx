@@ -35,9 +35,7 @@ export const Button: React.FC<ButtonProps> = ({
   children,
   disabled,
 }) => {
-  console.log(disabled);
   color = disabled ? 'disabled' : 'default';
-  console.log(color);
   return (
     <button
       className={ButtonCVA({ size, color })}
