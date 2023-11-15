@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import { AddChannelButton } from './AddChannelButton';
 
 export function SelectChannel({
   myChannel,
@@ -31,15 +31,7 @@ export function SelectChannel({
           모든채널
         </button>
       </div>
-      <button>
-        <Image
-          alt="add channel"
-          src="/icon/add.svg"
-          width={25}
-          height={25}
-          layout="relative"
-        />
-      </button>
+      <AddChannelButton />
     </div>
   );
 }
