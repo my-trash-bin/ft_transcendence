@@ -6,11 +6,13 @@ import { useEffect, useState } from 'react';
 export function MessageSearchInput({
   height,
   width,
+  placeholder,
   eventFunction,
 }: Readonly<{
   height: string;
   width: string;
-  eventFunction: (arg: any | void) => any | void;
+  placeholder: string;
+  eventFunction: (searchInput: string) => any | void;
 }>) {
   const [searchInput, setSearchInput] = useState('');
 
@@ -20,7 +22,6 @@ export function MessageSearchInput({
 
   useEffect(() => {
     const identifier = setTimeout(() => {
-      console.log(searchInput);
       eventFunction(searchInput);
     }, 500);
 
@@ -50,8 +51,8 @@ export function MessageSearchInput({
           type="text"
           value={searchInput}
           onChange={inputChangeEvent}
-          placeholder="search user"
-          className="w-[80%] h-[90%] bg-[inherit] outline-none placeholder-text-left pl-[1%] "
+          placeholder={placeholder}
+          className="w-[80%] h-[90%] bg-[inherit] outline-none placeholder-text-left pl-[1%] placeholder:italic"
         />
         <button onClick={crossOnClick}>
           <Image

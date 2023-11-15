@@ -32,7 +32,7 @@ export default function ChannelHome() {
           <ChannelList />
         </div>
         <div className="w-[520px] h-[750px] flex flex-col items-center">
-          <ChannleMessageBox />
+          <ChannleMessageBox modalOpen={modalOpen} />
         </div>
       </div>
     </>
