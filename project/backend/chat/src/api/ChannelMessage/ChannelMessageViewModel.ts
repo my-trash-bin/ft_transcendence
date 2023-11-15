@@ -1,5 +1,4 @@
-
-import { Field, ID } from "type-graphql";
+import { Field, ID } from 'type-graphql';
 
 export class ChannelMessageViewModel {
   @Field(() => ID, { nullable: false })
@@ -16,5 +15,4 @@ export class ChannelMessageViewModel {
 
   @Field(() => String, { nullable: false })
   messageJson!: string;
-
 }

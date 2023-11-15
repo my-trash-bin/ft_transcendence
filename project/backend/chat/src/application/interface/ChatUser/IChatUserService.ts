@@ -5,5 +5,7 @@ export interface IChatUserService {
   getMany(
     ids: readonly ChatUserId[],
   ): Promise<(ChatUserView | InvalidIdException)[]>;
+  findOne(chatUserId: ChatUserId): Promise<ChatUserView>;
   create(): Promise<ChatUserView>;
+  findOrCreate(): Promise<ChatUserView>;
 }

@@ -1,12 +1,14 @@
-import { ChannelMessageView } from "../../application/interface/ChannelMessage/view/ChannelMessageView";
-import { ChannelMessageViewModel } from "./ChannelMessageViewModel";
+import { ChannelMessageView } from '../../application/interface/ChannelMessage/view/ChannelMessageView';
+import { ChannelMessageViewModel } from './ChannelMessageViewModel';
 
-export function mapToChannelMessageViewModel(channelMessageView: ChannelMessageView): ChannelMessageViewModel {
+export function mapToChannelMessageViewModel(
+  view: ChannelMessageView,
+): ChannelMessageViewModel {
   const viewModel = new ChannelMessageViewModel();
-  viewModel.id = channelMessageView.id.value;
-  viewModel.channelId = channelMessageView.channelId.value;
-  viewModel.memberId = channelMessageView.memberId.value;
-  viewModel.sentAt = channelMessageView.sentAt;
-  viewModel.messageJson = channelMessageView.messageJson;
+  viewModel.id = view.id.value;
+  viewModel.channelId = view.channelId.value;
+  viewModel.memberId = view.memberId.value;
+  viewModel.sentAt = view.sentAt;
+  viewModel.messageJson = view.messageJson;
   return viewModel;
 }

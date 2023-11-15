@@ -3,7 +3,6 @@ import { invalidId } from '../../../exception/invalidId';
 import { getId } from '../../../util/id/getId';
 import { sortAs } from '../../../util/sortAs';
 import { ApplicationImports } from '../../ApplicationImports';
-import { RequestContext } from '../../RequestContext';
 import { InvalidAccessException } from '../../exception/InvalidAccessException';
 import { InvalidIdException } from '../../exception/InvalidIdException';
 import { IChatUserService } from '../../interface/ChatUser/IChatUserService';
@@ -12,6 +11,7 @@ import {
   ChatUserView,
 } from '../../interface/ChatUser/view/ChatUserView';
 import { IRepository } from '../../interface/IRepository';
+import { RequestContext } from '../../RequestContext';
 import { mapPrismaUserToChatUserView } from './mapPrismaUserToChatUserView';
 
 export class ChatUserService implements IChatUserService {
@@ -38,14 +38,36 @@ export class ChatUserService implements IChatUserService {
     );
   }
 
+  async findOne(chatUserId: ChatUserId): Promise<ChatUserView> {
+    const prismaUser = await this.repository.client.chatUser.findUnique({
+      where: { id: chatUserId.value },
+    });
+    if (prismaUser === null) {
+      throw new InvalidIdException(chatUserId);
+    }
+    return mapPrismaUserToChatUserView(prismaUser);
+  }
+
   async create(): Promise<ChatUserView> {
-    const authUser = this.getAuthUserIdFromContext()
+    const authUser = this.getAuthUserIdFromContext();
     const prismaUser = await this.repository.client.chatUser.create({
       data: { authUserId: authUser.value },
     });
     return mapPrismaUserToChatUserView(prismaUser);
   }
-  
+
+  async findOrCreate(): Promise<ChatUserView> {
+    const authUser = this.getAuthUserIdFromContext();
+    const prismaUser = await this.repository.client.chatUser.upsert({
+      where: { authUserId: authUser.value },
+      update: {},
+      create: {
+        authUserId: authUser.value,
+      },
+    });
+    return mapPrismaUserToChatUserView(prismaUser);
+  }
+
   private getAuthUserIdFromContext() {
     const authUser = this.requestContext.user;
     if (!authUser) {

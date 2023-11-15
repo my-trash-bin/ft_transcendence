@@ -1,6 +1,6 @@
-import { idOf } from "../../../util/id/idOf";
-import { DMChannelAssociationView } from "../../interface/DMChannelAssociation/view/DMChannelAssociationView";
-import { PrismaDMChannelAssociation } from "./PrismaDMChannelAssociation";
+import { idOf } from '../../../util/id/idOf';
+import { DMChannelAssociationView } from '../../interface/DMChannelAssociation/view/DMChannelAssociationView';
+import { PrismaDMChannelAssociation } from './PrismaDMChannelAssociation';
 
 export function mapPrismaDMChannelAssociationToDMChannelAssociationView({
   id,
@@ -10,6 +10,6 @@ export function mapPrismaDMChannelAssociationToDMChannelAssociationView({
   return {
     id: idOf(id),
     member1Id: idOf(member1Id),
-    member2Id: idOf(member2Id)
-  }
+    member2Id: idOf(member2Id),
+  };
 }

@@ -1,5 +1,5 @@
 import { ChannelMemberType } from '@prisma/client';
-import { Field, ID } from "type-graphql";
+import { Field, ID } from 'type-graphql';
 
 export class ChannelMemberViewModel {
   @Field(() => ID, { nullable: false })
@@ -13,5 +13,4 @@ export class ChannelMemberViewModel {
 
   @Field(() => Date, { nullable: false })
   mutedUntil!: Date;
-
 }

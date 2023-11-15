@@ -1,11 +1,13 @@
-import { ChannelMemberView } from "../../application/interface/ChannelMember/view/ChannelMemberView";
-import { ChannelMemberViewModel } from "./ChannelMemberViewModel";
+import { ChannelMemberView } from '../../application/interface/ChannelMember/view/ChannelMemberView';
+import { ChannelMemberViewModel } from './ChannelMemberViewModel';
 
-export function mapToChannelMemberViewModel(channelMemberView: ChannelMemberView): ChannelMemberViewModel {
+export function mapToChannelMemberViewModel(
+  view: ChannelMemberView,
+): ChannelMemberViewModel {
   const viewModel = new ChannelMemberViewModel();
-  viewModel.channelId = channelMemberView.channelId.value;
-  viewModel.memberId = channelMemberView.memberId.value;
-  viewModel.memberType = channelMemberView.memberType;
-  viewModel.mutedUntil = channelMemberView.mutedUntil;
+  viewModel.channelId = view.channelId.value;
+  viewModel.memberId = view.memberId.value;
+  viewModel.memberType = view.memberType;
+  viewModel.mutedUntil = view.mutedUntil;
   return viewModel;
 }

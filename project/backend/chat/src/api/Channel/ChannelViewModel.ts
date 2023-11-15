@@ -1,4 +1,4 @@
-import { Field, ID } from "type-graphql";
+import { Field, ID } from 'type-graphql';
 
 export class ChannelViewModel {
   @Field(() => ID)

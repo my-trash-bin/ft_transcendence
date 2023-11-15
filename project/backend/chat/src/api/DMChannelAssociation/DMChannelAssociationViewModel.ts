@@ -1,16 +1,12 @@
-import { ChatUserId } from "../../ChatUser/view/ChatUserView";
-import { Id } from "../../Id";
-
-import { Field, ID } from "type-graphql";
+import { Field, ID } from 'type-graphql';
 
 export class DMChannelAssociationViewModel {
   @Field(() => ID, { nullable: false })
-  id!: DMChannelAssociationId;
+  id!: string;
 
   @Field(() => ID, { nullable: false })
-  member1Id!: ChatUserId;
+  member1Id!: string;
 
   @Field(() => ID, { nullable: false })
-  member2Id!: ChatUserId;
-
+  member2Id!: string;
 }

@@ -3,10 +3,9 @@ import { ChatUserId } from '../ChatUser/view/ChatUserView';
 import { ChannelInvitationView } from './view/ChannelInvitationView';
 
 export interface IChannelInvitationService {
-
   addInvitation(
     channelId: ChannelId,
-    memberId: ChatUserId, 
+    memberId: ChatUserId,
   ): Promise<ChannelInvitationView>;
 
   deleteInvitation(

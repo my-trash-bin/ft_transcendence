@@ -1,6 +1,7 @@
-
 import { Field, ID, Int, ObjectType } from 'type-graphql';
+import { ChannelInvitation } from '../ChannelInvitation/ChannelInvitation';
 import { ChannelMember } from '../ChannelMember/ChannelMember';
+import { ChannelMessage } from '../ChannelMessage/ChannelMessage';
 import { ChatUser } from '../ChatUser/ChatUser';
 
 // @InputType: GraphQL 입력 타입 정의. 뮤테이션에서 복잡한 인자 받을때 사용

@@ -1,16 +1,16 @@
-import { ChannelView } from "../../application/interface/Channel/view/ChannelView";
-import { ChannelViewModel } from "./ChannelViewModel";
+import { ChannelView } from '../../application/interface/Channel/view/ChannelView';
+import { ChannelViewModel } from './ChannelViewModel';
 
-export function mapToChannelViewModel(channelView: ChannelView): ChannelViewModel {
+export function mapToChannelViewModel(view: ChannelView): ChannelViewModel {
   const viewModel = new ChannelViewModel();
-  viewModel.id = channelView.id.value;
-  viewModel.title = channelView.title;
-  viewModel.isPublic = channelView.isPublic;
-  viewModel.password = channelView.password;
-  viewModel.createdAt = channelView.createdAt;
-  viewModel.lastActiveAt = channelView.lastActiveAt;
-  viewModel.ownerId = channelView.ownerId?.value;
-  viewModel.memberCount = channelView.memberCount;
-  viewModel.maximumMemberCount = channelView.maximumMemberCount;
+  viewModel.id = view.id.value;
+  viewModel.title = view.title;
+  viewModel.isPublic = view.isPublic;
+  viewModel.password = view.password;
+  viewModel.createdAt = view.createdAt;
+  viewModel.lastActiveAt = view.lastActiveAt;
+  viewModel.ownerId = view.ownerId?.value;
+  viewModel.memberCount = view.memberCount;
+  viewModel.maximumMemberCount = view.maximumMemberCount;
   return viewModel;
 }

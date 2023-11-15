@@ -7,13 +7,13 @@ export function mapPrismaChannelMessageToChannelMessageView({
   channelId,
   memberId,
   sentAt,
-  messageJson
+  messageJson,
 }: PrismaChannelMessage): ChannelMessageView {
   return {
     id: idOf(id),
     channelId: idOf(channelId),
     memberId: idOf(memberId),
     sentAt,
-    messageJson
+    messageJson,
   };
 }

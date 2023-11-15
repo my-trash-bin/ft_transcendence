@@ -1,4 +1,4 @@
-import { Field, ID } from "type-graphql";
+import { Field, ID } from 'type-graphql';
 
 export class ChannelInvitationViewModel {
   @Field(() => ID, { nullable: false })
@@ -9,5 +9,4 @@ export class ChannelInvitationViewModel {
 
   @Field(() => Date, { nullable: false })
   invitedAt!: Date;
-
 }

@@ -12,6 +12,6 @@ export function mapPrismaChannelInvitationToChannelInvitationView({
   return {
     channelId: idOf(channelId),
     memberId: idOf(memberId),
-    invitedAt
+    invitedAt,
   };
 }

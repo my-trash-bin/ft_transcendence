@@ -1,12 +1,12 @@
-import { ChatUserId } from "../../ChatUser/view/ChatUserView";
-import { DMChannelAssociationId } from "../../DMChannelAssociation/view/DMChannelAssociationView";
-import { Id } from "../../Id";
+import { ChatUserId } from '../../ChatUser/view/ChatUserView';
+import { DMChannelAssociationId } from '../../DMChannelAssociation/view/DMChannelAssociationView';
+import { Id } from '../../Id';
 
-export type DMChannelInfoId = Id<'dMCHnnelInfoId'>
+export type DMChannelInfoId = Id<'dMCHnnelInfoId'>;
 
 export interface DMChannelInfoView {
   fromId: ChatUserId;
   toId: ChatUserId;
-  channelId: DMChannelAssociationId
+  channelId: DMChannelAssociationId;
   name: string;
 }

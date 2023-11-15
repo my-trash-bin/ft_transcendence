@@ -2,7 +2,6 @@ import { idOf } from '../../../util/id/idOf';
 import { ChannelView } from '../../interface/Channel/view/ChannelView';
 import { PrismaChannel } from './PrismaChannel';
 
-
 export function mapPrismaChannelToChannelView({
   id,
   title,

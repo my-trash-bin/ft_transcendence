@@ -4,27 +4,29 @@ import { ChatUserId } from '../ChatUser/view/ChatUserView';
 import { ChannelMemberView } from './view/ChannelMemberView';
 
 export interface IChannelMemberService {
-
   create(
     channelId: ChannelId,
-    memberType: ChannelMemberType
+    memberType: ChannelMemberType,
   ): Promise<ChannelMemberView>;
 
-  findByChannel(
-    channelId: ChannelId
-  ): Promise<ChannelMemberView[]>;
-  
-  findByMember(
-    memberId: ChatUserId
-  ): Promise<ChannelMemberView[]>;
+  findByChannel(channelId: ChannelId): Promise<ChannelMemberView[]>;
 
-  updateOfCreate(
+  findByMember(memberId: ChatUserId): Promise<ChannelMemberView[]>;
+
+  update(
     channelId: ChannelId,
     memberId: ChatUserId,
     memberType: ChannelMemberType,
-    mutedUntil: Date
+    mutedUntil: Date,
   ): Promise<ChannelMemberView>;
-  
+
+  updateOrCreate(
+    channelId: ChannelId,
+    memberId: ChatUserId,
+    memberType: ChannelMemberType,
+    mutedUntil: Date,
+  ): Promise<ChannelMemberView>;
+
   delete(
     channelId: ChannelId,
     memberId: ChatUserId,
