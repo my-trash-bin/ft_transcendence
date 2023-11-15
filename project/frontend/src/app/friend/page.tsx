@@ -1,8 +1,9 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import BlockCardList from '../../components/friend/BlockCardList';
 import FriendCardList from '../../components/friend/FriendCardList';
-import SearchUser from '../../components/friend/SearchUser';
+import { SearchCardList } from '../../components/friend/SearchCardList';
 
 export default function FriendPage() {
   const [activeScreen, setActiveScreen] = useState('friend');
@@ -19,6 +20,10 @@ export default function FriendPage() {
         : ' bg-light-gray border-gray text-gray')
     );
   }
+
+  useEffect(() => {
+    return () => toast.dismiss();
+  }, []);
 
   return (
     <div className="flex flex-row w-[100%] h-[100%]">
@@ -52,7 +57,7 @@ export default function FriendPage() {
           </div>
           {activeScreen === 'friend' && <FriendCardList />}
           {activeScreen === 'block' && <BlockCardList />}
-          {activeScreen === 'search' && <SearchUser />}
+          {activeScreen === 'search' && <SearchCardList />}
         </div>
       </div>
     </div>
