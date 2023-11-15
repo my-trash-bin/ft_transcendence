@@ -44,14 +44,15 @@ export const tetrominos = {
   ],
 };
 
-export const tetrominoColors = {
-  I: 'cyan',
-  J: 'blue',
-  L: 'orange',
-  O: 'yellow',
-  S: 'green',
-  T: 'purple',
-  Z: 'red',
+// 나중에 적용해보기
+export const cellColors: { [key: number]: string } = {
+  0: 'bg-white-interactive', // I
+  1: 'bg-dark-purple-interactive', // J
+  2: 'bg-dark-gray-interactive', // L
+  3: 'bg-dark-purple-interactive', // O
+  4: 'bg-dark-gray-interactive', // S
+  5: 'bg-dark-purple-interactive', // T
+  6: 'bg-dark-gray-interactive', // Z
 };
 
 export const getRandomTetromino = (): TetrominoShape => {

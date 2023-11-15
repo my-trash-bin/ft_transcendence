@@ -7,7 +7,11 @@ interface MatchingModalProps {
   mode: 'normal' | 'item';
 }
 
-const MatchingModal: React.FC<MatchingModalProps> = ({ isOpen, onClose, mode }) => {
+const MatchingModal: React.FC<MatchingModalProps> = ({
+  isOpen,
+  onClose,
+  mode,
+}) => {
   if (!isOpen) {
     return null;
   }
@@ -20,15 +24,23 @@ const MatchingModal: React.FC<MatchingModalProps> = ({ isOpen, onClose, mode }) 
 
   const hoverCSS = 'cursor-pointer';
   const txtPos = 'text-center mt-[80px]';
-  const buttonCSS = 'bg-dark-purple-interactive rounded-md \
+  const buttonCSS =
+    'bg-dark-purple-interactive rounded-md \
   text-light-gray-interactive text-h2 \
   w-lg mt-[65pt] ml-[250pt]';
 
   let content = mode === 'normal' ? '일반' : '아이템';
 
   return (
-    <Modal isOpen={isOpen} onRequestClose={onClose} shouldCloseOnOverlayClick={false} className="bg-transparent">
-      <div className={`${textCSS} ${alignCSS} ${positionCSS} ${borderCSS} ${size} ${bgCSS}`}>
+    <Modal
+      isOpen={isOpen}
+      onRequestClose={onClose}
+      shouldCloseOnOverlayClick={false}
+      className="bg-transparent"
+    >
+      <div
+        className={`${textCSS} ${alignCSS} ${positionCSS} ${borderCSS} ${size} ${bgCSS}`}
+      >
         <div className={`${txtPos}`}>
           <p>{content} 매칭이 진행중입니다.</p>
         </div>
