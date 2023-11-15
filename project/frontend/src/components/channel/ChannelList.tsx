@@ -1,96 +1,60 @@
-const dummyChannel = [
-  {
-    key: '1',
-    channelName: 'channel 1',
-    messageShortcut: 'hello',
-    date: new Date(),
-    max: 10,
-    now: 5,
-  },
-  {
-    key: '2',
-    channelName: 'channel 1',
-    messageShortcut: 'hello1',
-    date: new Date(),
-    max: 10,
-    now: 5,
-  },
-  {
-    key: '3',
-    channelName: 'channel 3',
-    messageShortcut: 'hello2',
-    date: new Date(),
-    max: 10,
-    now: 5,
-  },
-  {
-    key: '4',
-    channelName: 'channel 4',
-    messageShortcut: 'hello2',
-    date: new Date(),
-    max: 10,
-    now: 5,
-  },
-  {
-    key: '5',
-    channelName: 'channel 4',
-    messageShortcut: 'hello2',
-    date: new Date(),
-    max: 10,
-    now: 5,
-  },
-  {
-    key: '6',
-    channelName: 'user3',
-    messageShortcut: 'hello2',
-    date: new Date(),
-    max: 10,
-    now: 5,
-  },
-  {
-    key: '7',
-    channelName: 'user3',
-    messageShortcut: 'hello2',
-    date: new Date(),
-    max: 10,
-    now: 5,
-  },
-  {
-    key: '8',
-    channelName: 'user3',
-    messageShortcut: 'hello2',
-    date: new Date(),
-    max: 10,
-    now: 5,
-  },
-];
-
+'use client';
+import { GET_ALL_CHANNELS } from '@/api/channel/ChannelApi';
+import { useQuery } from '@apollo/client';
 import { AllChannelButton } from './AllChannelButton';
-export function ChannelList() {
+import { MyChannelButton } from './MyChannelButton';
+
+interface myChannelListProps {
+  channelName: string;
+  latestTime: Date;
+  preViewMessage: string;
+  max: number;
+  min: number;
+}
+
+interface allChannelListProps {
+  channelName: string;
+  max: number;
+  min: number;
+}
+
+export function ChannelList({
+  myChannel,
+  searchChannel,
+}: {
+  myChannel: boolean;
+  searchChannel: string;
+}) {
+  const { loading, error, data } = useQuery(GET_ALL_CHANNELS);
+  if (loading) return;
+  if (error) return <p>데이터를 가저오기에 실패했습니다.. ☠️</p>;
+
   return (
     <div className="w-[inherit] h-[530px] flex flex-col items-center overflow-y-scroll">
-      {/* {dummyChannel.map((data) => {
-        return (
-          <MyChannelButton
-            key={data.key}
-            channelName={data.channelName}
-            date={data.date}
-            messageShortcut={data.messageShortcut}
-            max={data.max}
-            now={data.now}
-          />
-        );
-      })} */}
-      {dummyChannel.map((data) => {
-        return (
-          <AllChannelButton
-            key={data.key}
-            channelName={data.channelName}
-            now={data.now}
-            max={data.max}
-          />
-        );
-      })}
+      {myChannel
+        ? data.allChannel.map((data: myChannelListProps) => {
+            return (
+              <MyChannelButton
+                key={data.channelName}
+                channelName={data.channelName}
+                date={data.latestTime}
+                messageShortcut={data.preViewMessage.substring(0, 18)}
+                max={data.max}
+                now={data.min}
+              />
+            );
+          })
+        : data.allChannel.map((data: allChannelListProps) => {
+            return (
+              <AllChannelButton
+                key={data.channelName}
+                channelName={data.channelName}
+                max={data.max}
+                now={data.min}
+              />
+            );
+          })}
+      ;
     </div>
   );
 }

@@ -52,7 +52,7 @@ export function MessageSearchInput({
           value={searchInput}
           onChange={inputChangeEvent}
           placeholder={placeholder}
-          className="w-[80%] h-[90%] bg-[inherit] outline-none placeholder-text-left pl-[1%] placeholder:italic"
+          className="w-[80%] h-[90%] bg-[inherit] outline-none placeholder-text-left pl-[10px] placeholder:italic"
         />
         <button onClick={crossOnClick}>
           <Image
