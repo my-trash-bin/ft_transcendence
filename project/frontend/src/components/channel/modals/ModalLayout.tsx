@@ -68,13 +68,20 @@ export const ModalLayout = ({
 }) => {
   const modalOpen = isOpen ? '' : 'hidden';
   const [modalType, setModalType] = useState(ModalType.PARTICIPANT);
-  const modalContent = getModalContent(modalType, closeModal, setModalType);
-
+  const modalCloseAndSetParticipant = () => {
+    closeModal();
+    setModalType(ModalType.PARTICIPANT);
+  };
+  const modalContent = getModalContent(
+    modalType,
+    modalCloseAndSetParticipant,
+    setModalType,
+  );
   return (
     <>
       <div
         className={`fixed inset-0 z-[10] ${modalOpen} bg-[#f3f0f8] opacity-50`}
-        onClick={closeModal}
+        onClick={modalCloseAndSetParticipant}
       ></div>
       <div
         style={{ width: width, height: height }}

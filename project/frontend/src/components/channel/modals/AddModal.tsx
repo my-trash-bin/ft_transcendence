@@ -13,11 +13,11 @@ const par = [
     imageUri: '/avatar/avatar-small.svg',
   },
   {
-    nickname: 'name2',
+    nickname: 'name3',
     imageUri: '/avatar/avatar-small.svg',
   },
   {
-    nickname: 'name2',
+    nickname: 'name21',
     imageUri: '/avatar/avatar-small.svg',
   },
 ];
@@ -55,7 +55,11 @@ export function AddModal({
       </div>
       <div className="flex flex-col items-center">
         <h3 className="text-center mb-[10px]">유저 검색</h3>
-        <MessageSearchInput width="250px" height="30px" />
+        <MessageSearchInput
+          width="280px"
+          height="30px"
+          placeholder="search user.."
+        />
         <div className="w-[300px] h-[380px] mt-[15px] flex flex-col items-center overflow-y-scroll">
           {par.map((p) => (
             <ParticipantCard

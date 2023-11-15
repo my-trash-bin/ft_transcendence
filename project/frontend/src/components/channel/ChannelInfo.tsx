@@ -1,13 +1,16 @@
 import Image from 'next/image';
 
-export function ChannelInfo() {
+export function ChannelInfo({ modalOpen }: { modalOpen: () => void }) {
   const channelData = {
     channelName: 'channel name',
   };
   return (
     <div className="w-[inherit] h-[80px] border-b border-default relative flex justify-center items-center">
       <h3>{channelData.channelName}</h3>
-      <button className="absolute right-[15px] top-[25px] w-[25px] h-[30px]">
+      <button
+        className="absolute right-[15px] top-[25px] w-[25px] h-[30px]"
+        onClick={modalOpen}
+      >
         <Image
           alt="message-setting"
           src={'/icon/message-setting.svg'}

@@ -12,27 +12,27 @@ const par = [
     imageUri: '/avatar/avatar-small.svg',
   },
   {
-    nickname: 'name2',
+    nickname: 'name3',
     imageUri: '/avatar/avatar-small.svg',
   },
   {
-    nickname: 'name2',
+    nickname: 'name4',
     imageUri: '/avatar/avatar-small.svg',
   },
   {
-    nickname: 'name2',
+    nickname: 'name5',
     imageUri: '/avatar/avatar-small.svg',
   },
   {
-    nickname: 'name2',
+    nickname: 'name6',
     imageUri: '/avatar/avatar-small.svg',
   },
   {
-    nickname: 'name2',
+    nickname: 'name7',
     imageUri: '/avatar/avatar-small.svg',
   },
   {
-    nickname: 'name2',
+    nickname: 'name8',
     imageUri: '/avatar/avatar-small.svg',
   },
 ];
