@@ -1,7 +1,7 @@
 'use client';
+
 import { GET_DM_USERS } from '@/api/dm/DmApi';
-import { getClient } from '@/lib/ApolloClient';
-import { useEffect, useState } from 'react';
+import { useQuery } from '@apollo/client';
 import { DmUser } from './DmUser';
 
 interface DmUser {
@@ -11,10 +11,13 @@ interface DmUser {
   latestTime: Date;
 }
 
-async function getDmUsers() {
-  const { data }: { data: any } = await getClient().query({
-    query: GET_DM_USERS,
-  });
+export function DmUserList({
+  searchUsername,
+}: Readonly<{ searchUsername: string }>) {
+  const { loading, data, error } = useQuery(GET_DM_USERS);
+  if (loading) return;
+  if (error) return <p>데이터를 가저오기에 실패했습니다.. ☠️</p>;
+
   let dmRenderData: DmUser[] = data.dmUser.map((val: any) => {
     return {
       nickname: val.nickname,
@@ -26,23 +29,12 @@ async function getDmUsers() {
       latestTime: val.latestTime,
     };
   });
-  return dmRenderData;
-}
 
-export function DmUserList({
-  searchUsername,
-}: Readonly<{ searchUsername: string }>) {
-  const [dmRenderData, setDmRenderData] = useState<DmUser[]>([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const dmData = await getDmUsers();
-      setDmRenderData(
-        dmData.filter((val) => val.nickname.includes(searchUsername)),
-      );
-    };
-    fetchData();
-  }, [searchUsername]);
+  if (searchUsername) {
+    dmRenderData = dmRenderData.filter((val) =>
+      val.nickname.includes(searchUsername),
+    );
+  }
 
   return (
     <div className="w-[inherit] flex-grow-1 flex flex-col items-center overflow-y-scroll">
