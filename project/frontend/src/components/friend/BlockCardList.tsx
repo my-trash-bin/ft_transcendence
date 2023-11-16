@@ -1,46 +1,41 @@
+import { GET_FRIENDS } from '@/api/friend/FriendApi';
+import { getClient } from '@/lib/ApolloClient';
+import { useEffect, useState } from 'react';
 import BlockCard from './BlockCard';
 
-const dummyFriend = [
-  {
-    key: '1',
-    imageUri: '/avatar/avatar-big.svg',
-    nickname: 'klew',
-  },
-  {
-    key: '2',
-    imageUri: '/avatar/avatar-small.svg',
-    nickname: 'minkim',
-  },
-  {
-    key: '3',
-    imageUri: '/avatar/avatar-black.svg',
-    nickname: 'yoonsele',
-  },
-  {
-    key: '4',
-    imageUri: '/avatar/avatar-small.svg',
-    nickname: 'hyunn',
-  },
-  {
-    key: '5',
-    imageUri: '/avatar/avatar-big.svg',
-    nickname: 'klew',
-  },
-  {
-    key: '6',
-    imageUri: '/avatar/avatar-small.svg',
-    nickname: 'kyu',
-  },
-];
+interface FriendInfo {
+  nickname: string;
+  profileImageUrl: string;
+}
+
+async function fetchFriends() {
+  const { data } = await getClient().query({
+    query: GET_FRIENDS,
+  });
+
+  return data.friend;
+}
 
 function BlockCardList() {
+  const [friendData, setFriendData] = useState<FriendInfo[]>([]);
+
+  // Use the useEffect hook to fetch data when the component mounts
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await fetchFriends();
+      setFriendData(data);
+    };
+
+    fetchData();
+  }, []); // Empty dependency array ensures the effect runs only once when the component mounts
+
   return (
     <div className="w-[700px] h-[600px] pt-xl grid gap-lg justify-center items-center overflow-y-scroll">
-      {dummyFriend.map((val) => {
+      {friendData.map((val, index) => {
         return (
           <BlockCard
-            key={val.key}
-            imageUri={val.imageUri}
+            key={index}
+            imageURL={val.profileImageUrl}
             nickname={val.nickname}
           />
         );

@@ -1,4 +1,4 @@
-import LinkButton from '../components/common/LinkButton';
+import LinkButton from '../components/sign-in/LinkButton';
 
 export default function Page() {
   return (

@@ -1,41 +1,41 @@
 import Link from 'next/link';
+import { useEffect } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
-import FriendAvatar from './FriendAvatar';
+import { Button } from '../common/Button';
 import FriendSetting from './FriendSetting';
+import { CommonCard } from './utils/CommonCard';
 
 interface FriendCardProps {
   readonly nickname: string;
-  readonly imageUri: string;
+  readonly imageURL: string;
 }
 
 function FriendCard(props: FriendCardProps) {
-  const profile = () => toast(`${props.nickname} 프로필 모달`);
-  const game = () => toast(`${props.nickname} 게임 요청`);
+  const game = () => {
+    // console.log('게임');
+    toast(`${props.nickname} 게임 요청`);
+  };
   const buttonClass =
-    'w-md h-xs bg-default rounded-sm border-2 border-dark-purple text-center text-black text-lg font-bold mr-lg hover:bg-light-background';
+    'w-md h-xs bg-default rounded-sm border-2 border-dark-purple text-center text-black text-lg font-bold mx-lg hover:bg-light-background';
+
+  // Cleanup toasts when the component unmounts
+  useEffect(() => {
+    return () => toast.dismiss();
+  }, []);
+
   return (
-    <div className="w-[600px] h-[100px] bg-white border-3 border-default rounded-md flex items-center relative">
+    <CommonCard imageURL={props.imageURL} nickname={props.nickname}>
       <Toaster
         toastOptions={{
           duration: 2000,
         }}
       />
-      <button onClick={profile}>
-        <FriendAvatar src={`${props.imageUri}`} size={50} />
-      </button>
-      <div className="text-left text-black text-h2 font-semibold ml-2xl">
-        {props.nickname}
-      </div>
-      <div className="absolute right-xl flex items-center">
-        <button onClick={game} className={buttonClass}>
-          게임 하기
-        </button>
-        <Link href={'/dm'} className={buttonClass}>
-          메세지
-        </Link>
-        <FriendSetting nickname={props.nickname} />
-      </div>
-    </div>
+      <Button onClick={game}>게임하기</Button>
+      <Link href={'/dm'} className={buttonClass}>
+        메세지
+      </Link>
+      <FriendSetting nickname={props.nickname} />
+    </CommonCard>
   );
 }
 export default FriendCard;

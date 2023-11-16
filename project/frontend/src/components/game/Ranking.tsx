@@ -1,26 +1,27 @@
-import React from 'react';
 import RankingCard from './RankingCard';
+import { mockRankings } from './mockRankings';
+import { mockUser } from './mockUser';
 
-interface IRankingItem {
-  id: number;
-  rank: number;
-  name: string;
-  avatar: string;
-}
-
-interface IRankingProps {
-  rankings: IRankingItem[];
-  className?: string;
-  isUser: boolean;
-}
-
-const Ranking: React.FC<IRankingProps> = ({ rankings, className, isUser }) => {
+export function Ranking() {
   return (
-    <div className={`max-w-[620px] mx-auto ${className}`}>
-      {rankings.map((item, index) => (
-        <RankingCard key={item.id} item={item} isUser={isUser} />
-      ))}
+    <div>
+      <RankingCard
+        rank={mockUser[0].rank}
+        name={mockUser[0].name}
+        avatar={mockUser[0].avatar}
+        isUser={true}
+      />
+      <div className={'max-w-[620px] mx-auto'}>
+        {mockRankings.map((item) => (
+          <RankingCard
+            key={item.id}
+            rank={item.rank}
+            name={item.name}
+            avatar={item.avatar}
+            isUser={false}
+          />
+        ))}
+      </div>
     </div>
   );
-};
-export default Ranking;
+}
