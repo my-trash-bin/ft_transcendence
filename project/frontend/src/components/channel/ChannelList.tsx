@@ -54,7 +54,6 @@ export function ChannelList({
               />
             );
           })}
-      ;
     </div>
   );
 }
