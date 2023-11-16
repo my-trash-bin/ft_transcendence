@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import LongCard from '../../common/LongCard';
+import { LongCard } from '../../common/LongCard';
 
 interface HistoryCardProps {
   readonly user1Name: string;
@@ -8,31 +8,45 @@ interface HistoryCardProps {
   readonly user2Avatar: string;
   readonly user1Score: number;
   readonly user2Score: number;
+  readonly isdefault: boolean;
 }
 
 export function HistoryCard(props: HistoryCardProps) {
   return (
-    <LongCard isUser={false}>
-      <Image
-        src={props.user1Avatar}
-        alt="avatar"
-        width={50}
-        height={50}
-        className="absolute left-sm"
-      />
-      <span className="text-left absolute left-3xl">{props.user1Name}</span>
-      <span className="absolute left-1/2 transform -translate-x-1/2 text-center">
-        {props.user1Score} : {props.user2Score}
-      </span>
-      <span className="text-right absolute right-3xl">{props.user2Name}</span>
-
-      <Image
-        src={props.user2Avatar}
-        alt="avatar"
-        width={50}
-        height={50}
-        className="absolute right-sm"
-      />
-    </LongCard>
+    <div className={props.isdefault ? 'mb-xl' : 'mb-md'}>
+      <LongCard size={props.isdefault ? 'medium' : 'small'} color="default">
+        <Image
+          src={props.user1Avatar}
+          alt="avatar"
+          width={props.isdefault ? 50 : 30}
+          height={props.isdefault ? 50 : 30}
+          className="absolute left-sm"
+        />
+        <Image
+          src={props.user2Avatar}
+          alt="avatar"
+          width={props.isdefault ? 50 : 30}
+          height={props.isdefault ? 50 : 30}
+          className="absolute right-sm"
+        />
+        <span
+          className={`absolute text-left ${
+            props.isdefault ? 'left-3xl' : 'left-2xl'
+          }`}
+        >
+          {props.user1Name}
+        </span>
+        <span className="absolute left-1/2 transform -translate-x-1/2 text-center">
+          {props.user1Score} : {props.user2Score}
+        </span>
+        <span
+          className={`absolute text-right ${
+            props.isdefault ? 'right-3xl' : 'right-2xl'
+          }`}
+        >
+          {props.user2Name}
+        </span>
+      </LongCard>
+    </div>
   );
 }

@@ -72,9 +72,7 @@ export const ChannelCreateContent = ({
   };
   const validText = 'text-[12px] mt-[5px]';
   const invalidText = 'text-[12px] mt-[5px] text-red-400';
-  console.log('titleValid = ' + titleValid);
-  console.log('passwordValid = ' + passwordValid);
-  console.log('sizeValid = ' + sizeValid);
+
   return (
     <>
       <div className="flex flex-col ml-[20px] mb-[15px]">
