@@ -11,6 +11,7 @@ export function MessageSearch({
       <MessageSearchInput
         width="270px"
         height="30px"
+        placeholder="유저 검색"
         eventFunction={userSearchCallback}
       />
     </div>

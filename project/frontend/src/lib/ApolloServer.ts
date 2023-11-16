@@ -37,6 +37,7 @@ const typeDefs = `#graphql
 
   type Query {
     dmUser: [DmUser],
+    allChannel: [Channel],
     friend: [Friend],
   }
 
@@ -47,10 +48,19 @@ const typeDefs = `#graphql
     preViewMessage: String,
   }
 
+  type Channel {
+    channelName: String,
+    latestTime: Date,
+    preViewMessage: String,
+    min: Int,
+    max: Int,
+  }
+
   type Friend {
     profileImageUrl: String,
     nickname: String,
   }
+
 `;
 
 const casual = require('casual');
@@ -77,6 +87,16 @@ const mocks = {
         latestTime: new Date(casual.date('YYYY-MM-DD HH:mm:ss')),
         preViewMessage: casual.sentence,
       })),
+
+    allChannel: () =>
+      new Array(10).fill(1).map(() => ({
+        channelName: casual.name.slice(0, 10).replace(' ', ''),
+        latestTime: new Date(casual.date('YYYY-MM-DD HH:mm:ss')),
+        preViewMessage: casual.sentence,
+        min: 5,
+        max: 10,
+      })),
+
     friend: () =>
       new Array(10).fill(1).map(() => ({
         profileImageUrl: getRandomProfileImageUrl(),
