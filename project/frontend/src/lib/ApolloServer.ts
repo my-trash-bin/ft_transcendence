@@ -112,15 +112,16 @@ const mocks = {
         profileImageUrl: getRandomProfileImageUrl(),
         nickname: casual.username,
       })),
-    profile: () =>
-      new Array(10).fill(1).map(() => ({
+    profile: () => [
+      {
         profileImageUrl: getRandomProfileImageUrl(),
         nickname: casual.username,
         win: casual.number,
         lose: casual.number,
         ratio: casual.number,
         statusMessage: casual.username,
-      })),
+      },
+    ],
   }),
 };
 
