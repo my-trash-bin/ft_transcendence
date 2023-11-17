@@ -37,6 +37,7 @@ export function CommonCard({ children, imageURL, nickname }: CommonCardProps) {
         isOpen={isModalOpen}
         onClose={handleModalClose}
         nickname={nickname}
+        imageURL={imageURL}
       />
     </div>
   );
