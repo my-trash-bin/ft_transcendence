@@ -10,7 +10,7 @@ export function MessageSendBox() {
         />
         <button className="w-[5%] h-[100%] self-end">
           <Image
-            alt="search icon"
+            alt="send icon"
             src="/icon/message-send.svg"
             width={30}
             height={30}

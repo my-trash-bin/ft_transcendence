@@ -4,7 +4,7 @@ import { ModeContextProvider } from '@-ft/mode-next';
 import { cookies } from 'next/headers';
 import { PropsWithChildren } from 'react';
 
-export default function Layout({ children }: PropsWithChildren) {
+export default function Layout({ children }: Readonly<PropsWithChildren>) {
   return (
     <html
       className={cookies().get('theme')?.value === 'dark' ? 'dark' : undefined}
