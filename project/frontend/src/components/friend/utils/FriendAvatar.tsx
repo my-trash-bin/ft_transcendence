@@ -3,6 +3,7 @@ import Image from 'next/image';
 type FriendAvatarProps = {
   readonly src: string;
   readonly size: number;
+  onClick?: () => void;
 };
 
 export default function FriendAvatar(props: FriendAvatarProps) {
@@ -16,6 +17,7 @@ export default function FriendAvatar(props: FriendAvatarProps) {
       width={props.size}
       height={props.size}
       className={className}
+      onClick={props.onClick}
     />
   );
 }
