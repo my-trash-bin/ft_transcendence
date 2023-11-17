@@ -23,8 +23,8 @@ export const ModalLayout = ({
       ></div>
       <div
         style={{ width: width, height: height }}
-        className={`fixed top-1/2 left-1/2 rounded-[5px] transform -translate-x-1/2 \
-          -translate-y-1/2 bg-default z-[20]`}
+        className={`fixed top-1/2 left-1/2 rounded-[5px] border-3 border-dark-purple transform -translate-x-1/2 \
+          -translate-y-1/2 bg-default z-[20] `}
       >
         {children}
       </div>

@@ -39,6 +39,7 @@ const typeDefs = `#graphql
     dmUser: [DmUser],
     allChannel: [Channel],
     friend: [Friend],
+    profile: [Profile],
   }
 
   type DmUser {
@@ -59,6 +60,15 @@ const typeDefs = `#graphql
   type Friend {
     profileImageUrl: String,
     nickname: String,
+  }
+
+  type Profile {
+    profileImageUrl: String,
+    nickname: String,
+    win: Int,
+    lose: Int,
+    ratio: Int,
+    statusMessage: String,
   }
 
 `;
@@ -102,6 +112,16 @@ const mocks = {
         profileImageUrl: getRandomProfileImageUrl(),
         nickname: casual.username,
       })),
+    profile: () => [
+      {
+        profileImageUrl: getRandomProfileImageUrl(),
+        nickname: casual.username,
+        win: casual.number,
+        lose: casual.number,
+        ratio: casual.number,
+        statusMessage: casual.username,
+      },
+    ],
   }),
 };
 

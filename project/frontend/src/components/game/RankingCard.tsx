@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import { useState } from 'react';
 import { LongCard } from '../common/LongCard';
-import ModalProfile from '../profile/modal/ModalProfile';
+import ProfileModal from '../profile/modal/ProfileModal';
 
 interface RankingCardProps {
   readonly rank: number;
@@ -45,7 +45,7 @@ export default function RankingCard({
           </div>
         </LongCard>
       </button>
-      <ModalProfile
+      <ProfileModal
         isOpen={isModalOpen}
         onClose={handleModalClose}
         nickname={name}

@@ -12,13 +12,12 @@ const ButtonCVA = cva(['text-center'], {
         'bg-default',
         'text-black',
       ],
+      modal: ['hover:bg-white', 'border-dark-purple', 'bg-white', 'text-black'],
       disabled: ['border-dark-gray', 'bg-gray', 'text-white', 'font-semibold'],
     },
   },
-
   defaultVariants: {
     size: 'small',
-    color: 'default',
   },
 });
 
@@ -26,16 +25,18 @@ export interface ButtonProps extends VariantProps<typeof ButtonCVA> {
   children?: React.ReactNode;
   readonly onClick: () => void;
   disabled?: boolean;
+  isModal?: boolean;
 }
 
 export const Button: React.FC<ButtonProps> = ({
   size,
-  color,
   onClick,
   children,
-  disabled,
+  disabled = false,
+  isModal = false,
 }) => {
-  color = disabled ? 'disabled' : 'default';
+  const color = disabled ? 'disabled' : isModal ? 'modal' : 'default';
+  console.log(color);
   return (
     <button
       className={ButtonCVA({ size, color })}
