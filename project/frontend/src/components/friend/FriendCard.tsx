@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { useEffect } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
-import { Button } from '../common/Button';
+import { Button } from '../common/button';
 import FriendSetting from './FriendSetting';
 import { CommonCard } from './utils/CommonCard';
 

@@ -7,8 +7,7 @@ type FriendAvatarProps = {
 };
 
 export default function FriendAvatar(props: FriendAvatarProps) {
-  const className = `w-md h-md rounded-md flex items-center justify-center hover:bg-default`;
-  console.log(props.src);
+  const className = `rounded-md flex items-center justify-center hover:bg-default`;
   return (
     <Image
       src={props.src}
@@ -17,6 +16,7 @@ export default function FriendAvatar(props: FriendAvatarProps) {
       width={props.size}
       height={props.size}
       className={className}
+      onClick={props.onClick}
     />
   );
 }

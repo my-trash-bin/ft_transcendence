@@ -1,9 +1,12 @@
 'use client';
 import { GET_PROFILES } from '@/api/profile/ProfileApi';
+import { Button } from '@/components/common/button';
 import FriendAvatar from '@/components/friend/utils/FriendAvatar';
 import { useQuery } from '@apollo/client';
 import { ModalLayout } from '../../channel/modals/ModalLayout';
 import { TextBox } from '../TextBox';
+import { HistoryCard } from '../history/HistoryCard';
+import { mockData } from '../history/mockDataHistory';
 
 interface ModalProfileProps {
   isOpen: boolean;
@@ -22,19 +25,53 @@ interface ModalData {
 
 const getModalContent = (props: ModalData) => {
   return (
-    <div className="flex felx-row">
-      <FriendAvatar
-        src={props.profileImageUrl}
-        size={75}
-        onClick={{} as () => void}
-      />
-      <TextBox
-        nickname={props.nickname}
-        win={props.win}
-        lose={props.lose}
-        ratio={props.ratio}
-        statusMessage={props.statusMessage}
-      />
+    <div className="p-xl flex flex-col">
+      <div className="flex felx-row">
+        <FriendAvatar
+          src={props.profileImageUrl}
+          size={80}
+          onClick={{} as () => void}
+        />
+        <TextBox
+          nickname={props.nickname}
+          win={props.win}
+          lose={props.lose}
+          ratio={props.ratio}
+          statusMessage={props.statusMessage}
+          isModal={true}
+        />
+      </div>
+      <div className="flex flex-col pt-xl">
+        {mockData.slice(0, 3).map((data) => (
+          <HistoryCard
+            key={data.key}
+            user1Name={data.user1Name}
+            user2Name={data.user2Name}
+            user1Avatar={data.user1Avatar}
+            user2Avatar={data.user2Avatar}
+            user1Score={data.user1Score}
+            user2Score={data.user2Score}
+          />
+        ))}
+      </div>
+      <div className="flex flex-col pt-xl gap-md">
+        <div className="flex flex-row gap-3xl justify-center">
+          <Button onClick={{} as () => void} isModal={true} disabled={true}>
+            친구추가
+          </Button>
+          <Button onClick={{} as () => void} isModal={true}>
+            게임하기
+          </Button>
+        </div>
+        <div className="flex flex-row gap-3xl justify-center">
+          <Button onClick={{} as () => void} isModal={true}>
+            차단하기
+          </Button>
+          <Button onClick={{} as () => void} isModal={true}>
+            DM
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };
@@ -47,22 +84,19 @@ const ProfileModal: React.FC<ModalProfileProps> = ({
   // parameter: nickname
   const { loading, error, data } = useQuery(GET_PROFILES);
 
-  // console.log(data);
   let modalContent: React.ReactNode;
   if (loading) {
     modalContent = <p>loading...</p>;
   } else if (error) {
     modalContent = <p>데이터를 가저오기에 실패했습니다.. ☠️</p>;
   } else {
-    console.log(data.profile[0].profileImageUrl);
-
     modalContent = getModalContent(data.profile[0]);
   }
   return (
     <ModalLayout
       isOpen={isOpen}
       closeModal={onClose}
-      width="350px"
+      width="400px"
       height="500px"
     >
       {modalContent}

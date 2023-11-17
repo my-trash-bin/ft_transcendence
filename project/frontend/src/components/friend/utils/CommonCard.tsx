@@ -23,15 +23,10 @@ export function CommonCard({ children, imageURL, nickname }: CommonCardProps) {
 
   const sizeCSS = 'w-[600px] h-[100px]';
   const colorCSS = 'bg-white border-3 border-default rounded-md';
-  const alignCSS = 'flex items-center relative';
+  const alignCSS = 'flex items-center relative p-md';
   return (
     <div className={`${sizeCSS} ${colorCSS} ${alignCSS}`}>
-      <button
-        onClick={handleButtonClick}
-        className="w-md h-md absolute left-md"
-      >
-        <FriendAvatar src={imageURL} size={75} onClick={handleModalOpen} />
-      </button>
+      <FriendAvatar src={imageURL} size={60} onClick={handleModalOpen} />
       <div className="text-left text-black text-h2 font-semibold absolute left-[100px]">
         {nickname}
       </div>
@@ -40,7 +35,6 @@ export function CommonCard({ children, imageURL, nickname }: CommonCardProps) {
         isOpen={isModalOpen}
         onClose={handleModalClose}
         nickname={nickname}
-        // imageURL={imageURL}
       />
     </div>
   );

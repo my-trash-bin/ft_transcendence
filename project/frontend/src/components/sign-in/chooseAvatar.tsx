@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '../common/Button';
+import { Button } from '../common/button';
 import SelectAvatar from './SelectAvatar';
 
 type ChooseAvatarProps = {
