@@ -37,6 +37,9 @@ const typeDefs = `#graphql
 
   type Query {
     dmUser: [DmUser],
+    allChannel: [Channel],
+    friend: [Friend],
+    profile: [Profile],
   }
 
   type DmUser {
@@ -45,9 +48,42 @@ const typeDefs = `#graphql
     latestTime: Date,
     preViewMessage: String,
   }
+
+  type Channel {
+    channelName: String,
+    latestTime: Date,
+    preViewMessage: String,
+    min: Int,
+    max: Int,
+  }
+
+  type Friend {
+    profileImageUrl: String,
+    nickname: String,
+  }
+
+  type Profile {
+    profileImageUrl: String,
+    nickname: String,
+    win: Int,
+    lose: Int,
+    ratio: Int,
+    statusMessage: String,
+  }
+
 `;
 
 const casual = require('casual');
+
+const profileImageOptions = [
+  '/avatar/avatar-small.svg',
+  '/avatar/avatar-big.svg',
+  '/avatar/avatar-black.svg',
+  '/avatar/avatar-blue.svg',
+];
+
+const getRandomProfileImageUrl = () =>
+  profileImageOptions[Math.floor(Math.random() * profileImageOptions.length)];
 
 const mocks = {
   Int: () => 6,
@@ -56,11 +92,36 @@ const mocks = {
   Query: () => ({
     dmUser: () =>
       new Array(10).fill(1).map(() => ({
-        profileImageUrl: '/avatar/avatar-small.svg',
-        nickname: casual.name,
+        profileImageUrl: getRandomProfileImageUrl(),
+        nickname: casual.username,
         latestTime: new Date(casual.date('YYYY-MM-DD HH:mm:ss')),
         preViewMessage: casual.sentence,
       })),
+
+    allChannel: () =>
+      new Array(10).fill(1).map(() => ({
+        channelName: casual.name.slice(0, 10).replace(' ', ''),
+        latestTime: new Date(casual.date('YYYY-MM-DD HH:mm:ss')),
+        preViewMessage: casual.sentence,
+        min: 5,
+        max: 10,
+      })),
+
+    friend: () =>
+      new Array(10).fill(1).map(() => ({
+        profileImageUrl: getRandomProfileImageUrl(),
+        nickname: casual.username,
+      })),
+    profile: () => [
+      {
+        profileImageUrl: getRandomProfileImageUrl(),
+        nickname: casual.username,
+        win: casual.number,
+        lose: casual.number,
+        ratio: casual.number,
+        statusMessage: casual.username,
+      },
+    ],
   }),
 };
 

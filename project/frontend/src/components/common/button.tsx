@@ -1,17 +1,49 @@
-interface ButtonProps {
+import { cva, type VariantProps } from 'class-variance-authority';
+
+const ButtonCVA = cva(['text-center'], {
+  variants: {
+    size: {
+      small: ['w-md h-xs', 'border-2', 'text-lg font-bold', 'rounded-sm'],
+    },
+    color: {
+      default: [
+        'hover:bg-light-background',
+        'border-dark-purple',
+        'bg-default',
+        'text-black',
+      ],
+      modal: ['hover:bg-white', 'border-dark-purple', 'bg-white', 'text-black'],
+      disabled: ['border-dark-gray', 'bg-gray', 'text-white', 'font-semibold'],
+    },
+  },
+  defaultVariants: {
+    size: 'small',
+  },
+});
+
+export interface ButtonProps extends VariantProps<typeof ButtonCVA> {
+  children?: React.ReactNode;
   readonly onClick: () => void;
-  readonly text: string;
+  disabled?: boolean;
+  isModal?: boolean;
 }
 
-function Button(props: ButtonProps) {
+export const Button: React.FC<ButtonProps> = ({
+  size,
+  onClick,
+  children,
+  disabled = false,
+  isModal = false,
+}) => {
+  const color = disabled ? 'disabled' : isModal ? 'modal' : 'default';
+  console.log(color);
   return (
     <button
-      className="bg-chat-color1-interactive text-white w-md h-xs text-lg"
-      onClick={props.onClick}
+      className={ButtonCVA({ size, color })}
+      onClick={onClick}
+      disabled={disabled}
     >
-      {props.text}
+      {children}
     </button>
   );
-}
-
-export default Button;
+};

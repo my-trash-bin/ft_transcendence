@@ -17,6 +17,15 @@ export function getClient() {
             },
           },
         },
+        Channel: {
+          fields: {
+            latestTime: {
+              read(value) {
+                return new Date(parseInt(value));
+              },
+            },
+          },
+        },
       },
     }),
   });
