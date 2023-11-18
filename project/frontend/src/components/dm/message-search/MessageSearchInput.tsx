@@ -38,7 +38,7 @@ export function MessageSearchInput({
     <div>
       <div
         style={{ height: height, width: width }}
-        className={`border border-dark-gray rounded-[10px] flex flex-row items-center justify-between`}
+        className={`border border-gray rounded-[10px] flex flex-row items-center justify-between`}
       >
         <Image
           className="w-[20px] h-[25px] ml-sm"

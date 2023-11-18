@@ -37,7 +37,7 @@ export function DmUserList({
   }
 
   return (
-    <div className="w-[inherit] flex-grow-1 flex flex-col items-center overflow-y-scroll">
+    <div className="w-[350px] h-[600px] flex-grow-1 flex flex-col items-center gap-sm overflow-y-scroll">
       {dmRenderData.map((val) => {
         return (
           <DmUser
