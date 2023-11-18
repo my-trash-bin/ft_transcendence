@@ -6,16 +6,18 @@ export function OtherChat({
   time,
   profile,
   isFirst,
+  nickname,
 }: Readonly<{
   content: string;
   time: Date;
   profile: string;
   isFirst: boolean;
+  nickname: string;
 }>) {
   const timeAMPM = formatAMPM(time);
   return (
     <div className="flex flex-row pl-[3%] mb-[1.5%]">
-      <div className="w-[10%] h-[10%]">
+      <button className="w-[50px] h-[50px] mt-[5px]">
         {isFirst === true ? (
           <Image
             alt="profile"
@@ -27,8 +29,13 @@ export function OtherChat({
         ) : (
           ''
         )}
-      </div>
+      </button>
       <div className="flex flex-col w-[80%] pl-[2%]">
+        {isFirst === true ? (
+          <p className="text-[15px] mb-[3px] mt-[3px]">{nickname}</p>
+        ) : (
+          ''
+        )}
         <p
           className={`p-[2%] text-center text-white inline-block max-w-[35%] rounded-[20px]
                 break-words bg-chat-color1 self-start min-w-[10%]`}

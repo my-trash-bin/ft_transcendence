@@ -1,8 +1,6 @@
 'use client';
-import { GET_PROFILES } from '@/api/profile/ProfileApi';
 import { Button } from '@/components/common/Button';
 import FriendAvatar from '@/components/friend/utils/FriendAvatar';
-import { useQuery } from '@apollo/client';
 import { ModalLayout } from '../channel/modals/ModalLayout';
 import { TextBox } from './TextBox';
 import { CardType, HistoryCard } from './history/HistoryCard';
@@ -83,16 +81,25 @@ const ProfileModal: React.FC<ModalProfileProps> = ({
   nickname,
 }) => {
   // parameter: nickname
-  const { loading, error, data } = useQuery(GET_PROFILES);
+  // const { loading, error, data } = useQuery(GET_PROFILES);
 
-  let modalContent: React.ReactNode;
-  if (loading) {
-    modalContent = <p>loading...</p>;
-  } else if (error) {
-    modalContent = <p>데이터를 가저오기에 실패했습니다.. ☠️</p>;
-  } else {
-    modalContent = getModalContent(data.profile[0]);
-  }
+  // let modalContent: React.ReactNode;
+  // if (loading) {
+  //   modalContent = <p>loading...</p>;
+  // } else if (error) {
+  //   modalContent = <p>데이터를 가저오기에 실패했습니다.. ☠️</p>;
+  // } else {
+  //   modalContent = getModalContent(data.profile[0]);
+  // }
+  let modalContent = getModalContent({
+    nickname: 'nickname',
+    profileImageUrl: 'https://avatars.githubusercontent.com/u/56240505?v=4',
+    win: 10,
+    lose: 10,
+    ratio: 1,
+    statusMessage: 'statusMessage',
+  });
+
   return (
     <ModalLayout
       isOpen={isOpen}
