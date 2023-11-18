@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import { useState } from 'react';
 import { LongCard } from '../common/LongCard';
-import ProfileModal from '../profile/modal/ProfileModal';
+import ProfileModal from '../profile/ProfileModal';
 
 interface RankingCardProps {
   readonly rank: number;
