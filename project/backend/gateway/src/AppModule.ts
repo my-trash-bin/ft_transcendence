@@ -39,7 +39,7 @@ import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.js';
         supergraphSdl: new IntrospectAndCompose({
           subgraphs: [
             { name: 'auth', url: env('SUBGRAPH_URL_AUTH') },
-            // { name: 'main', url: env('SUBGRAPH_URL_MAIN') },
+            { name: 'main', url: env('SUBGRAPH_URL_MAIN') },
             // { name: 'chat', url: env('SUBGRAPH_URL_CHAT') },
             // { name: 'pong', url: env('SUBGRAPH_URL_PONG') },
           ],

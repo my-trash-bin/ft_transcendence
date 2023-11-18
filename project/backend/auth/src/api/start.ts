@@ -53,13 +53,6 @@ export async function start(
   return commonStart(
     port,
     await schema,
-    async (ctx) =>
-      await makeContext(
-        container,
-        typeof ctx.connectionParams?.authToken === 'string'
-          ? ctx.connectionParams.authToken
-          : undefined,
-      ),
     async ({ req }) =>
       await makeContext(
         container,
@@ -71,7 +64,13 @@ export async function start(
       app.use(json());
       app.use(urlencoded({ extended: true }));
       app.use(cookieParser(env('COOKIE_SECRET')));
-      app.use(expressSession({ secret: env('SESSION_SECRET') }));
+      app.use(
+        expressSession({
+          secret: env('SESSION_SECRET'),
+          resave: false,
+          saveUninitialized: false,
+        }),
+      );
       app.use(initialize());
       app.use(session());
 

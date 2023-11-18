@@ -10,7 +10,8 @@
     "graphql": "^16.8.1"
   },
   "dependencies": {
-    "graphql": "^16.8.1"
+    "graphql": "^16.8.1",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@ft_transcendence/common": "file:../common/dist",

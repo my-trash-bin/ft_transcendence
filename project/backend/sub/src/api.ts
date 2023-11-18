@@ -17,10 +17,6 @@ import cors from 'cors';
 import express, { Express, json } from 'express';
 import gql from 'graphql-tag';
 import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.js';
-import { SubscribeMessage } from 'graphql-ws';
-import { Context } from 'graphql-ws/lib/server';
-import { useServer } from 'graphql-ws/lib/use/ws';
-import { ExecutionArgs } from 'graphql/execution/execute';
 import { GraphQLSchema } from 'graphql/type/schema';
 import deepMerge from 'lodash.merge';
 import {
@@ -28,45 +24,23 @@ import {
   createResolversMap,
   type BuildSchemaOptions,
 } from 'type-graphql';
-import { WebSocketServer } from 'ws';
 
 export async function start<TContext extends BaseContext>(
   port: number,
   schema: GraphQLSchema,
-  wsContext?: (
-    ctx: Context,
-    message: SubscribeMessage,
-    args: ExecutionArgs,
-  ) => Promise<TContext>,
   httpContext?: ContextFunction<[ExpressContextFunctionArgument], TContext>,
   registerMiddlewares?: (express: Express) => void,
 ) {
   const app = express();
   const httpServer = createServer(app);
-  const wsServer = new WebSocketServer({
-    server: httpServer,
-    path: '/subscriptions',
-  });
-
-  const wsServerCleanup = useServer({ schema, context: wsContext }, wsServer);
-
   const dev = process.env.NODE_ENV === 'development';
 
   const server = new ApolloServer({
     schema,
-    introspection: dev,
+    introspection: true,
     includeStacktraceInErrorResponses: dev,
     plugins: [
       ApolloServerPluginDrainHttpServer({ httpServer }),
-      {
-        async serverWillStart() {
-          return {
-            async drainServer() {
-              await wsServerCleanup.dispose();
-            },
-          };
-        },
-      },
       dev
         ? ApolloServerPluginLandingPageLocalDefault({ footer: false })
         : ApolloServerPluginLandingPageDisabled(),

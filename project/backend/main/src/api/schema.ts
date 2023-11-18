@@ -5,6 +5,7 @@ import { MiddlewareFn } from 'type-graphql';
 import { Context } from './Context';
 import { HelloWorldResolver } from './HelloWorld/HelloWorldResolver';
 import { isTypegraphqlError } from './isTypegraphqlError';
+import { UserResolver } from './User/UserResolver';
 
 const errorInterceptor: MiddlewareFn<Context> = async ({ context }, next) => {
   try {
@@ -24,6 +25,6 @@ const errorInterceptor: MiddlewareFn<Context> = async ({ context }, next) => {
 
 export const schema = buildFederatedSchema({
   globalMiddlewares: [errorInterceptor],
-  resolvers: [HelloWorldResolver],
+  resolvers: [HelloWorldResolver, UserResolver],
   validate: true,
 });
