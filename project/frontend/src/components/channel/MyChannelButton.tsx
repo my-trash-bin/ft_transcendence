@@ -15,17 +15,17 @@ export function MyChannelButton({
   const dateView = formatAMPM(date);
   const state = now + '/' + max;
   return (
-    <button className="w-[340px] h-[100px] relative bg-white border border-default rounded-md mb-[10px] shrink-0">
-      <p className="absolute left-[30px] bottom-[50px] text-[22px]">
-        {channelName}
-      </p>
-      <p className="absolute left-[30px] bottom-[10px] text-[14px]">
-        {messageShortcut}
-      </p>
-      <p className="absolute text-[9px] left-[280px] bottom-[70px]">
-        {dateView}
-      </p>
-      <p className="absolute left-[290px] bottom-[10px] text-[15px]">{state}</p>
+    <button className="w-[320px] h-[90px] bg-white border border-default rounded-md shrink-0 p-sm pl-md">
+      <div className="flex flex-col h-[100%] justify-between">
+        <div className="flex flex-row justify-between items-center">
+          <p className="text-[22px] text-left">{channelName}</p>
+          <p className="text-[12px] text-right ">{dateView}</p>
+        </div>
+        <div className="flex flex-row justify-between items-center">
+          <p className="text-[15px] text-left">{messageShortcut}</p>
+          <p className="text-[12px] text-right">{state}</p>
+        </div>
+      </div>
     </button>
   );
 }

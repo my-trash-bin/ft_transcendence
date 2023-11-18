@@ -1,4 +1,4 @@
-import ProfileModal from '@/components/profile/modal/ProfileModal';
+import ProfileModal from '@/components/profile/ProfileModal';
 import { ReactNode, useState } from 'react';
 import FriendAvatar from './FriendAvatar';
 

@@ -14,15 +14,12 @@ export default function ChannelHome() {
       <div
         className={`bg-opacity-50 flex flex-row bg-light-background rounded-[20px] w-[inherit]`}
       >
-        <div className="w-[380px] h-[750px] border-r">
+        <div className="w-[380px] h-[750px] border-r flex flex-col items-center">
           <ChannelInput
             myChannel={myChannel}
             setMyChannel={setMyChannel}
             setSearchChannel={setSearchChannel}
           />
-          <p className="text-[15px] text-dark-gray pl-[15px] mt-[15px] mb-[15px]">
-            {myChannel ? '내 채널' : '모든 채널'}
-          </p>
           <ChannelList myChannel={myChannel} searchChannel={searchChannel} />
         </div>
         <div className="w-[520px] h-[750px] flex flex-col items-center">

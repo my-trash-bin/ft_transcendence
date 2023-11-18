@@ -14,12 +14,16 @@ export function ChannelInput({
     setSearchChannel(searchInput);
   };
   return (
-    <div className="h-[140px] mt-[30px] pl-[15px] mb-[10px]">
-      <h3 className="text-[32px] pl-[15px]">채널</h3>
-      <SelectChannel myChannel={myChannel} setMyChannel={setMyChannel} />
+    <div className="w-[350px] mb-[20px] pt-lg pl-sm">
+      <div className="flex flex-row justify-between">
+        <h3 className="text-h2 font-semibold text-dark-gray text-left pb-md">
+          채널
+        </h3>
+        <SelectChannel myChannel={myChannel} setMyChannel={setMyChannel} />
+      </div>
       <MessageSearchInput
         height="30px"
-        width="270px"
+        width="330px"
         eventFunction={searchChannelFunction}
         placeholder="채널 검색"
       />

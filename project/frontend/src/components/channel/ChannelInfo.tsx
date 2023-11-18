@@ -19,7 +19,7 @@ export function ChannelInfo() {
   return (
     <>
       <ChannelSettingModal isOpen={isOpen} closeModal={modalClose} />
-      <div className="w-[inherit] h-[80px] border-b border-default relative flex justify-center items-center">
+      <div className="w-[95%] h-[80px] border-b border-default relative flex justify-center items-center">
         <h3>{channelData.channelName}</h3>
         <button
           className="absolute right-[15px] top-[25px] w-[25px] h-[30px]"

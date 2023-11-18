@@ -6,10 +6,10 @@ export function MessageSearch({
   userSearchCallback: (arg: string) => void;
 }) {
   return (
-    <div className="w-[350px] mb-[20px] pt-[30px] ">
-      <h3 className="mb-[30px] text-[32px] pl-[30px]">메세지</h3>
+    <div className="w-[350px] mb-[20px] pt-lg pl-sm">
+      <h3 className="text-h2 font-semibold text-dark-gray pb-md">메세지</h3>
       <MessageSearchInput
-        width="270px"
+        width="330px"
         height="30px"
         placeholder="유저 검색"
         eventFunction={userSearchCallback}

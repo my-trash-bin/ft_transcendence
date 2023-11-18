@@ -19,7 +19,6 @@ function HistoryArticle() {
               user2Avatar={data.user2Avatar}
               user1Score={data.user1Score}
               user2Score={data.user2Score}
-              isdefault={true}
             />
           ))}
         </div>

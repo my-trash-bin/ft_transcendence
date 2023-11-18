@@ -1,12 +1,12 @@
 'use client';
 import { GET_PROFILES } from '@/api/profile/ProfileApi';
-import { Button } from '@/components/common/button';
+import { Button } from '@/components/common/Button';
 import FriendAvatar from '@/components/friend/utils/FriendAvatar';
 import { useQuery } from '@apollo/client';
-import { ModalLayout } from '../../channel/modals/ModalLayout';
-import { TextBox } from '../TextBox';
-import { HistoryCard } from '../history/HistoryCard';
-import { mockData } from '../history/mockDataHistory';
+import { ModalLayout } from '../channel/modals/ModalLayout';
+import { TextBox } from './TextBox';
+import { CardType, HistoryCard } from './history/HistoryCard';
+import { mockData } from './history/mockDataHistory';
 
 interface ModalProfileProps {
   isOpen: boolean;
@@ -51,6 +51,7 @@ const getModalContent = (props: ModalData) => {
             user2Avatar={data.user2Avatar}
             user1Score={data.user1Score}
             user2Score={data.user2Score}
+            type={CardType.Small}
           />
         ))}
       </div>

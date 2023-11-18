@@ -30,7 +30,7 @@ export function ChannelList({
   if (error) return <p>데이터를 가저오기에 실패했습니다.. ☠️</p>;
 
   return (
-    <div className="w-[inherit] h-[530px] flex flex-col items-center overflow-y-scroll">
+    <div className="w-[350px] h-[600px] flex-grow-1 flex flex-col items-center gap-sm overflow-y-scroll">
       {myChannel
         ? data.allChannel.map((data: myChannelListProps) => {
             return (
