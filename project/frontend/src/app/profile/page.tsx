@@ -1,10 +1,25 @@
-import Navbar from '../../components/common/navbar';
+'use client';
+import ArchivementBox from '../../components/profile/achivement/ArchivementBox';
+import HistoryBox from '../../components/profile/history/HistoryBox';
+import ProfileBox from '../../components/profile/ProfileBox';
 
-export default function FriendHome() {
+export default function ProfilePage() {
   return (
-    <nav className="flex">
-      <Navbar />
-      <div> This is profile page </div>
-    </nav>
+    <div className="flex flex-row max-w-[100%] max-h-[100%]">
+      <div className="flex flex-col items-center max-w-[100%] max-h-[100%]">
+        <ProfileBox
+          avatar="/avatar/avatar-blue.svg"
+          nickname="happy"
+          win={3}
+          lose={5}
+          ratio={37}
+          statusMessage={'I can do it!'}
+        />
+        <div className="flex flex-row">
+          <ArchivementBox />
+          <HistoryBox />
+        </div>
+      </div>
+    </div>
   );
 }

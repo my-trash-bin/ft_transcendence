@@ -1,35 +1,33 @@
+import { useEffect } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
-import Avatar from '../common/Avatar';
+import { CommonCard } from './utils/CommonCard';
 
 interface FriendCardProps {
   readonly nickname: string;
-  readonly imageUri: string;
+  readonly imageURL: string;
 }
-const profile = () => toast('프로필 모달 호출');
-const unblock = () => toast('차단 해제하는 함수 호출');
 
 function FriendCard(props: FriendCardProps) {
-  const buttonClass =
-    'w-md h-xs bg-default rounded-sm border-2 border-dark-purple text-center text-black text-lg font-bold mr-lg hover:bg-light-background';
+  const unblock = () => toast(`${props.nickname} 차단 해제`);
+  useEffect(() => {
+    return () => toast.dismiss();
+  }, []);
   return (
-    <div className="w-[600px] h-[100px] bg-light-background rounded-md flex items-center relative">
+    <CommonCard imageURL={props.imageURL} nickname={props.nickname}>
       <Toaster
         toastOptions={{
           duration: 2000,
         }}
       />
-      <button onClick={profile}>
-        <Avatar src={`${props.imageUri}`} />
+      <button
+        onClick={unblock}
+        className={
+          'w-md h-xs bg-default rounded-sm border-2 border-dark-purple text-center text-black text-lg font-bold mr-lg hover:bg-light-background'
+        }
+      >
+        차단 풀기
       </button>
-      <div className="text-left text-black text-h2 font-semibold ml-2xl">
-        {props.nickname}
-      </div>
-      <div className="absolute right-xl flex">
-        <button onClick={unblock} className={buttonClass}>
-          차단 풀기
-        </button>
-      </div>
-    </div>
+    </CommonCard>
   );
 }
 export default FriendCard;

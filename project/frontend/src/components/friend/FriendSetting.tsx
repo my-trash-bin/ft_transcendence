@@ -1,13 +1,16 @@
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
 
 interface FriendSettingProps {
-  nickname: string;
+  readonly nickname: string;
 }
 
 function FriendSetting(props: FriendSettingProps) {
-  const [isActive, setActive] = useState(false);
+  const [active, setActive] = useState(false);
   const boxRef = useRef(null);
+  const breakFriend = () => toast(`${props.nickname} 친구 끊기`);
+  const block = () => toast(`${props.nickname} 차단`);
 
   useEffect(() => {
     // Add event listener to handle clicks outside of the box
@@ -25,11 +28,16 @@ function FriendSetting(props: FriendSettingProps) {
   }, []);
 
   const toggleBox = () => {
-    setActive(!isActive);
+    setActive(!active);
   };
-
+  const buttonClass = 'w-[58px] text-center text-black text-sm font-semibold';
   return (
-    <div className="relative">
+    <div>
+      <Toaster
+        toastOptions={{
+          duration: 2000,
+        }}
+      />
       <Image
         src="/icon/message-setting.svg"
         alt="setting-icon"
@@ -38,13 +46,20 @@ function FriendSetting(props: FriendSettingProps) {
         className="rotate-90 cursor-pointer"
         onClick={toggleBox}
       />
-      {isActive && (
+      {active && (
         <div
           ref={boxRef}
-          className="absolute top-6 right-0 bg-white border p-2"
+          className="w-[60px] bg-light-background border-2 border-dark-gray rounded-xs absolute"
         >
-          {/* Content of the little box */}
-          <button onClick={() => setActive(false)}>친구 끊기</button>
+          <div className="flex flex-col justify-center">
+            <button className={` ${buttonClass}`} onClick={breakFriend}>
+              친구 끊기
+            </button>
+            <hr />
+            <button className={` ${buttonClass}`} onClick={block}>
+              차단 하기
+            </button>
+          </div>
         </div>
       )}
     </div>

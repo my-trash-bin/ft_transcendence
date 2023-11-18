@@ -1,21 +1,35 @@
-import { DmUserList } from '../../../components/channel/dm-user/DmUserList';
-import { MessageSearch } from '../../../components/channel/message-search/MessageSearch';
-import { MessageBox } from '../../../components/channel/message/MessageBox';
-import Navbar from '../../components/common/navbar';
+'use client';
+
+import { DmUserList } from '@/components/dm/dm-user/DmUserList';
+import { MessageSearch } from '@/components/dm/message-search/MessageSearch';
+import { getClient } from '@/lib/ApolloClient';
+import { ApolloProvider } from '@apollo/client';
+import Image from 'next/image';
+import { useState } from 'react';
 
 export default function DmPage() {
+  const userSearchCallback = (searchUsername: string) => {
+    setSearchUsername(searchUsername);
+  };
+  const [searchUsername, setSearchUsername] = useState('');
+
   return (
-    <div className="flex flex-row h-[100%] w-[100%]">
-      <Navbar />
-      <div className="flex flex-row w-[100%]">
-        <div className=" w-[35%] h-full">
-          <MessageSearch />
-          <DmUserList />
+    <ApolloProvider client={getClient()}>
+      <div className="flex flex-row bg-light-background rounded-[20px] w-[inherit]">
+        <div className="w-[380px] h-[750px] border-r flex flex-col items-center">
+          <MessageSearch userSearchCallback={userSearchCallback} />
+          <DmUserList searchUsername={searchUsername} />
         </div>
-        <div className="w-[65%] h-full border-l  border-color6">
-          <MessageBox />
+        <div className="w-[520px] h-[750px] flex flex-col items-center justify-center">
+          <Image
+            alt="dm image"
+            src="/images/dm-page.png"
+            priority={true}
+            width={300}
+            height={300}
+          />
         </div>
       </div>
-    </div>
+    </ApolloProvider>
   );
 }

@@ -6,7 +6,7 @@ import { PropsWithChildren } from 'react';
 import { ApiContextProvider } from './_internal/provider/ApiContextProvider';
 import { QueryClientProvider } from './_internal/provider/QueryClientProvider';
 
-export default function Layout({ children }: PropsWithChildren) {
+export default function Layout({ children }: Readonly<PropsWithChildren>) {
   return (
     <html
       className={cookies().get('theme')?.value === 'dark' ? 'dark' : undefined}

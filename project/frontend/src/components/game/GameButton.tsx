@@ -7,6 +7,7 @@ interface ButtonComponentProps {
 
 const ButtonComponent: React.FC<ButtonComponentProps> = ({ mode }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [buttonActive, setButtonActive] = useState(0);
 
   const handleButtonClick = () => {
     setIsModalOpen(true);
@@ -14,14 +15,23 @@ const ButtonComponent: React.FC<ButtonComponentProps> = ({ mode }) => {
 
   const handleModalClose = () => {
     setIsModalOpen(false);
+    setButtonActive((prev) => (prev === 0 ? 1 : 0));
   };
 
   let content = mode === 'normal' ? '일반 게임' : '아이템 게임';
 
+  const bgCSS = 'bg-default-interactive rounded-md';
+  const sizeCSS = 'w-xl h-md';
+  const borderCSS = 'border-3 border-dark-purple';
+  const textCSS = 'text-dark-purple font-bold text-h2';
+  const hoverCSS =
+    'cursor-pointer transition-all duration-300 ease-in-out hover:shadow-custom hover:-translate-y-[0.148rem]';
+
   return (
     <div>
       <button
-        className="bg-default-interactive text-dark-purple font-bold text-h2 py-sm px-lg rounded-md cursor-pointer mx-sm mt-xl w-xl h-sm flex items-center justify-center border border-dark-purple transition-all duration-300 ease-in-out hover:shadow-custom hover:-translate-y-2.048"
+        key={buttonActive}
+        className={`${textCSS} ${borderCSS} ${hoverCSS} ${sizeCSS} ${bgCSS}`}
         onClick={handleButtonClick}
       >
         {content}

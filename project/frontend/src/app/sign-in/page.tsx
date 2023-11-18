@@ -1,9 +1,10 @@
 'use client';
 
+import LinkButton from '@/components/sign-in/LinkButton';
 import { useState } from 'react';
+import ChooseAvatar from '../../components/sign-in/ChooseAvatar';
+import ChooseNickname from '../../components/sign-in/ChooseNickname';
 import SelectAvatar from '../../components/sign-in/SelectAvatar';
-import ChooseAvatar from '../../components/sign-in/chooseAvatar';
-import ChooseNickname from '../../components/sign-in/chooseNickname';
 
 const avatars: string[] = [
   'avatar-blue.svg',
@@ -35,6 +36,7 @@ export default function SignIn() {
       <div>
         {nickname}
         <SelectAvatar name={avatar} isSelected={true} />
+        <LinkButton text="go to friend" href="/friend" />
       </div>
     );
 
