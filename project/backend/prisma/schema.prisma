@@ -1,0 +1,237 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String    @id @default(uuid()) @db.Uuid
+  joinedAt        DateTime  @default(now())
+  isLeaved        Boolean   @default(false)
+  leavedAt        DateTime?
+  nickname        String    @unique
+  profileImageUrl String?
+
+  Auth               Auth?                  @relation("Auth_user")
+  following          UserFollow[]           @relation("UserFollow_follower")
+  followedBy         UserFollow[]           @relation("UserFollow_followee")
+  achievements       UserAchievement[]      @relation("UserAchievement_user")
+  notifications      Notification[]         @relation("Notifications_user")
+  ownedChannels      Channel[]              @relation("Channel_owner")
+  channels           ChannelMember[]        @relation("ChannelMember_member")
+  messages           ChannelMessage[]       @relation("ChannelMessage_member")
+  channelInvitations ChannelInvitation[]    @relation("ChannelInvitation_member")
+  dmChannel1         DMChannelAssociation[] @relation("DMChannelAssociation_member1")
+  dmChannel2         DMChannelAssociation[] @relation("DMChannelAssociation_member2")
+  dmChannelInfoFrom  DMChannelInfo[]        @relation("DMChannelInfo_from")
+  dmChannelInfoTo    DMChannelInfo[]        @relation("DMChannelInfo_to")
+  dmMessage          DMMessage[]            @relation("DMMessage_member")
+  game1              PongLiveGame?          @relation("PongLiveGame_player1")
+  game2              PongLiveGame?          @relation("PongLiveGame_player2")
+}
+
+enum AuthType {
+  FT
+}
+
+model Auth {
+  type         AuthType
+  id           String
+  metadataJson String
+  userId       String   @unique @db.Uuid
+
+  user User @relation("Auth_user", fields: [userId], references: [id])
+
+  @@id([type, id])
+}
+
+model UserFollow {
+  followerId        String   @db.Uuid
+  followeeId        String   @db.Uuid
+  isBlock           Boolean
+  followOrBlockedAt DateTime @default(now()) @updatedAt
+
+  follower User @relation("UserFollow_follower", fields: [followerId], references: [id])
+  followee User @relation("UserFollow_followee", fields: [followeeId], references: [id])
+
+  @@id([followerId, followeeId])
+  @@index([followerId, isBlock, followOrBlockedAt])
+}
+
+model Achievement {
+  id          String @id @default(uuid()) @db.Uuid
+  title       String
+  imageUrl    String
+  description String
+
+  achievedUsers UserAchievement[] @relation("UserAchievement_achievement")
+}
+
+model UserAchievement {
+  userId        String   @db.Uuid
+  achievementId String   @db.Uuid
+  achievedAt    DateTime @default(now())
+
+  user        User        @relation("UserAchievement_user", fields: [userId], references: [id])
+  achievement Achievement @relation("UserAchievement_achievement", fields: [achievementId], references: [id])
+
+  @@id([userId, achievementId])
+  @@index([userId, achievedAt])
+  @@index([achievementId, achievedAt])
+}
+
+model Notification {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @db.Uuid
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  contentJson String
+
+  user User @relation("Notifications_user", fields: [userId], references: [id])
+
+  @@index([userId, createdAt])
+}
+
+model Channel {
+  id                 String   @id @default(uuid()) @db.Uuid
+  title              String
+  isPublic           Boolean
+  password           String?
+  createdAt          DateTime @default(now())
+  lastActiveAt       DateTime @default(now())
+  ownerId            String?  @db.Uuid
+  memberCount        Int      @default(0)
+  maximumMemberCount Int
+
+  owner User? @relation("Channel_owner", fields: [ownerId], references: [id])
+
+  members           ChannelMember[]     @relation("ChannelMember_channel")
+  messages          ChannelMessage[]    @relation("ChannelMessage_channel")
+  ChannelInvitation ChannelInvitation[] @relation("ChannelInvitation_channel")
+
+  @@index([isPublic, memberCount])
+  @@index([isPublic, title])
+  @@index([isPublic, createdAt])
+  @@index([isPublic, lastActiveAt])
+}
+
+enum ChannelMemberType {
+  ADMINISTRATOR
+  MEMBER
+  BANNED
+}
+
+model ChannelMember {
+  channelId  String            @db.Uuid
+  memberId   String            @db.Uuid
+  memberType ChannelMemberType
+  mutedUntil DateTime          @default(now())
+
+  channel Channel @relation("ChannelMember_channel", fields: [channelId], references: [id])
+  member  User    @relation("ChannelMember_member", fields: [memberId], references: [id])
+
+  @@id([channelId, memberId])
+  @@index([memberId, channelId])
+}
+
+model ChannelMessage {
+  id          String   @id @default(uuid()) @db.Uuid
+  channelId   String   @db.Uuid
+  memberId    String   @db.Uuid
+  sentAt      DateTime @default(now())
+  messageJson String
+
+  channel Channel @relation("ChannelMessage_channel", fields: [channelId], references: [id])
+  member  User    @relation("ChannelMessage_member", fields: [memberId], references: [id])
+
+  @@index([channelId, sentAt])
+}
+
+model ChannelInvitation {
+  channelId String   @db.Uuid
+  memberId  String   @db.Uuid
+  invitedAt DateTime @default(now())
+
+  channel Channel @relation("ChannelInvitation_channel", fields: [channelId], references: [id])
+  member  User    @relation("ChannelInvitation_member", fields: [memberId], references: [id])
+
+  @@id([channelId, memberId])
+  @@index([channelId, invitedAt])
+}
+
+// member1Id must be smaller than member2Id
+model DMChannelAssociation {
+  id        String @id @default(uuid()) @db.Uuid
+  member1Id String @db.Uuid
+  member2Id String @db.Uuid
+
+  member1 User @relation("DMChannelAssociation_member1", fields: [member1Id], references: [id])
+  member2 User @relation("DMChannelAssociation_member2", fields: [member2Id], references: [id])
+
+  channelInfo DMChannelInfo[] @relation("DMChannelInfo_channel")
+  DMMessage   DMMessage[]     @relation("DMMessage_channel")
+
+  @@unique([member1Id, member2Id])
+}
+
+model DMChannelInfo {
+  fromId    String @db.Uuid
+  toId      String @db.Uuid
+  channelId String @default(uuid()) @db.Uuid
+  name      String
+
+  from    User                 @relation("DMChannelInfo_from", fields: [fromId], references: [id])
+  to      User                 @relation("DMChannelInfo_to", fields: [toId], references: [id])
+  channel DMChannelAssociation @relation("DMChannelInfo_channel", fields: [channelId], references: [id])
+
+  @@id([fromId, toId])
+  @@index([fromId, name])
+}
+
+model DMMessage {
+  id          String   @id @default(uuid()) @db.Uuid
+  channelId   String   @db.Uuid
+  memberId    String   @db.Uuid
+  sentAt      DateTime @default(now())
+  messageJson String
+
+  channel DMChannelAssociation @relation("DMMessage_channel", fields: [channelId], references: [id])
+  member  User                 @relation("DMMessage_member", fields: [memberId], references: [id])
+
+  @@index([channelId, sentAt])
+}
+
+model PongSeasonLog {
+  season             Int
+  userId             String @db.Uuid
+  consecutiveWin     Int
+  maxConsecutiveWin  Int
+  maxConsecutiveLose Int
+  win                Int
+  lose               Int
+  total              Int
+  winRate            Float
+
+  @@id([userId, season])
+  @@index([season, consecutiveWin, userId])
+  @@index([season, win, userId])
+  @@index([season, total, userId])
+  @@index([season, winRate, total, userId])
+}
+
+model PongLiveGame {
+  id        String  @id @db.Uuid
+  startedAt String
+  isEnd     Boolean
+  player1Id String  @unique @db.Uuid
+  player2Id String  @unique @db.Uuid
+
+  player1 User @relation("PongLiveGame_player1", fields: [player1Id], references: [id])
+  player2 User @relation("PongLiveGame_player2", fields: [player2Id], references: [id])
+
+  @@index([isEnd, startedAt])
+  @@index([startedAt])
+}
