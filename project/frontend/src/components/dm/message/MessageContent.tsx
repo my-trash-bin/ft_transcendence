@@ -15,22 +15,11 @@ export function MessageContent() {
       />
 
       <OtherChat
+        nickname="username"
         content="h"
         time={new Date()}
         profile="/avatar/avatar-black.svg"
         isFirst={true}
-      />
-      <OtherChat
-        content="h"
-        time={new Date()}
-        profile="/avatar/avatar-black.svg"
-        isFirst={false}
-      />
-      <OtherChat
-        content="h"
-        time={new Date()}
-        profile="/avatar/avatar-black.svg"
-        isFirst={false}
       />
     </div>
   );

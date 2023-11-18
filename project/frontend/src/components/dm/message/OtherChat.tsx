@@ -6,11 +6,13 @@ export function OtherChat({
   time,
   profile,
   isFirst,
+  nickname,
 }: Readonly<{
   content: string;
   time: Date;
   profile: string;
   isFirst: boolean;
+  nickname: string;
 }>) {
   const timeAMPM = formatAMPM(time);
   return (
