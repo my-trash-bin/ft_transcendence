@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ChannelType } from './CreateChannelModal';
+import { inputValidator } from './InputValidator';
 
 export const ChannelCreateContent = ({
   channelType,
@@ -21,55 +22,14 @@ export const ChannelCreateContent = ({
 
   useEffect(() => {
     setPasswordValid(channelType === ChannelType.PUBLIC);
-  }, [channelType]);
+    setTitleValid(false);
+    setInputTitle('');
+    setInputPassword('');
+    setInputSize(2);
+    setSizeValid(true);
+    setIsValid(false);
+  }, [channelType, setIsValid]);
 
-  const inputValidator = (identifier: string, value: string) => {
-    const specialCharRegex = /[!@#$%^&*(),.?":{}|<>]/;
-
-    switch (identifier) {
-      case 'title':
-        if (
-          value.length > 15 ||
-          value.length < 2 ||
-          specialCharRegex.test(value)
-        ) {
-          setTitleValid(false);
-          setIsValid(false);
-        } else {
-          setTitleValid(true);
-          if (passwordValid && sizeValid) {
-            setIsValid(true);
-          }
-        }
-        break;
-      case 'password':
-        if (value.length !== 6 || !/^\d+$/.test(value)) {
-          setPasswordValid(false);
-          setIsValid(false);
-        } else {
-          setPasswordValid(true);
-          if (titleValid && sizeValid) {
-            setIsValid(true);
-          }
-        }
-        break;
-      case 'size':
-        if (
-          parseInt(value) < 2 ||
-          parseInt(value) > 10 ||
-          isNaN(parseInt(value))
-        ) {
-          setSizeValid(false);
-          setIsValid(false);
-        } else {
-          setSizeValid(true);
-          if (titleValid && passwordValid) {
-            setIsValid(true);
-          }
-        }
-        break;
-    }
-  };
   const validText = 'text-[12px] mt-[5px]';
   const invalidText = 'text-[12px] mt-[5px] text-red-400';
 
@@ -79,7 +39,10 @@ export const ChannelCreateContent = ({
         <input
           className="disabled w-[200px] pl-[5px] h-[25px] focus:border-purple-500 focus:ring-purple-500 focus:ring-2 rounded-sm focus:outline-none"
           onChange={(e) => {
-            inputValidator('title', e.target.value);
+            let res = inputValidator('title', e.target.value);
+            setTitleValid(res);
+            if (res && passwordValid && sizeValid) setIsValid(true);
+            else setIsValid(false);
             setInputTitle(e.target.value);
           }}
           value={inputTitle}
@@ -94,7 +57,10 @@ export const ChannelCreateContent = ({
           type="password"
           disabled={channelType === ChannelType.PUBLIC}
           onChange={(e) => {
-            inputValidator('password', e.target.value);
+            let res = inputValidator('password', e.target.value);
+            setPasswordValid(res);
+            if (res && titleValid && sizeValid) setIsValid(true);
+            else setIsValid(false);
             setInputPassword(e.target.value);
           }}
           value={inputPassword}
@@ -111,7 +77,10 @@ export const ChannelCreateContent = ({
           max={10}
           value={inputSize}
           onChange={(e) => {
-            inputValidator('size', e.target.value);
+            let res = inputValidator('size', e.target.value);
+            setSizeValid(res);
+            if (res && titleValid && passwordValid) setIsValid(true);
+            else setIsValid(false);
             setInputSize(parseInt(e.target.value));
           }}
         ></input>
