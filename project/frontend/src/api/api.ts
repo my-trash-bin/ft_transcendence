@@ -9,6 +9,10 @@
  * ---------------------------------------------------------------
  */
 
+export interface MeResult {
+  value: string;
+}
+
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, 'body' | 'bodyUsed'>;
 
@@ -273,9 +277,10 @@ export class Api<
      * @request GET:/api/v1/me
      */
     appControllerGetProfile: (params: RequestParams = {}) =>
-      this.request<void, any>({
+      this.request<MeResult, any>({
         path: `/api/v1/me`,
         method: 'GET',
+        format: 'json',
         ...params,
       }),
 
