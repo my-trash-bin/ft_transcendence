@@ -9,6 +9,7 @@ datasource db {
 
 model User {
   id              String    @id @default(uuid()) @db.Uuid
+  mfaPasswordHash String?
   joinedAt        DateTime  @default(now())
   isLeaved        Boolean   @default(false)
   leavedAt        DateTime?
@@ -41,9 +42,9 @@ model Auth {
   type         AuthType
   id           String
   metadataJson String
-  userId       String   @unique @db.Uuid
+  userId       String?  @unique @db.Uuid
 
-  user User @relation("Auth_user", fields: [userId], references: [id])
+  user User? @relation("Auth_user", fields: [userId], references: [id])
 
   @@id([type, id])
 }
