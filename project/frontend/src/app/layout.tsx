@@ -3,6 +3,7 @@ import './style.css';
 import { ModeContextProvider } from '@-ft/mode-next';
 import { cookies } from 'next/headers';
 import { PropsWithChildren } from 'react';
+import { ApiContextProvider } from './_internal/provider/ApiContextProvider';
 
 export default function Layout({ children }: PropsWithChildren) {
   return (
@@ -18,9 +19,11 @@ export default function Layout({ children }: PropsWithChildren) {
         <script src="/script/mode.js" />
       </head>
       <body className="bg-background text-text">
-        <ModeContextProvider variableName="npm:@-ft/mode-codegen">
-          {children}
-        </ModeContextProvider>
+        <ApiContextProvider>
+          <ModeContextProvider variableName="npm:@-ft/mode-codegen">
+            {children}
+          </ModeContextProvider>
+        </ApiContextProvider>
       </body>
     </html>
   );
