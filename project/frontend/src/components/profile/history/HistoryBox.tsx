@@ -1,6 +1,6 @@
 import { Title } from '@/components/common/Title';
 import { ProfileButton } from '../ProfileButton';
-import { HistoryCard } from './HistoryCard';
+import { CardType, HistoryCard } from './HistoryCard';
 import { mockData } from './mockDataHistory';
 
 function HistoryBox() {
@@ -19,7 +19,7 @@ function HistoryBox() {
               user2Avatar={data.user2Avatar}
               user1Score={data.user1Score}
               user2Score={data.user2Score}
-              isdefault={false}
+              type={CardType.Small}
             />
           ))}
         </div>
