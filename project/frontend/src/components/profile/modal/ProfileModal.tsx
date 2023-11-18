@@ -1,6 +1,6 @@
 'use client';
 import { GET_PROFILES } from '@/api/profile/ProfileApi';
-import { Button } from '@/components/common/button';
+import { Button } from '@/components/common/Button';
 import FriendAvatar from '@/components/friend/utils/FriendAvatar';
 import { useQuery } from '@apollo/client';
 import { ModalLayout } from '../../channel/modals/ModalLayout';
