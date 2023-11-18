@@ -48,6 +48,12 @@ export class AuthController {
     private readonly jwtService: JwtService,
   ) {}
 
+  @Get('logout')
+  async logout(@Response() res: ExpressResponse): Promise<void> {
+    res.clearCookie('jwt');
+    res.end();
+  }
+
   @UseGuards(FtGuard)
   @Get('42')
   async login(): Promise<void> {}
