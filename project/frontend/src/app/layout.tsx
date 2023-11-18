@@ -4,6 +4,7 @@ import { ModeContextProvider } from '@-ft/mode-next';
 import { cookies } from 'next/headers';
 import { PropsWithChildren } from 'react';
 import { ApiContextProvider } from './_internal/provider/ApiContextProvider';
+import { QueryClientProvider } from './_internal/provider/QueryClientProvider';
 
 export default function Layout({ children }: PropsWithChildren) {
   return (
@@ -19,11 +20,13 @@ export default function Layout({ children }: PropsWithChildren) {
         <script src="/script/mode.js" />
       </head>
       <body className="bg-background text-text">
-        <ApiContextProvider>
-          <ModeContextProvider variableName="npm:@-ft/mode-codegen">
-            {children}
-          </ModeContextProvider>
-        </ApiContextProvider>
+        <QueryClientProvider>
+          <ApiContextProvider>
+            <ModeContextProvider variableName="npm:@-ft/mode-codegen">
+              {children}
+            </ModeContextProvider>
+          </ApiContextProvider>
+        </QueryClientProvider>
       </body>
     </html>
   );

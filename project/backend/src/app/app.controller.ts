@@ -7,6 +7,7 @@ import { JwtGuard } from '../auth/jwt.guard';
 export class AppController {
   constructor(private authService: AuthService) {}
 
+  // TODO: apply https://docs.nestjs.com/openapi/operations
   @UseGuards(JwtGuard)
   @Get('me')
   getProfile(@Request() req: ExpressRequest) {
