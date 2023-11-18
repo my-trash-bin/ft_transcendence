@@ -1,7 +1,5 @@
 'use client';
 
-import { GET_DM_USERS } from '@/api/dm/DmApi';
-import { useQuery } from '@apollo/client';
 import { DmUser } from './DmUser';
 
 interface DmUser {
@@ -14,21 +12,43 @@ interface DmUser {
 export function DmUserList({
   searchUsername,
 }: Readonly<{ searchUsername: string }>) {
-  const { loading, data, error } = useQuery(GET_DM_USERS);
-  if (loading) return;
-  if (error) return <p>데이터를 가저오기에 실패했습니다.. ☠️</p>;
-
-  let dmRenderData: DmUser[] = data.dmUser.map((val: any) => {
-    return {
-      nickname: val.nickname,
-      profileImageUrl: val.profileImageUrl,
-      preViewMessage:
-        val.preViewMessage.length > 25
-          ? val.preViewMessage.slice(0, 22) + '...'
-          : val.preViewMessage,
-      latestTime: val.latestTime,
-    };
-  });
+  // let dmRenderData: DmUser[] = data.dmUser.map((val: any) => {
+  //   return {
+  //     nickname: val.nickname,
+  //     profileImageUrl: val.profileImageUrl,
+  //     preViewMessage:
+  //       val.preViewMessage.length > 25
+  //         ? val.preViewMessage.slice(0, 22) + '...'
+  //         : val.preViewMessage,
+  //     latestTime: val.latestTime,
+  //   };
+  // });
+  let dmRenderData: DmUser[] = [
+    {
+      nickname: 'test1',
+      profileImageUrl: '/avatar/avatar-big.svg',
+      preViewMessage: 'test1',
+      latestTime: new Date(),
+    },
+    {
+      nickname: 'test2',
+      profileImageUrl: '/avatar/avatar-big.svg',
+      preViewMessage: 'test2',
+      latestTime: new Date(),
+    },
+    {
+      nickname: 'test3',
+      profileImageUrl: '/avatar/avatar-big.svg',
+      preViewMessage: 'test3',
+      latestTime: new Date(),
+    },
+    {
+      nickname: 'test4',
+      profileImageUrl: '/avatar/avatar-big.svg',
+      preViewMessage: 'test4',
+      latestTime: new Date(),
+    },
+  ];
 
   if (searchUsername) {
     dmRenderData = dmRenderData.filter((val) =>

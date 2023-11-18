@@ -1,4 +1,9 @@
+'use client';
+
 import Image from 'next/image';
+import { useState } from 'react';
+import { ChannelButton } from '../ChannelButton';
+import { inputValidator } from './InputValidator';
 
 export function SettingModal({
   closeModal,
@@ -11,6 +16,11 @@ export function SettingModal({
     setModalAdd: () => void;
   };
 }) {
+  const [password, setPassword] = useState('');
+  const [passwordValid, setPasswordValid] = useState(false);
+
+  const validText = 'text-[12px] mt-[5px]';
+  const invalidText = 'text-[12px] mt-[5px] text-red-400';
   return (
     <>
       <div className="flex flex-row justify-between pt-[10px] pl-[10px] pr-[10px]">
@@ -36,21 +46,30 @@ export function SettingModal({
         <input
           type="password"
           placeholder="비밀번호를 입력하세요."
+          value={password}
+          onChange={(e) => {
+            setPasswordValid(inputValidator('password', e.target.value));
+            setPassword(e.target.value);
+          }}
           className="pl-[10px] rounded-sm outline-none placeholder:text-[12px] placeholder:text-center"
         ></input>
-        <p className="text-[12px] mt-[5px]">
+        <p className={passwordValid ? validText : invalidText}>
           비밀번호는 숫자 6자리로 입력해 주세요.
         </p>
         <div className="mt-[30px] pl-[20px] pr-[20px] w-[200px] flex flex-row justify-between">
-          <button className="bg-purple-500 w-[60px] rounded-sm border text-white hover:bg-purple-300">
-            적용
-          </button>
-          <button
-            className="bg-purple-500 w-[60px] rounded-sm border text-white hover:bg-purple-300"
+          <ChannelButton
+            text="적용"
+            width="60px"
+            height="35px"
             onClick={closeModal}
-          >
-            취소
-          </button>
+            disable={!passwordValid}
+          />
+          <ChannelButton
+            text="취소"
+            width="60px"
+            height="35px"
+            onClick={closeModal}
+          />
         </div>
       </div>
     </>

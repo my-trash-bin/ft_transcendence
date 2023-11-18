@@ -15,18 +15,35 @@ export function MessageContent() {
       />
 
       <OtherChat
+        nickname="username"
         content="h"
         time={new Date()}
         profile="/avatar/avatar-black.svg"
         isFirst={true}
       />
       <OtherChat
+        nickname="username"
         content="h"
         time={new Date()}
         profile="/avatar/avatar-black.svg"
         isFirst={false}
       />
       <OtherChat
+        nickname="username"
+        content="h"
+        time={new Date()}
+        profile="/avatar/avatar-black.svg"
+        isFirst={false}
+      />
+      <OtherChat
+        nickname="username"
+        content="hasdkasjdkashjdkshkdjskdjk"
+        time={new Date()}
+        profile="/avatar/avatar-black.svg"
+        isFirst={false}
+      />
+      <OtherChat
+        nickname="username"
         content="h"
         time={new Date()}
         profile="/avatar/avatar-black.svg"

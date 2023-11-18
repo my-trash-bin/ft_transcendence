@@ -1,20 +1,10 @@
-import { GET_FRIENDS } from '@/api/friend/FriendApi';
-import { getClient } from '@/lib/ApolloClient';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { MessageSearchInput } from '../dm/message-search/MessageSearchInput';
 import SearchCard from './SearchCard';
 
 interface SearchCard {
   nickname: string;
   profileImageUrl: string;
-}
-
-async function fetchFriends() {
-  const { data } = await getClient().query({
-    query: GET_FRIENDS,
-  });
-
-  return data.friend as SearchCard[];
 }
 
 export function SearchCardList() {
@@ -25,23 +15,13 @@ export function SearchCardList() {
     setSearchUsername(searchUsername);
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const friendData = await fetchFriends();
-      setFriendRenderData(
-        friendData.filter((val) => val.nickname.includes(searchUsername)),
-      );
-    };
-
-    fetchData();
-  }, [searchUsername]);
-
   return (
     <div className="felx flex-col justify-center items-center">
       <div className="w-[700px] h-[600px] flex flex-col items-center">
         <MessageSearchInput
           width="600px"
           height="30px"
+          placeholder="Search Friends"
           eventFunction={userSearchCallback}
         />
         <div className="w-[700px] h-[580px] grid gap-lg justify-center items-start overflow-y-scroll pt-xl place-content-start">
