@@ -32,11 +32,14 @@ export function CreateChannelModal({
         break;
     }
   };
-
+  const closeAndChangeTypePublic = () => {
+    setChannelType(ChannelType.PUBLIC);
+    closeModal();
+  };
   return (
     <ModalLayout
       isOpen={isOpen}
-      closeModal={closeModal}
+      closeModal={closeAndChangeTypePublic}
       width="500px"
       height="400px"
     >
@@ -63,14 +66,14 @@ export function CreateChannelModal({
         </div>
         <div className="mt-[20px] flex justify-around pr-[80px] pl-[50px]">
           <ChannelButton
-            onClick={closeModal}
+            onClick={closeAndChangeTypePublic}
             text="생성"
             width="60px"
             height="30px"
             disable={!isValid}
           ></ChannelButton>
           <ChannelButton
-            onClick={closeModal}
+            onClick={closeAndChangeTypePublic}
             text="취소"
             width="60px"
             height="30px"
