@@ -8,3 +8,4 @@ export function idOf<T extends string>(id: string): Id<T> {
 }
 
 export type UserId = Id<'user'>;
+export type AuthId = Id<'auth'>;
