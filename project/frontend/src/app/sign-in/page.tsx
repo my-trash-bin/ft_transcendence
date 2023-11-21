@@ -1,16 +1,15 @@
 'use client';
 
-import LinkButton from '@/components/sign-in/LinkButton';
+import RegisterUser from '@/components/sign-in/RegisterUser';
 import { useState } from 'react';
 import ChooseAvatar from '../../components/sign-in/ChooseAvatar';
 import ChooseNickname from '../../components/sign-in/ChooseNickname';
-import SelectAvatar from '../../components/sign-in/SelectAvatar';
 
 const avatars: string[] = [
-  'avatar-blue.svg',
-  'avatar-black.svg',
-  'avatar-big.svg',
-  'avatar-small.svg',
+  '/avatar/avatar-blue.svg',
+  '/avatar/avatar-black.svg',
+  '/avatar/avatar-big.svg',
+  '/avatar/avatar-small.svg',
 ];
 
 export default function SignIn() {
@@ -25,24 +24,20 @@ export default function SignIn() {
     setAvatar(selectedAvatar);
   };
 
-  const getNickname = (
+  const getNicknameComponent = (
     <ChooseNickname onNicknameSubmit={handleNicknameSubmit} />
   );
 
-  const getAvatar =
+  const getAvatarComponent =
     avatar === '' ? (
       <ChooseAvatar avatars={avatars} onChooseClick={handleChooseClick} />
     ) : (
-      <div>
-        {nickname}
-        <SelectAvatar name={avatar} isSelected={true} />
-        <LinkButton text="go to friend" href="/friend" />
-      </div>
+      <RegisterUser imageUrl={avatar} nickname={nickname}></RegisterUser>
     );
 
   return (
     <div className="min-h-screen flex items-center justify-center">
-      {nickname === '' ? getNickname : getAvatar}
+      {nickname === '' ? getNicknameComponent : getAvatarComponent}
     </div>
   );
 }
