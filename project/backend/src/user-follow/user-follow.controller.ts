@@ -7,7 +7,13 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { ApiResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import {
+  ApiOkResponse,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { Request as ExpressRequest } from 'express';
 import { JwtPayloadPhaseComplete } from '../auth/auth.service';
 import { JwtGuard } from '../auth/jwt.guard';
@@ -23,6 +29,7 @@ export class UserFollowController {
   constructor(private readonly userFollowService: UserFollowService) {}
 
   @Post('request')
+  @ApiOperation({ summary: '유저의 친구 요청' })
   @ApiResponse({ status: HttpStatus.OK, description: '친구 추가 성공' })
   async followUser(@Request() req: ExpressRequest, @Body() dto: TargetUserDto) {
     const isBlock = false;
@@ -30,6 +37,7 @@ export class UserFollowController {
   }
 
   @Post('block')
+  @ApiOperation({ summary: '유저의 블락 요청' })
   @ApiResponse({ status: HttpStatus.OK, description: '블락 추가 성공' })
   async blockUser(@Request() req: ExpressRequest, @Body() dto: TargetUserDto) {
     const isBlock = true;
@@ -37,6 +45,7 @@ export class UserFollowController {
   }
 
   @Post('unfriend')
+  @ApiOperation({ summary: '유저의 친구 해제 요청' })
   @ApiResponse({ status: HttpStatus.OK, description: '친구 해제 성공' })
   async unfollowUser(
     @Request() req: ExpressRequest,
@@ -47,6 +56,7 @@ export class UserFollowController {
   }
 
   @Post('unblock')
+  @ApiOperation({ summary: '유저의 블락 해제 요청' })
   @ApiResponse({ status: HttpStatus.OK, description: '블락 해제 성공' })
   async unBlockUser(
     @Request() req: ExpressRequest,
@@ -57,6 +67,7 @@ export class UserFollowController {
   }
 
   @Get('')
+  @ApiOperation({ summary: '유저의 친구/블락 리스트 조회' })
   @UseGuards(JwtGuard, PhaseGuard)
   @Phase('complete')
   @ApiUnauthorizedResponse({ description: '인증되지 않은 사용자의 요청' })
@@ -64,7 +75,7 @@ export class UserFollowController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: '요청자의 친구/블락 리스트',
-    type: UserFollowDto,
+    type: () => UserFollowDto,
     isArray: true,
   })
   async findRelationships(@Request() req: ExpressRequest) {
@@ -74,10 +85,10 @@ export class UserFollowController {
   }
 
   @Get('friends')
-  @ApiResponse({
-    status: HttpStatus.OK,
+  @ApiOperation({ summary: '유저의 친구 목록 조회' })
+  @ApiOkResponse({
     description: '요청자의 친구 리스트',
-    type: UserFollowDto,
+    type: () => UserFollowDto,
     isArray: true,
   })
   async findFriends(@Request() req: ExpressRequest): Promise<UserFollowDto[]> {
@@ -88,10 +99,10 @@ export class UserFollowController {
   }
 
   @Get('blocks')
-  @ApiResponse({
-    status: HttpStatus.OK,
+  @ApiOperation({ summary: '유저의 블락 목록 요청' })
+  @ApiOkResponse({
     description: '요청자의 블락 리스트',
-    type: UserFollowDto,
+    type: () => UserFollowDto,
     isArray: true,
   })
   async findBlocks(@Request() req: ExpressRequest): Promise<UserFollowDto[]> {
