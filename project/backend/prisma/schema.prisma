@@ -9,11 +9,13 @@ datasource db {
 
 model User {
   id              String    @id @default(uuid()) @db.Uuid
+  mfaPasswordHash String?
   joinedAt        DateTime  @default(now())
   isLeaved        Boolean   @default(false)
   leavedAt        DateTime?
-  nickname        String    @unique
+  nickname        String    @unique @default(uuid())
   profileImageUrl String?
+  statusMessage   String    @default("")
 
   Auth               Auth?                  @relation("Auth_user")
   following          UserFollow[]           @relation("UserFollow_follower")
@@ -41,9 +43,9 @@ model Auth {
   type         AuthType
   id           String
   metadataJson String
-  userId       String   @unique @db.Uuid
+  userId       String?  @unique @db.Uuid
 
-  user User @relation("Auth_user", fields: [userId], references: [id])
+  user User? @relation("Auth_user", fields: [userId], references: [id])
 
   @@id([type, id])
 }
