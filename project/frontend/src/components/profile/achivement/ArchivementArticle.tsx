@@ -13,7 +13,6 @@ function ArchivementArticle() {
           {mockData.map((badge) => (
             <Badge
               key={badge.key}
-              // size="default"
               nameContent={badge.name}
               commentContent={badge.explanation}
               imageURL={badge.imageURL}

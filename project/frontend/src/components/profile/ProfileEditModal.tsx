@@ -1,7 +1,6 @@
-'use client';
 import Image from 'next/image';
+import { useState } from 'react';
 import { ModalLayout } from '../channel/modals/ModalLayout';
-import { TextBox } from './TextBox';
 
 interface ModalProfileProps {
   isOpen: boolean;
@@ -12,42 +11,13 @@ interface ModalProfileProps {
 interface ModalData {
   readonly profileImageUrl: string;
   readonly nickname: string;
-  readonly win: number;
-  readonly lose: number;
-  readonly ratio: number;
   readonly statusMessage: string;
 }
 
 const mockModalData: ModalData = {
   profileImageUrl: '/avatar/avatar-black.svg',
   nickname: 'MockUser123',
-  win: 15,
-  lose: 5,
-  ratio: 3.0, // Assuming a win/lose ratio of 3:1
-  statusMessage: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-};
-
-const getModalContent = (props: ModalData) => {
-  return (
-    <div className="w-[100%] h-[100%] relative">
-      <div className="h-[inherit] p-2xl flex flex-row items-center">
-        <Image
-          src={props.profileImageUrl}
-          priority={true}
-          alt="avatar"
-          width={150}
-          height={200}
-        />
-        <TextBox
-          nickname={props.nickname}
-          win={props.win}
-          lose={props.lose}
-          ratio={props.ratio}
-          statusMessage={props.statusMessage}
-        />
-      </div>
-    </div>
-  );
+  statusMessage: 'Happy day~',
 };
 
 export const ProfileEditModal: React.FC<ModalProfileProps> = ({
@@ -55,16 +25,90 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
   onClose,
   nickname,
 }) => {
-  let modalContent = getModalContent(mockModalData);
+  const [editData, setEditData] = useState<ModalData>({
+    ...mockModalData,
+  });
+  const [isChanged, setIsChanged] = useState(false);
 
+  const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEditData((prevData) => ({
+      ...prevData,
+      nickname: e.target.value,
+    }));
+    setIsChanged(true);
+  };
+
+  const handleStatusMessageChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setEditData((prevData) => ({
+      ...prevData,
+      statusMessage: e.target.value,
+    }));
+    setIsChanged(true);
+  };
+
+  const saveChanges = () => {
+    console.log('call /users/{id} with', editData);
+    onClose();
+  };
+
+  const textClass = 'font-bold text-xl text-dark-purple leading-loose';
+  const buttonClass =
+    'w-[80px] h-[30px] rounded-sm border-2 text-center text-black text-lg font-bold hover:bg-light-background self-end';
+  const colorClass = isChanged
+    ? 'bg-default border-dark-purple'
+    : 'bg-gray border-dark-gray';
   return (
     <ModalLayout
       isOpen={isOpen}
       closeModal={onClose}
-      width="600px"
-      height="300px"
+      width="300px"
+      height="500px"
     >
-      {modalContent}
+      <div className="w-[100%] h-[100%] relative">
+        <div className="p-xl h-[100%] flex flex-col gap-lg justift-center items-center">
+          <p className="text-h2 font-bold text-dark-purple">프로필 수정</p>
+          <Image
+            src={editData.profileImageUrl}
+            priority={true}
+            alt="avatar"
+            width={100}
+            height={100}
+          />
+          {/* <button
+            onClick={saveChanges}
+            className={`${buttonClass} ${'bg-default border-dark-purple'}`}
+          >
+            아바타 변경
+          </button> */}
+          <div className="flex flex-col w-[100%] justify-center">
+            <p className={textClass}>닉네임</p>
+            <input
+              type="text"
+              value={editData.nickname}
+              onChange={handleNicknameChange}
+              placeholder={mockModalData.nickname}
+              className="bg-[#f3f0f8] border-2 border-dark-purple-interactive w-[200px]"
+            />
+            <p className={textClass}>상태메세지</p>
+            <input
+              type="text"
+              value={editData.statusMessage}
+              onChange={handleStatusMessageChange}
+              placeholder={mockModalData.statusMessage}
+              className="bg-[#f3f0f8] border-2 border-dark-purple"
+            />
+          </div>
+          <button
+            disabled={!isChanged}
+            onClick={saveChanges}
+            className={`${buttonClass} ${colorClass}`}
+          >
+            수정하기
+          </button>
+        </div>
+      </div>
     </ModalLayout>
   );
 };

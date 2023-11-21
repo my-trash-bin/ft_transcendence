@@ -11,9 +11,9 @@ function FriendCardList() {
 
   return (
     <div className="w-[700px] h-[600px] pt-xl grid gap-lg justify-center items-center overflow-y-scroll">
-      {friendData.map((val, index) => (
+      {friendData.map((val) => (
         <FriendCard
-          key={index}
+          key={val.nickname}
           imageURL={val.profileImageUrl}
           nickname={val.nickname}
         />
