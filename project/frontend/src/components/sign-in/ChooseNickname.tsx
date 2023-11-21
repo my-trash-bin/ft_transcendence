@@ -55,9 +55,9 @@ export default function ChooseNickname({
     }
   }
 
-  const handleButtonClick = () => {
+  const handleButtonClick = async () => {
     if (isValid) {
-      checkUnique();
+      await checkUnique();
       showUnique(isUnique);
     }
   };

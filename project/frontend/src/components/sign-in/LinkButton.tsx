@@ -1,19 +1,17 @@
-import Link from 'next/link';
+import { PropsWithChildren } from 'react';
 
-interface LinkButtonProps {
-  readonly text: string;
-  readonly href: string;
+interface LinkButtonProps extends PropsWithChildren {
+  readonly onClick?: () => void;
 }
 
-function LinkButton(props: LinkButtonProps) {
+function LinkButton({ onClick, children }: LinkButtonProps) {
   return (
-    <Link
-      href={props.href}
-      className="w-xl h-lg flex flex-col justify-center items-center
-         rounded-lg border-2 mb-xl bg-chat-color1"
+    <button
+      onClick={onClick}
+      className="w-xl h-lg flex flex-col justify-center items-center rounded-lg border-2 mb-xl bg-chat-color1"
     >
-      {props.text}
-    </Link>
+      {children}
+    </button>
   );
 }
 
