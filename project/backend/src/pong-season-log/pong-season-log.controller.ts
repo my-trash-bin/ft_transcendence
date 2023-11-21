@@ -1,6 +1,12 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { idOf } from '../common/Id';
+import { PongSeasonLogDto } from './dto/pong-season-log.dto';
 import { PongSeasonLogService } from './pong-season-log.service';
 
 @ApiTags('pong-season-log')
@@ -19,7 +25,13 @@ export class PongSeasonLogController {
   // }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  @ApiOperation({ summary: '유저 1명의 시즌 로그 조회' })
+  @ApiOkResponse({
+    description: '유저 1명의 특정 시즌 로그 하나 반환',
+    type: () => PongSeasonLogDto,
+  })
+  @ApiBadRequestResponse({ description: '올바르지 않은 id' })
+  findOne(@Param('id') id: string): Promise<PongSeasonLogDto> {
     return this.pongSeasonLogService.findOne(idOf(id));
   }
 

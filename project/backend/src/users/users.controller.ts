@@ -1,7 +1,11 @@
 import {
+  BadRequestException,
   Body,
+  ConflictException,
   Controller,
   Get,
+  HttpException,
+  HttpStatus,
   NotFoundException,
   Param,
   Patch,
@@ -9,7 +13,18 @@ import {
   Query,
   Request,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiConflictResponse,
+  ApiCreatedResponse,
+  ApiForbiddenResponse,
+  ApiInternalServerErrorResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiProperty,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { Request as ExpressRequest } from 'express';
 import { JwtPayloadPhaseComplete } from '../auth/auth.service';
 import { idOf } from '../common/Id';
@@ -18,32 +33,16 @@ import { UserFollowService } from '../user-follow/user-follow.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { NicknameCheckUserDto } from './dto/nickname-check-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import {
+  RecordDto,
+  RelationStatus,
+  UserProfileDto,
+} from './dto/user-profile.dto';
+import { UserDto } from './dto/user.dto';
 import { UsersService } from './users.service';
-// {
-// 	nickname : string,
-// 	imageUrl : string,
-// 	record : {
-// 		win : int,
-// 		lose : int,
-// 		ratio : int,
-// 	}
-// 	statusMessage : string,
-// 	relation: 'friend' // or 'block' or 'none' or 'me'
-// }
-
-class UserProfileResponse {
-  nickname!: string;
-  imageUrl!: string | null;
-  record!: {
-    win: number;
-    lose: number;
-    ratio: number;
-  };
-  statusMessage!: string;
-  relation!: 'friend' | 'block' | 'none' | 'me';
-}
 
 class UniqueCheckResponse {
+  @ApiProperty({ description: '유니크 여부', type: Boolean })
   isUnique!: boolean;
 }
 
@@ -56,44 +55,78 @@ export class UsersController {
     private readonly pongSeasonLogService: PongSeasonLogService,
   ) {}
 
-  @Post()
-  @ApiOperation({ summary: 'Create a new user' })
-  @ApiResponse({
-    status: 201,
-    description: 'The user has been successfully created.',
-  })
-  @ApiResponse({ status: 403, description: 'Forbidden.' })
-  @ApiResponse({ status: 409, description: 'Conflict.' })
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
-  }
-
   @Get()
-  @ApiOperation({ summary: 'Get all users' })
-  @ApiResponse({ status: 200, description: 'Return all users.' })
+  @ApiOperation({ summary: '모든 유저 조회' })
+  @ApiOkResponse({
+    description: '모든 유저 객체리스트 반환.',
+    type: () => UserDto,
+    isArray: true,
+  })
   findAll() {
     return this.usersService.findAll();
   }
 
   @Get(':id')
+  @ApiOperation({ summary: '유저 1명 기본 조회' })
+  @ApiOkResponse({ description: '유저 객체 하나 반환', type: () => UserDto })
+  @ApiBadRequestResponse({ description: '올바르지 않은 id' })
   findOne(@Param('id') id: string) {
-    return this.usersService.findOne(idOf(id));
+    const result = this.usersService.findOne(idOf(id));
+    if (result === null) {
+      throw new BadRequestException('올바르지 않은 id');
+    }
+    return result;
+  }
+
+  @Post()
+  @ApiOperation({
+    summary: '유저 생성. 사실 아직 이 테이블의 정확한 기능을 잘...',
+  })
+  @ApiCreatedResponse({
+    description: 'The user has been successfully created.',
+    type: () => UserDto,
+  })
+  @ApiForbiddenResponse({ description: 'Forbidden.' })
+  @ApiConflictResponse({ description: 'Conflict.' })
+  create(@Body() createUserDto: CreateUserDto) {
+    return this.usersService.create(createUserDto);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(idOf(id), updateUserDto);
+  @ApiOperation({ summary: '유저의 닉네임/프로필이미지링크 변경' })
+  @ApiOkResponse({
+    description: '유저 정보 변경 요청 성공(변경 사항 없는 요청 포함)',
+    type: () => UserDto,
+  })
+  @ApiBadRequestResponse({ description: '관계키 오류' })
+  @ApiConflictResponse({ description: '닉네임 유니크 조건 오류' })
+  @ApiInternalServerErrorResponse({ description: '알수 없는 내부 에러' })
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    try {
+      return await this.usersService.update(idOf(id), updateUserDto);
+    } catch (error) {
+      if (error instanceof ConflictException) {
+        throw new HttpException(error.getResponse(), HttpStatus.CONFLICT);
+      }
+      if (error instanceof BadRequestException) {
+        throw new HttpException(error.getResponse(), HttpStatus.BAD_REQUEST);
+      }
+      // 다른 예외에 대한 처리
+      throw new HttpException('서버 오류', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
-
   // @Delete(':id')
   // remove(@Param('id') id: string) {
   //   return this.usersService.remove(+id);
   // }
 
   @Post('unique-check')
-  @ApiResponse({ status: 200, description: 'Nickname check request accepted.' })
-  @ApiResponse({ status: 401, description: 'unauthorized.' })
-  @ApiResponse({ status: 403, description: 'forbidden.' })
+  @ApiOperation({ summary: '닉네임 유니크 여부 체크' })
+  @ApiOkResponse({
+    description: '성공적인 유니크 여부 체크. 유니크 여부 반환',
+    type: () => UniqueCheckResponse,
+  })
+  @ApiUnauthorizedResponse({ description: '인증되지 않은 유저로부터의 요청.' })
   // @ApiResponse({ status: 409, description: 'Nickname already exists.' })
   async checkNickname(
     @Body() dto: NicknameCheckUserDto,
@@ -105,10 +138,17 @@ export class UsersController {
   }
 
   @Get('profile')
+  @ApiOperation({ summary: '프로필 데이터를 위한 유저 조회' })
+  @ApiOkResponse({
+    description: '유저 1명의 프로필을 위한 데이터 반환',
+    type: () => UserProfileDto,
+  })
+  @ApiBadRequestResponse({ description: '유효하지 않은 ID' })
+  @ApiUnauthorizedResponse({ description: '인증되지 않은 유저로부터의 요청.' })
   async getUserInfo(
     @Query('targetUser') targetUserId: string,
     @Request() req: ExpressRequest,
-  ): Promise<UserProfileResponse> {
+  ): Promise<UserProfileDto> {
     const userId = (req.user as JwtPayloadPhaseComplete).id;
 
     const targetUser = await this.usersService.findOne(idOf(targetUserId)); // 본인, 타인 통합인듯
@@ -127,39 +167,28 @@ export class UsersController {
       ratio: seasonLog.winRate,
     };
 
-    return {
+    return new UserProfileDto({
       imageUrl: targetUser.profileImageUrl,
       nickname: targetUser.nickname,
-      record,
+      record: new RecordDto(record),
       relation,
       statusMessage: 'User 모델에 필드 추가해야함',
-    };
+    });
   }
   private async getRelation(
     followerId: string,
     follweeId: string,
-  ): Promise<'friend' | 'block' | 'none' | 'me'> {
+  ): Promise<RelationStatus> {
     if (followerId === follweeId) {
-      return 'me';
+      return RelationStatus.Me;
     }
     const friendship = await this.userFollowService.findOne(
       idOf(followerId),
       idOf(follweeId),
     );
     if (friendship === null) {
-      return 'none';
+      return RelationStatus.None;
     }
-    return friendship.isBlock ? 'block' : 'friend';
+    return friendship.isBlock ? RelationStatus.Block : RelationStatus.Friend;
   }
 }
-// {
-// 	nickname : string,
-// 	imageUrl : string,
-// 	record : {
-// 		win : int,
-// 		lose : int,
-// 		ratio : int,
-// 	}
-// 	statusMessage : string,
-// 	relation: 'friend' // or 'block' or 'none' or 'me'
-// }

@@ -8,7 +8,7 @@ export class UserFollowDto {
   // @ApiProperty({ description: '팔로우 대상의 아이디' })
   // followeeId!: string;
 
-  @ApiProperty({ description: '차단 여부' })
+  @ApiProperty({ description: '차단 여부', type: Boolean })
   isBlock!: boolean;
 
   @ApiProperty({ description: '팔로우 또는 차단된 날짜', type: Date })
@@ -17,7 +17,7 @@ export class UserFollowDto {
   // @ApiProperty({ description: '팔로우 또는 차단된 날짜', type: UserDto })
   // follower!: UserDto;
 
-  @ApiProperty({ description: '팔로우/블록 대상' })
+  @ApiProperty({ description: '팔로우/블록 대상', type: () => UserDto })
   followee!: UserDto;
 
   constructor(obj: {
@@ -30,6 +30,7 @@ export class UserFollowDto {
       leavedAt: Date | null;
       nickname: string;
       profileImageUrl: string | null;
+      statusMessage: string;
     };
   }) {
     this.isBlock = obj.isBlock;

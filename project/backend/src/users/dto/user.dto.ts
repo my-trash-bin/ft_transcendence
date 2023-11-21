@@ -3,7 +3,7 @@ import { User } from '@prisma/client';
 import { IsString } from 'class-validator';
 
 export class UserDto {
-  @ApiProperty({ description: '사용자 ID', type: String })
+  @ApiProperty({ description: '사용자 ID', type: String, format: 'uuid' })
   id!: string;
 
   @ApiProperty({ description: '닉네임', type: String })
@@ -27,6 +27,9 @@ export class UserDto {
   @ApiProperty({ description: '탈퇴 시기', required: false, type: Date })
   leavedAt: Date | null;
 
+  @ApiProperty({ description: '상태 메시지' })
+  statusMessage!: string;
+
   // enums
   // @ApiProperty({ enum: ['Admin', 'Moderator', 'User']}) 수동 설정 or
   // export enum UserRole{ Admin = 'Admin', ... } 직접 정의
@@ -39,6 +42,7 @@ export class UserDto {
     this.joinedAt = user.joinedAt;
     this.isLeaved = user.isLeaved;
     this.leavedAt = user.leavedAt;
+    this.statusMessage = user.statusMessage;
   }
 }
 
@@ -49,4 +53,5 @@ export const userSelect = {
   leavedAt: true,
   nickname: true,
   profileImageUrl: true,
+  statusMessage: true,
 };
