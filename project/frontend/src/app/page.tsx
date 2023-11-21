@@ -25,7 +25,7 @@ export default function Page() {
             <FriendAvatar src={'/avatar/avatar-blue.svg'} size={50} />
           </div>
           <a
-            href="https://api.intra.42.fr/oauth/authorize?response_type=code&redirect_uri=http://localhost:60080/api/auth/42/callback&client_id=u-s4t2ud-94c0c5cf7592264ccffbc786dac656324fd173fd328b1bc442dbf9e2d1f316a1"
+            href="/api/auth/42"
             className={`${textCSS} ${borderCSS} ${hoverCSS} ${sizeCSS} ${bgCSS}`}
           >
             42 intra 로그인
