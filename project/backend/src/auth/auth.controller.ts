@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import {
+  ApiOperation,
   ApiProperty,
   ApiPropertyOptional,
   ApiUnauthorizedResponse,
@@ -41,6 +42,8 @@ class TwoFactorAuthenticationBody {
   password!: string;
 }
 
+const FRONT_BASE_URL = 'http://localhost:53000';
+
 @Controller('/api/auth')
 export class AuthController {
   constructor(
@@ -54,40 +57,50 @@ export class AuthController {
     res.end();
   }
 
-  @UseGuards(FtGuard)
+  @ApiOperation({ summary: '42 Oauth 로그인' })
+  @UseGuards(FtGuard) // 얘가 있으면 무조건 핑퐁
   @Get('42')
   async login(): Promise<void> {}
 
+  @ApiOperation({ summary: '42 Oauth용 콜백 주소' })
   @UseGuards(FtGuard)
   @Get('42/callback')
   async test(
     @Request() req: ExpressRequest,
     @Response() res: ExpressResponse,
   ): Promise<void> {
+    console.log('test 진입');
     const jwtPayload = await this.authService.oauth42(req.user);
     this.setCookie(res, jwtPayload);
+    // 인증이된거고 => 인증 == 토큰 => 쿠키
+    // 리다이렉션 => /regisster
     switch (jwtPayload['phase']) {
       case 'register':
-        res.redirect('/register');
+        console.log('프론트/sign-in으로 이동!');
+        res.redirect(FRONT_BASE_URL + '/sign-in');
         break;
       case '2fa':
+        console.log('/2fa 로 가버려');
         res.redirect('/2fa');
         break;
       case 'complete':
+        console.log('프론트/friend로 이동!');
         this.welcome(res, 'FT');
         break;
     }
   }
 
   // TODO: argument validation
+  @ApiOperation({ summary: '회원 가입 요청' })
   @UseGuards(JwtGuard, PhaseGuard)
   @Phase('register')
   @Post('register')
   async register(
     @Request() req: ExpressRequest,
     @Response() res: ExpressResponse,
-    @Body() data: RegisterBody,
+    @Body() data: RegisterBody, // 닉네임만 받아도 될듯
   ) {
+    console.log('register 진입');
     const { type, id } = req.user as JwtPayloadPhaseRegister;
     const jwtPayload = await this.authService.register(
       type,
@@ -99,6 +112,7 @@ export class AuthController {
     this.welcome(res, type);
   }
 
+  @ApiOperation({ summary: '2FA 로그인 용' })
   @ApiUnauthorizedResponse({ description: 'incorrect 2fa password' })
   @UseGuards(JwtGuard, PhaseGuard)
   @Phase('2fa')
@@ -132,7 +146,7 @@ export class AuthController {
   private welcome(res: ExpressResponse, type: AuthType) {
     switch (type) {
       case 'FT':
-        res.redirect('http://localhost/register');
+        res.redirect(FRONT_BASE_URL + '/friend');
     }
   }
 }
