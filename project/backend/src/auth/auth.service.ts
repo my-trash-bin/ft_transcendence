@@ -78,7 +78,7 @@ export class AuthService {
     authType: AuthType,
     authId: string,
     nickname: string,
-    password?: string,
+    imageUrl: string,
   ): Promise<JwtPayload> {
     return await this.prismaService.$transaction(
       async (tx): Promise<JwtPayload> => {
@@ -88,8 +88,7 @@ export class AuthService {
             user: {
               create: {
                 nickname,
-                mfaPasswordHash:
-                  password && (await this.mfaPasswordHash(password)),
+                profileImageUrl: imageUrl,
               },
             },
           },
