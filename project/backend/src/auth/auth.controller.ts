@@ -132,7 +132,7 @@ export class AuthController {
   private welcome(res: ExpressResponse, type: AuthType) {
     switch (type) {
       case 'FT':
-        res.redirect('/welcome/42');
+        res.redirect('http://localhost/register');
     }
   }
 }

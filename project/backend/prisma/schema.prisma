@@ -13,8 +13,9 @@ model User {
   joinedAt        DateTime  @default(now())
   isLeaved        Boolean   @default(false)
   leavedAt        DateTime?
-  nickname        String    @unique
+  nickname        String    @unique @default(uuid())
   profileImageUrl String?
+  statusMessage   String    @default("")
 
   Auth               Auth?                  @relation("Auth_user")
   following          UserFollow[]           @relation("UserFollow_follower")
