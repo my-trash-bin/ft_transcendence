@@ -1,17 +1,15 @@
 import {
   BadRequestException,
   Body,
-  ConflictException,
   Controller,
   Get,
-  HttpException,
-  HttpStatus,
   NotFoundException,
   Param,
   Patch,
   Post,
   Query,
   Request,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -27,6 +25,8 @@ import {
 } from '@nestjs/swagger';
 import { Request as ExpressRequest } from 'express';
 import { JwtPayloadPhaseComplete } from '../auth/auth.service';
+import { JwtGuard } from '../auth/jwt.guard';
+import { Phase, PhaseGuard } from '../auth/phase.guard';
 import { idOf } from '../common/Id';
 import { PongSeasonLogService } from '../pong-season-log/pong-season-log.service';
 import { UserFollowService } from '../user-follow/user-follow.service';
@@ -102,18 +102,7 @@ export class UsersController {
   @ApiConflictResponse({ description: '닉네임 유니크 조건 오류' })
   @ApiInternalServerErrorResponse({ description: '알수 없는 내부 에러' })
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    try {
-      return await this.usersService.update(idOf(id), updateUserDto);
-    } catch (error) {
-      if (error instanceof ConflictException) {
-        throw new HttpException(error.getResponse(), HttpStatus.CONFLICT);
-      }
-      if (error instanceof BadRequestException) {
-        throw new HttpException(error.getResponse(), HttpStatus.BAD_REQUEST);
-      }
-      // 다른 예외에 대한 처리
-      throw new HttpException('서버 오류', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    return await this.usersService.update(idOf(id), updateUserDto);
   }
   // @Delete(':id')
   // remove(@Param('id') id: string) {
@@ -143,6 +132,8 @@ export class UsersController {
     description: '유저 1명의 프로필을 위한 데이터 반환',
     type: () => UserProfileDto,
   })
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
   @ApiBadRequestResponse({ description: '유효하지 않은 ID' })
   @ApiUnauthorizedResponse({ description: '인증되지 않은 유저로부터의 요청.' })
   async getUserInfo(

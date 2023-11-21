@@ -12,7 +12,6 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('ft_transcendence')
     .setVersion('1')
-    .addServer('http://localhost:60080') // TODO: ENV 활용하는 값으로 수정해주세요 맹님^^
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

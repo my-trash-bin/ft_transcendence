@@ -11,7 +11,6 @@ import { JwtService } from '@nestjs/jwt';
 import {
   ApiOperation,
   ApiProperty,
-  ApiPropertyOptional,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import {
@@ -30,11 +29,12 @@ import { JwtGuard } from './jwt.guard';
 import { Phase, PhaseGuard } from './phase.guard';
 
 class RegisterBody {
-  @ApiProperty()
+  // TODO: 입력 validatuion
+  @ApiProperty({ description: '유니크 닉네임' })
   nickname!: string;
 
-  @ApiPropertyOptional()
-  password?: string;
+  @ApiProperty({ description: '프로필 이미지 주소' })
+  imageUrl!: string;
 }
 
 class TwoFactorAuthenticationBody {
@@ -98,7 +98,7 @@ export class AuthController {
   async register(
     @Request() req: ExpressRequest,
     @Response() res: ExpressResponse,
-    @Body() data: RegisterBody, // 닉네임만 받아도 될듯
+    @Body() data: RegisterBody,
   ) {
     console.log('register 진입');
     const { type, id } = req.user as JwtPayloadPhaseRegister;
@@ -106,10 +106,10 @@ export class AuthController {
       type,
       id,
       data.nickname,
-      data.password,
+      data.imageUrl,
     );
     this.setCookie(res, jwtPayload);
-    this.welcome(res, type);
+    this.welcome(res, type); // TODO: 이 리다이렉션이 아닌 다른게 필요해보임.
   }
 
   @ApiOperation({ summary: '2FA 로그인 용' })
