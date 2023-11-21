@@ -8,7 +8,7 @@ import { ChannelRelationDto } from './dto/channel-relation-dto';
 import { CreateChannelDto } from './dto/create-channel.dto';
 
 @ApiTags('channel')
-@Controller('channel')
+@Controller('/api/v1/channel')
 export class ChannelController {
   constructor(private readonly channelService: ChannelService) {}
 

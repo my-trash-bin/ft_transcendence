@@ -10,7 +10,7 @@ import { PongSeasonLogDto } from './dto/pong-season-log.dto';
 import { PongSeasonLogService } from './pong-season-log.service';
 
 @ApiTags('pong-season-log')
-@Controller('pong-season-log')
+@Controller('/api/v1/pong-season-log')
 export class PongSeasonLogController {
   constructor(private readonly pongSeasonLogService: PongSeasonLogService) {}
 
