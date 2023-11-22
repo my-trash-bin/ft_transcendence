@@ -22,6 +22,7 @@ import { AuthType } from '@prisma/client';
 import {
   AuthService,
   JwtPayload,
+  JwtPayloadPhase2FA,
   JwtPayloadPhaseRegister,
 } from './auth.service';
 import { FtGuard } from './ft.guard';
@@ -41,8 +42,6 @@ class TwoFactorAuthenticationBody {
   @ApiProperty()
   password!: string;
 }
-
-const FRONT_BASE_URL = 'http://localhost:53000';
 
 @Controller('/api/auth')
 export class AuthController {
@@ -77,7 +76,7 @@ export class AuthController {
     switch (jwtPayload['phase']) {
       case 'register':
         console.log('프론트/sign-in으로 이동!');
-        res.redirect(FRONT_BASE_URL + '/sign-in');
+        res.redirect('/sign-in');
         break;
       case '2fa':
         console.log('/2fa 로 가버려');
@@ -122,7 +121,7 @@ export class AuthController {
     @Response() res: ExpressResponse,
     @Body() body: TwoFactorAuthenticationBody,
   ) {
-    const { type, id } = req.user as JwtPayloadPhaseRegister;
+    const { type, id } = req.user as JwtPayloadPhase2FA;
     const jwtPayload = await this.authService.twoFactorAuthentication(
       type,
       id,
@@ -146,7 +145,7 @@ export class AuthController {
   private welcome(res: ExpressResponse, type: AuthType) {
     switch (type) {
       case 'FT':
-        res.redirect(FRONT_BASE_URL + '/friend');
+        res.redirect('/friend');
     }
   }
 }
