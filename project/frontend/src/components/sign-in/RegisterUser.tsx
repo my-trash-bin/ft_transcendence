@@ -1,8 +1,8 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
-import { useContext } from 'react';
+import { useRouter } from 'next/navigation';
+import { useCallback, useContext } from 'react';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { Button } from '../common/Button';
 
@@ -16,21 +16,25 @@ export default function RegisterUser({
   nickname,
 }: RegisterUserProps) {
   const { api } = useContext(ApiContext);
+  const router = useRouter();
 
-  const doRegister = async function () {
-    console.log('trying register');
-    try {
-      await api.authControllerRegister({
-        nickname: nickname,
-      });
-      console.log('go to /friend');
-      <Link href="/friend" />;
-
-      // onRegister();
-    } catch (err) {
-      console.error('Error registering user:', err);
+  const handleSubmitClick = useCallback(() => {
+    if (!nickname || !imageUrl) {
+      alert('// TODO: 닉네임이나 아바타 설정 안 했을 때 에러 메시지 좀 예쁘게');
+      return;
     }
-  };
+    (async () => {
+      const result = await api.authControllerRegister({
+        nickname,
+        imageUrl,
+      });
+      if (!result.ok) {
+        console.error({ result });
+        alert('// TODO: 뭔가 좀 잘못 됐을 때 에러 메시지 좀 예쁘게');
+      }
+      router.push('/friend');
+    })();
+  }, [api, imageUrl, nickname, router]);
 
   return (
     <div className="w-xl h-xl bg-light-background border-2 border-dark-purple rounded-lg flex flex-col gap-xl justify-center items-start p-xl">
@@ -46,7 +50,7 @@ export default function RegisterUser({
         />
       </div>
       <div className="self-end">
-        <Button onClick={doRegister}>가입하기!</Button>
+        <Button onClick={handleSubmitClick}>가입하기!</Button>
       </div>
     </div>
   );
