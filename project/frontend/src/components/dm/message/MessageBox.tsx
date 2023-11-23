@@ -8,7 +8,11 @@ export function MessageBox({ username }: { username: string }) {
   return (
     <>
       <UserInfo imageUri={imageUri} username={username} onActive={false} />
-      <MessageContent channelId={channelId} type={messageType.DM} />
+      <MessageContent
+        channelId={channelId}
+        type={messageType.DM}
+        myNickname="aaa"
+      />
       <MessageSendBox channelId={channelId} type={messageType.DM} />
     </>
   );
