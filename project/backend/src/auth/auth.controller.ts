@@ -11,7 +11,6 @@ import { JwtService } from '@nestjs/jwt';
 import {
   ApiOperation,
   ApiProperty,
-  ApiPropertyOptional,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import {
@@ -23,6 +22,7 @@ import { AuthType } from '@prisma/client';
 import {
   AuthService,
   JwtPayload,
+  JwtPayloadPhase2FA,
   JwtPayloadPhaseRegister,
 } from './auth.service';
 import { FtGuard } from './ft.guard';
@@ -30,19 +30,18 @@ import { JwtGuard } from './jwt.guard';
 import { Phase, PhaseGuard } from './phase.guard';
 
 class RegisterBody {
-  @ApiProperty()
+  // TODO: 입력 validatuion
+  @ApiProperty({ description: '유니크 닉네임' })
   nickname!: string;
 
-  @ApiPropertyOptional()
-  password?: string;
+  @ApiProperty({ description: '프로필 이미지 주소' })
+  imageUrl!: string;
 }
 
 class TwoFactorAuthenticationBody {
   @ApiProperty()
   password!: string;
 }
-
-const FRONT_BASE_URL = 'http://localhost:53000';
 
 @Controller('/api/auth')
 export class AuthController {
@@ -77,7 +76,7 @@ export class AuthController {
     switch (jwtPayload['phase']) {
       case 'register':
         console.log('프론트/sign-in으로 이동!');
-        res.redirect(FRONT_BASE_URL + '/sign-in');
+        res.redirect('/sign-in');
         break;
       case '2fa':
         console.log('/2fa 로 가버려');
@@ -98,7 +97,7 @@ export class AuthController {
   async register(
     @Request() req: ExpressRequest,
     @Response() res: ExpressResponse,
-    @Body() data: RegisterBody, // 닉네임만 받아도 될듯
+    @Body() data: RegisterBody,
   ) {
     console.log('register 진입');
     const { type, id } = req.user as JwtPayloadPhaseRegister;
@@ -106,10 +105,10 @@ export class AuthController {
       type,
       id,
       data.nickname,
-      data.password,
+      data.imageUrl,
     );
     this.setCookie(res, jwtPayload);
-    this.welcome(res, type);
+    this.welcome(res, type); // TODO: 이 리다이렉션이 아닌 다른게 필요해보임.
   }
 
   @ApiOperation({ summary: '2FA 로그인 용' })
@@ -122,7 +121,7 @@ export class AuthController {
     @Response() res: ExpressResponse,
     @Body() body: TwoFactorAuthenticationBody,
   ) {
-    const { type, id } = req.user as JwtPayloadPhaseRegister;
+    const { type, id } = req.user as JwtPayloadPhase2FA;
     const jwtPayload = await this.authService.twoFactorAuthentication(
       type,
       id,
@@ -146,7 +145,7 @@ export class AuthController {
   private welcome(res: ExpressResponse, type: AuthType) {
     switch (type) {
       case 'FT':
-        res.redirect(FRONT_BASE_URL + '/friend');
+        res.redirect('/friend');
     }
   }
 }

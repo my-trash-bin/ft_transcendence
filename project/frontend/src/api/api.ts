@@ -14,8 +14,10 @@ export interface MeResult {
 }
 
 export interface RegisterBody {
+  /** 유니크 닉네임 */
   nickname: string;
-  password?: string;
+  /** 프로필 이미지 주소 */
+  imageUrl: string;
 }
 
 export interface TwoFactorAuthenticationBody {
@@ -258,6 +260,20 @@ export interface ChannelRelationDto {
   memberType: 'ADMINISTRATOR' | 'MEMBER' | 'BANNED';
 }
 
+export interface CreateChannelDto {
+  /** 채널 타입 */
+  type: 'public' | 'protected' | 'private';
+  /** 채널 제목 */
+  title: string;
+  /**
+   * 채널 암호
+   * @format email
+   */
+  password?: object;
+  /** 채널 최대 인원수 */
+  capacity: number;
+}
+
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, 'body' | 'bodyUsed'>;
 
@@ -310,7 +326,7 @@ export enum ContentType {
 }
 
 export class HttpClient<SecurityDataType = unknown> {
-  public baseUrl: string = 'http://localhost:60080';
+  public baseUrl: string = '';
   private securityData: SecurityDataType | null = null;
   private securityWorker?: ApiConfig<SecurityDataType>['securityWorker'];
   private abortControllers = new Map<CancelToken, AbortController>();
@@ -546,6 +562,7 @@ export class Api<
      * No description
      *
      * @name AuthControllerLogin
+     * @summary 42 Oauth 로그인
      * @request GET:/api/auth/42
      */
     authControllerLogin: (params: RequestParams = {}) =>
@@ -559,6 +576,7 @@ export class Api<
      * No description
      *
      * @name AuthControllerTest
+     * @summary 42 Oauth용 콜백 주소
      * @request GET:/api/auth/42/callback
      */
     authControllerTest: (params: RequestParams = {}) =>
@@ -572,6 +590,7 @@ export class Api<
      * No description
      *
      * @name AuthControllerRegister
+     * @summary 회원 가입 요청
      * @request POST:/api/auth/register
      */
     authControllerRegister: (data: RegisterBody, params: RequestParams = {}) =>
@@ -587,6 +606,7 @@ export class Api<
      * No description
      *
      * @name AuthControllerTwoFactorAuthentication
+     * @summary 2FA 로그인 용
      * @request POST:/api/auth/2fa
      */
     authControllerTwoFactorAuthentication: (
@@ -600,19 +620,18 @@ export class Api<
         type: ContentType.Json,
         ...params,
       }),
-  };
-  users = {
+
     /**
      * No description
      *
      * @tags users
      * @name UsersControllerFindAll
      * @summary 모든 유저 조회
-     * @request GET:/users
+     * @request GET:/api/v1/users
      */
     usersControllerFindAll: (params: RequestParams = {}) =>
       this.request<UserDto[], any>({
-        path: `/users`,
+        path: `/api/v1/users`,
         method: 'GET',
         format: 'json',
         ...params,
@@ -624,11 +643,11 @@ export class Api<
      * @tags users
      * @name UsersControllerCreate
      * @summary 유저 생성. 사실 아직 이 테이블의 정확한 기능을 잘...
-     * @request POST:/users
+     * @request POST:/api/v1/users
      */
     usersControllerCreate: (data: CreateUserDto, params: RequestParams = {}) =>
       this.request<UserDto, void>({
-        path: `/users`,
+        path: `/api/v1/users`,
         method: 'POST',
         body: data,
         type: ContentType.Json,
@@ -642,11 +661,11 @@ export class Api<
      * @tags users
      * @name UsersControllerFindOne
      * @summary 유저 1명 기본 조회
-     * @request GET:/users/{id}
+     * @request GET:/api/v1/users/{id}
      */
     usersControllerFindOne: (id: string, params: RequestParams = {}) =>
       this.request<UserDto, void>({
-        path: `/users/${id}`,
+        path: `/api/v1/users/${id}`,
         method: 'GET',
         format: 'json',
         ...params,
@@ -658,7 +677,7 @@ export class Api<
      * @tags users
      * @name UsersControllerUpdate
      * @summary 유저의 닉네임/프로필이미지링크 변경
-     * @request PATCH:/users/{id}
+     * @request PATCH:/api/v1/users/{id}
      */
     usersControllerUpdate: (
       id: string,
@@ -666,7 +685,7 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<UserDto, void>({
-        path: `/users/${id}`,
+        path: `/api/v1/users/${id}`,
         method: 'PATCH',
         body: data,
         type: ContentType.Json,
@@ -680,14 +699,14 @@ export class Api<
      * @tags users
      * @name UsersControllerCheckNickname
      * @summary 닉네임 유니크 여부 체크
-     * @request POST:/users/unique-check
+     * @request POST:/api/v1/users/unique-check
      */
     usersControllerCheckNickname: (
       data: NicknameCheckUserDto,
       params: RequestParams = {},
     ) =>
       this.request<UniqueCheckResponse, void>({
-        path: `/users/unique-check`,
+        path: `/api/v1/users/unique-check`,
         method: 'POST',
         body: data,
         type: ContentType.Json,
@@ -701,7 +720,7 @@ export class Api<
      * @tags users
      * @name UsersControllerGetUserInfo
      * @summary 프로필 데이터를 위한 유저 조회
-     * @request GET:/users/profile
+     * @request GET:/api/v1/users/profile
      */
     usersControllerGetUserInfo: (
       query: {
@@ -710,28 +729,27 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<UserProfileDto, void>({
-        path: `/users/profile`,
+        path: `/api/v1/users/profile`,
         method: 'GET',
         query: query,
         format: 'json',
         ...params,
       }),
-  };
-  friends = {
+
     /**
      * No description
      *
      * @tags friends
      * @name UserFollowControllerFollowUser
      * @summary 유저의 친구 요청
-     * @request POST:/friends/request
+     * @request POST:/api/v1/friends/request
      */
     userFollowControllerFollowUser: (
       data: TargetUserDto,
       params: RequestParams = {},
     ) =>
       this.request<void, any>({
-        path: `/friends/request`,
+        path: `/api/v1/friends/request`,
         method: 'POST',
         body: data,
         type: ContentType.Json,
@@ -744,14 +762,14 @@ export class Api<
      * @tags friends
      * @name UserFollowControllerBlockUser
      * @summary 유저의 블락 요청
-     * @request POST:/friends/block
+     * @request POST:/api/v1/friends/block
      */
     userFollowControllerBlockUser: (
       data: TargetUserDto,
       params: RequestParams = {},
     ) =>
       this.request<void, any>({
-        path: `/friends/block`,
+        path: `/api/v1/friends/block`,
         method: 'POST',
         body: data,
         type: ContentType.Json,
@@ -764,14 +782,14 @@ export class Api<
      * @tags friends
      * @name UserFollowControllerUnfollowUser
      * @summary 유저의 친구 해제 요청
-     * @request POST:/friends/unfriend
+     * @request POST:/api/v1/friends/unfriend
      */
     userFollowControllerUnfollowUser: (
       data: TargetUserDto,
       params: RequestParams = {},
     ) =>
       this.request<void, any>({
-        path: `/friends/unfriend`,
+        path: `/api/v1/friends/unfriend`,
         method: 'POST',
         body: data,
         type: ContentType.Json,
@@ -784,14 +802,14 @@ export class Api<
      * @tags friends
      * @name UserFollowControllerUnBlockUser
      * @summary 유저의 블락 해제 요청
-     * @request POST:/friends/unblock
+     * @request POST:/api/v1/friends/unblock
      */
     userFollowControllerUnBlockUser: (
       data: TargetUserDto,
       params: RequestParams = {},
     ) =>
       this.request<void, any>({
-        path: `/friends/unblock`,
+        path: `/api/v1/friends/unblock`,
         method: 'POST',
         body: data,
         type: ContentType.Json,
@@ -804,11 +822,11 @@ export class Api<
      * @tags friends
      * @name UserFollowControllerFindRelationships
      * @summary 유저의 친구/블락 리스트 조회
-     * @request GET:/friends
+     * @request GET:/api/v1/friends
      */
     userFollowControllerFindRelationships: (params: RequestParams = {}) =>
       this.request<UserFollowDto[], void>({
-        path: `/friends`,
+        path: `/api/v1/friends`,
         method: 'GET',
         format: 'json',
         ...params,
@@ -820,11 +838,11 @@ export class Api<
      * @tags friends
      * @name UserFollowControllerFindFriends
      * @summary 유저의 친구 목록 조회
-     * @request GET:/friends/friends
+     * @request GET:/api/v1/friends/friends
      */
     userFollowControllerFindFriends: (params: RequestParams = {}) =>
       this.request<UserFollowDto[], any>({
-        path: `/friends/friends`,
+        path: `/api/v1/friends/friends`,
         method: 'GET',
         format: 'json',
         ...params,
@@ -836,45 +854,43 @@ export class Api<
      * @tags friends
      * @name UserFollowControllerFindBlocks
      * @summary 유저의 블락 목록 요청
-     * @request GET:/friends/blocks
+     * @request GET:/api/v1/friends/blocks
      */
     userFollowControllerFindBlocks: (params: RequestParams = {}) =>
       this.request<UserFollowDto[], any>({
-        path: `/friends/blocks`,
+        path: `/api/v1/friends/blocks`,
         method: 'GET',
         format: 'json',
         ...params,
       }),
-  };
-  pongSeasonLog = {
+
     /**
      * No description
      *
      * @tags pong-season-log
      * @name PongSeasonLogControllerFindOne
      * @summary 유저 1명의 시즌 로그 조회
-     * @request GET:/pong-season-log/{id}
+     * @request GET:/api/v1/pong-season-log/{id}
      */
     pongSeasonLogControllerFindOne: (id: string, params: RequestParams = {}) =>
       this.request<PongSeasonLogDto, void>({
-        path: `/pong-season-log/${id}`,
+        path: `/api/v1/pong-season-log/${id}`,
         method: 'GET',
         format: 'json',
         ...params,
       }),
-  };
-  channel = {
+
     /**
      * No description
      *
      * @tags channel
      * @name ChannelControllerFindAll
      * @summary 모든 채널 검색
-     * @request GET:/channel/all
+     * @request GET:/api/v1/channel/all
      */
     channelControllerFindAll: (params: RequestParams = {}) =>
       this.request<ChannelDto[], any>({
-        path: `/channel/all`,
+        path: `/api/v1/channel/all`,
         method: 'GET',
         format: 'json',
         ...params,
@@ -886,12 +902,33 @@ export class Api<
      * @tags channel
      * @name ChannelControllerFindMyChannels
      * @summary 내가 속한 채널 검색
-     * @request GET:/channel/my
+     * @request GET:/api/v1/channel/my
      */
     channelControllerFindMyChannels: (params: RequestParams = {}) =>
       this.request<ChannelRelationDto[], any>({
-        path: `/channel/my`,
+        path: `/api/v1/channel/my`,
         method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags channel
+     * @name ChannelControllerCreate
+     * @summary 채널 생성
+     * @request POST:/api/v1/channel
+     */
+    channelControllerCreate: (
+      data: CreateChannelDto,
+      params: RequestParams = {},
+    ) =>
+      this.request<ChannelDto, any>({
+        path: `/api/v1/channel`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
         format: 'json',
         ...params,
       }),

@@ -3,7 +3,7 @@
 import httpProxy from 'http-proxy';
 import { RequestHandler } from 'next/dist/server/next';
 
-const API_ENDPOINT = process.env.NEXT_PUBLIC_API_ENDPOINT;
+const API_ENDPOINT = 'http://localhost:60080';
 
 const proxy = httpProxy.createProxyServer();
 

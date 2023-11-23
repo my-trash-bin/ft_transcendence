@@ -3,6 +3,8 @@ import { PrismaService } from '../base/prisma.service';
 import { UserId } from '../common/Id';
 import { ChannelDto } from './dto/channel-dto';
 import { ChannelRelationDto } from './dto/channel-relation-dto';
+import { CreateChannelDto } from './dto/create-channel.dto';
+import { ChannelType } from './enums/channel-type.enum';
 
 @Injectable()
 export class ChannelService {
@@ -23,5 +25,21 @@ export class ChannelService {
       },
     });
     return prismaChannelRelations.map((el) => new ChannelRelationDto(el));
+  }
+
+  async create(
+    id: UserId,
+    { type, title, password, capacity }: CreateChannelDto,
+  ) {
+    const prismaChannel = await this.prisma.channel.create({
+      data: {
+        title,
+        isPublic: type === ChannelType.Public,
+        password,
+        maximumMemberCount: capacity,
+        ownerId: id.value,
+      },
+    });
+    return new ChannelDto(prismaChannel);
   }
 }

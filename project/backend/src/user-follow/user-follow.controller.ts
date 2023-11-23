@@ -24,7 +24,7 @@ import { UserFollowDto } from './dto/user-follow.dto';
 import { UserFollowService } from './user-follow.service';
 
 @ApiTags('friends')
-@Controller('friends')
+@Controller('/api/v1/friends')
 export class UserFollowController {
   constructor(private readonly userFollowService: UserFollowService) {}
 

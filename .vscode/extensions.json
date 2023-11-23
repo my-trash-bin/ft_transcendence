@@ -6,8 +6,6 @@
     "esbenp.prettier-vscode",
     "dbaeumer.vscode-eslint",
     "prisma.prisma",
-    "graphql.vscode-graphql",
-    "graphql.vscode-graphql-syntax",
     "bradlc.vscode-tailwindcss",
     "rust-lang.rust-analyzer",
     "tamasfe.even-better-toml",

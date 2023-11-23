@@ -16,7 +16,7 @@ export default function ChooseNickname({
   const [nickname, setNickname] = useState('');
   const [isUnique, setIsUnique] = useState<boolean | undefined>(undefined);
   const [isValid, setIsValid] = useState(false);
-  const { users } = useContext(ApiContext);
+  const { api } = useContext(ApiContext);
 
   function isNicknameValid(nickname: string): boolean {
     const nicknameRegex = /^[a-zA-Z0-9\-_]{6,12}$/;
@@ -25,7 +25,7 @@ export default function ChooseNickname({
 
   const checkUnique = async function () {
     try {
-      const response = await users.usersControllerCheckNickname({
+      const response = await api.usersControllerCheckNickname({
         nickname: nickname,
       });
       const result: UniqueCheckResponse = response.data;
@@ -55,9 +55,9 @@ export default function ChooseNickname({
     }
   }
 
-  const handleButtonClick = () => {
+  const handleButtonClick = async () => {
     if (isValid) {
-      checkUnique();
+      await checkUnique();
       showUnique(isUnique);
     }
   };

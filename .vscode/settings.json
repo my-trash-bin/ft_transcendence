@@ -1,7 +1,6 @@
 {
   "files.exclude": {
     "**/node_modules": true,
-    "**/*.generated.ts": true,
   },
   "files.associations": {
     "**/*.env.*": "dotenv",
@@ -20,10 +19,6 @@
   "tailwindCSS.experimental.classRegex": [
     ["(?:clsx|twMerge|c)\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"],
   ],
-  "[graphql]": {
-    "editor.formatOnSave": true,
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-  },
   "[rust]": {
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "rust-lang.rust-analyzer",
