@@ -1,5 +1,6 @@
 import Image from 'next/image';
-import { useState } from 'react';
+import { useCallback, useContext, useState } from 'react';
+import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { ModalLayout } from '../channel/modals/ModalLayout';
 
 interface ModalProfileProps {
@@ -29,6 +30,7 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
     ...mockModalData,
   });
   const [isChanged, setIsChanged] = useState(false);
+  const { users } = useContext(ApiContext);
 
   const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEditData((prevData) => ({
@@ -48,10 +50,20 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
     setIsChanged(true);
   };
 
-  const saveChanges = () => {
-    console.log('call /users/{id} with', editData);
-    onClose();
-  };
+  const saveChanges = useCallback(() => {
+    const userId = 'userId';
+    async () => {
+      const result = await users.usersControllerUpdate(userId, {
+        nickname: nickname,
+        profileImageUrl: 'profileImageUrl',
+      });
+      if (!result.ok) {
+        console.error({ result });
+        alert('// TODO: 뭔가 좀 잘못 됐을 때 에러 메시지 좀 예쁘게');
+      }
+      onClose();
+    };
+  }, [users, nickname, onClose]);
 
   const textClass = 'font-bold text-xl text-dark-purple leading-loose';
   const buttonClass =
