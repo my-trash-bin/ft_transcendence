@@ -1,14 +1,10 @@
+import { getSocket } from '@/lib/Socket';
 import { useEffect, useState } from 'react';
 
-export function MessageContent({
-  socket,
-  receiver,
-}: {
-  socket: any;
-  receiver: string;
-}) {
+export function MessageContent({ receiver }: { receiver: string }) {
   const [messages, setMessages] = useState<string[]>([]);
   useEffect(() => {
+    const socket = getSocket();
     socket.on(`dm`, (data: any) => {
       const { sender, receiver, message } = data;
       console.log(`Received message from ${sender}: ${message}`);
@@ -18,7 +14,7 @@ export function MessageContent({
     return () => {
       socket.off(`dm`);
     };
-  }, [socket]);
+  }, []);
 
   return (
     <div className="w-[95%] h-[610px] pt-[20px] bg-chat-color2 rounded-[10px] flex flex-col overflow-y-scroll mt-sm">

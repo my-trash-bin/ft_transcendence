@@ -1,24 +1,15 @@
 'use client';
 
+import { getSocket } from '@/lib/Socket';
 import Image from 'next/image';
 import { useState } from 'react';
 
-export function MessageSendBox({
-  socket,
-  receiver,
-}: {
-  socket: any;
-  receiver: string;
-}) {
+export function MessageSendBox({ receiver }: { receiver: string }) {
   const [message, setMessage] = useState<string>('');
   const sendMessage = () => {
+    const socket = getSocket();
     console.log(socket.connected);
-    socket.emit(`dm`, {
-      sender: 'test',
-      receiver: 'test',
-      message: message,
-    });
-    console.log(message + ' sent');
+    socket.emit(`dm`);
     setMessage('');
   };
 
