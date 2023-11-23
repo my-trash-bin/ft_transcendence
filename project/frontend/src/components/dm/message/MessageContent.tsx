@@ -1,18 +1,22 @@
 import { getSocket } from '@/lib/Socket';
 import { useEffect, useState } from 'react';
 
-export function MessageContent({ receiver }: { receiver: string }) {
+export enum messageType {
+  DM = 'DM',
+  CHANNEL = 'CHANNEL',
+}
+
+export function MessageContent({
+  channelId,
+  type,
+}: Readonly<{ channelId: string; type: messageType }>) {
   const [messages, setMessages] = useState<string[]>([]);
   useEffect(() => {
     const socket = getSocket();
-    socket.on(`dm`, (data: any) => {
-      const { sender, receiver, message } = data;
-      console.log(`Received message from ${sender}: ${message}`);
-      setMessages((messages) => [...messages, message]);
-    });
+    socket.on(`message`, (data: any) => {});
 
     return () => {
-      socket.off(`dm`);
+      socket.off(`message`);
     };
   }, []);
 

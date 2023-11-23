@@ -3,8 +3,15 @@
 import { getSocket } from '@/lib/Socket';
 import Image from 'next/image';
 import { useState } from 'react';
+import { messageType } from './MessageContent';
 
-export function MessageSendBox({ receiver }: { receiver: string }) {
+export function MessageSendBox({
+  channelId,
+  type,
+}: {
+  channelId: string;
+  type: messageType;
+}) {
   const [message, setMessage] = useState<string>('');
   const sendMessage = () => {
     const socket = getSocket();

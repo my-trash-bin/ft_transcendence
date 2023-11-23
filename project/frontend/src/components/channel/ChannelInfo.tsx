@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { ChannelSettingModal } from './modals/ChannelSettingModal';
 
-export function ChannelInfo() {
+export function ChannelInfo({ channelId }: Readonly<{ channelId: string }>) {
   const channelData = {
     channelName: 'channel name',
   };

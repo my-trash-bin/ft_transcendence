@@ -4,13 +4,13 @@ import { formatAMPM } from '../utils/FromatAmPm';
 export function OtherChat({
   content,
   time,
-  profile,
+  profileImage,
   isFirst,
   nickname,
 }: Readonly<{
   content: string;
   time: Date;
-  profile: string;
+  profileImage: string;
   isFirst: boolean;
   nickname: string;
 }>) {
@@ -21,7 +21,7 @@ export function OtherChat({
         {isFirst === true ? (
           <Image
             alt="profile"
-            src={profile}
+            src={profileImage}
             width={40}
             height={40}
             layout="responsive"
