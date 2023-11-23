@@ -7,7 +7,7 @@ import { AppModule } from './app/app.module';
 import { env } from './util/env';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { snapshot: true });
 
   const config = new DocumentBuilder()
     .setTitle('ft_transcendence')
