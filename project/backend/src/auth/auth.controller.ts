@@ -145,7 +145,7 @@ export class AuthController {
   private welcome(res: ExpressResponse, type: AuthType) {
     switch (type) {
       case 'FT':
-        res.redirect('http://localhost:53000/friend');
+        res.redirect('/friend');
     }
   }
 }
