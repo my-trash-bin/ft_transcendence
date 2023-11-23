@@ -2,15 +2,15 @@ import Image from 'next/image';
 import { formatAMPM } from '../utils/FromatAmPm';
 
 export function OtherChat({
-  content,
+  message,
   time,
-  profile,
+  profileImage,
   isFirst,
   nickname,
 }: Readonly<{
-  content: string;
+  message: string;
   time: Date;
-  profile: string;
+  profileImage: string;
   isFirst: boolean;
   nickname: string;
 }>) {
@@ -21,7 +21,7 @@ export function OtherChat({
         {isFirst === true ? (
           <Image
             alt="profile"
-            src={profile}
+            src={profileImage}
             width={40}
             height={40}
             layout="responsive"
@@ -40,7 +40,7 @@ export function OtherChat({
           className={`p-[2%] text-center text-white inline-block max-w-[35%] rounded-[20px]
                 break-words bg-chat-color1 self-start min-w-[10%]`}
         >
-          {content}
+          {message}
         </p>
         <p className="pl-[1%] text-[11px] self-start">{timeAMPM}</p>
       </div>

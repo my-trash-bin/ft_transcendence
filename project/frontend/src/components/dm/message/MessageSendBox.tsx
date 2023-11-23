@@ -1,30 +1,23 @@
 'use client';
 
+import { getSocket } from '@/lib/Socket';
 import Image from 'next/image';
 import { useState } from 'react';
+import { messageType } from './MessageContent';
 
 export function MessageSendBox({
-  socket,
-  receiver,
+  channelId,
+  type,
 }: {
-  socket: any;
-  receiver: string;
+  channelId: string;
+  type: messageType;
 }) {
   const [message, setMessage] = useState<string>('');
   const sendMessage = () => {
-    console.log(socket.connected);
-    socket.emit(`dm`, {
-      sender: 'test',
-      receiver: 'test',
-      message: message,
-    });
-    console.log(message + ' sent');
+    const socket = getSocket();
+    socket.emit('message', { channelId, type, msg: message });
+    console.log(`send message: ${message}`);
     setMessage('');
-  };
-
-  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setMessage(e.target.value);
-    console.log(e.target.value);
   };
 
   return (
@@ -33,7 +26,7 @@ export function MessageSendBox({
         <input
           type="text"
           placeholder="Enter your message"
-          onChange={handleInput}
+          onChange={(e) => setMessage(e.target.value)}
           value={message}
           className="bg-chat-color2 outline-none h-[100%] w-[90%] pr-[1%] placeholder:text-center"
         />
