@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { AuthType } from '@prisma/client';
 
 import { PrismaService } from '../base/prisma.service';
-import { UserId, idOf } from '../common/Id';
+import { idOf, UserId } from '../common/Id';
 
 // After OAuth, if user not exists
 export interface JwtPayloadPhaseRegister {
@@ -39,14 +39,30 @@ export class AuthService {
   ) {}
 
   async oauth42(ftUser: any): Promise<JwtPayload> {
+    // console.log('ftUser'); // 프로필임
+    // console.log(ftUser);
+    /*
+    id: '104048', 유니크값
+    username: 'hyeonjan',
+    displayName: 'Hyeonjun Jang',
+    name: { familyName: 'Jang', givenName: 'Hyeonjun' },
+    profileUrl: 'https://api.intra.42.fr/v2/users/hyeonjan',
+    emails: [ { value: 'hyeonjan@student.42seoul.kr' } ],
+    phoneNumbers: [ { value: 'hidden' } ],
+    photos: [ { value: undefined } ],
+    provider: '42',
+    */
     const metadataJson = ftUser._raw;
     return await this.prismaService.$transaction(
+      // 첫번째 async
       async (tx): Promise<JwtPayload> => {
+        // Auth 모델 테이블
         const auth = await tx.auth.findUnique({
           where: { type_id: { type: 'FT', id: ftUser.id } },
           select: { userId: true },
         });
         if (!auth) {
+          // 1. auth 처음 가입
           const { type, id } = await tx.auth.create({
             data: { type: 'FT', id: ftUser.id, metadataJson },
             select: { type: true, id: true },
@@ -63,10 +79,13 @@ export class AuthService {
             },
           });
           if (user?.mfaPasswordHash) {
+            // 2. 2FA 설정된 상태
             return { phase: '2fa', type, id };
           } else if (!user) {
+            // 구분 잘 안됨
             return { phase: 'register', type, id };
           } else {
+            // 3. 통과
             return { phase: 'complete', id: idOf(user.id) };
           }
         }
