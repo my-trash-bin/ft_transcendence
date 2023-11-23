@@ -19,6 +19,7 @@ export class PhaseGuard implements CanActivate {
       'phase',
       context.getHandler(),
     );
+    console.log(`phase 가드 체크: ${phase}`);
     if (!phase) {
       return true;
     }

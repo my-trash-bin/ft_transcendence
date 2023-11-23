@@ -27,6 +27,7 @@ export class AppController {
     type: MeResult,
   })
   getProfile(@Request() req: ExpressRequest) {
-    return new MeResult((req.user as JwtPayloadPhaseComplete).id);
+    const userId = (req.user as JwtPayloadPhaseComplete).id;
+    return new MeResult(userId);
   }
 }
