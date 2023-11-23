@@ -36,7 +36,6 @@ export const Button: React.FC<ButtonProps> = ({
   isModal = false,
 }) => {
   const color = disabled ? 'disabled' : isModal ? 'modal' : 'default';
-  console.log(color);
   return (
     <button
       className={ButtonCVA({ size, color })}

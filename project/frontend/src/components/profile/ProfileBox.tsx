@@ -1,5 +1,6 @@
 import Image from 'next/image';
-import toast from 'react-hot-toast';
+import { useState } from 'react';
+import { ProfileEditModal } from './ProfileEditModal';
 import { TextBox } from './TextBox';
 
 interface ProfileArticleProps {
@@ -12,7 +13,13 @@ interface ProfileArticleProps {
 }
 
 function ProfileBox(props: ProfileArticleProps) {
-  const profile = () => toast(`프로필 수정`);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const handleButtonClick = () => {
+    setIsModalOpen(true);
+  };
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
   const buttonClass =
     'w-lg h-sm bg-default rounded-sm border-2 border-dark-purple text-center text-black text-lg font-bold hover:bg-light-background ' +
     'absolute top-xl right-xl';
@@ -33,10 +40,15 @@ function ProfileBox(props: ProfileArticleProps) {
           ratio={props.ratio}
           statusMessage={props.statusMessage}
         />
-        <button onClick={profile} className={buttonClass}>
+        <button onClick={handleButtonClick} className={buttonClass}>
           프로필 수정
         </button>
       </div>
+      <ProfileEditModal
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        nickname={props.nickname}
+      />
     </div>
   );
 }

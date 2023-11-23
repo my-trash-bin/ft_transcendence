@@ -13,6 +13,267 @@ export interface MeResult {
   value: string;
 }
 
+export interface RegisterBody {
+  /** 유니크 닉네임 */
+  nickname: string;
+  /** 프로필 이미지 주소 */
+  imageUrl: string;
+}
+
+export interface TwoFactorAuthenticationBody {
+  password: string;
+}
+
+export interface UserDto {
+  /**
+   * 사용자 ID
+   * @format uuid
+   */
+  id: string;
+  /** 닉네임 */
+  nickname: string;
+  /** 프로필 이미지 URL */
+  profileImageUrl?: string;
+  /**
+   * 가입 시기
+   * @format date-time
+   */
+  joinedAt: string;
+  /** 탈퇴 여부 */
+  isLeaved: boolean;
+  /**
+   * 탈퇴 시기
+   * @format date-time
+   */
+  leavedAt?: string;
+  /** 상태 메시지 */
+  statusMessage: string;
+}
+
+export interface CreateUserDto {
+  nickname: string;
+  profileImageUrl?: string;
+}
+
+export interface UpdateUserDto {
+  nickname?: string;
+  profileImageUrl?: string;
+}
+
+export interface NicknameCheckUserDto {
+  nickname: string;
+}
+
+export interface UniqueCheckResponse {
+  /** 유니크 여부 */
+  isUnique: boolean;
+}
+
+export interface RecordDto {
+  /** 승리 수 */
+  win: number;
+  /** 패배 수 */
+  lose: number;
+  /** 승률 */
+  ratio: number;
+}
+
+export interface UserProfileDto {
+  /** 닉네임 */
+  nickname: string;
+  /** 프로필 이미지 URL */
+  imageUrl?: string;
+  /** 전적 */
+  record: RecordDto;
+  /** 상태메시지 */
+  statusMessage: string;
+  /** 관계 */
+  relation: 'friend' | 'block' | 'none' | 'me';
+}
+
+export interface TargetUserDto {
+  targetUser: string;
+}
+
+export interface UserFollowDto {
+  /** 차단 여부 */
+  isBlock: boolean;
+  /**
+   * 팔로우 또는 차단된 날짜
+   * @format date-time
+   */
+  followOrBlockedAt: string;
+  /** 팔로우/블록 대상 */
+  followee: UserDto;
+}
+
+export interface PongSeasonLogDto {
+  /**
+   * 시즌 번호
+   * @example 1
+   */
+  season: number;
+  /**
+   * 사용자 ID
+   * @format uuid
+   * @example "uuid"
+   */
+  userId: string;
+  /**
+   * 연속 승리 횟수
+   * @example 3
+   */
+  consecutiveWin: number;
+  /**
+   * 최대 연속 승리 횟수
+   * @example 5
+   */
+  maxConsecutiveWin: number;
+  /**
+   * 최대 연속 패배 횟수
+   * @example 2
+   */
+  maxConsecutiveLose: number;
+  /**
+   * 총 승리 횟수
+   * @example 10
+   */
+  win: number;
+  /**
+   * 총 패배 횟수
+   * @example 8
+   */
+  lose: number;
+  /**
+   * 총 게임 횟수
+   * @example 18
+   */
+  total: number;
+  /**
+   * 승률(백분율)
+   * @example 55.56
+   */
+  winRate: float;
+}
+
+export interface ChannelDto {
+  /**
+   * 채널 ID
+   * @format uuid
+   * @example "uuid"
+   */
+  id: string;
+  /**
+   * 채널 제목
+   * @example "채널 이름"
+   */
+  title: string;
+  /**
+   * 채널 타입
+   * @example "public"
+   */
+  type: string;
+  /**
+   * 채널 생성 시각
+   * @format date-time
+   * @example "2023-01-01T00:00:00.000Z"
+   */
+  createdAt: string;
+  /**
+   * 채널 마지막 활동 시각
+   * @format date-time
+   * @example "2023-01-01T00:00:00.000Z"
+   */
+  lastActiveAt: string;
+  /**
+   * 채널 소유자 ID
+   * @format uuid
+   * @example "uuid"
+   */
+  ownerId?: object;
+  /**
+   * 현재 채널 멤버 수
+   * @example 10
+   */
+  memberCount: number;
+  /**
+   * 최대 채널 멤버 수
+   * @example 50
+   */
+  maximumMemberCount: number;
+}
+
+export interface ChannelRelationDto {
+  /**
+   * 채널 ID
+   * @format uuid
+   * @example "uuid"
+   */
+  id: string;
+  /**
+   * 채널 제목
+   * @example "채널 이름"
+   */
+  title: string;
+  /**
+   * 채널 타입
+   * @example "public"
+   */
+  type: string;
+  /**
+   * 채널 생성 시각
+   * @format date-time
+   * @example "2023-01-01T00:00:00.000Z"
+   */
+  createdAt: string;
+  /**
+   * 채널 마지막 활동 시각
+   * @format date-time
+   * @example "2023-01-01T00:00:00.000Z"
+   */
+  lastActiveAt: string;
+  /**
+   * 채널 소유자 ID
+   * @format uuid
+   * @example "uuid"
+   */
+  ownerId?: object;
+  /**
+   * 현재 채널 멤버 수
+   * @example 10
+   */
+  memberCount: number;
+  /**
+   * 최대 채널 멤버 수
+   * @example 50
+   */
+  maximumMemberCount: number;
+  /**
+   * 채팅 금지 시간
+   * @format date-time
+   */
+  mutedUntil: string;
+  /**
+   * 채널 멤버 타입
+   * @example "MEMBER"
+   */
+  memberType: 'ADMINISTRATOR' | 'MEMBER' | 'BANNED';
+}
+
+export interface CreateChannelDto {
+  /** 채널 타입 */
+  type: 'public' | 'protected' | 'private';
+  /** 채널 제목 */
+  title: string;
+  /**
+   * 채널 암호
+   * @format email
+   */
+  password?: object;
+  /** 채널 최대 인원수 */
+  capacity: number;
+}
+
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, 'body' | 'bodyUsed'>;
 
@@ -287,7 +548,21 @@ export class Api<
     /**
      * No description
      *
+     * @name AuthControllerLogout
+     * @request GET:/api/auth/logout
+     */
+    authControllerLogout: (params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/api/auth/logout`,
+        method: 'GET',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
      * @name AuthControllerLogin
+     * @summary 42 Oauth 로그인
      * @request GET:/api/auth/42
      */
     authControllerLogin: (params: RequestParams = {}) =>
@@ -301,12 +576,360 @@ export class Api<
      * No description
      *
      * @name AuthControllerTest
+     * @summary 42 Oauth용 콜백 주소
      * @request GET:/api/auth/42/callback
      */
     authControllerTest: (params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/api/auth/42/callback`,
         method: 'GET',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @name AuthControllerRegister
+     * @summary 회원 가입 요청
+     * @request POST:/api/auth/register
+     */
+    authControllerRegister: (data: RegisterBody, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/api/auth/register`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @name AuthControllerTwoFactorAuthentication
+     * @summary 2FA 로그인 용
+     * @request POST:/api/auth/2fa
+     */
+    authControllerTwoFactorAuthentication: (
+      data: TwoFactorAuthenticationBody,
+      params: RequestParams = {},
+    ) =>
+      this.request<any, void>({
+        path: `/api/auth/2fa`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags users
+     * @name UsersControllerFindAll
+     * @summary 모든 유저 조회
+     * @request GET:/api/v1/users
+     */
+    usersControllerFindAll: (params: RequestParams = {}) =>
+      this.request<UserDto[], any>({
+        path: `/api/v1/users`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags users
+     * @name UsersControllerCreate
+     * @summary 유저 생성. 사실 아직 이 테이블의 정확한 기능을 잘...
+     * @request POST:/api/v1/users
+     */
+    usersControllerCreate: (data: CreateUserDto, params: RequestParams = {}) =>
+      this.request<UserDto, void>({
+        path: `/api/v1/users`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags users
+     * @name UsersControllerFindOne
+     * @summary 유저 1명 기본 조회
+     * @request GET:/api/v1/users/{id}
+     */
+    usersControllerFindOne: (id: string, params: RequestParams = {}) =>
+      this.request<UserDto, void>({
+        path: `/api/v1/users/${id}`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags users
+     * @name UsersControllerUpdate
+     * @summary 유저의 닉네임/프로필이미지링크 변경
+     * @request PATCH:/api/v1/users/{id}
+     */
+    usersControllerUpdate: (
+      id: string,
+      data: UpdateUserDto,
+      params: RequestParams = {},
+    ) =>
+      this.request<UserDto, void>({
+        path: `/api/v1/users/${id}`,
+        method: 'PATCH',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags users
+     * @name UsersControllerCheckNickname
+     * @summary 닉네임 유니크 여부 체크
+     * @request POST:/api/v1/users/unique-check
+     */
+    usersControllerCheckNickname: (
+      data: NicknameCheckUserDto,
+      params: RequestParams = {},
+    ) =>
+      this.request<UniqueCheckResponse, void>({
+        path: `/api/v1/users/unique-check`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags users
+     * @name UsersControllerGetUserInfo
+     * @summary 프로필 데이터를 위한 유저 조회
+     * @request GET:/api/v1/users/profile
+     */
+    usersControllerGetUserInfo: (
+      query: {
+        targetUser: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<UserProfileDto, void>({
+        path: `/api/v1/users/profile`,
+        method: 'GET',
+        query: query,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags friends
+     * @name UserFollowControllerFollowUser
+     * @summary 유저의 친구 요청
+     * @request POST:/api/v1/friends/request
+     */
+    userFollowControllerFollowUser: (
+      data: TargetUserDto,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, any>({
+        path: `/api/v1/friends/request`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags friends
+     * @name UserFollowControllerBlockUser
+     * @summary 유저의 블락 요청
+     * @request POST:/api/v1/friends/block
+     */
+    userFollowControllerBlockUser: (
+      data: TargetUserDto,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, any>({
+        path: `/api/v1/friends/block`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags friends
+     * @name UserFollowControllerUnfollowUser
+     * @summary 유저의 친구 해제 요청
+     * @request POST:/api/v1/friends/unfriend
+     */
+    userFollowControllerUnfollowUser: (
+      data: TargetUserDto,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, any>({
+        path: `/api/v1/friends/unfriend`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags friends
+     * @name UserFollowControllerUnBlockUser
+     * @summary 유저의 블락 해제 요청
+     * @request POST:/api/v1/friends/unblock
+     */
+    userFollowControllerUnBlockUser: (
+      data: TargetUserDto,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, any>({
+        path: `/api/v1/friends/unblock`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags friends
+     * @name UserFollowControllerFindRelationships
+     * @summary 유저의 친구/블락 리스트 조회
+     * @request GET:/api/v1/friends
+     */
+    userFollowControllerFindRelationships: (params: RequestParams = {}) =>
+      this.request<UserFollowDto[], void>({
+        path: `/api/v1/friends`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags friends
+     * @name UserFollowControllerFindFriends
+     * @summary 유저의 친구 목록 조회
+     * @request GET:/api/v1/friends/friends
+     */
+    userFollowControllerFindFriends: (params: RequestParams = {}) =>
+      this.request<UserFollowDto[], any>({
+        path: `/api/v1/friends/friends`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags friends
+     * @name UserFollowControllerFindBlocks
+     * @summary 유저의 블락 목록 요청
+     * @request GET:/api/v1/friends/blocks
+     */
+    userFollowControllerFindBlocks: (params: RequestParams = {}) =>
+      this.request<UserFollowDto[], any>({
+        path: `/api/v1/friends/blocks`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags pong-season-log
+     * @name PongSeasonLogControllerFindOne
+     * @summary 유저 1명의 시즌 로그 조회
+     * @request GET:/api/v1/pong-season-log/{id}
+     */
+    pongSeasonLogControllerFindOne: (id: string, params: RequestParams = {}) =>
+      this.request<PongSeasonLogDto, void>({
+        path: `/api/v1/pong-season-log/${id}`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags channel
+     * @name ChannelControllerFindAll
+     * @summary 모든 채널 검색
+     * @request GET:/api/v1/channel/all
+     */
+    channelControllerFindAll: (params: RequestParams = {}) =>
+      this.request<ChannelDto[], any>({
+        path: `/api/v1/channel/all`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags channel
+     * @name ChannelControllerFindMyChannels
+     * @summary 내가 속한 채널 검색
+     * @request GET:/api/v1/channel/my
+     */
+    channelControllerFindMyChannels: (params: RequestParams = {}) =>
+      this.request<ChannelRelationDto[], any>({
+        path: `/api/v1/channel/my`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags channel
+     * @name ChannelControllerCreate
+     * @summary 채널 생성
+     * @request POST:/api/v1/channel
+     */
+    channelControllerCreate: (
+      data: CreateChannelDto,
+      params: RequestParams = {},
+    ) =>
+      this.request<ChannelDto, any>({
+        path: `/api/v1/channel`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
         ...params,
       }),
   };

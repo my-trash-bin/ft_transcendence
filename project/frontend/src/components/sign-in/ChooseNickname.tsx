@@ -1,5 +1,9 @@
-import { useState } from 'react';
+'use client';
+
+import { UniqueCheckResponse } from '@/api/api';
+import { useContext, useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
+import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { Button } from '../common/Button';
 
 type ChooseNicknameProps = {
@@ -12,16 +16,25 @@ export default function ChooseNickname({
   const [nickname, setNickname] = useState('');
   const [isUnique, setIsUnique] = useState<boolean | undefined>(undefined);
   const [isValid, setIsValid] = useState(false);
+  const { api } = useContext(ApiContext);
 
   function isNicknameValid(nickname: string): boolean {
     const nicknameRegex = /^[a-zA-Z0-9\-_]{6,12}$/;
     return nicknameRegex.test(nickname);
   }
 
-  function isNicknameUnique(nickname: string): boolean {
-    //ofc I will change this!!!
-    return nickname !== '------';
-  }
+  const checkUnique = async function () {
+    try {
+      const response = await api.usersControllerCheckNickname({
+        nickname: nickname,
+      });
+      const result: UniqueCheckResponse = response.data;
+      console.log('result: ', result);
+      setIsUnique(result.isUnique);
+    } catch (err) {
+      console.log('err: ', err);
+    }
+  };
 
   function handleNicknameChange(e: React.ChangeEvent<HTMLInputElement>) {
     const newNickname = e.target.value;
@@ -30,7 +43,7 @@ export default function ChooseNickname({
     setIsValid(isNicknameValid(newNickname));
   }
 
-  function handleIsUnique(unique: boolean | undefined): void {
+  function showUnique(unique: boolean | undefined): void {
     if (unique !== isUnique) {
       setIsUnique(unique);
 
@@ -42,13 +55,12 @@ export default function ChooseNickname({
     }
   }
 
-  const handleButtonClick = () => {
+  const handleButtonClick = async () => {
     if (isValid) {
-      handleIsUnique(isNicknameUnique(nickname));
+      await checkUnique();
+      showUnique(isUnique);
     }
   };
-
-  console.log(nickname, isUnique, isValid);
 
   return (
     <div className="w-2xl h-[400px] bg-light-background rounded-lg flex flex-col justify-center items-center">

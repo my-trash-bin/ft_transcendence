@@ -25,10 +25,10 @@ export function SearchCardList() {
           eventFunction={userSearchCallback}
         />
         <div className="w-[700px] h-[580px] grid gap-lg justify-center items-start overflow-y-scroll pt-xl place-content-start">
-          {friendRenderData.map((val, index) => {
+          {friendRenderData.map((val) => {
             return (
               <SearchCard
-                key={index}
+                key={val.nickname}
                 imageURL={val.profileImageUrl}
                 nickname={val.nickname}
               />
