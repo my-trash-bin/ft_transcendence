@@ -15,14 +15,9 @@ export function MessageSendBox({
   const [message, setMessage] = useState<string>('');
   const sendMessage = () => {
     const socket = getSocket();
-    console.log(socket.connected);
-    socket.emit(`dm`);
+    socket.emit('message', { channelId, type, msg: message });
+    console.log(`send message: ${message}`);
     setMessage('');
-  };
-
-  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setMessage(e.target.value);
-    console.log(e.target.value);
   };
 
   return (
@@ -31,7 +26,7 @@ export function MessageSendBox({
         <input
           type="text"
           placeholder="Enter your message"
-          onChange={handleInput}
+          onChange={(e) => setMessage(e.target.value)}
           value={message}
           className="bg-chat-color2 outline-none h-[100%] w-[90%] pr-[1%] placeholder:text-center"
         />
