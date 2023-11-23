@@ -6,6 +6,7 @@ import {
   ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
+  OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
@@ -13,103 +14,121 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
+interface JwtPayload {
+  phase: string;
+  id: {
+    value: string; // uuid
+  };
+  iat: number;
+  exp: number;
+}
+
 @WebSocketGateway(80, {
   cors: { origin: 'http://localhost:53000', credentials: true },
 })
 @Injectable()
-export class EventsGateway implements OnGatewayConnection {
+export class EventsGateway
+  implements OnGatewayConnection, OnGatewayConnection, OnGatewayInit
+{
   @WebSocketServer()
   server!: Server;
+
+  private channels!: Record<string, Record<string, string[]>>;
+  private user!: Record<string, any>;
 
   constructor(
     private jwtService: JwtService,
     private configService: ConfigService,
   ) {}
 
-  handleConnection(client: Socket, ...args: any[]) {
+  afterInit(server: Server) {
+    // 서버 초기화 시 변수 설정
+    this.channels = {
+      normal: {},
+      dm: {},
+    };
+    this.channels.normal['1'] = [];
+    this.channels.normal['2'] = [];
+    this.channels.normal['3'] = [];
+  }
+
+  handleConnection(@ConnectedSocket() client: Socket) {
     try {
-      console.log(client.handshake.headers.cookie);
-      if (client.handshake.headers.cookie === undefined) {
-        throw new WsException('인증을 위해 쿠키 필수입니다.');
-      }
-      const jwt = this.getCookie(client.handshake.headers.cookie, 'jwt');
-      if (jwt === null) {
-        throw new WsException('jwt 토큰이 쿠키에 없습니다.');
-      }
-      const secret = this.configService.getOrThrow<string>('JWT_SECRET');
-      console.log('decoded');
-      const decoded = this.jwtService.verify(jwt, { secret });
-      console.log(decoded);
-      // {
-      //   phase: 'complete',
-      //   id: { value: 'f2e26329-8209-4d33-869b-de72ec8cf46a' },
-      //   iat: 1700626642,
-      //   exp: 1700713042
-      // }
+      const decoded = this.isValidJwtAndPhase(client);
+
       console.log('인증 성공');
       // 여기서 인증된 사용자에 대한 로직 처리
     } catch (error) {
-      let msg = 'Unknown Error';
-      if (error instanceof WsException) {
-        msg = error.message;
-      }
+      const msg =
+        error instanceof WsException ? error.message : 'Unknown Error';
       client.emit('exception', { msg });
       console.log(`인증 실패: ${msg}`);
-      client.disconnect(); // 인증 실패 시 연결 종료
+      client.disconnect();
     }
   }
 
-  // 사용자가 채팅방에 참여할 때
-  @SubscribeMessage('JOIN')
-  handleJoinRoom(
-    @MessageBody() data: { roomId: string },
-    @ConnectedSocket() client: Socket,
-  ): void {
-    const { roomId } = data;
-    console.log(
-      `Client ${
-        client.id
-      } joined room ${roomId}. data: ${typeof data}, ${data}`,
-    );
-    if (roomId) {
-      console.log('전파');
-      client.join(roomId);
-      this.server
-        .to(roomId)
-        .emit('notification', `User ${client.id} has joined the room.`);
-    }
+  async handleDisconnect(client: Socket) {
+    const { id } = client;
+    Object.entries(this.channels).forEach(([_channelType, channels]) => {
+      this.removeUserFormChannels(channels, id);
+    });
   }
 
-  // 사용자가 채팅방에서 나갈 때
-  @SubscribeMessage('LEAVE')
-  handleLeaveRoom(
-    @MessageBody() data: { roomId: string },
+  @SubscribeMessage('message')
+  handleMessage(
     @ConnectedSocket() client: Socket,
+    @MessageBody() data: { type: string; channelId: string; msg: string },
   ): void {
-    const { roomId } = data;
-
-    console.log(`Client ${client.id} left room ${roomId}`);
-
-    if (roomId) {
-      client.leave(roomId);
-      this.server
-        .to(roomId)
-        .emit('notification', `User ${client.id} has left the room.`);
+    const { id } = client;
+    const { type, channelId, msg } = data;
+    if (!this.isUserInChannel(type, channelId, id)) {
+      throw new WsException(`Fail on message: (${type}, ${channelId}, ${msg})`);
     }
+    this.server.to(channelId).emit('message', msg);
   }
 
-  // 채팅 메시지 처리 (예시)
-  @SubscribeMessage('SEND')
-  handleChatMessage(
-    @MessageBody() data: { roomId: string; message: string },
+  @SubscribeMessage('join')
+  handleJoin(
     @ConnectedSocket() client: Socket,
+    @MessageBody() data: { type: string; channelId: string },
   ): void {
-    const { roomId, message } = data;
-    this.server.to(roomId).emit('chatMessage', { userId: client.id, message });
+    const { id } = client;
+    const { type, channelId } = data;
+
+    if (this.isUserInChannel(type, channelId, id)) {
+      throw new WsException(`Fail on join: (${type}, ${channelId})`);
+    }
+
+    client.join(channelId);
+    this.channels[type][channelId].push(id);
+
+    this.server
+      .to(channelId)
+      .emit('newUser', `New user ${id} joined in ${channelId}`);
+  }
+
+  @SubscribeMessage('leave')
+  handleLeave(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: { type: string; channelId: string },
+  ): void {
+    const { id } = client;
+    const { type, channelId } = data;
+
+    if (!this.isUserInChannel(type, channelId, id)) {
+      throw new WsException(`Fail on leave: (${type}, ${channelId})`);
+    }
+
+    client.leave(channelId);
+    this.removeUserFormChannel(this.channels[type][channelId], id);
+
+    this.server
+      .to(channelId)
+      .emit('userLeft', `User ${id} left from ${channelId}`);
   }
 
   @SubscribeMessage('ECHO') // 아래 처럼 받을 수도
-  handleMessage(
+  handleEcho(
     @MessageBody() data: any,
     @ConnectedSocket() client: Socket,
   ): void {
@@ -126,21 +145,58 @@ export class EventsGateway implements OnGatewayConnection {
     const jwtKeyValue = cookieKeyValues.find((el) => el[0] === key);
     return jwtKeyValue !== undefined ? jwtKeyValue[1] : null;
   };
+  private isValidJwtAndPhase = (client: Socket) => {
+    console.log(client.handshake.headers.cookie);
+    if (client.handshake.headers.cookie === undefined) {
+      throw new WsException('인증을 위해 쿠키 필수입니다.');
+    }
+    const jwt = this.getCookie(client.handshake.headers.cookie, 'jwt');
+    if (jwt === null) {
+      throw new WsException('jwt 토큰이 쿠키에 없습니다.');
+    }
+
+    const decoded = this.jwtService.verify<JwtPayload>(jwt, {
+      secret: this.configService.getOrThrow<string>('JWT_SECRET'),
+    });
+
+    if (decoded.phase !== 'complete') {
+      throw new WsException(
+        `jwt의 phase가 complete가 아닙니다. (${decoded.phase}).`,
+      );
+    }
+    return decoded;
+  };
+  private removeUserFormChannels = (
+    channels: Record<string, string[]>,
+    id: string,
+  ) => {
+    Object.entries(channels).forEach(([_channelId, channel]) =>
+      this.removeUserFormChannel(channel, id),
+    );
+  };
+  private removeUserFormChannel = (channel: string[], id: string) => {
+    const index = channel.indexOf(id);
+    if (index !== -1) {
+      channel.splice(index, 1);
+    }
+  };
+  private isUserInChannel = (
+    type: string,
+    channelId: string,
+    clientId: string,
+  ) => {
+    if (!(type in this.channels)) {
+      throw new WsException(`유효하지 않은 type: ${type}`);
+    }
+
+    const channels = this.channels[type];
+
+    if (!(channelId in channels)) {
+      throw new WsException(`유효하지 않은 channelId: ${channelId}`);
+    }
+
+    const channel = channels[channelId];
+
+    return channel.includes(clientId);
+  };
 }
-
-// @SubscribeMessage('events') // 메시지 구독 시작
-// findAll(@MessageBody() data: any): Observable<WsResponse<number>> {
-//   return from([1, 2, 3]).pipe(
-//     map((item) => ({ event: 'events', data: item })),
-//   );
-// }
-
-// @SubscribeMessage('identity')
-// async identity(@MessageBody() data: number): Promise<number> {
-//   return data;
-// }
-
-// @SubscribeMessage('whaami') // 아래 처럼 받을 수도
-// async sample(@MessageBody('id') id: number): Promise<number> {
-//   return id;
-// }
