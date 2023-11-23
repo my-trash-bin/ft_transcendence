@@ -35,6 +35,15 @@ export class FtStrategy extends PassportStrategy(passport42.Strategy) {
     _refreshToken: string,
     profile: Profile,
   ): Promise<Profile> {
+    console.log('프로필 리턴');
+    // console.log('validate');
+    // console.log('------------------');
+    // console.log(_accessToken);
+    // console.log('------------------');
+    // console.log(_refreshToken);
+    // console.log('------------------');
+    // console.log(profile);
+    // console.log('----     ************* -------');
     return profile;
   }
 }
