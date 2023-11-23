@@ -1,40 +1,13 @@
 'use client';
 
-import Image from 'next/image';
 import { useState } from 'react';
 import { Button } from '../common/Button';
-// import SelectAvatar from './SelectAvatar';
+import SelectAvatar from './SelectAvatar';
 
 type ChooseAvatarProps = {
   readonly avatars: string[];
   readonly onChooseClick: (avatar: string) => void;
 };
-
-type AvatarProps = {
-  name: string;
-  isSelected: boolean;
-  onClick: () => void;
-};
-
-function SelectAvatar({ name, isSelected, onClick }: AvatarProps) {
-  const src = `/avatar/${name}`;
-
-  const activeClass: string = isSelected
-    ? 'border-3 border-dark-purple bg-light-background'
-    : 'border-3 border-default hover:border-dark-gray hover:bg-light-background';
-  const className = `w-lg h-lg flex items-center justify-center ${activeClass}`;
-  return (
-    <Image
-      src={src}
-      priority={true}
-      alt="avatar"
-      width={100}
-      height={100}
-      className={className}
-      onClick={onClick}
-    />
-  );
-}
 
 export default function ChooseAvatar({
   avatars,
@@ -50,7 +23,7 @@ export default function ChooseAvatar({
           {avatars.map((avatar, index) => (
             <SelectAvatar
               key={index}
-              name={avatar}
+              imageUrl={avatar}
               isSelected={selectedAvatar === avatar}
               onClick={() => setSelectedAvatar(avatar)}
             />

@@ -4,7 +4,7 @@ import { ProfileEditModal } from './ProfileEditModal';
 import { TextBox } from './TextBox';
 
 interface ProfileArticleProps {
-  readonly avatar: string;
+  readonly imageUrl?: string;
   readonly nickname: string;
   readonly win: number;
   readonly lose: number;
@@ -27,11 +27,11 @@ function ProfileBox(props: ProfileArticleProps) {
     <div className="w-[900px] h-xl bg-light-background rounded-lg mb-[30px] relative">
       <div className="h-[inherit] p-2xl flex flex-row items-center">
         <Image
-          src={props.avatar}
+          src={props.imageUrl ?? '/avatar/avatar-black.svg'}
           priority={true}
           alt="avatar"
           width={150}
-          height={200}
+          height={150}
         />
         <TextBox
           nickname={props.nickname}
