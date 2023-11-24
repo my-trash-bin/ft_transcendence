@@ -1,26 +1,31 @@
-import { useEffect } from 'react';
-import toast, { Toaster } from 'react-hot-toast';
+import { TargetUserDto } from '@/api/api';
+import { useCallback, useContext } from 'react';
+import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { CommonCard } from './utils/CommonCard';
 
-interface FriendCardProps {
+interface BlockCardProps {
   readonly nickname: string;
-  readonly imageURL: string;
+  readonly imageURL?: string;
 }
 
-function FriendCard(props: FriendCardProps) {
-  const unblock = () => toast(`${props.nickname} 차단 해제`);
-  useEffect(() => {
-    return () => toast.dismiss();
-  }, []);
+export function BlockCard(props: BlockCardProps) {
+  const { api } = useContext(ApiContext);
+
+  const unblockUser = useCallback(async () => {
+    try {
+      const requestData: TargetUserDto = { targetUser: props.nickname };
+      alert('call unblock api');
+      await api.userFollowControllerUnBlockUser(requestData);
+      console.log('UnBlock sent successfully');
+    } catch (error) {
+      console.error('Error sending unblock:', error);
+    }
+  }, [api, props.nickname]);
+
   return (
     <CommonCard imageURL={props.imageURL} nickname={props.nickname}>
-      <Toaster
-        toastOptions={{
-          duration: 2000,
-        }}
-      />
       <button
-        onClick={unblock}
+        onClick={unblockUser}
         className={
           'w-md h-xs bg-default rounded-sm border-2 border-dark-purple text-center text-black text-lg font-bold mr-lg hover:bg-light-background'
         }
@@ -30,4 +35,3 @@ function FriendCard(props: FriendCardProps) {
     </CommonCard>
   );
 }
-export default FriendCard;

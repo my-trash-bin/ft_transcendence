@@ -4,7 +4,7 @@ import FriendAvatar from './FriendAvatar';
 
 interface CommonCardProps {
   readonly children: ReactNode;
-  readonly imageURL: string;
+  readonly imageURL?: string;
   readonly nickname: string;
 }
 
@@ -26,7 +26,7 @@ export function CommonCard({ children, imageURL, nickname }: CommonCardProps) {
   const alignCSS = 'flex items-center relative p-md';
   return (
     <div className={`${sizeCSS} ${colorCSS} ${alignCSS}`}>
-      <FriendAvatar src={imageURL} size={60} onClick={handleModalOpen} />
+      <FriendAvatar imageUrl={imageURL} size={60} onClick={handleModalOpen} />
       <div className="text-left text-black text-h2 font-semibold absolute left-[100px]">
         {nickname}
       </div>
