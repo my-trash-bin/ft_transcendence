@@ -7,57 +7,65 @@ import { ModalLayout } from '../channel/modals/ModalLayout';
 interface ModalProfileProps {
   isOpen: boolean;
   onClose: () => void;
-  nickname: string;
+  fetchData: () => Promise<void>;
+}
+function isNicknameValid(nickname: string): boolean {
+  const nicknameRegex = /^[a-zA-Z0-9\-_]{6,12}$/;
+  return nicknameRegex.test(nickname);
 }
 
 export const ProfileEditModal: React.FC<ModalProfileProps> = ({
   isOpen,
   onClose,
-  nickname,
+  fetchData,
 }) => {
   const [isChanged, setIsChanged] = useState(false);
   const { api } = useContext(ApiContext);
-
   const mockId: string = '172daa3c-10af-4b37-b4d5-7a2f4ccc0dc2';
+  // TODO: get id from cookie
   const [profileData, setProfileData] = useState<UserDto>({
     id: '',
     nickname: '',
-    profileImageUrl: '', // Provide a default value if needed
+    profileImageUrl: '',
     joinedAt: '',
-    isLeaved: false, // Set the default value for boolean
-    leavedAt: undefined, // You can set it to undefined or provide a default value
+    isLeaved: false,
+    leavedAt: undefined,
     statusMessage: '',
   });
 
+  const getProfileData = useCallback(async () => {
+    try {
+      const result = await api.usersControllerFindOne(mockId);
+      // TODO: -> /api/v1/users/profile GET
+      // TODO: me api -> replace mockId
+      if (result.ok) {
+        setProfileData(result.data);
+      } else {
+        console.error({ result });
+        alert('TODO: Handle the error gracefully');
+      }
+    } catch (error) {
+      console.error('Error fetching profile data:', error);
+      alert('TODO: Handle the error gracefully');
+    }
+  }, [api, mockId]);
+
   useEffect(() => {
     if (isOpen) {
-      const getProfileData = async () => {
-        try {
-          const result = await api.usersControllerFindOne(mockId);
-          // alert('TODO: -> /api/v1/users/profile GET');
-          // alert('TODO: me api -> replace mockId');
-          if (result.ok) {
-            // console.log(result);
-            setProfileData(result.data);
-          } else {
-            console.error({ result });
-            alert('// TODO: Handle the error gracefully');
-          }
-        } catch (error) {
-          console.error('Error fetching profile data:', error);
-          alert('// TODO: Handle the error gracefully');
-        }
-      };
       getProfileData();
     }
-  }, [api, mockId, isOpen]);
+  }, [isOpen, getProfileData]);
 
   const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newNickname = e.target.value;
     setProfileData((profileData) => ({
       ...profileData,
-      nickname: e.target.value,
+      nickname: newNickname,
     }));
-    setIsChanged(true);
+    setIsChanged(false);
+    if (isNicknameValid(newNickname)) {
+      setIsChanged(true);
+    }
   };
 
   const handleStatusMessageChange = (
@@ -70,22 +78,22 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
     setIsChanged(true);
   };
 
-  const saveChanges = useCallback(() => {
-    console.log('click saveChanges');
-    async () => {
-      console.log('inside async');
+  const saveChanges = useCallback(async () => {
+    try {
       const result = await api.usersControllerUpdate(mockId, {
-        nickname: nickname,
+        nickname: profileData.nickname,
       });
       if (!result.ok) {
         console.error({ result });
-        alert('// TODO: 뭔가 좀 잘못 됐을 때 에러 메시지 좀 예쁘게');
+        alert('// TODO: Handle errors gracefully');
       }
-      console.log('get data');
-      console.log(result);
+      fetchData();
       onClose();
-    };
-  }, [api, nickname, onClose]);
+    } catch (error) {
+      console.error('Error saving changes:', error);
+      alert('// TODO: Handle errors gracefully');
+    }
+  }, [api, mockId, profileData.nickname, onClose, fetchData]);
 
   const textClass = 'font-bold text-xl text-dark-purple leading-loose';
   const buttonClass =
@@ -103,13 +111,21 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
       <div className="w-[100%] h-[100%] relative">
         <div className="p-xl h-[100%] flex flex-col gap-lg justift-center items-center">
           <p className="text-h2 font-bold text-dark-purple">프로필 수정</p>
-          <Image
-            src={profileData.profileImageUrl ?? '/avatar/avatar-black.svg'}
-            priority={true}
-            alt="avatar"
-            width={100}
-            height={100}
-          />
+          {profileData.profileImageUrl ? (
+            <Image
+              src={profileData.profileImageUrl}
+              alt="avatar"
+              width={150}
+              height={150}
+            />
+          ) : (
+            <Image
+              src={'/avatar/avatar-black.svg'}
+              alt="avatar"
+              width={150}
+              height={150}
+            />
+          )}
           <div className="flex flex-col w-[100%] justify-center">
             <p className={textClass}>닉네임</p>
             <input
@@ -129,7 +145,7 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
             />
           </div>
           <button
-            disabled={!isChanged}
+            disabled={!isChanged || !isNicknameValid(profileData.nickname)}
             onClick={saveChanges}
             className={`${buttonClass} ${colorClass}`}
           >
