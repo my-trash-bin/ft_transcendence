@@ -1,6 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
+import { useState } from 'react';
 import BlockCardList from '../../components/friend/BlockCardList';
 import FriendCardList from '../../components/friend/FriendCardList';
 import { SearchCardList } from '../../components/friend/SearchCardList';
@@ -20,10 +19,6 @@ export default function FriendPage() {
         : ' bg-light-gray border-gray text-gray')
     );
   }
-
-  useEffect(() => {
-    return () => toast.dismiss();
-  }, []);
 
   return (
     <div className="flex flex-row w-[100%] h-[100%]">

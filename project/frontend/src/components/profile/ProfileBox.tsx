@@ -1,18 +1,39 @@
+import { UserDto } from '@/api/api';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useCallback, useContext, useState } from 'react';
+import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { ProfileEditModal } from './ProfileEditModal';
 import { TextBox } from './TextBox';
 
-interface ProfileArticleProps {
-  readonly avatar: string;
-  readonly nickname: string;
-  readonly win: number;
-  readonly lose: number;
-  readonly ratio: number;
-  readonly statusMessage: string;
-}
+function ProfileBox() {
+  const { api } = useContext(ApiContext);
+  const mockId: string = '172daa3c-10af-4b37-b4d5-7a2f4ccc0dc2';
+  // TODO: get id from cookie
+  const [profileData, setProfileData] = useState<UserDto>({
+    id: '',
+    nickname: '',
+    profileImageUrl: '',
+    joinedAt: '',
+    isLeaved: false,
+    leavedAt: undefined,
+    statusMessage: '',
+  });
 
-function ProfileBox(props: ProfileArticleProps) {
+  const getProfileData = useCallback(async () => {
+    try {
+      const result = await api.usersControllerFindOne(mockId);
+      if (result.ok) {
+        setProfileData(result.data);
+      } else {
+        console.error({ result });
+        alert('// TODO: Handle the error gracefully');
+      }
+    } catch (error) {
+      console.error('Error fetching profile data:', error);
+      alert('// TODO: Handle the error gracefully');
+    }
+  }, [api, mockId]);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const handleButtonClick = () => {
     setIsModalOpen(true);
@@ -26,19 +47,27 @@ function ProfileBox(props: ProfileArticleProps) {
   return (
     <div className="w-[900px] h-xl bg-light-background rounded-lg mb-[30px] relative">
       <div className="h-[inherit] p-2xl flex flex-row items-center">
-        <Image
-          src={props.avatar}
-          priority={true}
-          alt="avatar"
-          width={150}
-          height={200}
-        />
+        {profileData.profileImageUrl ? (
+          <Image
+            src={profileData.profileImageUrl}
+            alt="avatar"
+            width={150}
+            height={150}
+          />
+        ) : (
+          <Image
+            src={'/avatar/avatar-black.svg'}
+            alt="avatar"
+            width={150}
+            height={150}
+          />
+        )}
         <TextBox
-          nickname={props.nickname}
-          win={props.win}
-          lose={props.lose}
-          ratio={props.ratio}
-          statusMessage={props.statusMessage}
+          nickname={profileData.nickname}
+          win={10}
+          lose={10}
+          ratio={50}
+          statusMessage={profileData.statusMessage}
         />
         <button onClick={handleButtonClick} className={buttonClass}>
           프로필 수정
@@ -47,7 +76,7 @@ function ProfileBox(props: ProfileArticleProps) {
       <ProfileEditModal
         isOpen={isModalOpen}
         onClose={handleModalClose}
-        nickname={props.nickname}
+        fetchData={getProfileData}
       />
     </div>
   );
