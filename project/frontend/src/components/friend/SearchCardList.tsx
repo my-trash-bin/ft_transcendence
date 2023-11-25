@@ -1,5 +1,5 @@
 import { UserDto } from '@/api/api';
-import { useCallback, useContext, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { MessageSearchInput } from '../dm/message-search/MessageSearchInput';
 import SearchCard from './SearchCard';
@@ -28,6 +28,10 @@ export function SearchCardList() {
       setLoading(false);
     }
   }, [api, searchName]);
+
+  useEffect(() => {
+    fetchFriends();
+  }, [fetchFriends]);
 
   return (
     <div className="felx flex-col justify-center items-center">
