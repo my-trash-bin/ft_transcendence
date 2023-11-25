@@ -5,18 +5,19 @@ import { CommonCard } from './utils/CommonCard';
 
 interface FriendCardProps {
   readonly nickname: string;
-  readonly imageURL?: string;
+  readonly imageUrl?: string;
   readonly id: string;
   readonly refetch: () => Promise<unknown>;
 }
 
-export function FriendCard(props: FriendCardProps) {
+export function FriendCard({
+  nickname,
+  imageUrl,
+  id,
+  refetch,
+}: FriendCardProps) {
   return (
-    <CommonCard
-      imageURL={props.imageURL}
-      nickname={props.nickname}
-      id={props.id}
-    >
+    <CommonCard imageUrl={imageUrl} nickname={nickname} id={id}>
       <Button onClick={() => alert('call game start api')}>게임하기</Button>
       <Link
         href={'/dm'}
@@ -26,7 +27,7 @@ export function FriendCard(props: FriendCardProps) {
       >
         메세지
       </Link>
-      <FriendSetting targetId={props.id} refetch={props.refetch} />
+      <FriendSetting targetId={id} refetch={refetch} />
     </CommonCard>
   );
 }

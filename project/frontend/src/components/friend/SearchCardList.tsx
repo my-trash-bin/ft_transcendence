@@ -21,7 +21,6 @@ export function SearchCardList({ activeScreen }: { activeScreen: string }) {
   );
   const userSearchCallback = (searchUsername: string) => {
     setSearchName(searchUsername);
-    refetch();
   };
   useEffect(() => {
     if (activeScreen === 'search') {
@@ -50,6 +49,7 @@ export function SearchCardList({ activeScreen }: { activeScreen: string }) {
                 imageURL={val.profileImageUrl}
                 nickname={val.nickname}
                 id={val.id}
+                refetch={refetch}
               />
             ))
           ) : (

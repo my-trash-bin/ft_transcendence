@@ -29,7 +29,7 @@ export function BlockCardList({ activeScreen }: { activeScreen: string }) {
         data.map((val) => (
           <BlockCard
             key={val.followee.id}
-            imageURL={val.followee.profileImageUrl}
+            imageUrl={val.followee.profileImageUrl}
             nickname={val.followee.nickname}
             id={val.followee.id}
             refetch={refetch}

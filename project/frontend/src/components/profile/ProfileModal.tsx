@@ -21,14 +21,55 @@ const ProfileModal: React.FC<ModalProfileProps> = ({
   targetId,
 }) => {
   const { api } = useContext(ApiContext);
-  const { isLoading, isError, data } = useQuery(
-    [],
+  const { isLoading, isError, data, refetch } = useQuery(
+    [targetId],
     useCallback(
       async () =>
         (await api.usersControllerGetUserInfo({ targetUser: targetId })).data,
       [api, targetId],
     ),
   );
+
+  const requestFriend = useCallback(async () => {
+    try {
+      await api.userFollowControllerFollowUser({ targetUser: targetId });
+      console.log('Friend successfully');
+      refetch();
+    } catch (error) {
+      console.error('Error friend:', error);
+    }
+  }, [api, targetId, refetch]);
+
+  const unfollowUser = useCallback(async () => {
+    try {
+      await api.userFollowControllerUnfollowUser({ targetUser: targetId });
+      console.log('Unfriend successfully');
+      refetch();
+    } catch (error) {
+      console.error('Error unfriend:', error);
+    }
+  }, [api, targetId, refetch]);
+
+  const unblockUser = useCallback(async () => {
+    try {
+      await api.userFollowControllerUnBlockUser({ targetUser: targetId });
+      console.log('UnBlock successfully');
+      refetch();
+    } catch (error) {
+      console.error('Error unblock:', error);
+    }
+  }, [api, refetch, targetId]);
+
+  const blockUser = useCallback(async () => {
+    try {
+      await api.userFollowControllerBlockUser({ targetUser: targetId });
+      console.log('Block successfully');
+      refetch();
+    } catch (error) {
+      console.error('Error block:', error);
+    }
+  }, [api, targetId, refetch]);
+
   const record = data?.record || { win: 0, lose: 0, ratio: 0 };
 
   return (
@@ -46,11 +87,7 @@ const ProfileModal: React.FC<ModalProfileProps> = ({
         ) : (
           <div>
             <div className="flex felx-row">
-              <FriendAvatar
-                imageUrl={data.imageUrl}
-                size={80}
-                onClick={{} as () => void}
-              />
+              <FriendAvatar imageUrl={data.imageUrl} size={80} />
               <TextBox
                 nickname={data.nickname}
                 win={record.win}

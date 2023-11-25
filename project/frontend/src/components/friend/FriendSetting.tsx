@@ -2,14 +2,12 @@ import Image from 'next/image';
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
 
-// readonly refetch: () => Promise<unknown>;
-export function FriendSetting({
-  targetId,
-  refetch,
-}: {
+interface FriendSettingProps {
   targetId: string;
   refetch: () => Promise<unknown>;
-}) {
+}
+
+export function FriendSetting({ targetId, refetch }: FriendSettingProps) {
   const [active, setActive] = useState(false);
   const boxRef = useRef<HTMLDivElement>(null);
   const { api } = useContext(ApiContext);

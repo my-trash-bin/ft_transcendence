@@ -4,30 +4,26 @@ import { CommonCard } from './utils/CommonCard';
 
 interface BlockCardProps {
   readonly nickname: string;
-  readonly imageURL?: string;
+  readonly imageUrl?: string;
   readonly id: string;
   readonly refetch: () => Promise<unknown>;
 }
 
-export function BlockCard(props: BlockCardProps) {
+export function BlockCard({ nickname, imageUrl, id, refetch }: BlockCardProps) {
   const { api } = useContext(ApiContext);
 
   const unblockUser = useCallback(async () => {
     try {
-      await api.userFollowControllerUnBlockUser({ targetUser: props.id });
-      console.log('UnBlock sent successfully');
-      props.refetch();
+      await api.userFollowControllerUnBlockUser({ targetUser: id });
+      console.log('UnBlock successfully');
+      refetch();
     } catch (error) {
-      console.error('Error sending unblock:', error);
+      console.error('Error unblock:', error);
     }
-  }, [api, props]);
+  }, [api, id, refetch]);
 
   return (
-    <CommonCard
-      imageURL={props.imageURL}
-      nickname={props.nickname}
-      id={props.id}
-    >
+    <CommonCard imageUrl={imageUrl} nickname={nickname} id={id}>
       <button
         onClick={unblockUser}
         className={
