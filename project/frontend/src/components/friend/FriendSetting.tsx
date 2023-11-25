@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
 
-export function FriendSetting({ targetNickname }: { targetNickname: string }) {
+export function FriendSetting({ targetId }: { targetId: string }) {
   const [active, setActive] = useState(false);
   const boxRef = useRef<HTMLDivElement>(null);
   const { api } = useContext(ApiContext);
@@ -23,25 +23,25 @@ export function FriendSetting({ targetNickname }: { targetNickname: string }) {
 
   const unfollowUser = useCallback(async () => {
     try {
-      const requestData: TargetUserDto = { targetUser: targetNickname };
+      const requestData: TargetUserDto = { targetUser: targetId };
       alert('call request unfriend api');
       await api.userFollowControllerUnfollowUser(requestData);
       console.log('Unfriend request sent successfully');
     } catch (error) {
       console.error('Error sending unfriend request:', error);
     }
-  }, [api, targetNickname]);
+  }, [api, targetId]);
 
   const blockUser = useCallback(async () => {
     try {
-      const requestData: TargetUserDto = { targetUser: targetNickname };
+      const requestData: TargetUserDto = { targetUser: targetId };
       alert('call block api');
       await api.userFollowControllerBlockUser(requestData);
       console.log('Block sent successfully');
     } catch (error) {
       console.error('Error sending block:', error);
     }
-  }, [api, targetNickname]);
+  }, [api, targetId]);
 
   const buttonClass = 'w-[58px] text-center text-black text-sm font-semibold';
   return (
