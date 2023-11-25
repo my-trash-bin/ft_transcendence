@@ -29,6 +29,8 @@ const ProfileModal: React.FC<ModalProfileProps> = ({
       [api, targetId],
     ),
   );
+  const record = data?.record || { win: 0, lose: 0, ratio: 0 };
+
   return (
     <ModalLayout
       isOpen={isOpen}
@@ -51,9 +53,9 @@ const ProfileModal: React.FC<ModalProfileProps> = ({
               />
               <TextBox
                 nickname={data.nickname}
-                win={data.record.win}
-                lose={data.record.lose}
-                ratio={data.record.ratio}
+                win={record.win}
+                lose={record.lose}
+                ratio={record.ratio}
                 statusMessage={data.statusMessage}
                 isModal={true}
               />
