@@ -1,9 +1,13 @@
-import { TargetUserDto } from '@/api/api';
 import Image from 'next/image';
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
 
-export function FriendSetting({ targetNickname }: { targetNickname: string }) {
+interface FriendSettingProps {
+  targetId: string;
+  refetch: () => Promise<unknown>;
+}
+
+export function FriendSetting({ targetId, refetch }: FriendSettingProps) {
   const [active, setActive] = useState(false);
   const boxRef = useRef<HTMLDivElement>(null);
   const { api } = useContext(ApiContext);
@@ -23,25 +27,23 @@ export function FriendSetting({ targetNickname }: { targetNickname: string }) {
 
   const unfollowUser = useCallback(async () => {
     try {
-      const requestData: TargetUserDto = { targetUser: targetNickname };
-      alert('call request unfriend api');
-      await api.userFollowControllerUnfollowUser(requestData);
-      console.log('Unfriend request sent successfully');
+      await api.userFollowControllerUnfollowUser({ targetUser: targetId });
+      console.log('Unfriend successfully');
+      refetch();
     } catch (error) {
-      console.error('Error sending unfriend request:', error);
+      console.error('Error unfriend:', error);
     }
-  }, [api, targetNickname]);
+  }, [api, targetId, refetch]);
 
   const blockUser = useCallback(async () => {
     try {
-      const requestData: TargetUserDto = { targetUser: targetNickname };
-      alert('call block api');
-      await api.userFollowControllerBlockUser(requestData);
-      console.log('Block sent successfully');
+      await api.userFollowControllerBlockUser({ targetUser: targetId });
+      console.log('Block successfully');
+      refetch();
     } catch (error) {
-      console.error('Error sending block:', error);
+      console.error('Error block:', error);
     }
-  }, [api, targetNickname]);
+  }, [api, targetId, refetch]);
 
   const buttonClass = 'w-[58px] text-center text-black text-sm font-semibold';
   return (

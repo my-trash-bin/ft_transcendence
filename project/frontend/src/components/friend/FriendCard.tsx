@@ -1,21 +1,23 @@
 import Link from 'next/link';
-import { useContext } from 'react';
-import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { Button } from '../common/Button';
 import { FriendSetting } from './FriendSetting';
 import { CommonCard } from './utils/CommonCard';
 
 interface FriendCardProps {
   readonly nickname: string;
-  readonly imageURL?: string;
+  readonly imageUrl?: string;
+  readonly id: string;
+  readonly refetch: () => Promise<unknown>;
 }
 
-export function FriendCard(props: FriendCardProps) {
-  const { api } = useContext(ApiContext);
-  const { nickname } = props;
-
+export function FriendCard({
+  nickname,
+  imageUrl,
+  id,
+  refetch,
+}: FriendCardProps) {
   return (
-    <CommonCard imageURL={props.imageURL} nickname={props.nickname}>
+    <CommonCard imageUrl={imageUrl} nickname={nickname} id={id}>
       <Button onClick={() => alert('call game start api')}>게임하기</Button>
       <Link
         href={'/dm'}
@@ -25,7 +27,7 @@ export function FriendCard(props: FriendCardProps) {
       >
         메세지
       </Link>
-      <FriendSetting targetNickname={props.nickname} />
+      <FriendSetting targetId={id} refetch={refetch} />
     </CommonCard>
   );
 }

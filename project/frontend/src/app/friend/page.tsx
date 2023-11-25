@@ -50,9 +50,15 @@ export default function FriendPage() {
               </button>
             </div>
           </div>
-          {activeScreen === 'friend' && <FriendCardList />}
-          {activeScreen === 'block' && <BlockCardList />}
-          {activeScreen === 'search' && <SearchCardList />}
+          {activeScreen === 'friend' && (
+            <FriendCardList activeScreen={activeScreen} />
+          )}
+          {activeScreen === 'block' && (
+            <BlockCardList activeScreen={activeScreen} />
+          )}
+          {activeScreen === 'search' && (
+            <SearchCardList activeScreen={activeScreen} />
+          )}
         </div>
       </div>
     </div>
