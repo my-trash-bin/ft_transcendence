@@ -14,7 +14,7 @@ export function FriendCardList() {
   );
 
   return (
-    <div className="w-[700px] h-[600px] pt-xl grid gap-lg justify-center items-center overflow-y-scroll">
+    <div className="w-[700px] h-[600px] pt-xl grid gap-lg justify-center items-center overflow-y-scroll place-content-start">
       {isLoading || !data ? (
         <p>Loading...</p>
       ) : data.length > 0 ? (
