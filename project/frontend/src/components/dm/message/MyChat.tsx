@@ -1,9 +1,9 @@
 import { formatAMPM } from '../utils/FromatAmPm';
 
 export function MyChat({
-  content,
+  message,
   time,
-}: Readonly<{ content: string; time: Date }>) {
+}: Readonly<{ message: string; time: Date }>) {
   const timeAMPM = formatAMPM(time);
 
   return (
@@ -12,7 +12,7 @@ export function MyChat({
         className="p-[2%] text-center inline-block max-w-[35%] rounded-[20px]
                 break-words bg-white self-end min-w-[10%]"
       >
-        {content}
+        {message}
       </p>
       <p className="pr-[1%] text-[11px] self-end">{timeAMPM}</p>
     </div>

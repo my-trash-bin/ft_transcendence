@@ -93,7 +93,7 @@ const ProfileModal: React.FC<ModalProfileProps> = ({
   // }
   let modalContent = getModalContent({
     nickname: 'nickname',
-    profileImageUrl: 'https://avatars.githubusercontent.com/u/56240505?v=4',
+    profileImageUrl: '/avatar/avatar-black.svg',
     win: 10,
     lose: 10,
     ratio: 1,
