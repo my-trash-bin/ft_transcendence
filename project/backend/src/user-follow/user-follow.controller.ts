@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -31,9 +32,17 @@ export class UserFollowController {
   @Post('request')
   @ApiOperation({ summary: '유저의 친구 요청' })
   @ApiResponse({ status: HttpStatus.OK, description: '친구 추가 성공' })
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
   async followUser(@Request() req: ExpressRequest, @Body() dto: TargetUserDto) {
+    console.log('requset');
+    console.log(dto);
     const isBlock = false;
-    this.createOrUpdate(req, dto, isBlock);
+    const result = await this.createOrUpdate(req, dto, isBlock);
+    if (!result.ok) {
+      throw new BadRequestException(result!.error?.message);
+    }
+    return result!.data;
   }
 
   @Post('block')
@@ -47,6 +56,8 @@ export class UserFollowController {
   @Post('unfriend')
   @ApiOperation({ summary: '유저의 친구 해제 요청' })
   @ApiResponse({ status: HttpStatus.OK, description: '친구 해제 성공' })
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
   async unfollowUser(
     @Request() req: ExpressRequest,
     @Body() dto: TargetUserDto,
@@ -58,6 +69,8 @@ export class UserFollowController {
   @Post('unblock')
   @ApiOperation({ summary: '유저의 블락 해제 요청' })
   @ApiResponse({ status: HttpStatus.OK, description: '블락 해제 성공' })
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
   async unBlockUser(
     @Request() req: ExpressRequest,
     @Body() dto: TargetUserDto,
@@ -68,8 +81,6 @@ export class UserFollowController {
 
   @Get('')
   @ApiOperation({ summary: '유저의 친구/블락 리스트 조회' })
-  @UseGuards(JwtGuard, PhaseGuard)
-  @Phase('complete')
   @ApiUnauthorizedResponse({ description: '인증되지 않은 사용자의 요청' })
   // @ApiForbiddenResponse({ description: '인가되지 않은 사용자의 요청' })
   @ApiResponse({
@@ -78,7 +89,10 @@ export class UserFollowController {
     type: () => UserFollowDto,
     isArray: true,
   })
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
   async findRelationships(@Request() req: ExpressRequest) {
+    console.log('findRelationships', req.user);
     const userId = (req.user as JwtPayloadPhaseComplete).id;
     const result = await this.userFollowService.findByUsers(userId);
     return result.map((el) => new UserFollowDto(el));
@@ -91,8 +105,12 @@ export class UserFollowController {
     type: () => UserFollowDto,
     isArray: true,
   })
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
   async findFriends(@Request() req: ExpressRequest): Promise<UserFollowDto[]> {
+    console.log('findFriends', req.user);
     const userId = (req.user as JwtPayloadPhaseComplete).id;
+    console.log('findFriends2', userId);
     const isBlock = false;
     const result = await this.userFollowService.findByUsers(userId, isBlock);
     return result.map((el) => new UserFollowDto(el));
@@ -105,7 +123,10 @@ export class UserFollowController {
     type: () => UserFollowDto,
     isArray: true,
   })
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
   async findBlocks(@Request() req: ExpressRequest): Promise<UserFollowDto[]> {
+    console.log('findBlocks', req.user);
     const userId = (req.user as JwtPayloadPhaseComplete).id;
     const isBlock = true;
     const result = await this.userFollowService.findByUsers(userId, isBlock);
@@ -113,24 +134,27 @@ export class UserFollowController {
   }
 
   private async createOrUpdate(
-    @Request() req: ExpressRequest,
-    @Body() dto: TargetUserDto,
+    req: ExpressRequest,
+    dto: TargetUserDto,
     isBlock: boolean,
   ) {
+    console.log('createOrUpdate', req.user, dto);
     const userId = (req.user as JwtPayloadPhaseComplete).id;
     const targetUserId = dto.targetUser;
-    return await this.userFollowService.createOrUpdate(
+    const result = await this.userFollowService.createOrUpdate(
       idOf(userId.value),
       idOf(targetUserId),
       isBlock,
     );
+    return result;
   }
 
   private async delete(
-    @Request() req: ExpressRequest,
-    @Body() dto: TargetUserDto,
+    req: ExpressRequest,
+    dto: TargetUserDto,
     isBlock: boolean,
   ) {
+    console.log('createOrUpdate', req.user, dto);
     const userId = (req.user as JwtPayloadPhaseComplete).id;
     const targetUserId = dto.targetUser;
     return await this.userFollowService.remove(

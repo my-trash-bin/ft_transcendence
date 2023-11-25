@@ -62,8 +62,28 @@ export class UsersController {
     type: () => UserDto,
     isArray: true,
   })
-  findAll() {
-    return this.usersService.findAll();
+  async findAll() {
+    return await this.usersService.findAll();
+  }
+
+  @Get('search')
+  @ApiOperation({ summary: '닉네임 기반 유저 검색' })
+  @ApiOkResponse({
+    description: '일치하는 유저 객체리스트 반환.',
+    type: () => UserDto,
+    isArray: true,
+  })
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
+  async searchByNickname(
+    @Request() req: ExpressRequest,
+    @Query('q') nickname?: string,
+  ) {
+    console.log('complete', nickname, req.user);
+    // const userId = (req.user as JwtPayloadPhaseComplete).id;
+    return await (!nickname
+      ? this.usersService.findAll()
+      : this.usersService.searchByBickname(nickname));
   }
 
   @Get(':id')
