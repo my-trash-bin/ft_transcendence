@@ -1,6 +1,4 @@
 import Link from 'next/link';
-import { useContext } from 'react';
-import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { Button } from '../common/Button';
 import { FriendSetting } from './FriendSetting';
 import { CommonCard } from './utils/CommonCard';
@@ -8,14 +6,16 @@ import { CommonCard } from './utils/CommonCard';
 interface FriendCardProps {
   readonly nickname: string;
   readonly imageURL?: string;
+  readonly id: string;
 }
 
 export function FriendCard(props: FriendCardProps) {
-  const { api } = useContext(ApiContext);
-  const { nickname } = props;
-
   return (
-    <CommonCard imageURL={props.imageURL} nickname={props.nickname}>
+    <CommonCard
+      imageURL={props.imageURL}
+      nickname={props.nickname}
+      id={props.id}
+    >
       <Button onClick={() => alert('call game start api')}>게임하기</Button>
       <Link
         href={'/dm'}

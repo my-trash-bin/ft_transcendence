@@ -42,6 +42,7 @@ export function SearchCardList() {
                 key={val.nickname}
                 imageURL={val.profileImageUrl}
                 nickname={val.nickname}
+                id={val.id}
               />
             ))
           ) : (

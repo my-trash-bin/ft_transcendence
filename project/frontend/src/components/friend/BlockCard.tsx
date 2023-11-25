@@ -6,6 +6,7 @@ import { CommonCard } from './utils/CommonCard';
 interface BlockCardProps {
   readonly nickname: string;
   readonly imageURL?: string;
+  readonly id: string;
 }
 
 export function BlockCard(props: BlockCardProps) {
@@ -13,17 +14,20 @@ export function BlockCard(props: BlockCardProps) {
 
   const unblockUser = useCallback(async () => {
     try {
-      const requestData: TargetUserDto = { targetUser: props.nickname };
-      alert('call unblock api');
+      const requestData: TargetUserDto = { targetUser: props.id };
       await api.userFollowControllerUnBlockUser(requestData);
       console.log('UnBlock sent successfully');
     } catch (error) {
       console.error('Error sending unblock:', error);
     }
-  }, [api, props.nickname]);
+  }, [api, props.id]);
 
   return (
-    <CommonCard imageURL={props.imageURL} nickname={props.nickname}>
+    <CommonCard
+      imageURL={props.imageURL}
+      nickname={props.nickname}
+      id={props.id}
+    >
       <button
         onClick={unblockUser}
         className={

@@ -7,6 +7,7 @@ import { CommonCard } from './utils/CommonCard';
 interface SearchCardProps {
   readonly nickname: string;
   readonly imageURL?: string;
+  readonly id: string;
 }
 
 export function SearchCard(props: SearchCardProps) {
@@ -14,16 +15,20 @@ export function SearchCard(props: SearchCardProps) {
 
   const requestFriend = useCallback(async () => {
     try {
-      const requestData: TargetUserDto = { targetUser: props.nickname };
+      const requestData: TargetUserDto = { targetUser: props.id };
       await api.userFollowControllerFollowUser(requestData);
       console.log('friend request sent successfully');
     } catch (error) {
       console.error('Error sending friend request:', error);
     }
-  }, [api, props.nickname]);
+  }, [api, props.id]);
 
   return (
-    <CommonCard imageURL={props.imageURL} nickname={props.nickname}>
+    <CommonCard
+      imageURL={props.imageURL}
+      nickname={props.nickname}
+      id={props.id}
+    >
       <Button onClick={requestFriend}>친구 하기</Button>
     </CommonCard>
   );

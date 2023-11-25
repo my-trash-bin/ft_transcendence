@@ -6,9 +6,15 @@ interface CommonCardProps {
   readonly children: ReactNode;
   readonly imageURL?: string;
   readonly nickname: string;
+  readonly id: string;
 }
 
-export function CommonCard({ children, imageURL, nickname }: CommonCardProps) {
+export function CommonCard({
+  children,
+  imageURL,
+  nickname,
+  id,
+}: CommonCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleModalClose = () => {
@@ -31,7 +37,7 @@ export function CommonCard({ children, imageURL, nickname }: CommonCardProps) {
       <ProfileModal
         isOpen={isModalOpen}
         onClose={handleModalClose}
-        nickname={nickname}
+        targetId={id}
       />
     </div>
   );

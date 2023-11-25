@@ -23,6 +23,7 @@ export function BlockCardList() {
             key={val.followee.id}
             imageURL={val.followee.profileImageUrl}
             nickname={val.followee.nickname}
+            id={val.followee.id}
           />
         ))
       ) : (
