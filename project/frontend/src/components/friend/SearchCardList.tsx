@@ -1,38 +1,29 @@
-import { UserDto } from '@/api/api';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useState } from 'react';
+import { useQuery } from 'react-query';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { MessageSearchInput } from '../dm/message-search/MessageSearchInput';
 import { SearchCard } from './SearchCard';
 
 export function SearchCardList() {
-  const [searchedData, setSearchedData] = useState<UserDto[]>([]);
-  const [searchName, setSearchName] = useState('');
   const { api } = useContext(ApiContext);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [searchName, setSearchName] = useState('');
 
+  const { isLoading, isError, data, refetch } = useQuery(
+    [],
+    useCallback(
+      async () =>
+        (
+          await api.usersControllerSearchByNickname({
+            q: searchName,
+          })
+        ).data,
+      [api, searchName],
+    ),
+  );
   const userSearchCallback = (searchUsername: string) => {
     setSearchName(searchUsername);
-    fetchFriends();
+    refetch();
   };
-
-  const fetchFriends = useCallback(async () => {
-    try {
-      setLoading(true);
-      const result = await api.usersControllerSearchByNickname({
-        q: searchName,
-      });
-      setSearchedData(result.data);
-    } catch (error) {
-      console.error('Error fetching profile data:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [api, searchName]);
-
-  useEffect(() => {
-    fetchFriends();
-  }, [fetchFriends]);
-
   return (
     <div className="felx flex-col justify-center items-center">
       <div className="w-[700px] h-[600px] flex flex-col items-center">
@@ -43,15 +34,19 @@ export function SearchCardList() {
           eventFunction={userSearchCallback}
         />
         <div className="w-[700px] h-[580px] grid gap-lg justify-center items-start overflow-y-scroll pt-xl place-content-start">
-          {searchedData.map((val) => {
-            return (
+          {isLoading || !data ? (
+            <p>Loading...</p>
+          ) : data.length > 0 ? (
+            data.map((val) => (
               <SearchCard
                 key={val.nickname}
                 imageURL={val.profileImageUrl}
                 nickname={val.nickname}
               />
-            );
-          })}
+            ))
+          ) : (
+            <div>No elements</div>
+          )}
         </div>
       </div>
     </div>
