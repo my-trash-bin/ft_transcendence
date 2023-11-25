@@ -55,6 +55,35 @@ export class UsersController {
     private readonly pongSeasonLogService: PongSeasonLogService,
   ) {}
 
+  @Get('me')
+  @ApiOperation({ summary: '내 정보' })
+  @ApiOkResponse({
+    type: () => UserProfileDto,
+  })
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
+  async myProfile(@Request() req: ExpressRequest) {
+    const userId = (req.user as JwtPayloadPhaseComplete).id;
+    const me = (await this.usersService.findOne(userId))!; // 본인, 타인 통합인듯
+    const relation = await this.getRelation(userId.value, userId.value);
+
+    const seasonLog = await this.pongSeasonLogService.findOne(userId);
+    const record = {
+      win: seasonLog.win,
+      lose: seasonLog.lose,
+      ratio: seasonLog.winRate,
+    };
+
+    return new UserProfileDto({
+      id: userId,
+      imageUrl: me.profileImageUrl,
+      nickname: me.nickname,
+      record: new RecordDto(record),
+      relation,
+      statusMessage: 'User 모델에 필드 추가해야함',
+    });
+  }
+
   @Get()
   @ApiOperation({ summary: '모든 유저 조회' })
   @ApiOkResponse({
@@ -86,6 +115,48 @@ export class UsersController {
     return await (!nickname
       ? this.findAll()
       : this.usersService.searchByBickname(nickname));
+  }
+
+  @Get('profile')
+  @ApiOperation({ summary: '프로필 데이터를 위한 유저 조회' })
+  @ApiOkResponse({
+    description: '유저 1명의 프로필을 위한 데이터 반환',
+    type: () => UserProfileDto,
+  })
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
+  @ApiBadRequestResponse({ description: '유효하지 않은 ID' })
+  @ApiUnauthorizedResponse({ description: '인증되지 않은 유저로부터의 요청.' })
+  async getUserInfo(
+    @Query('targetUser') targetUserId: string,
+    @Request() req: ExpressRequest,
+  ): Promise<UserProfileDto> {
+    const userId = (req.user as JwtPayloadPhaseComplete).id;
+
+    const targetUser = await this.usersService.findOne(idOf(targetUserId)); // 본인, 타인 통합인듯
+
+    if (targetUser === null) {
+      throw new NotFoundException('Invalid Id. (targetUser)');
+    }
+    const relation = await this.getRelation(userId.value, targetUserId);
+
+    const seasonLog = await this.pongSeasonLogService.findOne(
+      idOf(targetUserId),
+    );
+    const record = {
+      win: seasonLog.win,
+      lose: seasonLog.lose,
+      ratio: seasonLog.winRate,
+    };
+
+    return new UserProfileDto({
+      id: idOf(targetUserId),
+      imageUrl: targetUser.profileImageUrl,
+      nickname: targetUser.nickname,
+      record: new RecordDto(record),
+      relation,
+      statusMessage: 'User 모델에 필드 추가해야함',
+    });
   }
 
   @Get(':id')
@@ -152,46 +223,6 @@ export class UsersController {
     return { isUnique };
   }
 
-  @Get('profile')
-  @ApiOperation({ summary: '프로필 데이터를 위한 유저 조회' })
-  @ApiOkResponse({
-    description: '유저 1명의 프로필을 위한 데이터 반환',
-    type: () => UserProfileDto,
-  })
-  @UseGuards(JwtGuard, PhaseGuard)
-  @Phase('complete')
-  @ApiBadRequestResponse({ description: '유효하지 않은 ID' })
-  @ApiUnauthorizedResponse({ description: '인증되지 않은 유저로부터의 요청.' })
-  async getUserInfo(
-    @Query('targetUser') targetUserId: string,
-    @Request() req: ExpressRequest,
-  ): Promise<UserProfileDto> {
-    const userId = (req.user as JwtPayloadPhaseComplete).id;
-
-    const targetUser = await this.usersService.findOne(idOf(targetUserId)); // 본인, 타인 통합인듯
-
-    if (targetUser === null) {
-      throw new NotFoundException('Invalid Id. (targetUser)');
-    }
-    const relation = await this.getRelation(userId.value, targetUserId);
-
-    const seasonLog = await this.pongSeasonLogService.findOne(
-      idOf(targetUserId),
-    );
-    const record = {
-      win: seasonLog.win,
-      lose: seasonLog.lose,
-      ratio: seasonLog.winRate,
-    };
-
-    return new UserProfileDto({
-      imageUrl: targetUser.profileImageUrl,
-      nickname: targetUser.nickname,
-      record: new RecordDto(record),
-      relation,
-      statusMessage: 'User 모델에 필드 추가해야함',
-    });
-  }
   private async getRelation(
     followerId: string,
     follweeId: string,
