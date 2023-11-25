@@ -14,8 +14,9 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChangeActionType, ChannelService } from '../channel/channel.service';
-import { idOf } from '../common/Id';
+import { idOf, UserId } from '../common/Id';
 import { DmService } from '../dm/dm.service';
+import { UserFollowService } from '../user-follow/user-follow.service';
 import { UserDto } from '../users/dto/user.dto';
 import { UsersService } from '../users/users.service';
 
@@ -33,6 +34,8 @@ enum ChannelType {
   DM = 'dm',
 }
 
+type ChannelTypeKey = string;
+type ChannelIdKey = string;
 type UserIdKey = string;
 type ClientIdKey = string;
 
@@ -46,10 +49,13 @@ export class EventsGateway
   @WebSocketServer()
   server!: Server;
 
-  private channels!: Record<string, Record<string, string[]>>;
+  // private channels!: Record<string, Record<string, string[]>>;
+  private channels!: Record<
+    ChannelTypeKey,
+    Record<ChannelIdKey, Set<UserIdKey>>
+  >;
   private socketMap = new Map<UserIdKey, Socket[]>();
   private userMap = new Map<ClientIdKey, UserIdKey>();
-  private userId = 1;
 
   constructor(
     private jwtService: JwtService,
@@ -57,6 +63,7 @@ export class EventsGateway
     private usersService: UsersService,
     private dmService: DmService,
     private channelService: ChannelService,
+    private userFollowService: UserFollowService,
   ) {}
 
   afterInit(server: Server) {
@@ -71,6 +78,7 @@ export class EventsGateway
     try {
       const decoded = this.isValidJwtAndPhase(client);
       const userId = decoded.id.value;
+
       this.addClient(client, userId);
       const { dmChannels, channels } = await this.addUserJoinedChannels(
         client,
@@ -115,6 +123,23 @@ export class EventsGateway
     if (!result.ok) {
       throw new WsException(result.error!.message);
     }
+
+    const blockList = await this.userFollowService.findByUsers(
+      idOf(this.userMap.get(id)!),
+      true,
+    );
+
+    Array.from(this.channels[type][channelId])
+      .filter(
+        (userId) =>
+          blockList.findIndex(({ followee }) => followee.id === userId) !== -1,
+      )
+      .forEach((userId) => {
+        this.socketMap
+          .get(userId)!
+          .forEach((client) => client.emit('message', result));
+      });
+
     this.server.to(type + channelId).emit('message', result);
   }
 
@@ -138,35 +163,69 @@ export class EventsGateway
       throw new WsException(result.error!.message);
     }
 
-    this.server.to(type + result.data!.channelId).emit('message', result);
+    const userFollow = await this.userFollowService.findOne(
+      idOf(memberId),
+      idOf(this.userMap.get(id)!),
+    );
+
+    if (!userFollow?.isBlock) {
+      this.channels[type][result.data!.channelId].forEach((userId) => {
+        this.socketMap
+          .get(userId)
+          ?.forEach((client) => client.emit('message', result));
+      });
+    } else {
+      client.emit('message', result);
+    }
   }
 
   // no dmChannel, 방금 생성된 채널에 오너만 소켓통신 위해 추가 처리하는 코드, 일반 채널 생성은 유효성 검사를 위해 API에서만....
-  @SubscribeMessage('createChannel')
-  async handleCreateChannel(
-    @ConnectedSocket() client: Socket,
-    @MessageBody()
-    data: { channelId: string },
-  ) {
-    const { id } = client;
-    const { channelId } = data;
-    const type = ChannelType.NORMAL;
+  // @SubscribeMessage('createChannel')
+  // async handleCreateChannel(
+  //   @ConnectedSocket() client: Socket,
+  //   @MessageBody()
+  //   data: { channelId: string },
+  // ) {
+  //   const { id } = client;
+  //   const { channelId } = data;
+  //   const type = ChannelType.NORMAL;
 
-    const channel = await this.channelService.findOne(idOf(channelId));
-    if (channel === null) {
-      throw new WsException(`유효하지않은 channelId: ${channelId}`);
+  //   const channel = await this.channelService.findOne(idOf(channelId));
+  //   if (channel === null) {
+  //     throw new WsException(`유효하지않은 channelId: ${channelId}`);
+  //   }
+  //   const userId = this.userMap.get(id);
+  //   if (channel.ownerId === null || channel.ownerId !== userId) {
+  //     throw new WsException(`채널 생성 시, 소유자를 위한 메서드입니다.`);
+  //   }
+
+  //   client.join(type + channelId);
+  //   this.channels[type][channelId].push(id);
+
+  //   this.server
+  //     .to(type + channelId)
+  //     .emit('newUser', `New user ${id} joined in ${channelId}`);
+  // }
+
+  // API 호출에 의해 생성 시, 집어 넣기
+  handleNewChannel(type: string, channelId: string, id: UserId) {
+    const userId = id.value;
+    const isValidType = (
+      [ChannelType.DM, ChannelType.NORMAL] as string[]
+    ).includes(type);
+    if (!isValidType) {
+      console.error(`handleNewChannel 시, 유효하지 않음 채널타입: ${type}`);
     }
-    const userId = this.userMap.get(id);
-    if (channel.ownerId === null || channel.ownerId !== userId) {
-      throw new WsException(`채널 생성 시, 소유자를 위한 메서드입니다.`);
+
+    const clients = this.socketMap.get(userId);
+    if (clients?.length) {
+      // 접속중인 클라이언트가 있을때, 새롭게 생긴 room에 join시켜주는것.
+      clients.forEach((client) => {
+        client.join(type + channelId);
+        this.clientJoinChannel(type, channelId, userId);
+        client.emit('events', `채널 넣어드림: ${channelId}`);
+      });
     }
-
-    client.join(type + channelId);
-    this.channels[type][channelId].push(id);
-
-    this.server
-      .to(type + channelId)
-      .emit('newUser', `New user ${id} joined in ${channelId}`);
   }
 
   // only dmChannel
@@ -231,9 +290,23 @@ export class EventsGateway
     }
 
     client.join(type + channelId);
-    this.channels[type][channelId].push(id);
+    this.clientJoinChannel(type, channelId, this.userMap.get(id)!);
 
     this.server.to(type + channelId).emit('newUser', { data: result.data! });
+    this.channels[type][channelId];
+  }
+
+  private clientJoinChannel(type: string, channelId: string, userId: string) {
+    if (!(channelId in this.channels[type])) {
+      this.channels[type][channelId] = new Set();
+    }
+    this.channels[type][channelId].add(userId);
+  }
+
+  private clientLeaveChannel(type: string, channelId: string, userId: string) {
+    if (channelId in this.channels[type]) {
+      this.channels[type][channelId].delete(userId);
+    }
   }
 
   // no dmChannel
@@ -384,37 +457,31 @@ export class EventsGateway
     return { dmChannels, channels };
   }
   private removeUserFromAllChannels(id: string) {
-    Object.entries(this.channels).forEach(([_channelType, chennels]) => {
-      this.removeUserFromChannels(chennels, id);
+    Object.entries(this.channels).forEach(([_channelType, _chennels]) => {
+      this.removeUserFromChannels(_channelType, id);
     });
   }
-  private removeUserFromChannels(
-    channels: Record<string, string[]>,
-    id: string,
-  ) {
-    Object.entries(channels).forEach(([_channelId, channel]) =>
-      this.removeUserFromChannel(channel, id),
+  private removeUserFromChannels(channelType: string, id: string) {
+    Object.entries(this.channels[channelType]).forEach(
+      ([_channelId, channel]) => this.removeUserFromChannel(channel, id),
     );
   }
-  private removeUserFromChannel(channel: string[], id: string) {
-    const index = channel.indexOf(id);
-    if (index !== -1) {
-      channel.splice(index, 1);
-    }
+  private removeUserFromChannel(channel: Set<string>, id: string) {
+    channel.delete(id);
   }
-  private isUserInChannel(type: string, channelId: string, clientId: string) {
-    if (!(type in this.channels)) {
-      throw new WsException(`유효하지 않은 type: ${type}`);
-    }
+  // private isUserInChannel(type: string, channelId: string, clientId: string) {
+  //   if (!(type in this.channels)) {
+  //     throw new WsException(`유효하지 않은 type: ${type}`);
+  //   }
 
-    const channels = this.channels[type];
+  //   const channels = this.channels[type];
 
-    if (!(channelId in channels)) {
-      throw new WsException(`유효하지 않은 channelId: ${channelId}`);
-    }
+  //   if (!(channelId in channels)) {
+  //     throw new WsException(`유효하지 않은 channelId: ${channelId}`);
+  //   }
 
-    const channel = channels[channelId];
+  //   const channel = channels[channelId];
 
-    return channel.includes(clientId);
-  }
+  //   return channel.includes(clientId);
+  // }
 }

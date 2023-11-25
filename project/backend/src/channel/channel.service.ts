@@ -67,7 +67,7 @@ export class ChannelService {
 
   async findByUser(id: UserId) {
     const prismaChannelRelations = await this.prisma.channelMember.findMany({
-      where: { channelId: id.value },
+      where: { memberId: id.value },
       select: {
         memberType: true,
         mutedUntil: true,
@@ -80,17 +80,33 @@ export class ChannelService {
   async create(
     id: UserId,
     { type, title, password, capacity }: CreateChannelDto,
-  ) {
-    const prismaChannel = await this.prisma.channel.create({
-      data: {
-        title,
-        isPublic: type === ChannelType.Public,
-        password,
-        maximumMemberCount: capacity,
-        ownerId: id.value,
-      },
-    });
-    return new ChannelDto(prismaChannel);
+  ): Promise<ServiceResponse<ChannelDto>> {
+    try {
+      const prismaChannel = await this.prisma.channel.create({
+        data: {
+          title,
+          isPublic: type === ChannelType.Public,
+          password,
+          maximumMemberCount: capacity,
+          ownerId: id.value,
+          memberCount: 1,
+          members: {
+            create: [
+              {
+                memberId: id.value,
+                memberType: ChannelMemberType.ADMINISTRATOR,
+              },
+            ],
+          },
+        },
+      });
+      return newServiceOkResponse(new ChannelDto(prismaChannel));
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        return newServiceFailPrismaKnownResponse(error.code, 400);
+      }
+      return newServiceFailPrismaUnKnownResponse(500);
+    }
   }
 
   // ChannelMember

@@ -13,7 +13,7 @@ export class CreateChannelDto {
   @Length(6, 20)
   title!: string;
 
-  @ApiPropertyOptional({ description: '채널 암호', format: 'email' })
+  @ApiPropertyOptional({ description: '채널 암호', type: String })
   @IsString()
   @Length(6, 12)
   password?: string | null;
