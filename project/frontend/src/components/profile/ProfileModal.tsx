@@ -113,22 +113,18 @@ const ProfileModal: React.FC<ModalProfileProps> = ({
             </div>
             <div className="flex flex-col pt-xl gap-md">
               <div className="flex flex-row gap-3xl justify-center">
-                <Button
-                  onClick={{} as () => void}
-                  isModal={true}
-                  disabled={true}
-                >
+                <Button onClick={requestFriend} isModal={true} disabled={true}>
                   친구추가
                 </Button>
-                <Button onClick={{} as () => void} isModal={true}>
+                <Button onClick={() => alert('game api')} isModal={true}>
                   게임하기
                 </Button>
               </div>
               <div className="flex flex-row gap-3xl justify-center">
-                <Button onClick={{} as () => void} isModal={true}>
+                <Button onClick={blockUser} isModal={true}>
                   차단하기
                 </Button>
-                <Button onClick={{} as () => void} isModal={true}>
+                <Button onClick={() => alert('move to dm')} isModal={true}>
                   DM
                 </Button>
               </div>
