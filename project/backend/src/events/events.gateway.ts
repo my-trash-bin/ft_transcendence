@@ -14,7 +14,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChangeActionType, ChannelService } from '../channel/channel.service';
-import { idOf } from '../common/Id';
+import { idOf, UserId } from '../common/Id';
 import { DmService } from '../dm/dm.service';
 import { UserDto } from '../users/dto/user.dto';
 import { UsersService } from '../users/users.service';
@@ -142,31 +142,51 @@ export class EventsGateway
   }
 
   // no dmChannel, 방금 생성된 채널에 오너만 소켓통신 위해 추가 처리하는 코드, 일반 채널 생성은 유효성 검사를 위해 API에서만....
-  @SubscribeMessage('createChannel')
-  async handleCreateChannel(
-    @ConnectedSocket() client: Socket,
-    @MessageBody()
-    data: { channelId: string },
-  ) {
-    const { id } = client;
-    const { channelId } = data;
-    const type = ChannelType.NORMAL;
+  // @SubscribeMessage('createChannel')
+  // async handleCreateChannel(
+  //   @ConnectedSocket() client: Socket,
+  //   @MessageBody()
+  //   data: { channelId: string },
+  // ) {
+  //   const { id } = client;
+  //   const { channelId } = data;
+  //   const type = ChannelType.NORMAL;
 
-    const channel = await this.channelService.findOne(idOf(channelId));
-    if (channel === null) {
-      throw new WsException(`유효하지않은 channelId: ${channelId}`);
+  //   const channel = await this.channelService.findOne(idOf(channelId));
+  //   if (channel === null) {
+  //     throw new WsException(`유효하지않은 channelId: ${channelId}`);
+  //   }
+  //   const userId = this.userMap.get(id);
+  //   if (channel.ownerId === null || channel.ownerId !== userId) {
+  //     throw new WsException(`채널 생성 시, 소유자를 위한 메서드입니다.`);
+  //   }
+
+  //   client.join(type + channelId);
+  //   this.channels[type][channelId].push(id);
+
+  //   this.server
+  //     .to(type + channelId)
+  //     .emit('newUser', `New user ${id} joined in ${channelId}`);
+  // }
+
+  // API 호출에 의해 생성 시, 집어 넣기
+  handleNewChannel(type: string, channelId: string, id: UserId) {
+    const userId = id.value;
+    const isValidType = (
+      [ChannelType.DM, ChannelType.NORMAL] as string[]
+    ).includes(type);
+    if (!isValidType) {
+      console.error(`handleNewChannel 시, 유효하지 않음 채널타입: ${type}`);
     }
-    const userId = this.userMap.get(id);
-    if (channel.ownerId === null || channel.ownerId !== userId) {
-      throw new WsException(`채널 생성 시, 소유자를 위한 메서드입니다.`);
+
+    const clients = this.socketMap.get(userId);
+    if (clients?.length) {
+      // 접속중인 클라이언트가 있을때, 새롭게 생긴 room에 join시켜주는것.
+      clients.forEach((client) => {
+        client.join(type + channelId);
+        client.emit('events', `채널 넣어드림: ${channelId}`);
+      });
     }
-
-    client.join(type + channelId);
-    this.channels[type][channelId].push(id);
-
-    this.server
-      .to(type + channelId)
-      .emit('newUser', `New user ${id} joined in ${channelId}`);
   }
 
   // only dmChannel

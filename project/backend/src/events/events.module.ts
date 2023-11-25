@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { BaseModule } from '../base/base.module';
 import { ChannelModule } from '../channel/channel.module';
 import { ChannelService } from '../channel/channel.service';
@@ -9,7 +9,7 @@ import { UsersService } from '../users/users.service';
 import { EventsGateway } from './events.gateway';
 
 @Module({
-  imports: [UsersModule, ChannelModule, DmModule, BaseModule],
+  imports: [UsersModule, forwardRef(() => ChannelModule), DmModule, BaseModule],
   providers: [UsersService, ChannelService, DmService, EventsGateway],
   exports: [EventsGateway],
 })
