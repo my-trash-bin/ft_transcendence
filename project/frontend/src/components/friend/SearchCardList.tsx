@@ -46,7 +46,7 @@ export function SearchCardList({ activeScreen }: { activeScreen: string }) {
             data.map((val) => (
               <SearchCard
                 key={val.nickname}
-                imageURL={val.profileImageUrl}
+                imageUrl={val.profileImageUrl}
                 nickname={val.nickname}
                 id={val.id}
                 refetch={refetch}
