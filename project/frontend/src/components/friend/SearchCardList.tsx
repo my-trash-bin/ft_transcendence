@@ -2,7 +2,7 @@ import { UserDto } from '@/api/api';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { MessageSearchInput } from '../dm/message-search/MessageSearchInput';
-import SearchCard from './SearchCard';
+import { SearchCard } from './SearchCard';
 
 export function SearchCardList() {
   const [searchedData, setSearchedData] = useState<UserDto[]>([]);
