@@ -48,9 +48,9 @@ function ProfileBox() {
             )}{' '}
             <TextBox
               nickname={data.nickname}
-              win={10}
-              lose={10}
-              ratio={50}
+              win={data.record.win}
+              lose={data.record.win}
+              ratio={data.record.win}
               statusMessage={data.statusMessage}
             />
             <button onClick={handleButtonClick} className={buttonClass}>
