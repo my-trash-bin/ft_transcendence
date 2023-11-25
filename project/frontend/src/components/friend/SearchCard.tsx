@@ -5,7 +5,7 @@ import { CommonCard } from './utils/CommonCard';
 
 interface SearchCardProps {
   readonly nickname: string;
-  readonly imageURL: string;
+  readonly imageURL?: string;
 }
 
 function SearchCard(props: SearchCardProps) {
