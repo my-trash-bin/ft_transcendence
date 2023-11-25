@@ -48,6 +48,8 @@ export class UserFollowController {
   @Post('block')
   @ApiOperation({ summary: '유저의 블락 요청' })
   @ApiResponse({ status: HttpStatus.OK, description: '블락 추가 성공' })
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
   async blockUser(@Request() req: ExpressRequest, @Body() dto: TargetUserDto) {
     const isBlock = true;
     this.createOrUpdate(req, dto, isBlock);

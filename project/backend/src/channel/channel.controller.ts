@@ -34,6 +34,8 @@ export class ChannelController {
     type: () => ChannelDto,
     isArray: true,
   })
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
   async findAll() {
     return await this.channelService.findAll();
   }
@@ -45,6 +47,8 @@ export class ChannelController {
     type: () => ChannelRelationDto,
     isArray: true,
   })
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
   async findMyChannels(@Request() req: ExpressRequest) {
     const userId = (req.user as JwtPayloadPhaseComplete).id;
     return await this.channelService.findByUser(userId);

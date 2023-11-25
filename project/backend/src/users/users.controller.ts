@@ -62,6 +62,8 @@ export class UsersController {
     type: () => UserDto,
     isArray: true,
   })
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
   async findAll() {
     return await this.usersService.findAll();
   }
@@ -82,7 +84,7 @@ export class UsersController {
     console.log('complete', nickname, req.user);
     // const userId = (req.user as JwtPayloadPhaseComplete).id;
     return await (!nickname
-      ? this.usersService.findAll()
+      ? this.findAll()
       : this.usersService.searchByBickname(nickname));
   }
 
@@ -90,6 +92,8 @@ export class UsersController {
   @ApiOperation({ summary: '유저 1명 기본 조회' })
   @ApiOkResponse({ description: '유저 객체 하나 반환', type: () => UserDto })
   @ApiBadRequestResponse({ description: '올바르지 않은 id' })
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
   findOne(@Param('id') id: string) {
     const result = this.usersService.findOne(idOf(id));
     if (result === null) {
@@ -108,6 +112,8 @@ export class UsersController {
   })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
   @ApiConflictResponse({ description: 'Conflict.' })
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
@@ -121,13 +127,11 @@ export class UsersController {
   @ApiBadRequestResponse({ description: '관계키 오류' })
   @ApiConflictResponse({ description: '닉네임 유니크 조건 오류' })
   @ApiInternalServerErrorResponse({ description: '알수 없는 내부 에러' })
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return await this.usersService.update(idOf(id), updateUserDto);
   }
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.usersService.remove(+id);
-  // }
 
   @Post('unique-check')
   @ApiOperation({ summary: '닉네임 유니크 여부 체크' })
@@ -137,6 +141,8 @@ export class UsersController {
   })
   @ApiUnauthorizedResponse({ description: '인증되지 않은 유저로부터의 요청.' })
   // @ApiResponse({ status: 409, description: 'Nickname already exists.' })
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
   async checkNickname(
     @Body() dto: NicknameCheckUserDto,
   ): Promise<UniqueCheckResponse> {

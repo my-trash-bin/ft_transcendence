@@ -1,10 +1,12 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+import { JwtGuard } from '../auth/jwt.guard';
+import { Phase, PhaseGuard } from '../auth/phase.guard';
 import { idOf } from '../common/Id';
 import { PongSeasonLogDto } from './dto/pong-season-log.dto';
 import { PongSeasonLogService } from './pong-season-log.service';
@@ -31,6 +33,8 @@ export class PongSeasonLogController {
     type: () => PongSeasonLogDto,
   })
   @ApiBadRequestResponse({ description: '올바르지 않은 id' })
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
   findOne(@Param('id') id: string): Promise<PongSeasonLogDto> {
     return this.pongSeasonLogService.findOne(idOf(id));
   }
