@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { UserId } from '../../common/Id';
 
 // export enum EnumRelation {
 //   'friend',
@@ -42,6 +43,7 @@ export class RecordDto {
 }
 
 interface UserProfileDtoInput {
+  id: UserId;
   imageUrl: string | null;
   nickname: string;
   record: RecordDto;
@@ -50,26 +52,30 @@ interface UserProfileDtoInput {
 }
 
 export class UserProfileDto {
+  @ApiProperty({ description: '아이디', type: String })
+  id: string;
+
   @ApiProperty({ description: '닉네임', type: String })
-  nickname!: string;
+  nickname: string;
 
   @ApiProperty({
     description: '프로필 이미지 URL',
     required: false,
     type: String,
   })
-  imageUrl!: string | null;
+  imageUrl: string | null;
 
   @ApiProperty({ description: '전적', type: () => RecordDto })
-  record!: RecordDto;
+  record: RecordDto;
 
   @ApiProperty({ description: '상태메시지', type: String })
-  statusMessage!: string;
+  statusMessage: string;
 
   @ApiProperty({ description: '관계', enum: RelationStatus })
-  relation!: RelationStatus;
+  relation: RelationStatus;
 
   constructor(input: UserProfileDtoInput) {
+    this.id = input.id.value;
     this.nickname = input.nickname;
     this.imageUrl = input.imageUrl;
     this.record = input.record;

@@ -55,6 +55,35 @@ export class UsersController {
     private readonly pongSeasonLogService: PongSeasonLogService,
   ) {}
 
+  @Get('me')
+  @ApiOperation({ summary: '내 정보' })
+  @ApiOkResponse({
+    type: () => UserProfileDto,
+  })
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
+  async myProfile(@Request() req: ExpressRequest) {
+    const userId = (req.user as JwtPayloadPhaseComplete).id;
+    const me = (await this.usersService.findOne(userId))!; // 본인, 타인 통합인듯
+    const relation = await this.getRelation(userId.value, userId.value);
+
+    const seasonLog = await this.pongSeasonLogService.findOne(userId);
+    const record = {
+      win: seasonLog.win,
+      lose: seasonLog.lose,
+      ratio: seasonLog.winRate,
+    };
+
+    return new UserProfileDto({
+      id: userId,
+      imageUrl: me.profileImageUrl,
+      nickname: me.nickname,
+      record: new RecordDto(record),
+      relation,
+      statusMessage: 'User 모델에 필드 추가해야함',
+    });
+  }
+
   @Get()
   @ApiOperation({ summary: '모든 유저 조회' })
   @ApiOkResponse({
@@ -121,6 +150,7 @@ export class UsersController {
     };
 
     return new UserProfileDto({
+      id: idOf(targetUserId),
       imageUrl: targetUser.profileImageUrl,
       nickname: targetUser.nickname,
       record: new RecordDto(record),
