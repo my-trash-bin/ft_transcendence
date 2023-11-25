@@ -80,7 +80,7 @@ export class UsersController {
       nickname: me.nickname,
       record: new RecordDto(record),
       relation,
-      statusMessage: 'User 모델에 필드 추가해야함',
+      statusMessage: me.statusMessage,
     });
   }
 
@@ -155,7 +155,7 @@ export class UsersController {
       nickname: targetUser.nickname,
       record: new RecordDto(record),
       relation,
-      statusMessage: 'User 모델에 필드 추가해야함',
+      statusMessage: targetUser.statusMessage,
     });
   }
 
