@@ -11,9 +11,6 @@ interface CommonCardProps {
 export function CommonCard({ children, imageURL, nickname }: CommonCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleButtonClick = () => {
-    setIsModalOpen(true);
-  };
   const handleModalClose = () => {
     setIsModalOpen(false);
   };
