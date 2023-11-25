@@ -8,7 +8,7 @@ export function SearchCardList({ activeScreen }: { activeScreen: string }) {
   const { api } = useContext(ApiContext);
   const [searchName, setSearchName] = useState('');
   const { isLoading, isError, data, refetch } = useQuery(
-    ['searchList'],
+    ['searchList', searchName],
     useCallback(
       async () =>
         (
@@ -19,14 +19,16 @@ export function SearchCardList({ activeScreen }: { activeScreen: string }) {
       [api, searchName],
     ),
   );
-  const userSearchCallback = (searchUsername: string) => {
-    setSearchName(searchUsername);
-  };
+
   useEffect(() => {
     if (activeScreen === 'search') {
       refetch();
     }
   }, [activeScreen, refetch]);
+
+  const userSearchCallback = (searchUsername: string) => {
+    setSearchName(searchUsername);
+  };
 
   return (
     <div className="felx flex-col justify-center items-center">
