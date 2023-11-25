@@ -1,6 +1,12 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { PrismaService } from '../base/prisma.service';
 import { UserId } from '../common/Id';
+import {
+  newServiceFailPrismaKnownResponse,
+  newServiceFailPrismaUnKnownResponse,
+  newServiceOkResponse,
+} from '../common/ServiceResponse';
 import { userSelect } from '../users/dto/user.dto';
 
 @Injectable()
@@ -12,30 +18,39 @@ export class UserFollowService {
     followeeId: UserId,
     isBlock: boolean,
   ) {
-    const prismaResult = await this.prismaService.userFollow.upsert({
-      where: {
-        followerId_followeeId: {
-          followerId: followerId.value,
-          followeeId: followeeId.value,
-        },
-      },
-      create: {
-        followerId: followerId.value,
-        followeeId: followeeId.value,
-        isBlock,
-      },
-      update: {
-        isBlock,
-        followOrBlockedAt: new Date(),
-      },
-      select: {
-        follower: true,
-        followee: true,
-        isBlock: true,
-        followOrBlockedAt: true,
-      },
-    });
-    return prismaResult;
+    try {
+      const result = await this.prismaService.$transaction(async (prisma) => {
+        return await this.prismaService.userFollow.upsert({
+          where: {
+            followerId_followeeId: {
+              followerId: followerId.value,
+              followeeId: followeeId.value,
+            },
+          },
+          create: {
+            followerId: followerId.value,
+            followeeId: followeeId.value,
+            isBlock,
+          },
+          update: {
+            isBlock,
+            followOrBlockedAt: new Date(),
+          },
+          select: {
+            follower: true,
+            followee: true,
+            isBlock: true,
+            followOrBlockedAt: true,
+          },
+        });
+      });
+      return newServiceOkResponse(result);
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        return newServiceFailPrismaKnownResponse(error.code, 400);
+      }
+      return newServiceFailPrismaUnKnownResponse(500);
+    }
   }
 
   findAll() {
