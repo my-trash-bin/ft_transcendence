@@ -1,4 +1,3 @@
-import { TargetUserDto } from '@/api/api';
 import { useCallback, useContext } from 'react';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { CommonCard } from './utils/CommonCard';
@@ -7,6 +6,7 @@ interface BlockCardProps {
   readonly nickname: string;
   readonly imageURL?: string;
   readonly id: string;
+  readonly refetch: () => Promise<unknown>;
 }
 
 export function BlockCard(props: BlockCardProps) {
@@ -14,13 +14,13 @@ export function BlockCard(props: BlockCardProps) {
 
   const unblockUser = useCallback(async () => {
     try {
-      const requestData: TargetUserDto = { targetUser: props.id };
-      await api.userFollowControllerUnBlockUser(requestData);
+      await api.userFollowControllerUnBlockUser({ targetUser: props.id });
       console.log('UnBlock sent successfully');
+      props.refetch();
     } catch (error) {
       console.error('Error sending unblock:', error);
     }
-  }, [api, props.id]);
+  }, [api, props]);
 
   return (
     <CommonCard

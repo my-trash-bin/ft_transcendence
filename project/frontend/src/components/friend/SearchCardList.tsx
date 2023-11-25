@@ -1,15 +1,14 @@
-import { useCallback, useContext, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { MessageSearchInput } from '../dm/message-search/MessageSearchInput';
 import { SearchCard } from './SearchCard';
 
-export function SearchCardList() {
+export function SearchCardList({ activeScreen }: { activeScreen: string }) {
   const { api } = useContext(ApiContext);
   const [searchName, setSearchName] = useState('');
-
   const { isLoading, isError, data, refetch } = useQuery(
-    [],
+    ['searchList'],
     useCallback(
       async () =>
         (
@@ -24,6 +23,12 @@ export function SearchCardList() {
     setSearchName(searchUsername);
     refetch();
   };
+  useEffect(() => {
+    if (activeScreen === 'search') {
+      refetch();
+    }
+  }, [activeScreen, refetch]);
+
   return (
     <div className="felx flex-col justify-center items-center">
       <div className="w-[700px] h-[600px] flex flex-col items-center">
@@ -34,8 +39,10 @@ export function SearchCardList() {
           eventFunction={userSearchCallback}
         />
         <div className="w-[700px] h-[580px] grid gap-lg justify-center items-start overflow-y-scroll pt-xl place-content-start">
-          {isLoading || !data ? (
+          {isLoading ? (
             <p>Loading...</p>
+          ) : isError || !data ? (
+            <p>Error loading profile data.</p>
           ) : data.length > 0 ? (
             data.map((val) => (
               <SearchCard

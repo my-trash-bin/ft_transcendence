@@ -7,6 +7,7 @@ interface FriendCardProps {
   readonly nickname: string;
   readonly imageURL?: string;
   readonly id: string;
+  readonly refetch: () => Promise<unknown>;
 }
 
 export function FriendCard(props: FriendCardProps) {
@@ -25,7 +26,7 @@ export function FriendCard(props: FriendCardProps) {
       >
         메세지
       </Link>
-      <FriendSetting targetNickname={props.nickname} />
+      <FriendSetting targetId={props.id} refetch={props.refetch} />
     </CommonCard>
   );
 }
