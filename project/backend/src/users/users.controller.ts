@@ -189,7 +189,7 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
-  @Patch(':id')
+  @Patch()
   @ApiOperation({ summary: '유저의 닉네임/프로필이미지링크 변경' })
   @ApiOkResponse({
     description: '유저 정보 변경 요청 성공(변경 사항 없는 요청 포함)',
@@ -200,8 +200,12 @@ export class UsersController {
   @ApiInternalServerErrorResponse({ description: '알수 없는 내부 에러' })
   @UseGuards(JwtGuard, PhaseGuard)
   @Phase('complete')
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return await this.usersService.update(idOf(id), updateUserDto);
+  async update(
+    @Request() request: ExpressRequest,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    const user = request.user as JwtPayloadPhaseComplete;
+    return await this.usersService.update(user.id, updateUserDto);
   }
 
   @Post('unique-check')
