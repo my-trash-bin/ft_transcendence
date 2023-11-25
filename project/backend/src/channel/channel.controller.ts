@@ -1,7 +1,19 @@
-import { Body, Controller, Get, Post, Request } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  InternalServerErrorException,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request as ExpressRequest } from 'express';
 import { JwtPayloadPhaseComplete } from '../auth/auth.service';
+import { JwtGuard } from '../auth/jwt.guard';
+import { Phase, PhaseGuard } from '../auth/phase.guard';
+import { EventsGateway } from '../events/events.gateway';
 import { ChannelService } from './channel.service';
 import { ChannelDto } from './dto/channel-dto';
 import { ChannelRelationDto } from './dto/channel-relation-dto';
@@ -10,7 +22,10 @@ import { CreateChannelDto } from './dto/create-channel.dto';
 @ApiTags('channel')
 @Controller('/api/v1/channel')
 export class ChannelController {
-  constructor(private readonly channelService: ChannelService) {}
+  constructor(
+    private readonly channelService: ChannelService,
+    private readonly eventsGateway: EventsGateway,
+  ) {}
 
   @Get('all')
   @ApiOperation({ summary: '모든 채널 검색' })
@@ -19,6 +34,8 @@ export class ChannelController {
     type: () => ChannelDto,
     isArray: true,
   })
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
   async findAll() {
     return await this.channelService.findAll();
   }
@@ -30,6 +47,8 @@ export class ChannelController {
     type: () => ChannelRelationDto,
     isArray: true,
   })
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
   async findMyChannels(@Request() req: ExpressRequest) {
     const userId = (req.user as JwtPayloadPhaseComplete).id;
     return await this.channelService.findByUser(userId);
@@ -41,14 +60,20 @@ export class ChannelController {
     description: '생성된 채널 정보 객체 반환',
     type: () => ChannelDto,
   })
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
   async create(@Body() dto: CreateChannelDto, @Request() req: ExpressRequest) {
     const userId = (req.user as JwtPayloadPhaseComplete).id;
-    console.log('create에서 req.user 테스트');
-    console.log(`userId: ${userId}`);
-    console.log('req.user 객체');
-    console.log(req.user);
-    console.log('--------------------------------');
-    return await this.channelService.create(userId, dto);
+
+    const result = await this.channelService.create(userId, dto);
+    if (!result.ok) {
+      if (result.error!.statusCode === 500) {
+        throw new InternalServerErrorException(result.error!.message);
+      }
+      throw new BadRequestException(result.error!.message);
+    }
+    this.eventsGateway.handleNewChannel('normal', result.data!.id, userId);
+    return result!.data;
   }
 
   // @Get('participand/:cheenlId')
