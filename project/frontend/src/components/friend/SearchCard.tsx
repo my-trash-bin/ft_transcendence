@@ -1,27 +1,36 @@
-import { useEffect } from 'react';
-import toast, { Toaster } from 'react-hot-toast';
+import { useCallback, useContext } from 'react';
+import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { Button } from '../common/Button';
 import { CommonCard } from './utils/CommonCard';
 
 interface SearchCardProps {
   readonly nickname: string;
-  readonly imageURL: string;
+  readonly imageUrl?: string;
+  readonly id: string;
+  readonly refetch: () => Promise<unknown>;
 }
 
-function SearchCard(props: SearchCardProps) {
-  const friend = () => toast(`${props.nickname} 친구 하기`);
-  useEffect(() => {
-    return () => toast.dismiss();
-  }, []);
+export function SearchCard({
+  nickname,
+  imageUrl,
+  id,
+  refetch,
+}: SearchCardProps) {
+  const { api } = useContext(ApiContext);
+
+  const requestFriend = useCallback(async () => {
+    try {
+      await api.userFollowControllerFollowUser({ targetUser: id });
+      console.log('Friend request successfully');
+      refetch();
+    } catch (error) {
+      console.error('Error friend request:', error);
+    }
+  }, [api, id, refetch]);
+
   return (
-    <CommonCard imageURL={props.imageURL} nickname={props.nickname}>
-      <Toaster
-        toastOptions={{
-          duration: 2000,
-        }}
-      />
-      <Button onClick={friend}>친구 하기</Button>
+    <CommonCard imageUrl={imageUrl} nickname={nickname} id={id}>
+      <Button onClick={requestFriend}>친구 하기</Button>
     </CommonCard>
   );
 }
-export default SearchCard;

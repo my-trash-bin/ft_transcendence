@@ -15,20 +15,25 @@ export function MessageSearchInput({
   eventFunction: (searchInput: string) => any | void;
 }>) {
   const [searchInput, setSearchInput] = useState('');
+  const [callApi, setCallApi] = useState(false);
 
   const inputChangeEvent = (event: any) => {
     setSearchInput(event.target.value);
+    setCallApi(true);
   };
 
   useEffect(() => {
     const identifier = setTimeout(() => {
-      eventFunction(searchInput);
+      if (callApi) {
+        eventFunction(searchInput);
+        setCallApi(false);
+      }
     }, 500);
 
     return () => {
       clearTimeout(identifier);
     };
-  }, [eventFunction, searchInput]);
+  }, [eventFunction, searchInput, callApi]);
 
   const crossOnClick = (event: any) => {
     setSearchInput('');

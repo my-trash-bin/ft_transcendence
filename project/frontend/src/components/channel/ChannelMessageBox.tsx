@@ -1,13 +1,19 @@
-import { MessageContent } from '../dm/message/MessageContent';
+import { MessageContent, messageType } from '../dm/message/MessageContent';
 import { MessageSendBox } from '../dm/message/MessageSendBox';
 import { ChannelInfo } from './ChannelInfo';
 
-export function ChannleMessageBox() {
+export function ChannleMessageBox({
+  channelId,
+}: Readonly<{ channelId: string }>) {
   return (
     <>
-      <ChannelInfo />
-      <MessageContent />
-      <MessageSendBox />
+      <ChannelInfo channelId={channelId} />
+      <MessageContent
+        channelId={channelId}
+        type={messageType.CHANNEL}
+        myNickname={'myNickname'}
+      />
+      <MessageSendBox channelId={channelId} type={messageType.CHANNEL} />
     </>
   );
 }

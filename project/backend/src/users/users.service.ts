@@ -1,12 +1,7 @@
-import {
-  BadRequestException,
-  ConflictException,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../base/prisma.service';
 import { UserId } from '../common/Id';
+import { isUniqueConstraintError } from '../util/isUniqueConstraintError';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDto } from './dto/user.dto';
@@ -14,6 +9,11 @@ import { UserDto } from './dto/user.dto';
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
+
+  async me(id: UserId) {
+    const user = await this.prisma.user.findUnique({ where: { id: id.value } });
+    return user ? new UserDto(user) : null;
+  }
 
   async create(createUserDto: CreateUserDto): Promise<UserDto> {
     try {
@@ -25,15 +25,7 @@ export class UsersService {
       });
       return new UserDto(prismaUser);
     } catch (error) {
-      if (!(error instanceof Prisma.PrismaClientKnownRequestError)) {
-        throw new InternalServerErrorException('알수 없는 에러');
-      }
-      if (error.code === 'P2003') {
-        throw new BadRequestException(
-          'Error: Foreign key constraint failed on the field',
-        ); // 추가적인 정보를 meta에 안 담아준다는것 같기도.
-      }
-      if (error.code === 'P2002') {
+      if (isUniqueConstraintError(error)) {
         throw new ConflictException(
           `Error: Unique constraint failed on the (${
             error?.meta?.target ?? 'something'
@@ -53,11 +45,30 @@ export class UsersService {
     return prismaUsers.map((prismaUser) => new UserDto(prismaUser));
   }
 
-  async findOne(id: UserId) {
+  async findOne(targetId: UserId) {
     const prismaUser = await this.prisma.user.findUnique({
-      where: { id: id.value },
+      where: { id: targetId.value },
     });
     return prismaUser === null ? null : new UserDto(prismaUser);
+  }
+
+  async findOneByNickname(nickname: string) {
+    const prismaUser = await this.prisma.user.findUnique({
+      where: { nickname },
+    });
+    return prismaUser === null ? null : new UserDto(prismaUser);
+  }
+
+  async searchByBickname(nickname: string) {
+    console.log('searchByBickname', nickname);
+    const prismaUsers = await this.prisma.user.findMany({
+      where: {
+        nickname: {
+          contains: nickname,
+        },
+      },
+    });
+    return prismaUsers.map((prismaUser) => new UserDto(prismaUser));
   }
 
   async update(id: UserId, updateUserDto: UpdateUserDto) {
@@ -71,15 +82,7 @@ export class UsersService {
       });
       return new UserDto(prismaUser);
     } catch (error) {
-      if (!(error instanceof Prisma.PrismaClientKnownRequestError)) {
-        throw new InternalServerErrorException('알수 없는 에러');
-      }
-      if (error.code === 'P2003') {
-        throw new BadRequestException(
-          'Error: Foreign key constraint failed on the field',
-        ); // 추가적인 정보를 meta에 안 담아준다는것 같기도.
-      }
-      if (error.code === 'P2002') {
+      if (isUniqueConstraintError(error)) {
         throw new ConflictException(
           `Error: Unique constraint failed on the (${
             error?.meta?.target ?? 'something'

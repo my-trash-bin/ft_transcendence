@@ -1,12 +1,12 @@
 import { Controller, Get, Request, UseGuards } from '@nestjs/common';
 import { ApiOkResponse, ApiProperty } from '@nestjs/swagger';
 import { Request as ExpressRequest } from 'express';
-import { AuthService, JwtPayloadPhaseComplete } from '../auth/auth.service';
+import { JwtPayloadPhaseComplete } from '../auth/auth.service';
 import { JwtGuard } from '../auth/jwt.guard';
 import { Phase, PhaseGuard } from '../auth/phase.guard';
 import { UserId } from '../common/Id';
 
-class MeResult {
+class JWTResult {
   @ApiProperty()
   value: string;
 
@@ -17,17 +17,17 @@ class MeResult {
 
 @Controller('api/v1')
 export class AppController {
-  constructor(private authService: AuthService) {}
+  constructor() {}
 
   // TODO: apply https://docs.nestjs.com/openapi/operations
   @UseGuards(JwtGuard, PhaseGuard)
   @Phase('complete')
-  @Get('me')
+  @Get('jwt')
   @ApiOkResponse({
-    type: MeResult,
+    type: JWTResult,
   })
-  getProfile(@Request() req: ExpressRequest) {
+  getJWT(@Request() req: ExpressRequest) {
     const userId = (req.user as JwtPayloadPhaseComplete).id;
-    return new MeResult(userId);
+    return new JWTResult(userId);
   }
 }

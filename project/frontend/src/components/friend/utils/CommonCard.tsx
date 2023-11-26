@@ -4,16 +4,19 @@ import FriendAvatar from './FriendAvatar';
 
 interface CommonCardProps {
   readonly children: ReactNode;
-  readonly imageURL: string;
+  readonly imageUrl?: string;
   readonly nickname: string;
+  readonly id: string;
 }
 
-export function CommonCard({ children, imageURL, nickname }: CommonCardProps) {
+export function CommonCard({
+  children,
+  imageUrl,
+  nickname,
+  id,
+}: CommonCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleButtonClick = () => {
-    setIsModalOpen(true);
-  };
   const handleModalClose = () => {
     setIsModalOpen(false);
   };
@@ -26,7 +29,7 @@ export function CommonCard({ children, imageURL, nickname }: CommonCardProps) {
   const alignCSS = 'flex items-center relative p-md';
   return (
     <div className={`${sizeCSS} ${colorCSS} ${alignCSS}`}>
-      <FriendAvatar src={imageURL} size={60} onClick={handleModalOpen} />
+      <FriendAvatar imageUrl={imageUrl} size={60} onClick={handleModalOpen} />
       <div className="text-left text-black text-h2 font-semibold absolute left-[100px]">
         {nickname}
       </div>
@@ -34,7 +37,7 @@ export function CommonCard({ children, imageURL, nickname }: CommonCardProps) {
       <ProfileModal
         isOpen={isModalOpen}
         onClose={handleModalClose}
-        nickname={nickname}
+        targetId={id}
       />
     </div>
   );
