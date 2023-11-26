@@ -26,23 +26,27 @@ export function FriendCardList({
 
   return (
     <div className="w-[700px] h-[600px] pt-xl grid gap-lg justify-center items-center overflow-y-scroll place-content-start">
-      {isLoading ? (
-        <Loading width={500} />
-      ) : isError || !data ? (
-        <p>Error loading profile data.</p>
-      ) : data.length > 0 ? (
-        data.map((val) => (
-          <FriendCard
-            key={val.followee.id}
-            imageUrl={val.followee.profileImageUrl}
-            nickname={val.followee.nickname}
-            id={val.followee.id}
-            refetch={refetch}
-          />
-        ))
-      ) : (
-        <div>No elements</div>
-      )}
+      {render()}
     </div>
   );
+
+  function render() {
+    if (isLoading) return <Loading width={500} />;
+
+    if (isError || !data) {
+      return <p className="font-normal text-h2">Something wrong</p>;
+    }
+    if (data.length === 0) {
+      return <p className="font-semibold text-h2">No elements</p>;
+    }
+    return data.map((val) => (
+      <FriendCard
+        key={val.followee.id}
+        imageUrl={val.followee.profileImageUrl}
+        nickname={val.followee.nickname}
+        id={val.followee.id}
+        refetch={refetch}
+      />
+    ));
+  }
 }
