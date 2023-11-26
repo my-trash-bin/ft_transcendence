@@ -4,8 +4,9 @@ import { useQuery } from 'react-query';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { ProfileEditModal } from './ProfileEditModal';
 import { TextBox } from './TextBox';
+import { Loading } from '../common/Loading';
 
-function ProfileBox() {
+export function ProfileBox() {
   const { api } = useContext(ApiContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { isLoading, isError, data, refetch } = useQuery(
@@ -24,49 +25,48 @@ function ProfileBox() {
     'absolute top-xl right-xl';
   return (
     <div className="w-[900px] h-xl bg-light-background rounded-lg mb-[30px] relative">
-      {isLoading ? (
-        <p>Loading...</p>
-      ) : isError || !data ? (
-        <p>Error loading profile data.</p>
-      ) : (
-        <div>
-          <div className="h-[inherit] p-2xl flex flex-row items-center">
-            {data.imageUrl ? (
-              <Image
-                src={data.imageUrl}
-                alt="avatar"
-                width={150}
-                height={150}
-              />
-            ) : (
-              <Image
-                src={'/avatar/avatar-black.svg'}
-                alt="avatar"
-                width={150}
-                height={150}
-              />
-            )}{' '}
-            <TextBox
-              nickname={data.nickname}
-              win={data.record.win}
-              lose={data.record.win}
-              ratio={data.record.win}
-              statusMessage={data.statusMessage}
-            />
-            <button onClick={handleButtonClick} className={buttonClass}>
-              프로필 수정
-            </button>
-          </div>
-          <ProfileEditModal
-            isOpen={isModalOpen}
-            onClose={handleModalClose}
-            fetchData={refetch}
-            defaultData={data}
-          />
-        </div>
-      )}
+      <div className="h-[inherit] p-2xl flex flex-row items-center">
+        {renderProfileContent()}
+      </div>
     </div>
   );
-}
 
-export default ProfileBox;
+  function renderProfileContent() {
+    if (isLoading) return <Loading width={300} />;
+
+    if (isError || !data) {
+      return <p>Error loading profile data.</p>;
+    }
+
+    return (
+      <div className="flex flex-row ">
+        {data.imageUrl ? (
+          <Image src={data.imageUrl} alt="avatar" width={150} height={150} />
+        ) : (
+          <Image
+            src={'/avatar/avatar-black.svg'}
+            alt="avatar"
+            width={150}
+            height={150}
+          />
+        )}
+        <TextBox
+          nickname={data.nickname}
+          win={data.record.win}
+          lose={data.record.win}
+          ratio={data.record.win}
+          statusMessage={data.statusMessage}
+        />
+        <button onClick={handleButtonClick} className={buttonClass}>
+          프로필 수정
+        </button>
+        <ProfileEditModal
+          isOpen={isModalOpen}
+          onClose={handleModalClose}
+          fetchData={refetch}
+          defaultData={data}
+        />
+      </div>
+    );
+  }
+}

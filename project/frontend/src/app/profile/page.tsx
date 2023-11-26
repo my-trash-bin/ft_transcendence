@@ -1,5 +1,5 @@
 'use client';
-import ProfileBox from '../../components/profile/ProfileBox';
+import { ProfileBox } from '../../components/profile/ProfileBox';
 import ArchivementBox from '../../components/profile/achivement/ArchivementBox';
 import HistoryBox from '../../components/profile/history/HistoryBox';
 
