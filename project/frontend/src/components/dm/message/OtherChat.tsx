@@ -1,7 +1,7 @@
 'use client';
 
 import Portal from '@/components/common/Portal';
-import ProfileModal from '@/components/profile/ProfileModal';
+import { ProfileModal } from '@/components/profile/ProfileModal';
 import Image from 'next/image';
 import { useState } from 'react';
 import { formatAMPM } from '../utils/FromatAmPm';
@@ -34,7 +34,7 @@ export function OtherChat({
         <ProfileModal
           isOpen={isModalOpen}
           onClose={handleModalClose}
-          nickname={nickname}
+          targetId={nickname}
         />
       </Portal>
       <div className="flex flex-row pl-[3%] mb-[1.5%] items-center">
@@ -56,7 +56,9 @@ export function OtherChat({
         )}
         <div className="flex flex-col w-[80%] pl-[2%]">
           {isFirst === true ? (
-            <p className="text-[15px] mb-[3px] mt-[3px]">{nickname}</p>
+            <p className="text-[15px] mb-[3px] mt-[3px] text-slate-700">
+              {nickname}
+            </p>
           ) : (
             ''
           )}

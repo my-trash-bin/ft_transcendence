@@ -17,22 +17,26 @@ interface messageContent {
 export function MessageContent({
   channelId,
   type,
-  myNickname,
-}: Readonly<{ channelId: string; type: messageType; myNickname: string }>) {
+}: Readonly<{ channelId: string; type: messageType }>) {
   const [messages, setMessages] = useState<messageContent[]>([]);
 
   useEffect(() => {
     const socket = getSocket();
-    socket.on(`message`, (data: messageContent) => {
-      if (data.channelId === channelId) {
+    if (type === messageType.DM) {
+      socket.on(`dm`, (data: messageContent) => {
         setMessages((messages) => [...messages, data]);
-      }
-    });
+      });
+    } else {
+      socket.on(`channelMessage`, (data: messageContent) => {
+        setMessages((messages) => [...messages, data]);
+      });
+    }
 
     return () => {
-      socket.off(`message`);
+      socket.off(`dm`);
+      socket.off(`channelMessage`);
     };
-  }, [channelId]);
+  }, [channelId, type]);
 
   return (
     <div className="w-[95%] h-[610px] pt-[20px] bg-chat-color2 rounded-[10px] flex flex-col overflow-y-scroll mt-sm">
