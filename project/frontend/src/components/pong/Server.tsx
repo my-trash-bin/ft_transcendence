@@ -55,7 +55,6 @@ io.on('connection', (socket: Socket) => {
 
     socket.on('disconnect', () => {
       console.log('User disconnected');
-      // 사용자가 로비에서 나갈 때 해당 로비 정보 업데이트
       if (lobby.player1 === socket) {
         lobby.player1 = null;
       }
