@@ -29,7 +29,12 @@ export function SearchCard({
   }, [api, id, refetch]);
 
   return (
-    <CommonCard imageUrl={imageUrl} nickname={nickname} id={id}>
+    <CommonCard
+      imageUrl={imageUrl}
+      nickname={nickname}
+      id={id}
+      refetch={refetch}
+    >
       <Button onClick={requestFriend}>친구 하기</Button>
     </CommonCard>
   );

@@ -23,7 +23,12 @@ export function BlockCard({ nickname, imageUrl, id, refetch }: BlockCardProps) {
   }, [api, id, refetch]);
 
   return (
-    <CommonCard imageUrl={imageUrl} nickname={nickname} id={id}>
+    <CommonCard
+      imageUrl={imageUrl}
+      nickname={nickname}
+      id={id}
+      refetch={refetch}
+    >
       <button
         onClick={unblockUser}
         className={
