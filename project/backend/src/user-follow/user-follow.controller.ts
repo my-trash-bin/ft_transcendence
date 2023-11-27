@@ -147,6 +147,9 @@ export class UserFollowController {
     console.log('createOrUpdate', req.user, dto);
     const userId = (req.user as JwtPayloadPhaseComplete).id;
     const targetUserId = dto.targetUser;
+    if (userId.value === targetUserId) {
+      throw new BadRequestException('나 자신을 사랑하거나 미워하지 말자');
+    }
     const result = await this.userFollowService.createOrUpdate(
       idOf(userId.value),
       idOf(targetUserId),
