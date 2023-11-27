@@ -74,6 +74,34 @@ export interface UserDto {
   statusMessage: string;
 }
 
+export interface UserRelationshipDto {
+  /**
+   * 사용자 ID
+   * @format uuid
+   */
+  id: string;
+  /** 닉네임 */
+  nickname: string;
+  /** 프로필 이미지 URL */
+  profileImageUrl?: string;
+  /**
+   * 가입 시기
+   * @format date-time
+   */
+  joinedAt: string;
+  /** 탈퇴 여부 */
+  isLeaved: boolean;
+  /**
+   * 탈퇴 시기
+   * @format date-time
+   */
+  leavedAt?: string;
+  /** 상태 메시지 */
+  statusMessage: string;
+  /** 관계 */
+  relation: 'friend' | 'block' | 'none' | 'me';
+}
+
 export interface CreateUserDto {
   nickname: string;
   profileImageUrl?: string;
@@ -702,7 +730,7 @@ export class Api<
       },
       params: RequestParams = {},
     ) =>
-      this.request<UserDto[], any>({
+      this.request<UserRelationshipDto[], any>({
         path: `/api/v1/users/search`,
         method: 'GET',
         query: query,

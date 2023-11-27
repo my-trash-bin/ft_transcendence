@@ -1,4 +1,4 @@
-import ProfileModal from '@/components/profile/ProfileModal';
+import { ProfileModal } from '@/components/profile/ProfileModal';
 import { ReactNode, useState } from 'react';
 import FriendAvatar from './FriendAvatar';
 
@@ -7,6 +7,7 @@ interface CommonCardProps {
   readonly imageUrl?: string;
   readonly nickname: string;
   readonly id: string;
+  readonly refetch: () => Promise<unknown>;
 }
 
 export function CommonCard({
@@ -14,6 +15,7 @@ export function CommonCard({
   imageUrl,
   nickname,
   id,
+  refetch,
 }: CommonCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -38,6 +40,7 @@ export function CommonCard({
         isOpen={isModalOpen}
         onClose={handleModalClose}
         targetId={id}
+        refetchPage={refetch}
       />
     </div>
   );
