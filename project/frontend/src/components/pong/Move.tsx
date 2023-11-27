@@ -1,26 +1,32 @@
 import { useEffect, useRef } from 'react';
-import useStore from './Store';
+import useStore from './Paddle';
+
 const PADDLE_MOVE_STEP = 0.5; // 움직임의 단계 크기 증가
 
 const usePaddleMovement = () => {
-  const movePaddle1 = useStore(state => state.movePaddle1);
-  const movePaddle2 = useStore(state => state.movePaddle2);
+  const { isPlayer1, movePaddle1, movePaddle2 } = useStore();
   const keysPressed = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     const updatePaddleMovement = () => {
-      if (keysPressed.current.has('w')) {
-        movePaddle1(-PADDLE_MOVE_STEP);
+      if (isPlayer1) {
+        // 플레이어 1의 패들 움직임 처리
+        if (keysPressed.current.has('w') || keysPressed.current.has('ArrowUp')) {
+          movePaddle1(-PADDLE_MOVE_STEP);
+        }
+        if (keysPressed.current.has('s') || keysPressed.current.has('ArrowDown')) {
+          movePaddle1(PADDLE_MOVE_STEP);
+        }
+      } else {
+        // 플레이어 2의 패들 움직임 처리
+        if (keysPressed.current.has('w') || keysPressed.current.has('ArrowUp')) {
+          movePaddle2(-PADDLE_MOVE_STEP);
+        }
+        if (keysPressed.current.has('s') || keysPressed.current.has('ArrowDown')) {
+          movePaddle2(PADDLE_MOVE_STEP);
+        }
       }
-      if (keysPressed.current.has('s')) {
-        movePaddle1(PADDLE_MOVE_STEP);
-      }
-      if (keysPressed.current.has('ArrowUp')) {
-        movePaddle2(-PADDLE_MOVE_STEP);
-      }
-      if (keysPressed.current.has('ArrowDown')) {
-        movePaddle2(PADDLE_MOVE_STEP);
-      }
+
       requestAnimationFrame(updatePaddleMovement);
     };
 
@@ -42,7 +48,7 @@ const usePaddleMovement = () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [movePaddle1, movePaddle2]);
+  }, [isPlayer1, movePaddle1, movePaddle2]);
 
   return null;
 };
