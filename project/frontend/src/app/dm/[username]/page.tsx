@@ -25,14 +25,17 @@ export default function DmPage({
     />
   );
   return (
-    <div className="flex flex-row bg-light-background rounded-[20px] w-[inherit]">
-      <div className="w-[380px] h-[750px] border-r flex flex-col items-center">
-        <MessageSearch userSearchCallback={userSearchCallback} />
-        <DmUserList searchUsername={searchUsername} />
+    <>
+      <div id="backdrop-root"></div>
+      <div className="flex flex-row bg-light-background rounded-[20px] w-[inherit]">
+        <div className="w-[380px] h-[750px] border-r flex flex-col items-center">
+          <MessageSearch userSearchCallback={userSearchCallback} />
+          <DmUserList searchUsername={searchUsername} />
+        </div>
+        <div className="w-[520px] h-[750px] flex flex-col items-center justify-center">
+          {renderMessageBox}
+        </div>
       </div>
-      <div className="w-[520px] h-[750px] flex flex-col items-center justify-center">
-        {renderMessageBox}
-      </div>
-    </div>
+    </>
   );
 }
