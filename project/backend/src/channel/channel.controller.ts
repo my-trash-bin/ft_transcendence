@@ -13,7 +13,8 @@ import { Request as ExpressRequest } from 'express';
 import { JwtPayloadPhaseComplete } from '../auth/auth.service';
 import { JwtGuard } from '../auth/jwt.guard';
 import { Phase, PhaseGuard } from '../auth/phase.guard';
-import { EventsService } from '../events/events.service';
+import { idOf } from '../common/Id';
+import { ChannelRoomType, EventsService } from '../events/events.service';
 import { ChannelService } from './channel.service';
 import { ChannelDto } from './dto/channel-dto';
 import { ChannelRelationDto } from './dto/channel-relation-dto';
@@ -72,7 +73,12 @@ export class ChannelController {
       }
       throw new BadRequestException(result.error!.message);
     }
-    this.eventsService.handleNewChannel('normal', result.data!.id, userId);
+    const channelId = result.data!.id;
+    this.eventsService.handleUserJoinChannel(
+      ChannelRoomType.NORMAL,
+      idOf(channelId),
+      userId,
+    );
     return result!.data;
   }
 
