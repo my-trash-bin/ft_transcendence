@@ -1,6 +1,6 @@
 const mockNotifications = [
   {
-    id: 'notification-123',
+    id: 'notification-1',
     userId: '1',
     isRead: false,
     createdAt: new Date().toISOString(),
@@ -8,7 +8,7 @@ const mockNotifications = [
       '{"type": "newFriend", "sourceId": "123", "sourceName": "klew"}',
   },
   {
-    id: 'notification-456',
+    id: 'notification-2',
     userId: '2',
     isRead: false,
     createdAt: new Date().toISOString(),
@@ -16,7 +16,7 @@ const mockNotifications = [
       '{"type": "newMessageDm", "sourceId": "123", "sourceName": "klew"}',
   },
   {
-    id: 'notification-789',
+    id: 'notification-23',
     userId: '3',
     isRead: false,
     createdAt: new Date().toISOString(),
@@ -24,7 +24,7 @@ const mockNotifications = [
       '{"type": "newMessageChannel", "sourceId": "123", "sourceName": "klew"}',
   },
   {
-    id: 'notification-987',
+    id: 'notification-4',
     userId: '4',
     isRead: false,
     createdAt: new Date().toISOString(),
@@ -32,8 +32,40 @@ const mockNotifications = [
       '{"type": "gameRequest", "sourceId": "123", "sourceName": "klew"}',
   },
   {
-    id: 'notification-6543',
+    id: 'notification-5',
     userId: '5',
+    isRead: false,
+    createdAt: new Date().toISOString(),
+    contentJson:
+      '{"type": "newFriend", "sourceId": "123", "sourceName": "klew"}',
+  },
+  {
+    id: 'notification-6',
+    userId: '6',
+    isRead: false,
+    createdAt: new Date().toISOString(),
+    contentJson:
+      '{"type": "gameRequest", "sourceId": "123", "sourceName": "klew"}',
+  },
+  {
+    id: 'notification-7',
+    userId: '7',
+    isRead: false,
+    createdAt: new Date().toISOString(),
+    contentJson:
+      '{"type": "newFriend", "sourceId": "123", "sourceName": "klew"}',
+  },
+  {
+    id: 'notification-8',
+    userId: '8',
+    isRead: false,
+    createdAt: new Date().toISOString(),
+    contentJson:
+      '{"type": "gameRequest", "sourceId": "123", "sourceName": "klew"}',
+  },
+  {
+    id: 'notification-9',
+    userId: '9',
     isRead: false,
     createdAt: new Date().toISOString(),
     contentJson:
