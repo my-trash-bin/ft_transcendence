@@ -1,7 +1,7 @@
 'use client';
 import { Button } from '@/components/common/Button';
 import FriendAvatar from '@/components/friend/utils/FriendAvatar';
-import { useCallback, useContext } from 'react';
+import { useCallback, useContext, useEffect } from 'react';
 import { useQuery } from 'react-query';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { ModalLayout } from '../channel/modals/ModalLayout';
@@ -31,6 +31,12 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
       [api, targetId],
     ),
   );
+
+  useEffect(() => {
+    if (isOpen) {
+      refetch();
+    }
+  }, [isOpen, refetch]);
 
   function handleFriendComponent() {
     if (!data) return <p>error</p>;
