@@ -5,7 +5,13 @@ import { BALL_SIZE, BOARD_HEIGHT, BOARD_WIDTH, DEFAULT_SPEED, PADDLE_HEIGHT, PAD
 
 const app = express();
 const httpServer = createServer(app);
-const io = new SocketIOServer(httpServer);
+const io = new SocketIOServer(httpServer, {
+  cors: {
+    origin: "http://localhost:53000", // 클라이언트 url
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
 
 // 게임 상태
 let gameState = {
@@ -25,18 +31,26 @@ let lobby = {
 };
 
 io.on('connection', (socket: Socket) => {
+  
+  socket.on('connect_error', (err) => {
+    console.log('Connection Error:', err.message);
+  });
+  
   console.log('A user connected');
-
   socket.on('joinLobby', () => {
-    // 로비에 입장하는 로직
+    console.log('User entered the lobby');
     if (!lobby.player1) {
       lobby.player1 = socket;
-      socket.emit('waitingForPlayer'); // 플레이어 1은 대기 중임을 클라이언트에게 알림
+      socket.emit('waitingForPlayer');
+      socket.emit('playerRole', 'player1');
     } else if (!lobby.player2) {
       lobby.player2 = socket;
-      socket.emit('matchFound', { role: 'player2' }); // 플레이어 2는 매칭이 완료되었음을 클라이언트에게 알림
-      lobby.player1.emit('matchFound', { role: 'player1' }); // 플레이어 1에게도 매칭이 완료되었음을 클라이언트에게 알림
-      // 게임 초기화 및 시작 로직 추가
+      socket.emit('matchFound', { role: 'player2' });
+      lobby.player1.emit('matchFound', { role: 'player1' });
+      lobby.player2.emit('playerRole', 'player2');
+      lobby.player1.emit('playerRole', 'player1');
+
+      // 게임 초기화 및 시작 로직
     }
 
     socket.on('disconnect', () => {
@@ -150,6 +164,6 @@ setInterval(() => {
     }
 }, 1000 / 60); // 60FPS
 
-httpServer.listen(60080, () => {
-  console.log('Listening on *:60080');
+httpServer.listen(8080, () => {
+  console.log('Listening on *:8080');
 });

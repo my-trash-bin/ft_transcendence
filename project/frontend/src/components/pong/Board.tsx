@@ -37,7 +37,7 @@ const GameBoard: React.FC = () => {
 
   useEffect(() => {
     // Socket.IO 클라이언트 연결
-    const socket = io('localhost', { withCredentials: true });
+    const socket = io('http://localhost:8080', { withCredentials: true });
 
     // 연결이 성공적으로 수립되었을 때
     socket.on('connect', () => {
@@ -52,18 +52,33 @@ const GameBoard: React.FC = () => {
       console.log(`You are ${role}`);
     });
 
-    // 서버로부터 게임 상태 업데이트를 받았을 때
     socket.on('gameUpdate', (data: GameState) => {
-      useStore.setState({
-        paddle1: data.paddle1,
-        paddle2: data.paddle2,
-        ball: data.ball,
-        velocity: data.velocity,
-        score1: data.score1,
-        score2: data.score2,
-        gameOver: data.gameOver,
-      });
+      const { isPlayer1 } = useStore.getState();
+    
+      // 플레이어 1인 경우, 상대방인 플레이어 2의 패들 위치만 업데이트
+      if (isPlayer1) {
+        useStore.setState({
+          paddle2: data.paddle2,
+          ball: data.ball,
+          velocity: data.velocity,
+          score1: data.score1,
+          score2: data.score2,
+          gameOver: data.gameOver,
+        });
+      } 
+      // 플레이어 2인 경우, 상대방인 플레이어 1의 패들 위치만 업데이트
+      else {
+        useStore.setState({
+          paddle1: data.paddle1,
+          ball: data.ball,
+          velocity: data.velocity,
+          score1: data.score1,
+          score2: data.score2,
+          gameOver: data.gameOver,
+        });
+      }
     });
+    
 
     // 연결이 끊어졌을 때
     socket.on('disconnect', () => {
