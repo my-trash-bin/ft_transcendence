@@ -19,8 +19,8 @@ const NavIcon = (props: NavIconProps) => {
       <Image
         src={`/icon/${props.type}.svg`}
         alt={`${props.type}-icon`}
-        width={30}
-        height={30}
+        width={27}
+        height={27}
       />
     </Link>
   );

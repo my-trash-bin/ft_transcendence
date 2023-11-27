@@ -5,6 +5,8 @@ import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 
 export function Notification() {
+  const [isHovered, setIsHovered] = useState(false);
+
   const [active, setActive] = useState(false);
   const boxRef = useRef<HTMLDivElement>(null);
   const data = mockNotifications;
@@ -24,13 +26,20 @@ export function Notification() {
   }, []);
 
   return (
-    <div className="relative">
+    <div
+      className="relative mt-xl w-[30px] h-[30px] hover:bg-dark-purple \
+    rounded-full flex justify-center items-center"
+    >
       <Image
-        src="/icon/message-setting.svg"
+        src="/icon/bell.svg"
         alt="setting-icon"
         width={20}
         height={20}
-        className="rotate-90 cursor-pointer relative"
+        style={{
+          filter: isHovered ? 'invert(1)' : 'invert(0)',
+        }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
         onClick={() => setActive(!active)}
       />
       {active && (
