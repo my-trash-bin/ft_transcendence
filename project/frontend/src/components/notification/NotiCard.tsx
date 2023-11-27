@@ -68,6 +68,7 @@ export const NotiCard: React.FC<NotiCardProps> = ({ content }) => {
       className={`group ${sizeCSS} ${colorCSS} ${alignCSS}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      onClick={() => handlerFunction()}
     >
       <div className={`relative ${isHovered ? 'hidden' : 'block'}`}>
         {notificationContent}
@@ -76,7 +77,6 @@ export const NotiCard: React.FC<NotiCardProps> = ({ content }) => {
         className={`absolute ${
           isHovered ? 'block' : 'hidden'
         } bg-light-purple p-2`}
-        onClick={() => handlerFunction()}
       >
         {hoverContent}
       </div>
