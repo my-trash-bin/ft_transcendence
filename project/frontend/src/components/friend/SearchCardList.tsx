@@ -61,13 +61,7 @@ export function SearchCardList({
       return <p className="font-semibold text-h2">No elements</p>;
     }
     return data.map((val) => (
-      <SearchCard
-        key={val.nickname}
-        imageUrl={val.profileImageUrl}
-        nickname={val.nickname}
-        id={val.id}
-        refetch={refetch}
-      />
+      <SearchCard key={val.nickname} data={val} refetch={refetch} />
     ));
   }
 }
