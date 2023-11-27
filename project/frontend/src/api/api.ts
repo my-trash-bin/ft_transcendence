@@ -9,7 +9,7 @@
  * ---------------------------------------------------------------
  */
 
-export interface MeResult {
+export interface JWTResult {
   value: string;
 }
 
@@ -22,6 +22,30 @@ export interface RegisterBody {
 
 export interface TwoFactorAuthenticationBody {
   password: string;
+}
+
+export interface RecordDto {
+  /** 승리 수 */
+  win: number;
+  /** 패배 수 */
+  lose: number;
+  /** 승률 */
+  ratio: number;
+}
+
+export interface UserProfileDto {
+  /** 아이디 */
+  id: string;
+  /** 닉네임 */
+  nickname: string;
+  /** 프로필 이미지 URL */
+  imageUrl?: string;
+  /** 전적 */
+  record: RecordDto;
+  /** 상태메시지 */
+  statusMessage: string;
+  /** 관계 */
+  relation: 'friend' | 'block' | 'none' | 'me';
 }
 
 export interface UserDto {
@@ -50,6 +74,34 @@ export interface UserDto {
   statusMessage: string;
 }
 
+export interface UserRelationshipDto {
+  /**
+   * 사용자 ID
+   * @format uuid
+   */
+  id: string;
+  /** 닉네임 */
+  nickname: string;
+  /** 프로필 이미지 URL */
+  profileImageUrl?: string;
+  /**
+   * 가입 시기
+   * @format date-time
+   */
+  joinedAt: string;
+  /** 탈퇴 여부 */
+  isLeaved: boolean;
+  /**
+   * 탈퇴 시기
+   * @format date-time
+   */
+  leavedAt?: string;
+  /** 상태 메시지 */
+  statusMessage: string;
+  /** 관계 */
+  relation: 'friend' | 'block' | 'none' | 'me';
+}
+
 export interface CreateUserDto {
   nickname: string;
   profileImageUrl?: string;
@@ -67,28 +119,6 @@ export interface NicknameCheckUserDto {
 export interface UniqueCheckResponse {
   /** 유니크 여부 */
   isUnique: boolean;
-}
-
-export interface RecordDto {
-  /** 승리 수 */
-  win: number;
-  /** 패배 수 */
-  lose: number;
-  /** 승률 */
-  ratio: number;
-}
-
-export interface UserProfileDto {
-  /** 닉네임 */
-  nickname: string;
-  /** 프로필 이미지 URL */
-  imageUrl?: string;
-  /** 전적 */
-  record: RecordDto;
-  /** 상태메시지 */
-  statusMessage: string;
-  /** 관계 */
-  relation: 'friend' | 'block' | 'none' | 'me';
 }
 
 export interface TargetUserDto {
@@ -265,11 +295,8 @@ export interface CreateChannelDto {
   type: 'public' | 'protected' | 'private';
   /** 채널 제목 */
   title: string;
-  /**
-   * 채널 암호
-   * @format email
-   */
-  password?: object;
+  /** 채널 암호 */
+  password?: string;
   /** 채널 최대 인원수 */
   capacity: number;
 }
@@ -534,12 +561,12 @@ export class Api<
     /**
      * No description
      *
-     * @name AppControllerGetProfile
-     * @request GET:/api/v1/me
+     * @name AppControllerGetJwt
+     * @request GET:/api/v1/jwt
      */
-    appControllerGetProfile: (params: RequestParams = {}) =>
-      this.request<MeResult, any>({
-        path: `/api/v1/me`,
+    appControllerGetJwt: (params: RequestParams = {}) =>
+      this.request<JWTResult, any>({
+        path: `/api/v1/jwt`,
         method: 'GET',
         format: 'json',
         ...params,
@@ -625,6 +652,22 @@ export class Api<
      * No description
      *
      * @tags users
+     * @name UsersControllerMyProfile
+     * @summary 내 정보
+     * @request GET:/api/v1/users/me
+     */
+    usersControllerMyProfile: (params: RequestParams = {}) =>
+      this.request<UserProfileDto, any>({
+        path: `/api/v1/users/me`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags users
      * @name UsersControllerFindAll
      * @summary 모든 유저 조회
      * @request GET:/api/v1/users
@@ -659,33 +702,13 @@ export class Api<
      * No description
      *
      * @tags users
-     * @name UsersControllerFindOne
-     * @summary 유저 1명 기본 조회
-     * @request GET:/api/v1/users/{id}
-     */
-    usersControllerFindOne: (id: string, params: RequestParams = {}) =>
-      this.request<UserDto, void>({
-        path: `/api/v1/users/${id}`,
-        method: 'GET',
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags users
      * @name UsersControllerUpdate
      * @summary 유저의 닉네임/프로필이미지링크 변경
-     * @request PATCH:/api/v1/users/{id}
+     * @request PATCH:/api/v1/users
      */
-    usersControllerUpdate: (
-      id: string,
-      data: UpdateUserDto,
-      params: RequestParams = {},
-    ) =>
+    usersControllerUpdate: (data: UpdateUserDto, params: RequestParams = {}) =>
       this.request<UserDto, void>({
-        path: `/api/v1/users/${id}`,
+        path: `/api/v1/users`,
         method: 'PATCH',
         body: data,
         type: ContentType.Json,
@@ -697,19 +720,20 @@ export class Api<
      * No description
      *
      * @tags users
-     * @name UsersControllerCheckNickname
-     * @summary 닉네임 유니크 여부 체크
-     * @request POST:/api/v1/users/unique-check
+     * @name UsersControllerSearchByNickname
+     * @summary 닉네임 기반 유저 검색
+     * @request GET:/api/v1/users/search
      */
-    usersControllerCheckNickname: (
-      data: NicknameCheckUserDto,
+    usersControllerSearchByNickname: (
+      query: {
+        q: string;
+      },
       params: RequestParams = {},
     ) =>
-      this.request<UniqueCheckResponse, void>({
-        path: `/api/v1/users/unique-check`,
-        method: 'POST',
-        body: data,
-        type: ContentType.Json,
+      this.request<UserRelationshipDto[], any>({
+        path: `/api/v1/users/search`,
+        method: 'GET',
+        query: query,
         format: 'json',
         ...params,
       }),
@@ -732,6 +756,43 @@ export class Api<
         path: `/api/v1/users/profile`,
         method: 'GET',
         query: query,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags users
+     * @name UsersControllerFindOne
+     * @summary 유저 1명 기본 조회
+     * @request GET:/api/v1/users/{id}
+     */
+    usersControllerFindOne: (id: string, params: RequestParams = {}) =>
+      this.request<UserDto, void>({
+        path: `/api/v1/users/${id}`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags users
+     * @name UsersControllerCheckNickname
+     * @summary 닉네임 유니크 여부 체크
+     * @request POST:/api/v1/users/unique-check
+     */
+    usersControllerCheckNickname: (
+      data: NicknameCheckUserDto,
+      params: RequestParams = {},
+    ) =>
+      this.request<UniqueCheckResponse, void>({
+        path: `/api/v1/users/unique-check`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
         format: 'json',
         ...params,
       }),

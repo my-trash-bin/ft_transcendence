@@ -1,27 +1,64 @@
-import { useEffect } from 'react';
-import toast, { Toaster } from 'react-hot-toast';
+import { useCallback, useContext } from 'react';
+import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { Button } from '../common/Button';
 import { CommonCard } from './utils/CommonCard';
+import { UserRelationshipDto } from '@/api/api';
 
 interface SearchCardProps {
-  readonly nickname: string;
-  readonly imageURL: string;
+  readonly data: UserRelationshipDto;
+  readonly refetch: () => Promise<unknown>;
 }
 
-function SearchCard(props: SearchCardProps) {
-  const friend = () => toast(`${props.nickname} 친구 하기`);
-  useEffect(() => {
-    return () => toast.dismiss();
-  }, []);
+export function SearchCard({ data, refetch }: SearchCardProps) {
+  const { api } = useContext(ApiContext);
+
+  function handler() {
+    if (!data) return <p>error</p>;
+    let handler;
+    let content;
+    let disabled = false;
+    if (data.relation === 'friend') {
+      disabled = true;
+      content = '이미친구';
+    } else if (data.relation === 'none') {
+      handler = requestFriend;
+      content = '친구추가';
+    } else if (data.relation === 'me') {
+      content = '나';
+      disabled = true;
+    } else {
+      content = '차단상태';
+      disabled = true;
+    }
+    return (
+      <Button
+        isModal={true}
+        disabled={disabled}
+        onClick={!disabled ? handler : undefined}
+      >
+        {content}
+      </Button>
+    );
+  }
+
+  const requestFriend = useCallback(async () => {
+    try {
+      await api.userFollowControllerFollowUser({ targetUser: data.id });
+      console.log('Friend request successfully');
+      refetch();
+    } catch (error) {
+      console.error('Error friend request:', error);
+    }
+  }, [api, data, refetch]);
+
   return (
-    <CommonCard imageURL={props.imageURL} nickname={props.nickname}>
-      <Toaster
-        toastOptions={{
-          duration: 2000,
-        }}
-      />
-      <Button onClick={friend}>친구 하기</Button>
+    <CommonCard
+      imageUrl={data.profileImageUrl}
+      nickname={data.nickname}
+      id={data.id}
+      refetch={refetch}
+    >
+      {handler()}
     </CommonCard>
   );
 }
-export default SearchCard;

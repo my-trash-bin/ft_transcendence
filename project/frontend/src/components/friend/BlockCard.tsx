@@ -1,26 +1,36 @@
-import { useEffect } from 'react';
-import toast, { Toaster } from 'react-hot-toast';
+import { useCallback, useContext } from 'react';
+import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { CommonCard } from './utils/CommonCard';
 
-interface FriendCardProps {
+interface BlockCardProps {
   readonly nickname: string;
-  readonly imageURL: string;
+  readonly imageUrl?: string;
+  readonly id: string;
+  readonly refetch: () => Promise<unknown>;
 }
 
-function FriendCard(props: FriendCardProps) {
-  const unblock = () => toast(`${props.nickname} 차단 해제`);
-  useEffect(() => {
-    return () => toast.dismiss();
-  }, []);
+export function BlockCard({ nickname, imageUrl, id, refetch }: BlockCardProps) {
+  const { api } = useContext(ApiContext);
+
+  const unblockUser = useCallback(async () => {
+    try {
+      await api.userFollowControllerUnBlockUser({ targetUser: id });
+      console.log('UnBlock successfully');
+      refetch();
+    } catch (error) {
+      console.error('Error unblock:', error);
+    }
+  }, [api, id, refetch]);
+
   return (
-    <CommonCard imageURL={props.imageURL} nickname={props.nickname}>
-      <Toaster
-        toastOptions={{
-          duration: 2000,
-        }}
-      />
+    <CommonCard
+      imageUrl={imageUrl}
+      nickname={nickname}
+      id={id}
+      refetch={refetch}
+    >
       <button
-        onClick={unblock}
+        onClick={unblockUser}
         className={
           'w-md h-xs bg-default rounded-sm border-2 border-dark-purple text-center text-black text-lg font-bold mr-lg hover:bg-light-background'
         }
@@ -30,4 +40,3 @@ function FriendCard(props: FriendCardProps) {
     </CommonCard>
   );
 }
-export default FriendCard;

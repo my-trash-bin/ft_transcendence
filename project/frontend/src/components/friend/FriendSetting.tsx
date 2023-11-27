@@ -1,50 +1,60 @@
 import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
-import toast, { Toaster } from 'react-hot-toast';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { ApiContext } from '../../app/_internal/provider/ApiContext';
 
 interface FriendSettingProps {
-  readonly nickname: string;
+  targetId: string;
+  refetch: () => Promise<unknown>;
 }
 
-function FriendSetting(props: FriendSettingProps) {
+export function FriendSetting({ targetId, refetch }: FriendSettingProps) {
   const [active, setActive] = useState(false);
-  const boxRef = useRef(null);
-  const breakFriend = () => toast(`${props.nickname} 친구 끊기`);
-  const block = () => toast(`${props.nickname} 차단`);
+  const boxRef = useRef<HTMLDivElement>(null);
+  const { api } = useContext(ApiContext);
 
   useEffect(() => {
-    // Add event listener to handle clicks outside of the box
-    function handleClickOutside(event) {
+    function handleClickOutside(event: any) {
       if (boxRef.current && !boxRef.current.contains(event.target)) {
         setActive(false);
       }
+      event.stopPropagation();
     }
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
-      // Clean up the event listener when the component unmounts
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
-  const toggleBox = () => {
-    setActive(!active);
-  };
+  const unfollowUser = useCallback(async () => {
+    try {
+      await api.userFollowControllerUnfollowUser({ targetUser: targetId });
+      console.log('Unfriend successfully');
+      refetch();
+    } catch (error) {
+      console.error('Error unfriend:', error);
+    }
+  }, [api, targetId, refetch]);
+
+  const blockUser = useCallback(async () => {
+    try {
+      await api.userFollowControllerBlockUser({ targetUser: targetId });
+      console.log('Block successfully');
+      refetch();
+    } catch (error) {
+      console.error('Error block:', error);
+    }
+  }, [api, targetId, refetch]);
+
   const buttonClass = 'w-[58px] text-center text-black text-sm font-semibold';
   return (
     <div>
-      <Toaster
-        toastOptions={{
-          duration: 2000,
-        }}
-      />
       <Image
         src="/icon/message-setting.svg"
         alt="setting-icon"
         width={20}
         height={20}
         className="rotate-90 cursor-pointer"
-        onClick={toggleBox}
+        onClick={() => setActive(!active)}
       />
       {active && (
         <div
@@ -52,11 +62,11 @@ function FriendSetting(props: FriendSettingProps) {
           className="w-[60px] bg-light-background border-2 border-dark-gray rounded-xs absolute"
         >
           <div className="flex flex-col justify-center">
-            <button className={` ${buttonClass}`} onClick={breakFriend}>
+            <button className={buttonClass} onClick={unfollowUser}>
               친구 끊기
             </button>
             <hr />
-            <button className={` ${buttonClass}`} onClick={block}>
+            <button className={buttonClass} onClick={blockUser}>
               차단 하기
             </button>
           </div>
@@ -65,5 +75,3 @@ function FriendSetting(props: FriendSettingProps) {
     </div>
   );
 }
-
-export default FriendSetting;
