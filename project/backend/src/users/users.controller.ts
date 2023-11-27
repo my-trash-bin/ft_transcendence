@@ -38,6 +38,7 @@ import {
   RelationStatus,
   UserProfileDto,
 } from './dto/user-profile.dto';
+import { UserRelationshipDto } from './dto/user-relationship.dto';
 import { UserDto } from './dto/user.dto';
 import { UsersService } from './users.service';
 
@@ -101,20 +102,18 @@ export class UsersController {
   @ApiOperation({ summary: '닉네임 기반 유저 검색' })
   @ApiOkResponse({
     description: '일치하는 유저 객체리스트 반환.',
-    type: () => UserDto,
+    type: () => UserRelationshipDto,
     isArray: true,
   })
   @UseGuards(JwtGuard, PhaseGuard)
   @Phase('complete')
   async searchByNickname(
     @Request() req: ExpressRequest,
-    @Query('q') nickname?: string,
+    @Query('q') nickname: string,
   ) {
     console.log('complete', nickname, req.user);
-    // const userId = (req.user as JwtPayloadPhaseComplete).id;
-    return await (!nickname
-      ? this.findAll()
-      : this.usersService.searchByBickname(nickname));
+    const userId = (req.user as JwtPayloadPhaseComplete).id;
+    return await this.usersService.searchByBickname(userId, nickname);
   }
 
   @Get('profile')
