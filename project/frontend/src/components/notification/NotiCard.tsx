@@ -8,7 +8,7 @@ interface NotiCardProps {
 }
 
 export const NotiCard: React.FC<NotiCardProps> = ({ content }) => {
-  const sizeCSS = 'h-[60px] text-sm';
+  const sizeCSS = 'h-[60px] text-md';
   const colorCSS =
     'bg-white border-3 border-default rounded-md hover:bg-light-background';
   const alignCSS = 'flex items-center relative p-sm';
@@ -40,22 +40,22 @@ export const NotiCard: React.FC<NotiCardProps> = ({ content }) => {
 
   switch (obj.type) {
     case 'newFriend':
-      notificationContent = `${obj.sourceName}가 당신을 친구로 추가했습니다.`;
+      notificationContent = `가 당신을 친구로 추가했습니다.`;
       hoverContent = '나도 친구로 추가';
       handlerFunction = requestFriend;
       break;
     case 'newMessageDm':
-      notificationContent = `${obj.sourceName}으로부터 새로운 메세지가 도착했습니다.`;
+      notificationContent = `으로부터 새로운 메세지가 도착했습니다.`;
       hoverContent = '메세지창으로 이동';
       handlerFunction = () => alert('move to dm');
       break;
     case 'newMessageChannel':
-      notificationContent = `${obj.sourceName}으로부터 새로운 메세지가 도착했습니다.`;
+      notificationContent = `으로부터 새로운 메세지가 도착했습니다.`;
       hoverContent = '메세지창으로 이동';
       handlerFunction = () => alert('move to channel');
       break;
     case 'gameRequest':
-      notificationContent = `${obj.sourceName}가 1대1 게임을 요청했습니다.`;
+      notificationContent = `가 1대1 게임을 요청했습니다.`;
       hoverContent = '게임 참여하기';
       handlerFunction = () => alert('game api');
       break;
@@ -71,10 +71,11 @@ export const NotiCard: React.FC<NotiCardProps> = ({ content }) => {
       onClick={() => handlerFunction()}
     >
       <div className={`relative ${isHovered ? 'hidden' : 'block'}`}>
+        <strong>{obj.sourceName}</strong>
         {notificationContent}
       </div>
       <div
-        className={`absolute ${
+        className={`absolute text-lg font-semibold ${
           isHovered ? 'block' : 'hidden'
         } bg-light-purple p-2`}
       >

@@ -6,7 +6,6 @@ import { useEffect, useRef, useState } from 'react';
 
 export function Notification() {
   const [isHovered, setIsHovered] = useState(false);
-
   const [active, setActive] = useState(false);
   const boxRef = useRef<HTMLDivElement>(null);
   const data = mockNotifications;
@@ -27,8 +26,10 @@ export function Notification() {
 
   return (
     <div
-      className="relative mt-xl w-[30px] h-[30px] hover:bg-dark-purple \
-    rounded-full flex justify-center items-center"
+      className={`relative mt-xl w-[30px] h-[30px] \
+    rounded-full flex justify-center items-center ${
+      isHovered || active ? 'bg-dark-purple' : null
+    }`}
     >
       <Image
         src="/icon/bell.svg"
@@ -36,7 +37,7 @@ export function Notification() {
         width={20}
         height={20}
         style={{
-          filter: isHovered ? 'invert(1)' : 'invert(0)',
+          filter: isHovered || active ? 'invert(1)' : 'invert(0)',
         }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
