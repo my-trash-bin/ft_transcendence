@@ -82,6 +82,26 @@ export class UserFollowService {
     });
   }
 
+  async getUsersBlockingMe(meId: UserId) {
+    return await this.prismaService.userFollow.findMany({
+      where: {
+        followeeId: meId.value,
+        isBlock: true,
+      },
+    });
+  }
+
+  async getUserRelationshipWithMe(followerId: UserId, meId: UserId) {
+    return await this.prismaService.userFollow.findUnique({
+      where: {
+        followerId_followeeId: {
+          followerId: followerId.value,
+          followeeId: meId.value,
+        },
+      },
+    });
+  }
+
   async remove(
     followerId: UserId,
     followeeId: UserId,

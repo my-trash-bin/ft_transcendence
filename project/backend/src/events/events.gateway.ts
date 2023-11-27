@@ -14,6 +14,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChangeActionType } from '../channel/channel.service';
+import { GateWayEvents } from '../common/gateway-events.enum';
 import { idOf } from '../common/Id';
 import { EventsService } from './events.service';
 
@@ -25,16 +26,6 @@ interface JwtPayload {
   iat: number;
   exp: number;
 }
-
-enum ChannelType {
-  NORMAL = 'normal',
-  DM = 'dm',
-}
-
-type ChannelTypeKey = string;
-type ChannelIdKey = string;
-type UserIdKey = string;
-type ClientIdKey = string;
 
 @WebSocketGateway(80, {
   cors: { origin: 'http://localhost:53000', credentials: true },
@@ -66,7 +57,7 @@ export class EventsGateway
       const msg =
         error instanceof WsException ? error.message : 'Unknown Error';
       console.error(error);
-      client.emit('exception', { msg });
+      client.emit(GateWayEvents.Exception, { msg });
       console.log(`인증 실패: ${msg}`);
       client.disconnect();
     }
@@ -77,7 +68,7 @@ export class EventsGateway
   }
 
   // no dm
-  @SubscribeMessage('message')
+  @SubscribeMessage(GateWayEvents.ChannelMessage)
   async handleMessage(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { channelId: string; msg: string },
@@ -87,7 +78,7 @@ export class EventsGateway
   }
 
   // only dm
-  @SubscribeMessage('dm')
+  @SubscribeMessage(GateWayEvents.Dm)
   async handleDm(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { memberId: string; msg: string },
@@ -97,7 +88,7 @@ export class EventsGateway
   }
 
   // only dmChannel
-  @SubscribeMessage('createDmChannel')
+  @SubscribeMessage(GateWayEvents.CreateDmChannel)
   async handleCreateDmChannel(
     @ConnectedSocket() client: Socket,
     @MessageBody()
@@ -109,29 +100,29 @@ export class EventsGateway
   }
 
   // no dmChannel
-  @SubscribeMessage('join')
+  @SubscribeMessage(GateWayEvents.Join)
   async handleJoin(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { channelId: string },
   ) {
     const { channelId } = data;
 
-    await this.eventsService.handleJoinChannel(client, idOf(channelId));
+    await this.eventsService.handleJoin(client, idOf(channelId));
   }
 
   // no dmChannel
-  @SubscribeMessage('leave')
+  @SubscribeMessage(GateWayEvents.Leave)
   async handleLeave(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { channelId: string },
   ) {
     const { channelId } = data;
 
-    await this.eventsService.handleLeaveChannel(client, idOf(channelId));
+    await this.eventsService.handleLeave(client, idOf(channelId));
   }
 
   // no dmChannel
-  @SubscribeMessage('kickBanPromote')
+  @SubscribeMessage(GateWayEvents.KickBanPromote)
   async handleKick(
     @ConnectedSocket() client: Socket,
     @MessageBody()
@@ -149,8 +140,20 @@ export class EventsGateway
 
   // To test
   @SubscribeMessage('triggerNotification')
-  han(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
-    this.server.emit('noti', data);
+  handleNoti(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+    this.server.emit(GateWayEvents.Notification, data);
+  }
+
+  // To test
+  @SubscribeMessage(GateWayEvents.Exception)
+  testException(@ConnectedSocket() _client: Socket, @MessageBody() data: any) {
+    throw new WsException(`WsException 테스트 중입니다.`);
+  }
+
+  // To test
+  @SubscribeMessage('invite')
+  testOk(@ConnectedSocket() _client: Socket, @MessageBody() data: any): string {
+    return `ok 테스트 중입니다.`;
   }
 
   private getCookie = (cookies: string, key: string) => {
