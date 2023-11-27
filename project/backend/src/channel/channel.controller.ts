@@ -13,7 +13,7 @@ import { Request as ExpressRequest } from 'express';
 import { JwtPayloadPhaseComplete } from '../auth/auth.service';
 import { JwtGuard } from '../auth/jwt.guard';
 import { Phase, PhaseGuard } from '../auth/phase.guard';
-import { EventsGateway } from '../events/events.gateway';
+import { EventsService } from '../events/events.service';
 import { ChannelService } from './channel.service';
 import { ChannelDto } from './dto/channel-dto';
 import { ChannelRelationDto } from './dto/channel-relation-dto';
@@ -24,7 +24,7 @@ import { CreateChannelDto } from './dto/create-channel.dto';
 export class ChannelController {
   constructor(
     private readonly channelService: ChannelService,
-    private readonly eventsGateway: EventsGateway,
+    private readonly eventsService: EventsService,
   ) {}
 
   @Get('all')
@@ -72,7 +72,7 @@ export class ChannelController {
       }
       throw new BadRequestException(result.error!.message);
     }
-    this.eventsGateway.handleNewChannel('normal', result.data!.id, userId);
+    this.eventsService.handleNewChannel('normal', result.data!.id, userId);
     return result!.data;
   }
 
