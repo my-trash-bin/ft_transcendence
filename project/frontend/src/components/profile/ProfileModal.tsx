@@ -38,7 +38,7 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
     }
   }, [isOpen, refetch]);
 
-  function handleFriendComponent() {
+  function handleFriendButton() {
     if (!data) return <p>error</p>;
     let handler;
     let content;
@@ -67,7 +67,7 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
     );
   }
 
-  function handleBlockComponent() {
+  function handleBlockButton() {
     if (!data) return <p>error</p>;
     let handler;
     let content;
@@ -81,6 +81,51 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
     } else {
       handler = blockUser;
       content = '차단하기';
+    }
+    return (
+      <Button
+        isModal={true}
+        disabled={disabled}
+        onClick={!disabled ? handler : undefined}
+      >
+        {content}
+      </Button>
+    );
+  }
+
+  function handlerGameButton() {
+    if (!data) return <p>error</p>;
+    let handler;
+    let content;
+    let disabled = false;
+    if (data.relation === 'me') {
+      disabled = true;
+      content = '나';
+    } else {
+      content = '게임하기';
+      handler = () => alert('game api');
+    }
+    return (
+      <Button
+        isModal={true}
+        disabled={disabled}
+        onClick={!disabled ? handler : undefined}
+      >
+        {content}
+      </Button>
+    );
+  }
+  function handlerDmButton() {
+    if (!data) return <p>error</p>;
+    let handler;
+    let content;
+    let disabled = false;
+    if (data.relation === 'me') {
+      disabled = true;
+      content = '나';
+    } else {
+      content = 'DM';
+      handler = () => alert('move to dm');
     }
     return (
       <Button
@@ -180,16 +225,12 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
             </div>
             <div className="flex flex-col pt-xl gap-md">
               <div className="flex flex-row gap-3xl justify-center">
-                {handleFriendComponent()}
-                <Button onClick={() => alert('game api')} isModal={true}>
-                  게임하기
-                </Button>
+                {handleFriendButton()}
+                {handlerGameButton()}
               </div>
               <div className="flex flex-row gap-3xl justify-center">
-                {handleBlockComponent()}
-                <Button onClick={() => alert('move to dm')} isModal={true}>
-                  DM
-                </Button>
+                {handleBlockButton()}
+                {handlerDmButton()}
               </div>
             </div>
           </div>
