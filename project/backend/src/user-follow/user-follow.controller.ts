@@ -52,7 +52,11 @@ export class UserFollowController {
   @Phase('complete')
   async blockUser(@Request() req: ExpressRequest, @Body() dto: TargetUserDto) {
     const isBlock = true;
-    this.createOrUpdate(req, dto, isBlock);
+    const result = await this.createOrUpdate(req, dto, isBlock);
+    if (!result.ok) {
+      throw new BadRequestException(result!.error?.message);
+    }
+    return result!.data;
   }
 
   @Post('unfriend')
