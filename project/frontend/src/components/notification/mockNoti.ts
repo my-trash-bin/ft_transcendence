@@ -2,18 +2,18 @@ const mockNotifications = [
   {
     id: 'notification-1',
     userId: '1',
-    isRead: false,
+    isRead: true,
     createdAt: new Date().toISOString(),
     contentJson:
-      '{"type": "newFriend", "sourceId": "123", "sourceName": "klew"}',
+      '{"type": "newFriend", "sourceId": "123", "sourceName": "ede-thom"}',
   },
   {
     id: 'notification-2',
     userId: '2',
-    isRead: false,
+    isRead: true,
     createdAt: new Date().toISOString(),
     contentJson:
-      '{"type": "newMessageDm", "sourceId": "123", "sourceName": "klew"}',
+      '{"type": "newMessageDm", "sourceId": "123", "sourceName": "ede-thom"}',
   },
   {
     id: 'notification-23',
@@ -39,38 +39,38 @@ const mockNotifications = [
     contentJson:
       '{"type": "newFriend", "sourceId": "123", "sourceName": "klew"}',
   },
-  {
-    id: 'notification-6',
-    userId: '6',
-    isRead: false,
-    createdAt: new Date().toISOString(),
-    contentJson:
-      '{"type": "gameRequest", "sourceId": "123", "sourceName": "klew"}',
-  },
-  {
-    id: 'notification-7',
-    userId: '7',
-    isRead: false,
-    createdAt: new Date().toISOString(),
-    contentJson:
-      '{"type": "newFriend", "sourceId": "123", "sourceName": "klew"}',
-  },
-  {
-    id: 'notification-8',
-    userId: '8',
-    isRead: false,
-    createdAt: new Date().toISOString(),
-    contentJson:
-      '{"type": "gameRequest", "sourceId": "123", "sourceName": "klew"}',
-  },
-  {
-    id: 'notification-9',
-    userId: '9',
-    isRead: false,
-    createdAt: new Date().toISOString(),
-    contentJson:
-      '{"type": "newFriend", "sourceId": "123", "sourceName": "klew"}',
-  },
+  // {
+  //   id: 'notification-6',
+  //   userId: '6',
+  //   isRead: false,
+  //   createdAt: new Date().toISOString(),
+  //   contentJson:
+  //     '{"type": "gameRequest", "sourceId": "123", "sourceName": "klew"}',
+  // },
+  // {
+  //   id: 'notification-7',
+  //   userId: '7',
+  //   isRead: false,
+  //   createdAt: new Date().toISOString(),
+  //   contentJson:
+  //     '{"type": "newFriend", "sourceId": "123", "sourceName": "klew"}',
+  // },
+  // {
+  //   id: 'notification-8',
+  //   userId: '8',
+  //   isRead: false,
+  //   createdAt: new Date().toISOString(),
+  //   contentJson:
+  //     '{"type": "gameRequest", "sourceId": "123", "sourceName": "klew"}',
+  // },
+  // {
+  //   id: 'notification-9',
+  //   userId: '9',
+  //   isRead: false,
+  //   createdAt: new Date().toISOString(),
+  //   contentJson:
+  //     '{"type": "newFriend", "sourceId": "123", "sourceName": "klew"}',
+  // },
 ];
 
 export default mockNotifications;

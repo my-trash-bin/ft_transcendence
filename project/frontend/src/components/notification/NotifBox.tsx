@@ -1,6 +1,7 @@
 import { NotiCard } from './NotiCard';
 import mockNotifications from './mockNoti';
 import { useEffect, useRef, useState } from 'react';
+import { SelectNotif } from './SelectNotif';
 
 export function NotifBox({
   active,
@@ -11,6 +12,7 @@ export function NotifBox({
 }) {
   const boxRef = useRef<HTMLDivElement>(null);
   const data = mockNotifications;
+  const [showAll, setShowAll] = useState(false);
   useEffect(() => {
     function handleClickOutside(event: any) {
       if (boxRef.current && !boxRef.current.contains(event.target)) {
@@ -22,7 +24,7 @@ export function NotifBox({
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
+  }, [setActive]);
   return (
     active && (
       <div
@@ -34,13 +36,19 @@ export function NotifBox({
         overflow-y-scroll'
         }
       >
-        {data.map((val) => (
-          <NotiCard
-            key={val.id}
-            isRead={val.isRead}
-            content={val.contentJson}
-          />
-        ))}
+        <SelectNotif showAll={showAll} setShowAll={setShowAll} />
+        {data.map((val) => {
+          if (showAll || !val.isRead) {
+            return (
+              <NotiCard
+                key={val.id}
+                isRead={val.isRead}
+                content={val.contentJson}
+              />
+            );
+          }
+          return null;
+        })}
       </div>
     )
   );
