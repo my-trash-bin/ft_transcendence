@@ -7,5 +7,6 @@ import { UserFollowService } from './user-follow.service';
   imports: [BaseModule],
   controllers: [UserFollowController],
   providers: [UserFollowService],
+  exports: [UserFollowService],
 })
 export class UserFollowModule {}
