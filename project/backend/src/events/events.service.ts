@@ -74,8 +74,8 @@ export class EventsService {
 
   async handleDisconnect(client: Socket) {
     const { id } = client;
-    const userId = this.userMap.get(id)!;
-    const noti = this.removeClient(id);
+    this.removeClient(id);
+    this.removeUserFromAllChannels(id);
   }
 
   async sendMessage(client: Socket, channelId: ChannelId, msg: string) {
@@ -217,7 +217,7 @@ export class EventsService {
     }
 
     client.join(type + channelId);
-    this.clientJoinChannel(type, channelId.value, this.userMap.get(id)!);
+    this.clientJoinChannel(type, channelId.value, userId!);
 
     this.server
       .to(type + channelId.value)
@@ -368,9 +368,23 @@ export class EventsService {
   }
   private async addUserJoinedChannels(client: Socket, userId: UserId) {
     const dmChannels = await this.dmService.getDMChannelsWithMessages(userId);
-    dmChannels.forEach((el) => client.join(ChannelType.DM + el.id));
+    dmChannels.forEach((dmChannel) => {
+      // console.log('dm방 넣어주기 ', ChannelType.DM, ' ', dmChannel.id);
+      client.join(dmChannel.id + dmChannel.id);
+      if (!(ChannelType.DM in this.channels[ChannelType.DM])) {
+        this.channels[ChannelType.DM][dmChannel.id] = new Set();
+      }
+      this.channels[ChannelType.DM][dmChannel.id].add(userId.value);
+    });
     const channels = await this.channelService.findByUser(userId);
-    channels.forEach((el) => client.join(ChannelType.NORMAL + el.id));
+    channels.forEach((channel) => {
+      // console.log('채널방 넣어주기 ', ChannelType.NORMAL, ' ', channel.id);
+      client.join(ChannelType.NORMAL + channel.id);
+      if (!(channel.id in this.channels[ChannelType.NORMAL])) {
+        this.channels[ChannelType.DM][channel.id] = new Set();
+      }
+      this.channels[ChannelType.DM][channel.id].add(userId.value);
+    });
     return { dmChannels, channels };
   }
   private removeUserFromAllChannels(id: string) {
