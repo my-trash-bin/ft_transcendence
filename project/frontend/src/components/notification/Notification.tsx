@@ -35,10 +35,12 @@ export function Notification() {
       />
       {active && (
         <div
+          ref={boxRef}
           className={
             'w-[250px] h-[400px] fixed left-[100px] bottom-[50px] \
-            rounded-[5px] border-3 border-dark-purple bg-default z-[20] \
-            felx flex-col items-center justify-center'
+            rounded-[5px] border-3 border-dark-purple bg-default \
+            felx flex-col items-center justify-center \
+            overflow-y-scroll'
           }
         >
           {data.map((val) => (
