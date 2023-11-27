@@ -9,5 +9,6 @@ import { UsersService } from './users.service';
   imports: [BaseModule],
   controllers: [UsersController],
   providers: [UsersService, UserFollowService, PongSeasonLogService],
+  exports: [UsersService],
 })
 export class UsersModule {}

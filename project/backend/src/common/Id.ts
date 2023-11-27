@@ -11,3 +11,4 @@ export type UserId = Id<'user'>;
 export type AuthId = Id<'auth'>;
 export type ChannelId = Id<'channel'>;
 export type DmChannelId = Id<'dmChannel'>;
+export type ClientId = Id<'client'>;
