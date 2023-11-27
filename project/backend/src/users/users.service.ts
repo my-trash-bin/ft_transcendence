@@ -1,9 +1,12 @@
 import { ConflictException, Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../base/prisma.service';
 import { UserId } from '../common/Id';
 import { isUniqueConstraintError } from '../util/isUniqueConstraintError';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { RelationStatus } from './dto/user-profile.dto';
+import { UserRelationshipDto } from './dto/user-relationship.dto';
 import { UserDto } from './dto/user.dto';
 
 @Injectable()
@@ -59,16 +62,41 @@ export class UsersService {
     return prismaUser === null ? null : new UserDto(prismaUser);
   }
 
-  async searchByBickname(nickname: string) {
+  async searchByBickname(
+    id: UserId,
+    nickname: string,
+  ): Promise<UserRelationshipDto[]> {
     console.log('searchByBickname', nickname);
+    const where: Prisma.UserWhereInput | undefined = !nickname
+      ? undefined
+      : {
+          nickname: {
+            contains: nickname,
+          },
+        };
+
     const prismaUsers = await this.prisma.user.findMany({
-      where: {
-        nickname: {
-          contains: nickname,
+      where,
+      include: {
+        followedBy: {
+          where: {
+            followerId: id.value,
+          },
         },
       },
     });
-    return prismaUsers.map((prismaUser) => new UserDto(prismaUser));
+
+    return prismaUsers.map(
+      (prismaUser) =>
+        new UserRelationshipDto(
+          prismaUser,
+          this.getRelation(
+            prismaUser.followedBy.length === 0
+              ? undefined
+              : prismaUser.followedBy[0].isBlock,
+          ),
+        ),
+    );
   }
 
   async update(id: UserId, updateUserDto: UpdateUserDto) {
@@ -96,6 +124,13 @@ export class UsersService {
   remove(id: string) {
     return `This action removes a #${id} user`;
   }
+
+  getRelation = (isBlock?: boolean): RelationStatus =>
+    isBlock === undefined
+      ? RelationStatus.None
+      : isBlock
+      ? RelationStatus.Block
+      : RelationStatus.Friend;
 
   async isUniqueNickname(nickname: string) {
     const prismaUser = await this.prisma.user.findUnique({
