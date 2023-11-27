@@ -1,14 +1,11 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { BaseModule } from '../base/base.module';
 import { ChannelModule } from '../channel/channel.module';
-import { ChannelService } from '../channel/channel.service';
 import { DmModule } from '../dm/dm.module';
-import { DmService } from '../dm/dm.service';
 import { UserFollowModule } from '../user-follow/user-follow.module';
-import { UserFollowService } from '../user-follow/user-follow.service';
 import { UsersModule } from '../users/users.module';
-import { UsersService } from '../users/users.service';
 import { EventsGateway } from './events.gateway';
+import { EventsService } from './events.service';
 
 @Module({
   imports: [
@@ -18,13 +15,7 @@ import { EventsGateway } from './events.gateway';
     DmModule,
     BaseModule,
   ],
-  providers: [
-    UsersService,
-    UserFollowService,
-    ChannelService,
-    DmService,
-    EventsGateway,
-  ],
-  exports: [EventsGateway],
+  providers: [EventsGateway, EventsService],
+  exports: [EventsService],
 })
 export class EventsModule {}

@@ -216,7 +216,7 @@ export class UsersController {
   @ApiUnauthorizedResponse({ description: '인증되지 않은 유저로부터의 요청.' })
   // @ApiResponse({ status: 409, description: 'Nickname already exists.' })
   @UseGuards(JwtGuard, PhaseGuard)
-  @Phase('complete')
+  @Phase('register')
   async checkNickname(
     @Body() dto: NicknameCheckUserDto,
   ): Promise<UniqueCheckResponse> {
