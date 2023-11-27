@@ -2,8 +2,13 @@ import { NotiCard } from './NotiCard';
 import mockNotifications from './mockNoti';
 import { useEffect, useRef, useState } from 'react';
 
-export function NotifBox() {
-  const [active, setActive] = useState(false);
+export function NotifBox({
+  active,
+  setActive,
+}: {
+  active: boolean;
+  setActive: Function;
+}) {
   const boxRef = useRef<HTMLDivElement>(null);
   const data = mockNotifications;
   useEffect(() => {
