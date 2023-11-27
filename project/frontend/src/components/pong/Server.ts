@@ -3,6 +3,8 @@ import { createServer } from 'http';
 import { Socket, Server as SocketIOServer } from 'socket.io';
 import { BALL_SIZE, BOARD_HEIGHT, BOARD_WIDTH, DEFAULT_SPEED, PADDLE_HEIGHT, PADDLE_STRIKE, PADDLE_WIDTH, SMASH_SPEED } from './gameConstants';
 
+// npm run build && npm start
+//ts-node src/components/pong/Server.ts
 const app = express();
 const httpServer = createServer(app);
 const io = new SocketIOServer(httpServer, {
@@ -134,6 +136,7 @@ function updateGameLogic() {
 
   //  ============================= 클라이언트에게 상태 업데이트 전송 =============================
   io.emit('gameUpdate', gameState);
+  // console.log(`update!! ${gameState.ball.x}`); 
 }
 
 io.on('connection', (socket: Socket) => {
