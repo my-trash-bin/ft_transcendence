@@ -1,5 +1,6 @@
 import Logo from './Logo';
 import NavIcon from './NavIcon';
+import { Notification } from '../notification/Notification';
 
 const Navbar = () => {
   return (
@@ -10,6 +11,7 @@ const Navbar = () => {
       <NavIcon type="channel" />
       <NavIcon type="game" />
       <NavIcon type="profile" />
+      <Notification />
     </nav>
   );
 };
