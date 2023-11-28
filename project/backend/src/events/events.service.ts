@@ -11,6 +11,13 @@ import { UsersService } from '../users/users.service';
 import { Server, Socket } from 'socket.io';
 import { GateWayEvents } from '../common/gateway-events.enum';
 import { UserDto } from '../users/dto/user.dto';
+import {
+  ChannelMemberInfo,
+  DmChannelInfoType,
+  JoiningChannelInfo,
+  LeavingChannelInfo,
+  MessageInfo,
+} from './event-response.dto';
 
 interface JwtPayload {
   phase: string;
@@ -134,7 +141,7 @@ export class EventsService {
 
     const eventName = GateWayEvents.ChannelMessage;
 
-    const data = result;
+    const data: MessageInfo = result.data!;
 
     this.broadcastToChannel(type, channelId, blockedIdList, eventName, data);
   }
@@ -179,10 +186,8 @@ export class EventsService {
       throw new WsException(result.error!.message);
     }
 
-    const dmChannel = result.data!;
-
     const eventName = GateWayEvents.Events;
-    const data = dmChannel;
+    const data: DmChannelInfoType = result.data!;
 
     client.emit(eventName, data);
   }
@@ -213,7 +218,7 @@ export class EventsService {
 
     const eventName = GateWayEvents.DirectMessage;
 
-    const data = result;
+    const data: MessageInfo = result.data!;
 
     this.broadcastToChannel(
       type,
@@ -246,7 +251,7 @@ export class EventsService {
 
     const eventName = GateWayEvents.Join;
 
-    const data = result.data!;
+    const data: JoiningChannelInfo = result.data!;
 
     this.broadcastToChannel(type, channelId, [], eventName, data);
   }
@@ -273,7 +278,7 @@ export class EventsService {
     this.handleUserLeaveChannel(type, channelId, idOf(userId));
 
     const eventName = GateWayEvents.Leave;
-    const data = result.data!;
+    const data: LeavingChannelInfo = result.data!;
     this.broadcastToChannel(type, channelId, [], eventName, data);
   }
 
@@ -318,7 +323,7 @@ export class EventsService {
 
     const eventName = GateWayEvents.KickBanPromote;
 
-    const data = result.data!;
+    const data: ChannelMemberInfo = result.data!;
 
     this.broadcastToChannel(type, channelId, [], eventName, data);
     this.removeUserFromChannel(this.channels[type][channelId.value], id);

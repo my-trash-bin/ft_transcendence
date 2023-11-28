@@ -16,6 +16,12 @@ import { Server, Socket } from 'socket.io';
 import { ChangeActionType } from '../channel/channel.service';
 import { GateWayEvents } from '../common/gateway-events.enum';
 import { idOf } from '../common/Id';
+import {
+  ChannelIdentityDto,
+  ChannelMessageDto,
+  CreateDmChannelDto,
+  DmMessageDto,
+} from './event-request.dto';
 import { EventsService } from './events.service';
 
 interface JwtPayload {
@@ -71,7 +77,7 @@ export class EventsGateway
   @SubscribeMessage(GateWayEvents.ChannelMessage)
   async handleMessage(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { channelId: string; msg: string },
+    @MessageBody() data: ChannelMessageDto,
   ) {
     const { channelId, msg } = data;
     await this.eventsService.sendMessage(client, idOf(channelId), msg);
@@ -81,7 +87,7 @@ export class EventsGateway
   @SubscribeMessage(GateWayEvents.DirectMessage)
   async handleDm(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { memberId: string; msg: string },
+    @MessageBody() data: DmMessageDto,
   ) {
     const { memberId, msg } = data;
     await this.eventsService.handleSendDm(client, idOf(memberId), msg);
@@ -92,7 +98,7 @@ export class EventsGateway
   async handleCreateDmChannel(
     @ConnectedSocket() client: Socket,
     @MessageBody()
-    data: { info: { nickname?: string; memberId?: string } },
+    data: CreateDmChannelDto,
   ) {
     const { nickname, memberId } = data.info;
 
@@ -103,7 +109,7 @@ export class EventsGateway
   @SubscribeMessage(GateWayEvents.Join)
   async handleJoin(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { channelId: string },
+    @MessageBody() data: ChannelIdentityDto,
   ) {
     const { channelId } = data;
 
@@ -114,7 +120,7 @@ export class EventsGateway
   @SubscribeMessage(GateWayEvents.Leave)
   async handleLeave(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { channelId: string },
+    @MessageBody() data: ChannelIdentityDto,
   ) {
     const { channelId } = data;
 
