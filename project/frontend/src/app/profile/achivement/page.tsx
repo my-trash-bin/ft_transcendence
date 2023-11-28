@@ -1,5 +1,5 @@
 'use client';
-import AchivementArticle from '../../../components/profile/achivement/AchivementArticle';
+import { AchivementArticle } from '../../../components/profile/achivement/AchivementArticle';
 
 export default function ProfilePage() {
   return (

@@ -3,7 +3,7 @@ import { ProfileButton } from '../ProfileButton';
 import { CardType, HistoryCard } from './HistoryCard';
 import { mockData } from './mockDataHistory';
 
-function HistoryBox() {
+export function HistoryBox() {
   return (
     <div className="w-[435px] h-[420px] bg-light-background rounded-lg ml-xl relative">
       <div className="h-[inherit] pt-3xl pb-xl flex flex-col items-center">
@@ -27,5 +27,3 @@ function HistoryBox() {
     </div>
   );
 }
-
-export default HistoryBox;

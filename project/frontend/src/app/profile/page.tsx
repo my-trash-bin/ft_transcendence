@@ -1,7 +1,7 @@
 'use client';
 import { ProfileBox } from '../../components/profile/ProfileBox';
-import AchivementBox from '../../components/profile/achivement/AchivementBox';
-import HistoryBox from '../../components/profile/history/HistoryBox';
+import { AchivementBox } from '../../components/profile/achivement/AchivementBox';
+import { HistoryBox } from '../../components/profile/history/HistoryBox';
 
 export default function ProfilePage() {
   return (

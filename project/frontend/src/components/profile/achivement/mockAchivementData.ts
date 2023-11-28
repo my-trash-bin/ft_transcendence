@@ -6,7 +6,7 @@ interface AchivementProps {
   isMine: boolean;
 }
 
-export const mockData: AchivementProps[] = [
+export const mockAchivementData: AchivementProps[] = [
   {
     key: 1,
     imageURL: '/achivement/bell.png',
