@@ -301,6 +301,15 @@ export interface CreateChannelDto {
   capacity: number;
 }
 
+export interface ChannelMemberDto {
+  channelId: string;
+  memberId: string;
+  memberType: 'ADMINISTRATOR' | 'MEMBER' | 'BANNED';
+  /** @format date-time */
+  mutedUntil: string;
+  member: UserDto;
+}
+
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, 'body' | 'bodyUsed'>;
 
@@ -764,6 +773,25 @@ export class Api<
      * No description
      *
      * @tags users
+     * @name UsersControllerGetUsetByNickname
+     * @summary 유저 1명 기본 조회 by 닉네임
+     * @request GET:/api/v1/users/nickname/{nickname}
+     */
+    usersControllerGetUsetByNickname: (
+      nickname: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<UserDto, void>({
+        path: `/api/v1/users/nickname/${nickname}`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags users
      * @name UsersControllerFindOne
      * @summary 유저 1명 기본 조회
      * @request GET:/api/v1/users/{id}
@@ -990,6 +1018,25 @@ export class Api<
         method: 'POST',
         body: data,
         type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags channel
+     * @name ChannelControllerFindChannelMembersByChannelId
+     * @summary 채널 참여자 목록 반환
+     * @request GET:/api/v1/channel/participant/{channelId}
+     */
+    channelControllerFindChannelMembersByChannelId: (
+      channelId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<ChannelMemberDto[], any>({
+        path: `/api/v1/channel/participant/${channelId}`,
+        method: 'GET',
         format: 'json',
         ...params,
       }),

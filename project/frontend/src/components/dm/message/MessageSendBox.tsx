@@ -10,7 +10,7 @@ export function MessageSendBox({
   type,
   targetUserId,
 }: {
-  channelId: string;
+  channelId?: string;
   type: messageType;
   targetUserId?: string;
 }) {
@@ -18,7 +18,10 @@ export function MessageSendBox({
   const sendMessage = () => {
     const socket = getSocket();
     if (type === messageType.DM) {
-      socket.emit('dm', { msg: message, memberId: targetUserId });
+      socket.emit('directMessage', {
+        msg: message,
+        memberId: targetUserId,
+      });
     } else socket.emit('channelMessage', { channelId, msg: message });
 
     setMessage('');

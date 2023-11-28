@@ -1,5 +1,7 @@
+import { Api } from '@/api/api';
 import { getSocket } from '@/lib/Socket';
 import { useEffect, useState } from 'react';
+import { MyChat } from './MyChat';
 import { OtherChat } from './OtherChat';
 
 export enum messageType {
@@ -7,23 +9,50 @@ export enum messageType {
   CHANNEL = 'CHANNEL',
 }
 interface messageContent {
-  channelId: string;
   message: string;
   time: Date;
   profileImage: string;
-  nickname: string;
+  targetNickname: string;
+  targetId: string;
 }
 
 export function MessageContent({
-  channelId,
   type,
-}: Readonly<{ channelId: string; type: messageType }>) {
+  nickname,
+}: Readonly<{ type: messageType; nickname: string }>) {
   const [messages, setMessages] = useState<messageContent[]>([]);
+  const [targetUserId, setTargetUserId] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<boolean>(false);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const data = await new Api().api.usersControllerGetUsetByNickname(
+          nickname,
+        );
+        setLoading(false);
+        setTargetUserId(data.data.id);
+      } catch (e) {
+        setError(true);
+      }
+    }
+    fetchData();
+  }, [nickname]);
 
   useEffect(() => {
     const socket = getSocket();
+
     if (type === messageType.DM) {
-      socket.on(`dm`, (data: messageContent) => {
+      socket.on(`directMessage`, (res) => {
+        const data = {
+          message: res.data.messageJson,
+          time: new Date(res.data.sentAt),
+          profileImage: '/avatar/avatar-big.svg',
+          targetId: res.data.memberId,
+          targetNickname: '윤서',
+        };
+        console.log(data);
         setMessages((messages) => [...messages, data]);
       });
     } else {
@@ -33,35 +62,49 @@ export function MessageContent({
     }
 
     return () => {
-      socket.off(`dm`);
-      socket.off(`channelMessage`);
+      if (type === messageType.DM) {
+        socket.off(`directMessage`);
+      } else {
+        socket.off(`channelMessage`);
+      }
     };
-  }, [channelId, type]);
+  }, [type]);
 
+  if (loading) return <div>loading...</div>;
+  if (error) return <div>error!</div>;
+  const me: string | null = localStorage.getItem('me');
+  const myNickname = me ? JSON.parse(me).nickname : '';
   return (
     <div className="w-[95%] h-[610px] pt-[20px] bg-chat-color2 rounded-[10px] flex flex-col overflow-y-scroll mt-sm">
-      {/* {messages.map((message, idx) => {
-        if (message.nickname === myNickname) {
+      {messages.map((message, idx) => {
+        if (message.targetNickname === myNickname) {
           return <MyChat key={message.time.toString()} {...message} />;
         } else {
           let isFirst = false;
-          if (idx != 0 && messages[idx - 1].nickname != message.nickname) {
+          if (
+            idx == 0 ||
+            (idx != 0 &&
+              messages[idx - 1].targetNickname != message.targetNickname)
+          ) {
             isFirst = true;
           }
-          <OtherChat
-            key={message.time.toString()}
-            {...message}
-            isFirst={isFirst}
-          />;
+          return (
+            <OtherChat
+              key={message.time.toString()}
+              {...message}
+              isFirst={isFirst}
+            />
+          );
         }
-      })} */}
+      })}
 
-      <OtherChat
+      {/* <OtherChat
         message="hihi"
         time={new Date()}
         profileImage="/avatar/avatar-big.svg"
         isFirst={true}
-        nickname="nickname"
+        targetId={targetUserId}
+        targetNickname={nickname}
       />
 
       <OtherChat
@@ -69,8 +112,10 @@ export function MessageContent({
         time={new Date()}
         profileImage="/avatar/avatar-big.svg"
         isFirst={false}
-        nickname="nickname"
+        targetId={targetUserId}
+        targetNickname={nickname}
       />
+      <UserStateAnnounce userState={UserState.LEAVE} nickname="hello" /> */}
     </div>
   );
 }
