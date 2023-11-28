@@ -6,14 +6,12 @@ import { MessageBox } from '@/components/dm/message/MessageBox';
 import Image from 'next/image';
 import { useState } from 'react';
 
-export default function DmPage({
-  params,
-}: Readonly<{ params: { username: string } }>) {
-  const userSearchCallback = (searchUsername: string) => {
-    setSearchUsername(searchUsername);
-  };
-  const [searchUsername, setSearchUsername] = useState('');
-  const renderMessageBox = params.hasOwnProperty('username') ? (
+const getRenderMessageBox = (params: { username: string }) => {
+  if (params.hasOwnProperty('username')) {
+    // create dm channel
+    // getSocket().emit('createDmChannel', { memberId: params.username });
+  }
+  const data = params.hasOwnProperty('username') ? (
     <MessageBox username={params.username} />
   ) : (
     <Image
@@ -24,6 +22,18 @@ export default function DmPage({
       height={300}
     />
   );
+
+  return data;
+};
+
+export default function DmPage({
+  params,
+}: Readonly<{ params: { username: string } }>) {
+  const userSearchCallback = (searchUsername: string) => {
+    setSearchUsername(searchUsername);
+  };
+  const [searchUsername, setSearchUsername] = useState('');
+  const renderMessageBox = getRenderMessageBox(params);
   return (
     <>
       <div id="backdrop-root"></div>
