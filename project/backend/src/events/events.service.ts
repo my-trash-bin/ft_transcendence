@@ -17,7 +17,6 @@ import {
   DmChannelInfoType,
   JoiningChannelInfo,
   LeavingChannelInfo,
-  MessageInfo,
 } from './event-response.dto';
 
 interface JwtPayload {
@@ -161,7 +160,7 @@ export class EventsService {
 
     const eventName = GateWayEvents.ChannelMessage;
 
-    const data: MessageInfo = result.data!;
+    const data: MessageWithMemberDto = result.data!;
 
     // console.log(result.data);
     // console.log(blockList);
