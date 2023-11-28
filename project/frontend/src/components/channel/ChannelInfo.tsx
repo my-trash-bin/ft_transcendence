@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { useState } from 'react';
+import Portal from '../common/Portal';
 import { ChannelSettingModal } from './modals/ChannelSettingModal';
 
 export function ChannelInfo({ channelId }: Readonly<{ channelId: string }>) {
@@ -18,7 +19,9 @@ export function ChannelInfo({ channelId }: Readonly<{ channelId: string }>) {
 
   return (
     <>
-      <ChannelSettingModal isOpen={isOpen} closeModal={modalClose} />
+      <Portal selector={'#modal-channel'}>
+        <ChannelSettingModal isOpen={isOpen} closeModal={modalClose} />
+      </Portal>
       <div className="w-[95%] h-[80px] border-b border-default relative flex justify-center items-center">
         <h3>{channelData.channelName}</h3>
         <button
