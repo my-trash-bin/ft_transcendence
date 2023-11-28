@@ -158,14 +158,32 @@ export class UsersController {
     });
   }
 
+  @Get('nickname/:nickname')
+  @ApiOperation({ summary: '유저 1명 기본 조회 by 닉네임' })
+  @ApiOkResponse({ description: '유저 객체 하나 반환', type: () => UserDto })
+  @ApiBadRequestResponse({ description: '올바르지 않은 닉네임' })
+  @ApiUnauthorizedResponse({ description: '인증되지 않은 유저로부터의 요청.' })
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
+  async getUsetByNickname(
+    @Param('nickname') nickname: string,
+  ): Promise<UserDto> {
+    const result = await this.usersService.findOneByNickname(nickname);
+    if (result === null) {
+      throw new BadRequestException(`올바르지 않은 닉네임: ${nickname}`);
+    }
+    return result;
+  }
+
   @Get(':id')
   @ApiOperation({ summary: '유저 1명 기본 조회' })
   @ApiOkResponse({ description: '유저 객체 하나 반환', type: () => UserDto })
   @ApiBadRequestResponse({ description: '올바르지 않은 id' })
+  @ApiUnauthorizedResponse({ description: '인증되지 않은 유저로부터의 요청.' })
   @UseGuards(JwtGuard, PhaseGuard)
   @Phase('complete')
-  findOne(@Param('id') id: string) {
-    const result = this.usersService.findOne(idOf(id));
+  async findOne(@Param('id') id: string) {
+    const result = await this.usersService.findOne(idOf(id));
     if (result === null) {
       throw new BadRequestException('올바르지 않은 id');
     }
@@ -195,6 +213,7 @@ export class UsersController {
     type: () => UserDto,
   })
   @ApiBadRequestResponse({ description: '관계키 오류' })
+  @ApiUnauthorizedResponse({ description: '인증되지 않은 유저로부터의 요청.' })
   @ApiConflictResponse({ description: '닉네임 유니크 조건 오류' })
   @ApiInternalServerErrorResponse({ description: '알수 없는 내부 에러' })
   @UseGuards(JwtGuard, PhaseGuard)

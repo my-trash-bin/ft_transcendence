@@ -1,7 +1,7 @@
 export enum GateWayEvents {
   /* 메세지 전송 */
   ChannelMessage = 'channelMessage',
-  Dm = 'dm',
+  DirectMessage = 'directMessage',
 
   /* Dm 채널 생성 */
   CreateDmChannel = 'createDmChannel',

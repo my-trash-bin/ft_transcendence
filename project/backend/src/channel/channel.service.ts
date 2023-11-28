@@ -17,7 +17,8 @@ import {
   ServiceResponse,
 } from '../common/ServiceResponse';
 import { ChannelDto } from './dto/channel-dto';
-import { ChannelRelationDto } from './dto/channel-relation-dto';
+import { ChannelMemberDto } from './dto/channel-members.dto';
+import { ChannelRelationDto } from './dto/channel-relation.dto';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { ChannelType } from './enums/channel-type.enum';
 
@@ -369,6 +370,39 @@ export class ChannelService {
       if (error instanceof ServiceError) {
         return { ok: false, error };
       }
+      if (error instanceof PrismaClientKnownRequestError) {
+        return newServiceFailPrismaKnownResponse(error.code, 400);
+      }
+      return newServiceFailPrismaUnKnownResponse(500);
+    }
+  }
+
+  async findChannelMembersByChannelId(
+    channelId: ChannelId,
+  ): Promise<ServiceResponse<ChannelMemberDto[]>> {
+    try {
+      const result = await this.prisma.$transaction(async (prisma) => {
+        return await this.prisma.channelMember.findMany({
+          where: {
+            channelId: channelId.value,
+          },
+          include: {
+            member: {
+              select: {
+                id: true,
+                joinedAt: true,
+                isLeaved: true,
+                leavedAt: true,
+                nickname: true,
+                profileImageUrl: true,
+                statusMessage: true,
+              },
+            },
+          },
+        });
+      });
+      return newServiceOkResponse(result);
+    } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         return newServiceFailPrismaKnownResponse(error.code, 400);
       }

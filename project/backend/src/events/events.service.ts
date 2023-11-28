@@ -211,7 +211,7 @@ export class EventsService {
 
     const channelId = result.data!.channelId;
 
-    const eventName = GateWayEvents.Dm;
+    const eventName = GateWayEvents.DirectMessage;
 
     const data = result;
 
@@ -350,11 +350,6 @@ export class EventsService {
     this.broadcastToUserClients(userId, eventName, data);
   }
 
-  private getCookie = (cookies: string, key: string) => {
-    const cookieKeyValues = cookies.split('; ').map((el) => el.split('='));
-    const jwtKeyValue = cookieKeyValues.find((el) => el[0] === key);
-    return jwtKeyValue !== undefined ? jwtKeyValue[1] : null;
-  };
   private getAllOnlineUsers = () => {
     return Array.from(this.userMap.values()).filter(
       (userId) => this.socketMap.get(userId)?.length,

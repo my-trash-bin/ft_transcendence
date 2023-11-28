@@ -3,7 +3,9 @@ import {
   Body,
   Controller,
   Get,
+  HttpException,
   InternalServerErrorException,
+  Param,
   Post,
   Request,
   UseGuards,
@@ -17,7 +19,8 @@ import { idOf } from '../common/Id';
 import { ChannelRoomType, EventsService } from '../events/events.service';
 import { ChannelService } from './channel.service';
 import { ChannelDto } from './dto/channel-dto';
-import { ChannelRelationDto } from './dto/channel-relation-dto';
+import { ChannelMemberDto } from './dto/channel-members.dto';
+import { ChannelRelationDto } from './dto/channel-relation.dto';
 import { CreateChannelDto } from './dto/create-channel.dto';
 
 @ApiTags('channel')
@@ -79,7 +82,28 @@ export class ChannelController {
       idOf(channelId),
       userId,
     );
-    return result!.data;
+    return result.data!;
+  }
+
+  @Get('participant/:channelId')
+  @ApiOperation({ summary: '채널 참여자 목록 반환' })
+  @ApiOkResponse({
+    description: '채널 참여자 목록',
+    type: () => ChannelMemberDto,
+    isArray: true,
+  })
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
+  async findChannelMembersByChannelId(
+    @Param('channelId') chaennelId: string,
+  ): Promise<ChannelMemberDto[]> {
+    const result = await this.channelService.findChannelMembersByChannelId(
+      idOf(chaennelId),
+    );
+    if (!result.ok) {
+      throw new HttpException(result.error!.message, result.error!.statusCode);
+    }
+    return result.data!;
   }
 
   // @Get('participand/:cheenlId')

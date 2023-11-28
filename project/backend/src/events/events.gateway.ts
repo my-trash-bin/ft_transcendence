@@ -78,7 +78,7 @@ export class EventsGateway
   }
 
   // only dm
-  @SubscribeMessage(GateWayEvents.Dm)
+  @SubscribeMessage(GateWayEvents.DirectMessage)
   async handleDm(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { memberId: string; msg: string },
