@@ -59,6 +59,11 @@ export class ChannelService {
     return prismaChannels.map((prismaChannel) => new ChannelDto(prismaChannel));
   }
 
+  async findAllChannelMembers() {
+    const prismaChannels = await this.prisma.channelMember.findMany();
+    return prismaChannels;
+  }
+
   async findOne(id: ChannelId) {
     const prismaChannel = await this.prisma.channel.findUnique({
       where: { id: id.value },
