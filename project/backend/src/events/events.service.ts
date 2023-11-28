@@ -1,6 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
 import { WsException } from '@nestjs/websockets';
 import { ChangeActionType, ChannelService } from '../channel/channel.service';
 import { ChannelId, ClientId, idOf, UserId } from '../common/Id';
@@ -18,6 +16,7 @@ import {
   JoiningChannelInfo,
   LeavingChannelInfo,
 } from './event-response.dto';
+import { UserSocket } from './events.gateway';
 
 interface JwtPayload {
   phase: string;
@@ -47,12 +46,9 @@ export class EventsService {
     ChannelRoomTypeKey,
     Record<ChannelIdKey, Set<UserIdKey>>
   >;
-  private socketMap = new Map<UserIdKey, Socket[]>();
-  private userMap = new Map<ClientIdKey, UserIdKey>();
+  private socketMap = new Map<UserIdKey, UserSocket[]>(); // 소켓맵은 이곳에서 초기화 상태
 
   constructor(
-    private jwtService: JwtService,
-    private configService: ConfigService,
     private usersService: UsersService,
     private dmService: DmService,
     private channelService: ChannelService,
@@ -67,6 +63,7 @@ export class EventsService {
       dm: {},
     };
 
+    // 아래는 각 채널에 들어가 있는 UserId 배포
     const channelMembers = await this.channelService.findAllChannelMembers();
     channelMembers.forEach(({ channelId, memberId }) =>
       this.handleUserJoinChannel(
@@ -80,34 +77,21 @@ export class EventsService {
       this.handleUserJoinChannel(ChannelRoomType.DM, idOf(id), idOf(member1Id));
       this.handleUserJoinChannel(ChannelRoomType.DM, idOf(id), idOf(member2Id));
     });
-    // console.log('-'.repeat(30));
-    // console.log(channelMembers);
-    // console.log('*'.repeat(30));
-    // console.log(dmChannels);
-    // console.log('-'.repeat(30));
   }
 
-  async handleConnection(
-    client: Socket,
-    userId: UserId,
-    isAddClient: boolean = true,
-  ) {
-    this.userMap.set(client.id, userId.value);
+  async handleConnection(client: UserSocket) {
+    this.addClientAtSocketMap(client); // 소켓의 새로운 접속을 반영
 
-    // client
-    if (isAddClient) {
-      this.addClientAtSocketMap(client, userId);
-    }
-    // UserId
-    const { dmChannels, channels } = await this.addUserJoinedChannels(
+    // 아래는 그저 유저에게 유용한 정보 전달.
+    const { dmChannels, channels } = await this.getUserJoinedChannelInfos(
       client,
-      userId,
     );
 
     // TODO: Game 상태까지 고려하기
     const allOnlineUsers = this.getAllOnlineUsers();
+
     client.emit(GateWayEvents.Events, {
-      userId,
+      userId: client.data.userId as string,
       dmChannels,
       channels,
       allOnlineUsers,
@@ -115,32 +99,25 @@ export class EventsService {
   }
 
   async handleDisconnect(client: Socket) {
-    const { id } = client;
-    const userId = this.userMap.get(id);
+    const userId = client.data.userId as string | undefined;
     if (userId) {
-      // client
-      this.removeClientAtSocketMap(idOf(id), idOf(userId));
-      // UserId
-      this.removeUserFromAllChannels(id);
+      this.removeClientAtSocketMap(idOf(client.id), idOf(userId)); // 소켓의 접속 해제를 반영
     }
-    this.userMap.delete(id);
   }
 
-  handleOnChat(client: Socket, userId: UserId) {
-    this.addClientAtSocketMap(client, userId);
-  }
+  // 애매하다. 이걸로도 부족할듯 하고.
+  // handleOnChat(client: UserSocket) {
+  //   this.addClientAtSocketMap(client);
+  // }
 
-  handleOffChat(client: Socket, userId: UserId) {
-    this.removeClientAtSocketMap(idOf(client.id), userId);
-  }
+  // handleOffChat(clientId: ClientId, userId: UserId) {
+  //   this.removeClientAtSocketMap(clientId, userId);
+  // }
 
-  async sendMessage(client: Socket, channelId: ChannelId, msg: string) {
-    const userId = this.userMap.get(client.id);
+  // only 일반채널
+  async sendMessage(client: UserSocket, channelId: ChannelId, msg: string) {
+    const userId = client.data.userId as string;
     const type = ChannelRoomType.NORMAL;
-
-    if (!userId) {
-      throw new WsException('Fail to mapping clientId to userId');
-    }
 
     const result = await this.channelService.sendMessage(
       idOf(userId),
@@ -162,30 +139,19 @@ export class EventsService {
 
     const data: MessageWithMemberDto = result.data!;
 
-    // console.log(result.data);
-    // console.log(blockList);
-    // console.log(`전체 소켓맵 체크`);
-    // for (let [key, value] of this.socketMap.entries()) {
-    //   console.log(`socket ${key}, ${value.map((socket) => socket.id)}`);
-    // }
     this.broadcastToChannel(type, channelId, blockedIdList, eventName, data);
   }
 
-  // only dmChannel
+  // only DM채널
   async handleCreateDmChannel(
-    client: Socket,
+    client: UserSocket,
     nickname?: string,
     memberId?: string,
   ) {
-    const { id } = client;
-    const userId = this.userMap.get(id);
+    const userId = client.data.userId as string;
     const type = ChannelRoomType.DM;
 
     let targetUser: UserDto | null;
-
-    if (!userId) {
-      throw new WsException(`Failt to mapping clientId to userId: ${id}`);
-    }
 
     if (nickname) {
       targetUser = await this.usersService.findOneByNickname(nickname);
@@ -204,7 +170,7 @@ export class EventsService {
     }
 
     const result = await this.dmService.findOrCraeteDmChannel(
-      idOf(this.userMap.get(id)!),
+      idOf(userId),
       idOf(targetUser.id),
     );
     if (!result.ok) {
@@ -214,17 +180,12 @@ export class EventsService {
     const eventName = GateWayEvents.Events;
     const data: DmChannelInfoType = result.data!;
 
-    client.emit(eventName, data);
+    this.broadcastToUserClients(idOf(userId), eventName, data);
   }
 
-  async handleSendDm(client: Socket, toId: UserId, msg: string) {
-    const { id } = client;
-    const userId = this.userMap.get(id);
+  async handleSendDm(client: UserSocket, toId: UserId, msg: string) {
+    const userId = client.data.userId as string;
     const type = ChannelRoomType.DM;
-
-    if (!userId) {
-      throw new WsException('Fail to mapping clientId to userId');
-    }
 
     const result = await this.dmService.createDm(idOf(userId), toId, msg);
 
@@ -254,20 +215,16 @@ export class EventsService {
     );
   }
 
-  // no dmChannel
+  // only 일반채널
   async handleJoin(client: Socket, channelId: ChannelId) {
-    const { id } = client;
-    const userId = this.userMap.get(id);
+    const userId = client.data.userId as string;
     const type = ChannelRoomType.NORMAL;
-
-    if (!userId) {
-      throw new WsException(`Fail to mapping clientId to userId: ${id}`);
-    }
 
     const result = await this.channelService.joinChannel(
       idOf(userId),
       channelId,
     );
+
     if (!result.ok) {
       throw new WsException(result.error!.message);
     }
@@ -281,15 +238,10 @@ export class EventsService {
     this.broadcastToChannel(type, channelId, [], eventName, data);
   }
 
-  // no dmChannel
+  // only 일반채널
   async handleLeave(client: Socket, channelId: ChannelId) {
-    const { id } = client;
-    const userId = this.userMap.get(id);
+    const userId = client.data.userId as string;
     const type = ChannelRoomType.NORMAL;
-
-    if (!userId) {
-      throw new WsException(`Fail to mapping clientId to userId: ${id}`);
-    }
 
     const result = await this.channelService.leaveChannel(
       idOf(userId!),
@@ -325,15 +277,14 @@ export class EventsService {
     return channel ? Array.from(channel) : null;
   }
 
-  // no dmChannel
+  // only 일반채널
   async handleKickBanPromote(
-    client: Socket,
+    client: UserSocket,
     channelId: ChannelId,
     toId: UserId,
     actionType: ChangeActionType,
   ) {
-    const { id } = client;
-    const userId = this.userMap.get(id);
+    const userId = client.data.userId as string;
     const type = ChannelRoomType.NORMAL;
 
     const result = await this.channelService.changeMemberStatus(
@@ -351,8 +302,11 @@ export class EventsService {
 
     const data: ChannelMemberInfo = result.data!;
 
-    this.broadcastToChannel(type, channelId, [], eventName, data);
-    this.removeUserFromChannel(this.channels[type][channelId.value], id);
+    this.broadcastToChannel(type, channelId, [], eventName, data); // 채널에 통보
+    this.removeUserFromChannel(
+      this.channels[type][channelId.value],
+      idOf(userId),
+    ); // 실제 쫓아내기
   }
 
   handleUserJoinChannel(
@@ -382,16 +336,17 @@ export class EventsService {
   }
 
   private getAllOnlineUsers = () => {
-    return Array.from(this.userMap.values()).filter(
-      (userId) => this.socketMap.get(userId)?.length,
-    );
+    return Array.from(this.socketMap.entries())
+      .filter(([_userId, sockets]) => sockets.length)
+      .map(([userId, _sockets]) => userId);
   };
-  private addClientAtSocketMap(client: Socket, userId: UserId) {
-    const sockets: Socket[] = this.socketMap.get(userId.value) ?? [];
+  private addClientAtSocketMap(client: UserSocket) {
+    const userId = client.data.userId as string;
+    const sockets: UserSocket[] = this.socketMap.get(userId) ?? [];
     if (sockets.length === 0) {
-      this.notiUserOn(userId.value);
+      this.notiUserOn(userId);
     }
-    this.socketMap.set(userId.value, [...sockets, client]);
+    this.socketMap.set(userId, [...sockets, client]);
   }
   private removeClientAtSocketMap(clientId: ClientId, userId: UserId) {
     const sockets = this.socketMap.get(userId.value);
@@ -412,8 +367,6 @@ export class EventsService {
     eventName: string,
     data: any,
   ) {
-    // console.log('채널상태: ', this.getChannelArray(type, channelId));
-    // console.log('blockedIdList: ', blockedIdList);
     this.getChannelArray(type, channelId)
       ?.filter((userId) =>
         blockedIdList.every((blockedId) => blockedId !== userId),
@@ -423,10 +376,6 @@ export class EventsService {
       );
   }
   private broadcastToUserClients(userId: UserId, eventName: string, data: any) {
-    // console.log(
-    //   `채널 소켓 리스트(${userId.value}): ${this.socketMap.get(userId.value)}`,
-    // );
-
     this.socketMap
       .get(userId.value)
       ?.forEach((client) => client.emit(eventName, data));
@@ -447,32 +396,16 @@ export class EventsService {
     this.notiUserStatusUpdate('game', userId);
   }
 
-  private async addUserJoinedChannels(client: Socket, userId: UserId) {
-    const dmChannels = await this.dmService.getDMChannelsWithMessages(userId);
-    dmChannels.forEach((dmChannel) => {
-      this.handleUserJoinChannel(
-        ChannelRoomType.DM,
-        idOf(dmChannel.id),
-        userId,
-      );
-    });
-    const channels = await this.channelService.findByUser(userId);
-    channels.forEach((channel) => {
-      this.handleUserJoinChannel(ChannelRoomType.DM, idOf(channel.id), userId);
-    });
+  private async getUserJoinedChannelInfos(client: UserSocket) {
+    const userId = client.data.userId as string;
+    const dmChannels = await this.dmService.getDMChannelsWithMessages(
+      idOf(userId),
+    );
+    const channels = await this.channelService.findByUser(idOf(userId));
     return { dmChannels, channels };
   }
-  private removeUserFromAllChannels(id: string) {
-    Object.entries(this.channels).forEach(([_channelType, _chennels]) => {
-      this.removeUserFromChannels(_channelType, id);
-    });
-  }
-  private removeUserFromChannels(channelType: string, id: string) {
-    Object.entries(this.channels[channelType]).forEach(
-      ([_channelId, channel]) => this.removeUserFromChannel(channel, id),
-    );
-  }
-  private removeUserFromChannel(channel: Set<string>, id: string) {
-    channel.delete(id);
+  // only DM채널
+  private removeUserFromChannel(channel: Set<UserIdKey>, userId: UserId) {
+    channel.delete(userId.value); // 스스로 방에서 나가거나, 쫓겨나거나
   }
 }
