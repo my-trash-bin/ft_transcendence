@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { useState } from 'react';
+import Portal from '../common/Portal';
 import { CreateChannelModal } from './modals/CreateChannelModal';
 
 export function AddChannelButton() {
@@ -12,7 +13,9 @@ export function AddChannelButton() {
   };
   return (
     <>
-      <CreateChannelModal isOpen={isOpen} closeModal={closeModal} />
+      <Portal selector={'#modal-channel'}>
+        <CreateChannelModal isOpen={isOpen} closeModal={closeModal} />
+      </Portal>
       <button onClick={openModal}>
         <Image
           alt="add channel"
