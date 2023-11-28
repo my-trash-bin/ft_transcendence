@@ -1,9 +1,8 @@
 'use client';
+import { getSocket } from '@/lib/Socket';
 import Image from 'next/image';
 import { useState } from 'react';
-import { io } from 'socket.io-client';
 import { NotifBox } from './NotifBox';
-import { getSocket } from '@/lib/Socket';
 
 export function Notification() {
   const [isHovered, setIsHovered] = useState(false);
