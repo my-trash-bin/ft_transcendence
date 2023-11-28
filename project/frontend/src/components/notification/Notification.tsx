@@ -4,11 +4,11 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { NotifBox } from './NotifBox';
 
+// TODO : call api to fetch noti table
 export function Notification() {
   const [isHovered, setIsHovered] = useState(false);
   const [active, setActive] = useState(false);
   const [newNotif, setNewNotif] = useState(false);
-  // TODO : call api to fetch noti table
 
   const socket = getSocket();
   socket.on('noti', () => setNewNotif(true));
