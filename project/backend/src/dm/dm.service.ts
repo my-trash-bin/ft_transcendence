@@ -9,11 +9,17 @@ import {
   newServiceOkResponse,
   ServiceResponse,
 } from '../common/ServiceResponse';
+import { MessageWithMemberDto } from './dto/message-with-member';
 
 @Injectable()
 export class DmService {
   constructor(private prisma: PrismaService) {}
 
+  async findAllDmChannels() {
+    return await this.prisma.dMChannelAssociation.findMany({
+      include: { DMMessage: true },
+    });
+  }
   async findOrCraeteDmChannel(
     member1Id: UserId,
     member2Id: UserId,
@@ -46,7 +52,7 @@ export class DmService {
     userId: UserId,
     targetId: UserId,
     messageJson: string,
-  ): Promise<ServiceResponse<DMMessage>> {
+  ): Promise<ServiceResponse<MessageWithMemberDto>> {
     const result = await this.findOrCraeteDmChannel(userId, targetId);
     if (!result.ok) {
       return { ok: false, error: result.error };
@@ -58,6 +64,19 @@ export class DmService {
           channelId: prismaDmChannelAssociation.id,
           memberId: userId.value,
           messageJson: messageJson,
+        },
+        include: {
+          member: {
+            select: {
+              id: true,
+              nickname: true,
+              profileImageUrl: true,
+              joinedAt: true,
+              isLeaved: true,
+              leavedAt: true,
+              statusMessage: true,
+            },
+          },
         },
       });
       return newServiceOkResponse(prismaDmMessage);

@@ -49,8 +49,8 @@ export class EventsGateway
     private eventsService: EventsService,
   ) {}
 
-  afterInit(server: Server) {
-    this.eventsService.afterInit(server);
+  async afterInit(server: Server) {
+    await this.eventsService.afterInit(server);
   }
 
   async handleConnection(@ConnectedSocket() client: Socket) {
