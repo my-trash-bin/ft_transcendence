@@ -10,7 +10,15 @@ import { UsersService } from '../users/users.service';
 // import { ChatRoomDto, ChatRoomStatusDto } from './chat.dto'
 import { Server, Socket } from 'socket.io';
 import { GateWayEvents } from '../common/gateway-events.enum';
+import { MessageWithMemberDto } from '../dm/dto/message-with-member';
 import { UserDto } from '../users/dto/user.dto';
+import {
+  ChannelMemberInfo,
+  DmChannelInfoType,
+  JoiningChannelInfo,
+  LeavingChannelInfo,
+  MessageInfo,
+} from './event-response.dto';
 
 interface JwtPayload {
   phase: string;
@@ -52,13 +60,32 @@ export class EventsService {
     private userFollowService: UserFollowService,
   ) {}
 
-  afterInit(server: Server) {
+  async afterInit(server: Server) {
     // 서버 초기화 시 변수 설정
     this.server = server;
     this.channels = {
       normal: {},
       dm: {},
     };
+
+    const channelMembers = await this.channelService.findAllChannelMembers();
+    channelMembers.forEach(({ channelId, memberId }) =>
+      this.handleUserJoinChannel(
+        ChannelRoomType.NORMAL,
+        idOf(channelId),
+        idOf(memberId),
+      ),
+    );
+    const dmChannels = await this.dmService.findAllDmChannels();
+    dmChannels.forEach(({ id, member1Id, member2Id }) => {
+      this.handleUserJoinChannel(ChannelRoomType.DM, idOf(id), idOf(member1Id));
+      this.handleUserJoinChannel(ChannelRoomType.DM, idOf(id), idOf(member2Id));
+    });
+    // console.log('-'.repeat(30));
+    // console.log(channelMembers);
+    // console.log('*'.repeat(30));
+    // console.log(dmChannels);
+    // console.log('-'.repeat(30));
   }
 
   async handleConnection(
@@ -134,8 +161,14 @@ export class EventsService {
 
     const eventName = GateWayEvents.ChannelMessage;
 
-    const data = result;
+    const data: MessageInfo = result.data!;
 
+    // console.log(result.data);
+    // console.log(blockList);
+    // console.log(`전체 소켓맵 체크`);
+    // for (let [key, value] of this.socketMap.entries()) {
+    //   console.log(`socket ${key}, ${value.map((socket) => socket.id)}`);
+    // }
     this.broadcastToChannel(type, channelId, blockedIdList, eventName, data);
   }
 
@@ -179,10 +212,8 @@ export class EventsService {
       throw new WsException(result.error!.message);
     }
 
-    const dmChannel = result.data!;
-
     const eventName = GateWayEvents.Events;
-    const data = dmChannel;
+    const data: DmChannelInfoType = result.data!;
 
     client.emit(eventName, data);
   }
@@ -213,7 +244,7 @@ export class EventsService {
 
     const eventName = GateWayEvents.DirectMessage;
 
-    const data = result;
+    const data: MessageWithMemberDto = result.data!;
 
     this.broadcastToChannel(
       type,
@@ -246,7 +277,7 @@ export class EventsService {
 
     const eventName = GateWayEvents.Join;
 
-    const data = result.data!;
+    const data: JoiningChannelInfo = result.data!;
 
     this.broadcastToChannel(type, channelId, [], eventName, data);
   }
@@ -273,7 +304,7 @@ export class EventsService {
     this.handleUserLeaveChannel(type, channelId, idOf(userId));
 
     const eventName = GateWayEvents.Leave;
-    const data = result.data!;
+    const data: LeavingChannelInfo = result.data!;
     this.broadcastToChannel(type, channelId, [], eventName, data);
   }
 
@@ -284,6 +315,7 @@ export class EventsService {
     if (!(type in this.channels)) {
       return null;
     }
+
     if (!(channelId.value in this.channels[type])) {
       return null;
     }
@@ -318,7 +350,7 @@ export class EventsService {
 
     const eventName = GateWayEvents.KickBanPromote;
 
-    const data = result.data!;
+    const data: ChannelMemberInfo = result.data!;
 
     this.broadcastToChannel(type, channelId, [], eventName, data);
     this.removeUserFromChannel(this.channels[type][channelId.value], id);
@@ -381,6 +413,8 @@ export class EventsService {
     eventName: string,
     data: any,
   ) {
+    // console.log('채널상태: ', this.getChannelArray(type, channelId));
+    // console.log('blockedIdList: ', blockedIdList);
     this.getChannelArray(type, channelId)
       ?.filter((userId) =>
         blockedIdList.every((blockedId) => blockedId !== userId),
@@ -390,6 +424,10 @@ export class EventsService {
       );
   }
   private broadcastToUserClients(userId: UserId, eventName: string, data: any) {
+    // console.log(
+    //   `채널 소켓 리스트(${userId.value}): ${this.socketMap.get(userId.value)}`,
+    // );
+
     this.socketMap
       .get(userId.value)
       ?.forEach((client) => client.emit(eventName, data));
