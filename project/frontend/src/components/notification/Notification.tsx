@@ -12,7 +12,7 @@ export function Notification() {
   // TODO : call api to fetch noti table
 
   const socket = getSocket();
-  socket.on('newNotif', () => setNewNotif(true));
+  socket.on('noti', () => setNewNotif(true));
 
   return (
     <div
