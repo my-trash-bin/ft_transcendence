@@ -1,9 +1,9 @@
 import { Title } from '@/components/common/Title';
 import { ProfileButton } from '../ProfileButton';
 import { Badge } from './Badge';
-import { mockData } from './mockData';
+import { mockData } from './mockAchimentData';
 
-function ArchivementArticle() {
+function AchivementArticle() {
   return (
     <div className="relative">
       <div className="h-[inherit] pt-3xl flex flex-col items-center">
@@ -16,6 +16,7 @@ function ArchivementArticle() {
               nameContent={badge.name}
               commentContent={badge.explanation}
               imageURL={badge.imageURL}
+              isMine={badge.isMine}
             />
           ))}
         </div>
@@ -24,4 +25,4 @@ function ArchivementArticle() {
   );
 }
 
-export default ArchivementArticle;
+export default AchivementArticle;

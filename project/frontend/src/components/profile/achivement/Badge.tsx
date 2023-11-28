@@ -28,6 +28,7 @@ export interface BadgeProps extends VariantProps<typeof badge> {
   nameContent: string;
   commentContent: string | null;
   imageURL: string;
+  isMine?: boolean;
 }
 
 export const Badge: React.FC<BadgeProps> = ({
@@ -35,13 +36,20 @@ export const Badge: React.FC<BadgeProps> = ({
   nameContent,
   commentContent,
   imageURL,
+  isMine = true,
 }) => {
   const imageSizeStyles: { width: number; height: number } =
     size === 'small' ? { width: 75, height: 75 } : { width: 100, height: 100 };
 
   return (
     <div className={badge({ size })}>
-      <Image src={imageURL} priority={true} alt="badge" {...imageSizeStyles} />
+      <Image
+        style={isMine ? undefined : { filter: 'grayscale(100%)' }}
+        src={imageURL}
+        priority={true}
+        alt="badge"
+        {...imageSizeStyles}
+      />
       <div className="pt-sm">{nameContent}</div>
       <div className={'font-normal text-center text-md align-top'}>
         {commentContent}
