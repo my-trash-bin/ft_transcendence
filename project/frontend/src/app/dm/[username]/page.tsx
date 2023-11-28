@@ -32,6 +32,7 @@ export default function DmPage({
     }
     if (localStorage.getItem('me') === null) FetchMyData();
     else setLoading(false);
+
     if (params.hasOwnProperty('username'))
       getSocket().emit('createDmChannel', { info: { nickname: 'testUser1' } });
 
@@ -49,6 +50,7 @@ export default function DmPage({
 
     setRenderMessageBox(data);
   }, [params]);
+
   if (loading) return <div>loading... 👾</div>;
   if (error) return <div>error!</div>;
 

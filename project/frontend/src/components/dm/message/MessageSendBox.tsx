@@ -18,6 +18,7 @@ export function MessageSendBox({
   const sendMessage = () => {
     const socket = getSocket();
     if (type === messageType.DM) {
+      console.log('send message', message, targetUserId);
       socket.emit('directMessage', {
         msg: message,
         memberId: targetUserId,

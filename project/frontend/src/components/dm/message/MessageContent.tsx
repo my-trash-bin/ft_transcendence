@@ -1,4 +1,3 @@
-import { Api } from '@/api/api';
 import { getSocket } from '@/lib/Socket';
 import { useEffect, useState } from 'react';
 import { MyChat } from './MyChat';
@@ -21,24 +20,6 @@ export function MessageContent({
   nickname,
 }: Readonly<{ type: messageType; nickname: string }>) {
   const [messages, setMessages] = useState<messageContent[]>([]);
-  const [targetUserId, setTargetUserId] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<boolean>(false);
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const data = await new Api().api.usersControllerGetUsetByNickname(
-          nickname,
-        );
-        setLoading(false);
-        setTargetUserId(data.data.id);
-      } catch (e) {
-        setError(true);
-      }
-    }
-    fetchData();
-  }, [nickname]);
 
   useEffect(() => {
     const socket = getSocket();
@@ -46,11 +27,11 @@ export function MessageContent({
     if (type === messageType.DM) {
       socket.on(`directMessage`, (res) => {
         const data = {
-          message: res.data.messageJson,
-          time: new Date(res.data.sentAt),
-          profileImage: '/avatar/avatar-big.svg',
-          targetId: res.data.memberId,
-          targetNickname: '윤서',
+          message: res.messageJson,
+          time: new Date(res.sentAt),
+          profileImage: res.member.profileImageUrl,
+          targetId: res.memberId,
+          targetNickname: res.member.nickname,
         };
         console.log(data);
         setMessages((messages) => [...messages, data]);
@@ -70,8 +51,6 @@ export function MessageContent({
     };
   }, [type]);
 
-  if (loading) return <div>loading...</div>;
-  if (error) return <div>error!</div>;
   const me: string | null = localStorage.getItem('me');
   const myNickname = me ? JSON.parse(me).nickname : '';
   return (
