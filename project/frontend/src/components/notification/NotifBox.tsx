@@ -1,7 +1,8 @@
-import { NotiCard } from './NotiCard';
-import mockNotifications from './mockNoti';
+import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
+import { NotiCard } from './NotiCard';
 import { SelectNotif } from './SelectNotif';
+import mockNotifications from './mockNoti';
 
 export function NotifBox({
   active,
@@ -36,7 +37,17 @@ export function NotifBox({
         overflow-y-scroll'
         }
       >
-        <SelectNotif showAll={showAll} setShowAll={setShowAll} />
+        <div className="flex flex-row justify-between">
+          <SelectNotif showAll={showAll} setShowAll={setShowAll} />
+          <Image
+            src="/icon/refresh.png"
+            alt="refresh"
+            width={20}
+            height={20}
+            className="w-[20px] h-[20px] self-center mr-sm"
+            onClick={() => alert('refetch')}
+          />
+        </div>
         {data.map((val) => {
           if (showAll || !val.isRead) {
             return (
