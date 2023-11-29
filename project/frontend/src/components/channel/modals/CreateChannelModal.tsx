@@ -1,4 +1,4 @@
-import { getSocket } from '@/lib/Socket';
+import { Api } from '@/api/api';
 import { useState } from 'react';
 import { ChannelButton } from '../ChannelButton';
 import { ChannelCreateContent } from './ChannelCreateContent';
@@ -6,9 +6,9 @@ import { ChannelSelector } from './ChannelSelector';
 import { ModalLayout } from './ModalLayout';
 
 export enum ChannelType {
-  PUBLIC,
-  PRIVATE,
-  PROTECTED,
+  PUBLIC = 'public',
+  PRIVATE = 'private',
+  PROTECTED = 'protected',
 }
 
 export function CreateChannelModal({
@@ -42,8 +42,30 @@ export function CreateChannelModal({
     closeModal();
   };
 
-  const sendCreateChannelEvnet = () => {
-    getSocket().emit('createDmChannel', {});
+  const sendCreateChannel = () => {
+    async function sendCreateChannelRequest() {
+      const channelCreateData =
+        channelType !== ChannelType.PUBLIC
+          ? {
+              title: inputTitle,
+              type: channelType,
+              capacity: inputSize,
+              password: inputPassword,
+            }
+          : {
+              title: inputTitle,
+              type: channelType,
+              capacity: inputSize,
+            };
+      try {
+        await new Api().api.channelControllerCreate(channelCreateData);
+        closeModal();
+        alert('채널 생성에 성공했습니다.');
+      } catch (e) {
+        alert('채널 생성에 실패했습니다.');
+      }
+    }
+    sendCreateChannelRequest();
   };
   return (
     <ModalLayout
@@ -81,7 +103,7 @@ export function CreateChannelModal({
         </div>
         <div className="mt-[20px] flex justify-around pr-[80px] pl-[50px]">
           <ChannelButton
-            onClick={closeAndChangeTypePublic}
+            onClick={sendCreateChannel}
             text="생성"
             width="60px"
             height="30px"
