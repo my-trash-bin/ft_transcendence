@@ -3,7 +3,8 @@
   "license": "UNLICENSED",
   "scripts": {
     "start": "nest start",
-    "build": "nest build"
+    "build": "nest build",
+    "dev": "npm run build && npx nest start --watch"
   },
   "dependencies": {
     "@nest-middlewares/cookie-parser": "^10.0.0",

@@ -1,7 +1,9 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
+  Logger,
   Post,
   Request,
   Response,
@@ -102,20 +104,27 @@ export class AuthController {
   @Post('register')
   async register(
     @Request() req: ExpressRequest,
-    @Response() res: ExpressResponse,
+    @Response({ passthrough: true }) res: ExpressResponse,
     @Body() data: RegisterBody,
   ) {
-    console.log('register 진입');
+    const logger = new Logger('Post register');
     const { type, id } = req.user as JwtPayloadPhaseRegister;
-    const jwtPayload = await this.authService.register(
-      type,
-      id,
-      data.nickname,
-      data.imageUrl,
-    );
-    this.setCookie(res, jwtPayload);
-    console.log('res.redirect2 => welcome => /friend');
-    this.welcome(res, type);
+    try {
+      const jwtPayload = await this.authService.register(
+        type,
+        id,
+        data.nickname,
+        data.imageUrl,
+      );
+      logger.debug(`jwtPayLoad: ${jwtPayload}`);
+      this.setCookie(res, jwtPayload);
+      logger.debug('res.redirect2 => welcome => /friend');
+      logger.debug('return jwtPayload');
+      return jwtPayload;
+    } catch (error) {
+      logger.error(error);
+      throw new BadRequestException(`가입 실패: ${error}`);
+    }
   }
 
   @ApiOperation({ summary: '2FA 로그인 용' })
