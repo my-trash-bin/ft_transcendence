@@ -60,7 +60,7 @@ export class GameService {
   private startGameLoop() {
     setInterval(() => {
       this.updateGameLogic();
-    }, 1000 / 30); // 초당 60번 업데이트
+    }, 1000 / 60); // 초당 60번 업데이트
   }
 
   getGameState() {
