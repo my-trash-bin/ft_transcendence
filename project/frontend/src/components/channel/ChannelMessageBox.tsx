@@ -8,11 +8,7 @@ export function ChannleMessageBox({
   return (
     <>
       <ChannelInfo channelId={channelId} />
-      <MessageContent
-        channelId={channelId}
-        type={messageType.CHANNEL}
-        myNickname={'myNickname'}
-      />
+      <MessageContent type={messageType.CHANNEL} />
       <MessageSendBox channelId={channelId} type={messageType.CHANNEL} />
     </>
   );

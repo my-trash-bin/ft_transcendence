@@ -31,7 +31,7 @@ export function MessageBox({ username }: { username: string }) {
   return (
     <>
       <UserInfo imageUri={imageUri} username={username} onActive={false} />
-      <MessageContent type={messageType.DM} nickname={username} />
+      <MessageContent type={messageType.DM} />
       <MessageSendBox type={messageType.DM} targetUserId={targetUserId} />
     </>
   );

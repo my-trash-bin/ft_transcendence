@@ -1,5 +1,5 @@
 import { getSocket } from '@/lib/Socket';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { MyChat } from './MyChat';
 import { OtherChat } from './OtherChat';
 
@@ -8,6 +8,7 @@ export enum messageType {
   CHANNEL = 'CHANNEL',
 }
 interface messageContent {
+  id: string;
   message: string;
   time: Date;
   profileImage: string;
@@ -15,11 +16,13 @@ interface messageContent {
   targetId: string;
 }
 
-export function MessageContent({
-  type,
-  nickname,
-}: Readonly<{ type: messageType; nickname: string }>) {
+export function MessageContent({ type }: Readonly<{ type: messageType }>) {
   const [messages, setMessages] = useState<messageContent[]>([]);
+  const messageEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   useEffect(() => {
     const socket = getSocket();
@@ -27,13 +30,14 @@ export function MessageContent({
     if (type === messageType.DM) {
       socket.on(`directMessage`, (res) => {
         const data = {
+          id: res.id,
           message: res.messageJson,
           time: new Date(res.sentAt),
           profileImage: res.member.profileImageUrl,
           targetId: res.memberId,
           targetNickname: res.member.nickname,
         };
-        console.log(data);
+        console.log(res);
         setMessages((messages) => [...messages, data]);
       });
     } else {
@@ -57,7 +61,7 @@ export function MessageContent({
     <div className="w-[95%] h-[610px] pt-[20px] bg-chat-color2 rounded-[10px] flex flex-col overflow-y-scroll mt-sm">
       {messages.map((message, idx) => {
         if (message.targetNickname === myNickname) {
-          return <MyChat key={message.time.toString()} {...message} />;
+          return <MyChat key={message.id} {...message} />;
         } else {
           let isFirst = false;
           if (
@@ -67,34 +71,10 @@ export function MessageContent({
           ) {
             isFirst = true;
           }
-          return (
-            <OtherChat
-              key={message.time.toString()}
-              {...message}
-              isFirst={isFirst}
-            />
-          );
+          return <OtherChat key={message.id} {...message} isFirst={isFirst} />;
         }
       })}
-
-      {/* <OtherChat
-        message="hihi"
-        time={new Date()}
-        profileImage="/avatar/avatar-big.svg"
-        isFirst={true}
-        targetId={targetUserId}
-        targetNickname={nickname}
-      />
-
-      <OtherChat
-        message="hihi"
-        time={new Date()}
-        profileImage="/avatar/avatar-big.svg"
-        isFirst={false}
-        targetId={targetUserId}
-        targetNickname={nickname}
-      />
-      <UserStateAnnounce userState={UserState.LEAVE} nickname="hello" /> */}
+      <div ref={messageEndRef}></div>
     </div>
   );
 }
