@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 import { ChangeActionType } from '../channel/channel.service';
 
 export class ChannelMessageDto {
@@ -21,11 +21,13 @@ export class DmMessageDto {
 
 class UserIdentityDto {
   @IsUUID()
-  memberId!: string;
+  @IsOptional()
+  memberId?: string;
 
   @IsString()
   @IsNotEmpty()
-  nickname!: string;
+  @IsOptional()
+  nickname?: string;
 }
 
 export class CreateDmChannelDto {

@@ -3,7 +3,6 @@ import {
   Channel,
   ChannelMember,
   ChannelMemberType,
-  ChannelMessage,
   Prisma,
 } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
@@ -16,6 +15,7 @@ import {
   newServiceOkResponse,
   ServiceResponse,
 } from '../common/ServiceResponse';
+import { MessageWithMemberDto } from '../dm/dto/message-with-member';
 import { ChannelDto } from './dto/channel-dto';
 import { ChannelMemberDto } from './dto/channel-members.dto';
 import { ChannelRelationDto } from './dto/channel-relation.dto';
@@ -57,6 +57,11 @@ export class ChannelService {
   async findAll() {
     const prismaChannels = await this.prisma.channel.findMany();
     return prismaChannels.map((prismaChannel) => new ChannelDto(prismaChannel));
+  }
+
+  async findAllChannelMembers() {
+    const prismaChannels = await this.prisma.channelMember.findMany();
+    return prismaChannels;
   }
 
   async findOne(id: ChannelId) {
@@ -323,7 +328,7 @@ export class ChannelService {
     userId: UserId,
     channelId: ChannelId,
     messageJson: string,
-  ): Promise<ServiceResponse<ChannelMessage>> {
+  ): Promise<ServiceResponse<MessageWithMemberDto>> {
     try {
       const result = await this.prisma.$transaction(async (prisma) => {
         const prismaChannel = await prisma.channel.findUnique({
@@ -362,6 +367,19 @@ export class ChannelService {
             channelId: channelId.value,
             memberId: userId.value,
             messageJson: messageJson,
+          },
+          include: {
+            member: {
+              select: {
+                id: true,
+                nickname: true,
+                profileImageUrl: true,
+                joinedAt: true,
+                isLeaved: true,
+                leavedAt: true,
+                statusMessage: true,
+              },
+            },
           },
         });
       });

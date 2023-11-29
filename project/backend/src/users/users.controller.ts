@@ -39,6 +39,12 @@ import {
   UserProfileDto,
 } from './dto/user-profile.dto';
 import { UserRelationshipDto } from './dto/user-relationship.dto';
+import {
+  FindOneParam,
+  GetUserQuery,
+  GetUsetByNicknameParam,
+  SearchByNicknameQuery,
+} from './dto/user-request.dto';
 import { UserDto } from './dto/user.dto';
 import { UsersService } from './users.service';
 
@@ -109,8 +115,9 @@ export class UsersController {
   @Phase('complete')
   async searchByNickname(
     @Request() req: ExpressRequest,
-    @Query('q') nickname: string,
+    @Query() query: SearchByNicknameQuery,
   ) {
+    const { q: nickname } = query;
     console.log('complete', nickname, req.user);
     const userId = (req.user as JwtPayloadPhaseComplete).id;
     return await this.usersService.searchByBickname(userId, nickname);
@@ -127,11 +134,11 @@ export class UsersController {
   @ApiBadRequestResponse({ description: '유효하지 않은 ID' })
   @ApiUnauthorizedResponse({ description: '인증되지 않은 유저로부터의 요청.' })
   async getUserInfo(
-    @Query('targetUser') targetUserId: string,
+    @Query() query: GetUserQuery,
     @Request() req: ExpressRequest,
   ): Promise<UserProfileDto> {
     const userId = (req.user as JwtPayloadPhaseComplete).id;
-
+    const { targetUser: targetUserId } = query;
     const targetUser = await this.usersService.findOne(idOf(targetUserId)); // 본인, 타인 통합인듯
 
     if (targetUser === null) {
@@ -166,8 +173,10 @@ export class UsersController {
   @UseGuards(JwtGuard, PhaseGuard)
   @Phase('complete')
   async getUsetByNickname(
-    @Param('nickname') nickname: string,
+    @Param() param: GetUsetByNicknameParam,
   ): Promise<UserDto> {
+    const { nickname } = param;
+    console.log(`nickname : ${nickname}`);
     const result = await this.usersService.findOneByNickname(nickname);
     if (result === null) {
       throw new BadRequestException(`올바르지 않은 닉네임: ${nickname}`);
@@ -182,7 +191,9 @@ export class UsersController {
   @ApiUnauthorizedResponse({ description: '인증되지 않은 유저로부터의 요청.' })
   @UseGuards(JwtGuard, PhaseGuard)
   @Phase('complete')
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param() param: FindOneParam) {
+    const { id } = param;
+    console.log(`findOne: ${id}`);
     const result = await this.usersService.findOne(idOf(id));
     if (result === null) {
       throw new BadRequestException('올바르지 않은 id');
@@ -201,9 +212,9 @@ export class UsersController {
   @ApiForbiddenResponse({ description: 'Forbidden.' })
   @ApiConflictResponse({ description: 'Conflict.' })
   @UseGuards(JwtGuard, PhaseGuard)
-  @Phase('complete')
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  @Phase('register')
+  async create(@Body() createUserDto: CreateUserDto) {
+    return await this.usersService.create(createUserDto);
   }
 
   @Patch()
