@@ -11,9 +11,9 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChangeActionType } from '../channel/channel.service';
-import { GateWayEvents } from '../common/gateway-events.enum';
 import { idOf } from '../common/Id';
-import { GameService, GameState } from './events.game';
+import { GateWayEvents } from '../common/gateway-events.enum';
+import { GameService, GameState } from '../pong/pong';
 import {
   ChannelIdentityDto,
   ChannelMessageDto,
@@ -68,8 +68,7 @@ export class EventsGateway
 
   async handleConnection(@ConnectedSocket() client: Socket) {
     try {
-      new Logger().debug('client connected');
-      // new Logger().debug(client.id);
+      new Logger().debug(`client connected ${client.id}`);
       const decoded = this.isValidJwtAndPhase(client);
       const userId = decoded.id.value;
 
@@ -166,15 +165,12 @@ export class EventsGateway
   @SubscribeMessage('joinLobby')
   handleJoinLobby(@ConnectedSocket() client: Socket) {
     const playerRole = 'player1';  // 임시로 고정
+    this.server.emit('playerRole', playerRole);
     // new Logger().debug(`request socket, ${client.id}`);
-    // new Logger().debug(`${client.connected}`);
-    client.to(client.id).emit('playerRole', "hihi");
-    // new Logger().debug(`${client.connected}`);
   }
 
   @SubscribeMessage('paddleMove')
   handlePaddleMove(@MessageBody() data: { direction: 'up' | 'down'; player: 'player1' | 'player2' }, @ConnectedSocket() client: Socket) {
-    // new Logger().debug(`paddle move`);
     this.gameService.handlePaddleMove(data.direction, data.player);
   }
   

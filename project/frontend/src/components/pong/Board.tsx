@@ -32,22 +32,16 @@ const PlayerAvatar: React.FC<PlayerAvatarProps> = ({
 const GameBoard: React.FC = () => {
   const { ball, paddle1, paddle2, score1, score2, isPlayer1 } = useStore();
   usePaddleMovement();
-  const previousStateRef = useRef<GameState | null>(null);
   const { setIsPlayer1 } = useStore();
 
   useEffect(() => {
     const socket = getGameSocket();
-
-    socket.on('connect', () => {
-      console.log('Connected to the game server');
-    });
     socket.emit('joinLobby');
 
     // 서버로부터 플레이어 역할 정보를 받았을 때
     socket.on('playerRole', (role) => {
       console.log(`You are ${role}`);
     });
-    console.log(`hello`);
 
     socket.on('gameUpdate', (data: GameState) => {
       useStore.setState({
@@ -59,37 +53,19 @@ const GameBoard: React.FC = () => {
         score2: data.score2,
         gameOver: data.gameOver,
       });
+    // 게임 오버 상태 확인
+    if (data.gameOver) {
+      // 게임 오버 처리 로직
+      // 예시: 게임 오버 화면 표시, 재시작 버튼 제공 등
+      // 이 부분에 실제 게임 오버 화면을 표시하거나, 사용자에게 재시작 옵션을 제공하는 코드를 추가할 수 있습니다.
+    }
     });
-    
-    // 연결이 끊어졌을 때
-    socket.on('disconnect', () => {
-      console.log('Disconnected from the game server');
-    });
-
-    const unsubscribe = useStore.subscribe((state: GameState) => {
-      const previousState = previousStateRef.current;
-
-      // 플레이어 1인 경우
-      if (isPlayer1) {
-        if (previousState && state.paddle1.y !== previousState.paddle1.y) {
-          socket.emit('paddleMove', { paddleY: state.paddle1.y });
-        }
-      }
-      else {
-        if (previousState && state.paddle2.y !== previousState.paddle2.y) {
-          socket.emit('paddleMove', { paddleY: state.paddle2.y });
-        }
-      }
-
-      // 현재 상태를 이전 상태로 업데이트
-      previousStateRef.current = state;
-    });
-
     return () => {
-      socket.disconnect();
-      unsubscribe(); // 구독 해제
+      // socket.disconnect();
+      socket.off('gameUpdate');
+      socket.off('playerRole');
     };
-  }, [setIsPlayer1, isPlayer1]); // 의존성 배열 업데이트
+  }, [setIsPlayer1, isPlayer1]);
 
   return (
     <div className="flex flex-col items-center mt-[50px] font-bold text-dark-purple-interactive text-dark-purple-interactive">

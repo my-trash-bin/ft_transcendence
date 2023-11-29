@@ -1,14 +1,18 @@
 // gameSocket.ts
-import { io, Socket } from 'socket.io-client';
+import { getSocket } from '@/lib/Socket';
+// import { io, Socket } from 'socket.io-client';
 
-let gameSocket: Socket | null = null;
+// let gameSocket: Socket | null = null;
 
-export function getGameSocket(): Socket {
-  if (!gameSocket) {
-    gameSocket = io('http://localhost:80', { 
-      withCredentials: true
-    });
-  }
+export function getGameSocket(){
+// export function getGameSocket(): Socket {
+  // if (!gameSocket) {
+  //   gameSocket = io('http://localhost:80', { 
+  //     reconnectionAttempts: 0,
+  //     withCredentials: true
+  //   });
+  // }
 
-  return gameSocket;
+  // return gameSocket;
+  return getSocket();
 }

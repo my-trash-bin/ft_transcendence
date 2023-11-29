@@ -1,5 +1,5 @@
 // events.game.ts
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { EventEmitter } from 'events';
 
 // 게임 상수
@@ -46,15 +46,12 @@ export class GameService {
     const deltaY = direction === 'up' ? -PADDLE_MOVE_STEP : PADDLE_MOVE_STEP;
     const paddle = player === 'player1' ? this.gameState.paddle1 : this.gameState.paddle2;
     const newY = this.checkPaddleBounds(paddle.y + deltaY);
-  
-    if (player === 'player1') {
-      this.gameState.paddle1.y = newY;
-    } else {
-      this.gameState.paddle2.y = newY;
-    }
-  
-    this.updateGameLogic();
-  }
+    paddle.y = newY;
+    // console.log('Before update:', this.gameState);
+    // this.updateGameLogic();
+    this.onGameUpdate.emit('gameState', this.gameState);
+    // console.log('After update:', this.gameState);
+}
   
 
   private checkPaddleBounds(paddleY: number): number {
@@ -77,7 +74,7 @@ export class GameService {
     // 공의 위치 업데이트
     this.gameState.ball.x += this.gameState.velocity.x;
     this.gameState.ball.y += this.gameState.velocity.y;
-    
+
     // 경계 체크 및 처리
     this.checkBoundaries();
 
@@ -101,15 +98,15 @@ export class GameService {
   }
 
   private handleXAxisBoundary() {
-    // 점수 업데이트 및 공 위치 초기화
+    // 점수 업데이트
     if (this.gameState.ball.x < 0) {
       this.gameState.score2++;
     } else {
       this.gameState.score1++;
     }
 
-    // 공을 중앙에 위치
-    this.resetBallPosition();
+    // 공과 패들을 중앙에 위치
+    this.resetPosition();
 
     // 점수 합이 짝수일 때 X축 속도 방향을 반전
     if ((this.gameState.score1 + this.gameState.score2) % 2 === 0) {
@@ -120,16 +117,21 @@ export class GameService {
     this.checkGameOver();
   }
 
-  private resetBallPosition() {
+  private resetPosition() {
     this.gameState.ball.x = BOARD_WIDTH / 2 - BALL_SIZE / 2;
     this.gameState.ball.y = BOARD_HEIGHT / 2 - BALL_SIZE / 2;
     this.gameState.velocity.x = DEFAULT_SPEED * (this.gameState.velocity.x < 0 ? -1 : 1);
     this.gameState.velocity.y = DEFAULT_SPEED / 2;
+    this.gameState.paddle1.y = 200;
+    this.gameState.paddle2.y = 200;
   }
 
   private checkGameOver() {
     if (this.gameState.score1 === 10 || this.gameState.score2 === 10) {
       this.gameState.gameOver = true;
+      // 임시로 ...
+      this.gameState.score1 = 0;
+      this.gameState.score2 = 0;
     }
   }
 
@@ -139,7 +141,7 @@ export class GameService {
     if (this.gameState.ball.x <= PADDLE_WIDTH + 10 &&
         this.gameState.ball.y + BALL_SIZE >= this.gameState.paddle1.y &&
         this.gameState.ball.y <= this.gameState.paddle1.y + PADDLE_HEIGHT) {
-      this.gameState.velocity.x = this.checkPaddleCollision(paddle1Center, this.gameState.ball.y);
+      this.gameState.velocity.x = this.checkSmash(paddle1Center, this.gameState.ball.y);
       this.gameState.ball.x = PADDLE_WIDTH + BALL_SIZE;
     }
 
@@ -148,13 +150,12 @@ export class GameService {
     if (this.gameState.ball.x + BALL_SIZE >= BOARD_WIDTH - PADDLE_WIDTH - 10 &&
         this.gameState.ball.y + BALL_SIZE >= this.gameState.paddle2.y &&
         this.gameState.ball.y <= this.gameState.paddle2.y + PADDLE_HEIGHT) {
-      this.gameState.velocity.x = -this.checkPaddleCollision(paddle2Center, this.gameState.ball.y);
+      this.gameState.velocity.x = -this.checkSmash(paddle2Center, this.gameState.ball.y);
       this.gameState.ball.x = BOARD_WIDTH - PADDLE_WIDTH - BALL_SIZE * 2;
     }
   }
 
-  private checkPaddleCollision(paddleCenter: number, ballY: number): number {
-    // 패들 충돌 로직 구현
+  private checkSmash(paddleCenter: number, ballY: number): number {
     const deltaY = Math.abs(ballY - paddleCenter);
     return deltaY < PADDLE_HEIGHT / PADDLE_STRIKE ? SMASH_SPEED : DEFAULT_SPEED;
   }

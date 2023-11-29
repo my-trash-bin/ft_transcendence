@@ -1,9 +1,5 @@
 import { create } from 'zustand';
 import { GameState, BOARD_HEIGHT, BOARD_WIDTH, BALL_SIZE, PADDLE_HEIGHT, DEFAULT_SPEED } from './gameConstants';
-import { getGameSocket } from './gameSocket';
-import { getSocket } from '@/lib/Socket';
-
-const socket = getGameSocket();
 
 interface ExtendedGameState extends GameState {
   isPlayer1: boolean;
@@ -26,10 +22,5 @@ const useStore = create<ExtendedGameState>((set) => ({
   // 서버로부터 게임 상태 업데이트 수신
   setGameState: (newState) => set({ ...newState }),
 }));
-
-// 서버로부터 게임 상태 업데이트 수신
-socket.on('gameUpdate', (gameState) => {
-  useStore.getState().setGameState(gameState);
-});
 
 export default useStore;
