@@ -1,92 +1,73 @@
-'use client';
 import { Api, ChannelDto } from '@/api/api';
 import { useEffect, useState } from 'react';
 import Portal from '../common/Portal';
 import { AllChannelButton } from './AllChannelButton';
-import { MyChannelButton } from './MyChannelButton';
 import { EnterPasswordModal } from './modals/EnterPasswordModal';
 
 function getLenderData(
   channelData: ChannelDto[],
   error: boolean,
-  myChannel: boolean,
   setIsModalOpen: (isModalOpen: boolean) => void,
   isModalOpen: boolean,
+  setSelectedChannel: (channelId: string) => void,
 ) {
   if (error) {
     return <p> 데이터를 가져오는데 실패했습니다 ☠️....</p>;
   }
-  if (myChannel) {
-    return channelData.map((channel) => (
-      <MyChannelButton
-        key={channel.id}
-        id={channel.id}
-        channelName={channel.title}
-        // date={new Date()}
-        // messageShortcut={'aaa'}
-        max={channel.maximumMemberCount}
-        now={channel.memberCount}
-      />
-    ));
-  } else {
-    return channelData.map((channel) => (
-      <AllChannelButton
-        key={channel.id}
-        id={channel.id}
-        channelName={channel.title}
-        max={channel.maximumMemberCount}
-        now={channel.memberCount}
-        type={channel.type}
-        setIsModalOpen={setIsModalOpen}
-      />
-    ));
-  }
+
+  return channelData.map((channel) => (
+    <AllChannelButton
+      key={channel.id}
+      id={channel.id}
+      channelName={channel.title}
+      max={channel.maximumMemberCount}
+      now={channel.memberCount}
+      type={channel.type}
+      setIsModalOpen={setIsModalOpen}
+      setSelectedChannel={setSelectedChannel}
+    />
+  ));
 }
 
-export function ChannelList({
-  myChannel,
-  searchChannel,
-}: {
-  myChannel: boolean;
-  searchChannel: string;
-}) {
+export function AllChannelList({ searchChannel }: { searchChannel: string }) {
   const [channelData, setChannelData] = useState<ChannelDto[]>([]);
   const [error, setError] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [selectedChannel, setSelectedChannel] = useState<string>('');
 
   useEffect(() => {
     async function fetchData() {
       try {
-        if (myChannel) {
-          const { data } =
-            await new Api().api.channelControllerFindMyChannels();
-          setChannelData(data);
-        } else {
-          const { data } = await new Api().api.channelControllerFindAll();
-          setChannelData(data);
-        }
-        setError(false);
+        const { data } = await new Api().api.channelControllerFindAll();
+        setIsLoading(false);
+        setChannelData(data);
       } catch (e) {
         setError(true);
       }
     }
     fetchData();
-  }, [searchChannel, myChannel]);
+  }, [searchChannel]);
 
   let lenderData = getLenderData(
     channelData,
     error,
-    myChannel,
     setIsModalOpen,
     isModalOpen,
+    setSelectedChannel,
   );
+
+  if (isLoading) {
+    return <p>로딩중...</p>;
+  }
+
   return (
     <>
       <Portal selector={'#modal-channel'}>
         <EnterPasswordModal
           isModalOpen={isModalOpen}
           setIsModalOpen={setIsModalOpen}
-          targetChannelId={''}
+          targetChannelId={selectedChannel}
         />
       </Portal>
       <div className="w-[350px] h-[600px] flex-grow-1 flex flex-col items-center gap-sm overflow-y-scroll">

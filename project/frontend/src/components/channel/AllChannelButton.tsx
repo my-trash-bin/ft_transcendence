@@ -8,6 +8,7 @@ export function AllChannelButton({
   max,
   type,
   setIsModalOpen,
+  setSelectedChannel,
 }: Readonly<{
   id: string;
   channelName: string;
@@ -15,6 +16,7 @@ export function AllChannelButton({
   max: number;
   type: string;
   setIsModalOpen: (isModalOpen: boolean) => void;
+  setSelectedChannel: (channelId: string) => void;
 }>) {
   const state = now + '/' + max;
 
@@ -22,6 +24,7 @@ export function AllChannelButton({
     if (type === 'public') getSocket().emit('join', { channelId: id });
     else {
       setIsModalOpen(true);
+      setSelectedChannel(id);
       // if(password)
       //   getSocket().emit('join', { channelId: id, password: password });
     }

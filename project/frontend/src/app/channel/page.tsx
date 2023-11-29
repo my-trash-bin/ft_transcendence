@@ -1,6 +1,7 @@
 'use client';
+import { AllChannelList } from '@/components/channel/AllChannelList';
 import { ChannelInput } from '@/components/channel/ChannelInput';
-import { ChannelList } from '@/components/channel/ChannelList';
+import { MyChannelList } from '@/components/channel/MyChannelList';
 import Image from 'next/image';
 
 import { useState } from 'react';
@@ -20,7 +21,11 @@ export default function ChannelHome() {
             setMyChannel={setMyChannel}
             setSearchChannel={setSearchChannel}
           />
-          <ChannelList myChannel={myChannel} searchChannel={searchChannel} />
+          {myChannel ? (
+            <MyChannelList searchChannel={searchChannel} />
+          ) : (
+            <AllChannelList searchChannel={searchChannel} />
+          )}
         </div>
         <div className="w-[520px] h-[750px] flex flex-col items-center justify-center">
           <Image
