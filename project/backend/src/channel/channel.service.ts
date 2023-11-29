@@ -395,12 +395,30 @@ export class ChannelService {
     }
   }
 
+  async findChannelWithMembers(channelId: ChannelId) {
+    try {
+      const result = await this.prisma.$transaction(async (prisma) => {
+        return await prisma.channel.findUniqueOrThrow({
+          where: {
+            id: channelId.value,
+          },
+          include: {
+            members: true,
+          },
+        });
+      });
+      return newServiceOkResponse(result);
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async findChannelMembersByChannelId(
     channelId: ChannelId,
   ): Promise<ServiceResponse<ChannelMemberDto[]>> {
     try {
       const result = await this.prisma.$transaction(async (prisma) => {
-        return await this.prisma.channelMember.findMany({
+        return await prisma.channelMember.findMany({
           where: {
             channelId: channelId.value,
           },
