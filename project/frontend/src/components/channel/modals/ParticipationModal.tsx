@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import { ModalLayout } from './ModalLayout';
 
-export function EnterPasswordModal({
+export function ParticipationModal({
   isModalOpen,
   setIsModalOpen,
   targetChannelId,
@@ -19,9 +19,9 @@ export function EnterPasswordModal({
       isOpen={isModalOpen}
       closeModal={closeModal}
       width="300px"
-      height="230px"
+      height="170px"
     >
-      <div className="flex flex-col h-[230px]">
+      <div className="flex flex-col h-[170px]">
         <button onClick={closeModal} className="self-end">
           <Image
             alt="close modal"
@@ -30,20 +30,15 @@ export function EnterPasswordModal({
             height={25}
           ></Image>
         </button>
-        <form className="flex flex-col items-center">
-          <p className="mb-[15px] mt-[20px]">비밀번호 입력</p>
-          <input
-            type="password"
-            placeholder="비밀번호를 입력하세요."
-            className="pl-[10px] rounded-sm outline-none placeholder:text-[12px] placeholder:text-center w-[200px]"
-          ></input>
+        <div className="flex flex-col items-center">
+          <p className="mb-[15px] mt-[20px]">참여하시겠습니까?</p>
           <button
             type="button"
             className="mt-[30px] pl-[20px] pr-[20px] w-[200px] h-[35px] bg-dark-purple rounded-md text-white"
           >
             확인
           </button>
-        </form>
+        </div>
       </div>
     </ModalLayout>
   );

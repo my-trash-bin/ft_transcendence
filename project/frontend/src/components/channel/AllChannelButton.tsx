@@ -1,4 +1,3 @@
-import { getSocket } from '@/lib/Socket';
 import Image from 'next/image';
 
 export function AllChannelButton({
@@ -7,7 +6,8 @@ export function AllChannelButton({
   now,
   max,
   type,
-  setIsModalOpen,
+  passwordModalOpen,
+  participateModalOpen,
   setSelectedChannel,
 }: Readonly<{
   id: string;
@@ -15,16 +15,18 @@ export function AllChannelButton({
   now: number;
   max: number;
   type: string;
-  setIsModalOpen: (isModalOpen: boolean) => void;
+  passwordModalOpen: (isModalOpen: boolean) => void;
+  participateModalOpen: (isModalOpen: boolean) => void;
   setSelectedChannel: (channelId: string) => void;
 }>) {
   const state = now + '/' + max;
 
   const addUserToChannel = () => {
-    if (type === 'public') getSocket().emit('join', { channelId: id });
-    else {
-      setIsModalOpen(true);
-      setSelectedChannel(id);
+    setSelectedChannel(id);
+    if (type === 'public') {
+      participateModalOpen(true);
+    } else if (type === 'protected') {
+      passwordModalOpen(true);
       // if(password)
       //   getSocket().emit('join', { channelId: id, password: password });
     }
