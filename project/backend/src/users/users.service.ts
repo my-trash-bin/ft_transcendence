@@ -1,5 +1,5 @@
 import { ConflictException, Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { ChannelMemberType, Prisma } from '@prisma/client';
 import { PrismaService } from '../base/prisma.service';
 import { UserId } from '../common/Id';
 import { isUniqueConstraintError } from '../util/isUniqueConstraintError';
@@ -14,8 +14,92 @@ export class UsersService {
   constructor(private prisma: PrismaService) {}
 
   async me(id: UserId) {
-    const user = await this.prisma.user.findUnique({ where: { id: id.value } });
-    return user ? new UserDto(user) : null;
+    const followings = await this.prisma.userFollow.findMany({
+      where: {
+        followerId: id.value,
+      },
+    });
+    const blockList = followings
+      .filter(({ isBlock }) => isBlock)
+      .map((el) => el.followeeId);
+    const friends = followings
+      .filter(({ isBlock }) => !isBlock)
+      .map((el) => el.followeeId);
+    const superMe = await this.prisma.user.findUnique({
+      where: { id: id.value },
+      select: {
+        id: true,
+        joinedAt: true,
+        isLeaved: true,
+        nickname: true,
+        profileImageUrl: true,
+        statusMessage: true,
+        following: true,
+        achievements: true,
+        notifications: true,
+        channels: {
+          where: {
+            NOT: { memberType: ChannelMemberType.BANNED },
+          },
+          include: {
+            channel: {
+              select: {
+                id: true,
+                title: true,
+                isPublic: true,
+                password: true,
+                createdAt: true,
+                lastActiveAt: true,
+                ownerId: true,
+                memberCount: true,
+                maximumMemberCount: true,
+                members: true,
+                messages: {
+                  where: {
+                    memberId: { notIn: blockList },
+                  },
+                },
+              },
+            },
+          },
+        },
+        dmChannel1: {
+          where: {
+            AND: [
+              {
+                member1Id: {
+                  notIn: blockList,
+                },
+                member2Id: {
+                  notIn: blockList,
+                },
+              },
+            ],
+          },
+          include: {
+            DMMessage: true,
+          },
+        },
+        dmChannel2: {
+          where: {
+            AND: [
+              {
+                member1Id: {
+                  notIn: blockList,
+                },
+                member2Id: {
+                  notIn: blockList,
+                },
+              },
+            ],
+          },
+          include: {
+            DMMessage: true,
+          },
+        },
+      },
+    });
+    return superMe!;
   }
 
   async create(createUserDto: CreateUserDto): Promise<UserDto> {

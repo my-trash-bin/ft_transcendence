@@ -22,10 +22,10 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Request as ExpressRequest } from 'express';
-import { JwtPayloadPhaseComplete } from '../auth/auth.service';
+import { JwtPayload, JwtPayloadPhaseComplete } from '../auth/auth.service';
 import { JwtGuard } from '../auth/jwt.guard';
 import { Phase, PhaseGuard } from '../auth/phase.guard';
-import { idOf } from '../common/Id';
+import { idOf, UserId } from '../common/Id';
 import { PongSeasonLogService } from '../pong-season-log/pong-season-log.service';
 import { UserFollowService } from '../user-follow/user-follow.service';
 import { NicknameCheckUserDto } from './dto/nickname-check-user.dto';
@@ -61,31 +61,44 @@ export class UsersController {
 
   @Get('me')
   @ApiOperation({ summary: '내 정보' })
-  @ApiOkResponse({
-    type: () => UserProfileDto,
-  })
-  @UseGuards(JwtGuard, PhaseGuard)
-  @Phase('complete')
+  // @ApiOkResponse({
+  //   type: () => UserProfileDto,
+  // })
+  @UseGuards(JwtGuard)
   async myProfile(@Request() req: ExpressRequest) {
-    const userId = (req.user as JwtPayloadPhaseComplete).id;
-    const me = (await this.usersService.findOne(userId))!; // 본인, 타인 통합인듯
-    const relation = await this.getRelation(userId.value, userId.value);
+    const { phase, id } = req.user as JwtPayload;
 
-    const seasonLog = await this.pongSeasonLogService.findOne(userId);
-    const record = {
-      win: seasonLog.win,
-      lose: seasonLog.lose,
-      ratio: seasonLog.winRate,
+    if (phase !== 'complete') {
+      return {
+        phase,
+        id: id as string,
+      };
+    }
+
+    const userId = id as UserId;
+    const me = (await this.usersService.me(userId))!; // 본인, 타인 통합인듯
+
+    return {
+      phase,
+      id: (id as UserId).value,
+      me,
     };
-
-    return new UserProfileDto({
-      id: userId,
-      imageUrl: me.profileImageUrl,
-      nickname: me.nickname,
-      record: new RecordDto(record),
-      relation,
-      statusMessage: me.statusMessage,
-    });
+    // const relation = await this.getRelation(userId.value, userId.value);
+    // const seasonLog = await this.pongSeasonLogService.findOne(userId);
+    // const record = {
+    //   win: seasonLog.win,
+    //   lose: seasonLog.lose,
+    //   ratio: seasonLog.winRate,
+    // };
+    // // return new UserProfileDto({
+    //   id: userId,
+    //   me,
+    //   imageUrl: me.profileImageUrl,
+    //   nickname: me.nickname,
+    //   record: new RecordDto(record),
+    //   relation,
+    //   statusMessage: me.statusMessage,
+    // });
   }
 
   @Get()
