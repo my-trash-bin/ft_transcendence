@@ -213,8 +213,8 @@ export class UsersController {
   @ApiConflictResponse({ description: 'Conflict.' })
   @UseGuards(JwtGuard, PhaseGuard)
   @Phase('register')
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto) {
+    return await this.usersService.create(createUserDto);
   }
 
   @Patch()

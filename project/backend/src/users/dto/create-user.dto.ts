@@ -10,8 +10,9 @@ export class CreateUserDto {
     message:
       '닉네임은 6-12자의 영문, 숫자, 하이픈(-), 언더스코어(_)만 사용 가능합니다.',
   })
-  nickname?: string;
+  nickname!: string;
 
   @ApiPropertyOptional({ description: '프로필 아바타 이미지 주소' })
-  profileImageUrl?: string;
+  @IsString()
+  profileImageUrl!: string;
 }
