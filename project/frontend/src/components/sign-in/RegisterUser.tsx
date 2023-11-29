@@ -31,23 +31,20 @@ export default function RegisterUser({
   //   [],
   // );
 
-  const handleSubmitClick = useCallback(() => {
+  const handleSubmitClick = useCallback(async () => {
     if (!nickname || !imageUrl) {
-      alert('// TODO: 닉네임이나 아바타 설정 안 했을 때 에러 메시지 좀 예쁘게');
+      alert('no nickname or image url');
+      console.error('no nickname or image url');
       return;
     }
-    (async () => {
-      const result = await api.authControllerRegister({
-        nickname,
-        imageUrl,
-      });
-      if (!result.ok) {
-        console.error({ result });
-        alert('// TODO: 뭔가 좀 잘못 됐을 때 에러 메시지 좀 예쁘게');
-      }
+    try {
+      await api.authControllerRegister({ nickname, imageUrl });
       router.push('/friend');
-    })();
+    } catch (error) {
+      console.error('some error');
+    }
   }, [api, imageUrl, nickname, router]);
+
   // const handleSubmitClick = useCallback(async () => {
   //   if (!nickname || !formData) {
   //     alert('// TODO: 닉네임이나 아바타 설정 안 했을 때 에러 메시지 좀 예쁘게');
