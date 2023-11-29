@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import usePaddleMovement from './KeyHandle';
 import useStore from './Update';
 import { BALL_SIZE, BOARD_HEIGHT, BOARD_WIDTH, GameState, PADDLE_HEIGHT, PADDLE_WIDTH } from './gameConstants';
@@ -40,7 +40,12 @@ const GameBoard: React.FC = () => {
 
     // 서버로부터 플레이어 역할 정보를 받았을 때
     socket.on('playerRole', (role) => {
-      console.log(`You are ${role}`);
+      if (role == 'player1') {
+        setIsPlayer1(true);
+      } else {
+        setIsPlayer1(false);
+      }
+      console.log(`Am I player 1? ${isPlayer1}`);
     });
 
     socket.on('gameUpdate', (data: GameState) => {
@@ -93,7 +98,11 @@ const GameBoard: React.FC = () => {
   
         {/* 공 */}
         <div className="absolute bg-dark-purple-interactive rounded-full"
-          style={{ width: BALL_SIZE, height: BALL_SIZE, left: `${ball.x}px`, top: `${ball.y}px` }} />
+          style={{ width: BALL_SIZE, 
+            height: BALL_SIZE,
+            left: isPlayer1 ? `${BOARD_WIDTH - PADDLE_WIDTH - 10 - ball.x}px` : `${ball.x}px`,
+            top: `${ball.y}px`
+          }} />
   
         {/* 현재 플레이어의 패들 */}
         <div className={`absolute bg-dark-purple-interactive rounded-md`}

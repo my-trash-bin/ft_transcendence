@@ -17,8 +17,8 @@ const PADDLE_MOVE_STEP = 20;
 export interface GameState {
   ball: { x: number; y: number };
   velocity: { x: number; y: number };
-  paddle1: { y: number };
-  paddle2: { y: number };
+  paddle1: { x: number, y: number };
+  paddle2: { x: number, y: number };
   score1: number;
   score2: number;
   gameOver: boolean;
@@ -31,8 +31,8 @@ export class GameService {
   private gameState: GameState = {
     ball: { x: BOARD_WIDTH / 2 - BALL_SIZE / 2, y: BOARD_HEIGHT / 2 - BALL_SIZE / 2 },
     velocity: { x: DEFAULT_SPEED, y: DEFAULT_SPEED / 2 },
-    paddle1: { y: 200 },
-    paddle2: { y: 200 },
+    paddle1: { x: PADDLE_WIDTH + 10, y: 200 },
+    paddle2: { x: BOARD_WIDTH - PADDLE_WIDTH - 10, y: 200 },
     score1: 0,
     score2: 0,
     gameOver: false,
@@ -47,23 +47,20 @@ export class GameService {
     const paddle = player === 'player1' ? this.gameState.paddle1 : this.gameState.paddle2;
     const newY = this.checkPaddleBounds(paddle.y + deltaY);
     paddle.y = newY;
-    // console.log('Before update:', this.gameState);
-    // this.updateGameLogic();
-    this.onGameUpdate.emit('gameState', this.gameState);
-    // console.log('After update:', this.gameState);
+    this.updateGameLogic();
 }
   
 
   private checkPaddleBounds(paddleY: number): number {
     const minY = 0;
-    const maxY = BOARD_HEIGHT - PADDLE_HEIGHT;
+    const maxY = BOARD_HEIGHT - PADDLE_HEIGHT - 4;
     return Math.min(Math.max(paddleY, minY), maxY);
   }
 
   private startGameLoop() {
     setInterval(() => {
       this.updateGameLogic();
-    }, 1000 / 60); // 초당 60번 업데이트
+    }, 1000 / 30); // 초당 60번 업데이트
   }
 
   getGameState() {
@@ -83,6 +80,7 @@ export class GameService {
 
     // 게임 업데이트
     this.onGameUpdate.emit('gameState', this.gameState);
+    // console.log('After update:', this.gameState);
   }
 
   private checkBoundaries() {
@@ -92,7 +90,7 @@ export class GameService {
     }
 
     // Y축 경계 체크
-    if (this.gameState.ball.y < 0 || this.gameState.ball.y > BOARD_HEIGHT - BALL_SIZE - 1) {
+    if (this.gameState.ball.y < 0 || this.gameState.ball.y > BOARD_HEIGHT - BALL_SIZE - 4) {
       this.gameState.velocity.y = -this.gameState.velocity.y;
     }
   }
@@ -138,7 +136,7 @@ export class GameService {
   private checkPaddleCollisions() {
     // 플레이어 1의 패들과의 충돌 체크
     const paddle1Center = this.gameState.paddle1.y + PADDLE_HEIGHT / 2;
-    if (this.gameState.ball.x <= PADDLE_WIDTH + 10 &&
+    if (this.gameState.ball.x <= this.gameState.paddle1.x &&
         this.gameState.ball.y + BALL_SIZE >= this.gameState.paddle1.y &&
         this.gameState.ball.y <= this.gameState.paddle1.y + PADDLE_HEIGHT) {
       this.gameState.velocity.x = this.checkSmash(paddle1Center, this.gameState.ball.y);
@@ -147,7 +145,7 @@ export class GameService {
 
     // 플레이어 2의 패들과의 충돌 체크
     const paddle2Center = this.gameState.paddle2.y + PADDLE_HEIGHT / 2;
-    if (this.gameState.ball.x + BALL_SIZE >= BOARD_WIDTH - PADDLE_WIDTH - 10 &&
+    if (this.gameState.ball.x + BALL_SIZE >= this.gameState.paddle2.x &&
         this.gameState.ball.y + BALL_SIZE >= this.gameState.paddle2.y &&
         this.gameState.ball.y <= this.gameState.paddle2.y + PADDLE_HEIGHT) {
       this.gameState.velocity.x = -this.checkSmash(paddle2Center, this.gameState.ball.y);
