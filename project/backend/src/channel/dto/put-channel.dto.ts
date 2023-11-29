@@ -4,13 +4,18 @@ import {
   IsInt,
   IsOptional,
   IsString,
+  IsUUID,
   Length,
   Max,
   Min,
 } from 'class-validator';
 import { ChannelType } from '../enums/channel-type.enum';
 
-export class CreateChannelDto {
+export class PutChannelDto {
+  @ApiProperty({ description: '채널 ID(UUID)', format: 'uuid' })
+  @IsUUID()
+  channelId!: string;
+
   @ApiProperty({ description: '채널 타입', enum: ChannelType })
   @IsString()
   @IsEnum(ChannelType)
