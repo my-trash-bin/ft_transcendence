@@ -6,6 +6,7 @@ import { UserFollowModule } from '../user-follow/user-follow.module';
 import { UsersModule } from '../users/users.module';
 import { EventsGateway } from './events.gateway';
 import { EventsService } from './events.service';
+import { GameService } from './events.game';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { EventsService } from './events.service';
     DmModule,
     BaseModule,
   ],
-  providers: [EventsGateway, EventsService],
-  exports: [EventsService],
+  providers: [EventsGateway, EventsService, GameService],
+  exports: [EventsService, GameService]
 })
 export class EventsModule {}

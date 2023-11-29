@@ -14,20 +14,10 @@ export const DEFAULT_SPEED = 3;
 export const SMASH_SPEED = 8;
 
 export interface GameState {
-  ball: {
-    x: number;
-    y: number;
-  };
-  velocity: {
-    x: number;
-    y: number;
-  };
-  paddle1: {
-    y: number;
-  };
-  paddle2: {
-    y: number;
-  };
+  ball: { x: number; y: number };
+  velocity: { x: number; y: number };
+  paddle1: { y: number };
+  paddle2: { y: number };
   score1: number;
   score2: number;
   gameOver: boolean;

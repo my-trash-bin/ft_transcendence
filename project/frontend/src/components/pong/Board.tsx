@@ -1,9 +1,9 @@
 import Image from 'next/image';
-import React, { useEffect, useRef, useState } from 'react';
-import io from 'socket.io-client';
-import usePaddleMovement from './Move';
-import useStore from './Paddle';
-import { GameState, BALL_SIZE, BOARD_HEIGHT, BOARD_WIDTH, PADDLE_HEIGHT, PADDLE_WIDTH } from './gameConstants';
+import React, { useEffect, useRef } from 'react';
+import usePaddleMovement from './KeyHandle';
+import useStore from './Update';
+import { BALL_SIZE, BOARD_HEIGHT, BOARD_WIDTH, GameState, PADDLE_HEIGHT, PADDLE_WIDTH } from './gameConstants';
+import { getGameSocket } from './gameSocket';
 
 interface PlayerAvatarProps {
   avatarUrl: string;
@@ -36,50 +36,31 @@ const GameBoard: React.FC = () => {
   const { setIsPlayer1 } = useStore();
 
   useEffect(() => {
-    // Socket.IO 클라이언트 연결
-    const socket = io('http://localhost:8080', { withCredentials: true });
+    const socket = getGameSocket();
 
-    // 연결이 성공적으로 수립되었을 때
     socket.on('connect', () => {
       console.log('Connected to the game server');
     });
     socket.emit('joinLobby');
 
     // 서버로부터 플레이어 역할 정보를 받았을 때
-    socket.on('playerRole', (role: string) => {
-      // 서버로부터 받은 역할 정보를 기반으로 플레이어 역할을 설정
-      setIsPlayer1(role === 'player1');
+    socket.on('playerRole', (role) => {
       console.log(`You are ${role}`);
     });
+    console.log(`hello`);
 
     socket.on('gameUpdate', (data: GameState) => {
-      const { isPlayer1 } = useStore.getState();
-    
-      // 플레이어 1인 경우, 상대방인 플레이어 2의 패들 위치만 업데이트
-      if (isPlayer1) {
-        useStore.setState({
-          paddle2: data.paddle2,
-          ball: data.ball,
-          velocity: data.velocity,
-          score1: data.score1,
-          score2: data.score2,
-          gameOver: data.gameOver,
-        });
-      } 
-      // 플레이어 2인 경우, 상대방인 플레이어 1의 패들 위치만 업데이트
-      else {
-        useStore.setState({
-          paddle1: data.paddle1,
-          ball: data.ball,
-          velocity: data.velocity,
-          score1: data.score1,
-          score2: data.score2,
-          gameOver: data.gameOver,
-        });
-      }
+      useStore.setState({
+        paddle1: data.paddle1,
+        paddle2: data.paddle2,
+        ball: data.ball,
+        velocity: data.velocity,
+        score1: data.score1,
+        score2: data.score2,
+        gameOver: data.gameOver,
+      });
     });
     
-
     // 연결이 끊어졌을 때
     socket.on('disconnect', () => {
       console.log('Disconnected from the game server');
@@ -90,17 +71,12 @@ const GameBoard: React.FC = () => {
 
       // 플레이어 1인 경우
       if (isPlayer1) {
-        // 플레이어 1의 패들 위치가 변경되었는지 확인
         if (previousState && state.paddle1.y !== previousState.paddle1.y) {
-          // 현재 사용자(Player1)의 패들 위치를 서버에 전송
           socket.emit('paddleMove', { paddleY: state.paddle1.y });
         }
       }
-      // 플레이어 2인 경우
       else {
-        // 플레이어 2의 패들 위치가 변경되었는지 확인
         if (previousState && state.paddle2.y !== previousState.paddle2.y) {
-          // 현재 사용자(Player2)의 패들 위치를 서버에 전송
           socket.emit('paddleMove', { paddleY: state.paddle2.y });
         }
       }
