@@ -103,16 +103,21 @@ export interface UserRelationshipDto {
 }
 
 export interface CreateUserDto {
+  /** 6~12 영문, 숫자 ㅡ하이픈, 언더스코어만 사용가능한 닉네임 */
   nickname: string;
+  /** 프로필 아바타 이미지 주소 */
   profileImageUrl?: string;
 }
 
 export interface UpdateUserDto {
+  /** 6~12 영문, 숫자 ㅡ하이픈, 언더스코어만 사용가능한 닉네임 */
   nickname?: string;
+  /** 프로필 아바타 이미지 주소 */
   profileImageUrl?: string;
 }
 
 export interface NicknameCheckUserDto {
+  /** 6~12 영문, 숫자 ㅡ하이픈, 언더스코어만 사용가능한 닉네임 */
   nickname: string;
 }
 
@@ -122,6 +127,7 @@ export interface UniqueCheckResponse {
 }
 
 export interface TargetUserDto {
+  /** 타게 유저 UUID */
   targetUser: string;
 }
 
@@ -308,6 +314,48 @@ export interface ChannelMemberDto {
   /** @format date-time */
   mutedUntil: string;
   member: UserDto;
+}
+
+export interface AchievementDto {
+  /**
+   * Achievement ID
+   * @example "uuid-generated-string"
+   */
+  id: string;
+  /**
+   * Achievement Title
+   * @example "Master of NestJS"
+   */
+  title: string;
+  /**
+   * Image URL
+   * @example "url-to-image"
+   */
+  imageUrl: string;
+  /**
+   * Achievement Description
+   * @example "Achieved something important in NestJS"
+   */
+  description: string;
+}
+
+export interface UserAchievementDto {
+  /**
+   * User ID
+   * @example "uuid-for-user"
+   */
+  userId: string;
+  /**
+   * Achievement ID
+   * @example "uuid-for-achievement"
+   */
+  achievementId: string;
+  /**
+   * Achievement Attained Date
+   * @format date-time
+   * @example "2023-11-27T00:00:00.000Z"
+   */
+  achievedAt: string;
 }
 
 export type QueryParamsType = Record<string | number, any>;
@@ -735,6 +783,7 @@ export class Api<
      */
     usersControllerSearchByNickname: (
       query: {
+        /** 6~12 영문, 숫자 ㅡ하이픈, 언더스코어만 사용가능한 닉네임 */
         q: string;
       },
       params: RequestParams = {},
@@ -757,6 +806,7 @@ export class Api<
      */
     usersControllerGetUserInfo: (
       query: {
+        /** 타겟 유저의 UUID */
         targetUser: string;
       },
       params: RequestParams = {},
@@ -1036,6 +1086,41 @@ export class Api<
     ) =>
       this.request<ChannelMemberDto[], any>({
         path: `/api/v1/channel/participant/${channelId}`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags achievement
+     * @name AchievementControllerFindAll
+     * @summary 모든 achievement 리턴
+     * @request GET:/api/v1/achievement
+     */
+    achievementControllerFindAll: (params: RequestParams = {}) =>
+      this.request<AchievementDto[], any>({
+        path: `/api/v1/achievement`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags achievement
+     * @name AchievementControllerFindByUser
+     * @summary user가 획득한 achievement 리턴
+     * @request GET:/api/v1/achievement/{userId}
+     */
+    achievementControllerFindByUser: (
+      userId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<UserAchievementDto[], void>({
+        path: `/api/v1/achievement/${userId}`,
         method: 'GET',
         format: 'json',
         ...params,
