@@ -3,7 +3,6 @@ import {
   Channel,
   ChannelMember,
   ChannelMemberType,
-  ChannelMessage,
   Prisma,
 } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
@@ -16,8 +15,10 @@ import {
   newServiceOkResponse,
   ServiceResponse,
 } from '../common/ServiceResponse';
+import { MessageWithMemberDto } from '../dm/dto/message-with-member';
 import { ChannelDto } from './dto/channel-dto';
-import { ChannelRelationDto } from './dto/channel-relation-dto';
+import { ChannelMemberDto } from './dto/channel-members.dto';
+import { ChannelRelationDto } from './dto/channel-relation.dto';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { ChannelType } from './enums/channel-type.enum';
 
@@ -56,6 +57,11 @@ export class ChannelService {
   async findAll() {
     const prismaChannels = await this.prisma.channel.findMany();
     return prismaChannels.map((prismaChannel) => new ChannelDto(prismaChannel));
+  }
+
+  async findAllChannelMembers() {
+    const prismaChannels = await this.prisma.channelMember.findMany();
+    return prismaChannels;
   }
 
   async findOne(id: ChannelId) {
@@ -322,7 +328,7 @@ export class ChannelService {
     userId: UserId,
     channelId: ChannelId,
     messageJson: string,
-  ): Promise<ServiceResponse<ChannelMessage>> {
+  ): Promise<ServiceResponse<MessageWithMemberDto>> {
     try {
       const result = await this.prisma.$transaction(async (prisma) => {
         const prismaChannel = await prisma.channel.findUnique({
@@ -362,6 +368,19 @@ export class ChannelService {
             memberId: userId.value,
             messageJson: messageJson,
           },
+          include: {
+            member: {
+              select: {
+                id: true,
+                nickname: true,
+                profileImageUrl: true,
+                joinedAt: true,
+                isLeaved: true,
+                leavedAt: true,
+                statusMessage: true,
+              },
+            },
+          },
         });
       });
       return newServiceOkResponse(result);
@@ -369,6 +388,39 @@ export class ChannelService {
       if (error instanceof ServiceError) {
         return { ok: false, error };
       }
+      if (error instanceof PrismaClientKnownRequestError) {
+        return newServiceFailPrismaKnownResponse(error.code, 400);
+      }
+      return newServiceFailPrismaUnKnownResponse(500);
+    }
+  }
+
+  async findChannelMembersByChannelId(
+    channelId: ChannelId,
+  ): Promise<ServiceResponse<ChannelMemberDto[]>> {
+    try {
+      const result = await this.prisma.$transaction(async (prisma) => {
+        return await this.prisma.channelMember.findMany({
+          where: {
+            channelId: channelId.value,
+          },
+          include: {
+            member: {
+              select: {
+                id: true,
+                joinedAt: true,
+                isLeaved: true,
+                leavedAt: true,
+                nickname: true,
+                profileImageUrl: true,
+                statusMessage: true,
+              },
+            },
+          },
+        });
+      });
+      return newServiceOkResponse(result);
+    } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         return newServiceFailPrismaKnownResponse(error.code, 400);
       }

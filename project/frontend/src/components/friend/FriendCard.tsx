@@ -17,7 +17,12 @@ export function FriendCard({
   refetch,
 }: FriendCardProps) {
   return (
-    <CommonCard imageUrl={imageUrl} nickname={nickname} id={id}>
+    <CommonCard
+      imageUrl={imageUrl}
+      nickname={nickname}
+      id={id}
+      refetch={refetch}
+    >
       <Button onClick={() => alert('call game start api')}>게임하기</Button>
       <Link
         href={'/dm'}

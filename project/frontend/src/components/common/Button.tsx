@@ -23,7 +23,7 @@ const ButtonCVA = cva(['text-center'], {
 
 export interface ButtonProps extends VariantProps<typeof ButtonCVA> {
   children?: React.ReactNode;
-  readonly onClick: () => void;
+  readonly onClick?: () => void;
   disabled?: boolean;
   isModal?: boolean;
 }

@@ -8,49 +8,93 @@ export enum messageType {
   CHANNEL = 'CHANNEL',
 }
 interface messageContent {
-  channelId: string;
   message: string;
   time: Date;
   profileImage: string;
-  nickname: string;
+  targetNickname: string;
+  targetId: string;
 }
 
 export function MessageContent({
-  channelId,
   type,
-  myNickname,
-}: Readonly<{ channelId: string; type: messageType; myNickname: string }>) {
+  nickname,
+}: Readonly<{ type: messageType; nickname: string }>) {
   const [messages, setMessages] = useState<messageContent[]>([]);
+
   useEffect(() => {
     const socket = getSocket();
-    socket.on(`message`, (data: messageContent) => {
-      if (data.channelId === channelId) {
+
+    if (type === messageType.DM) {
+      socket.on(`directMessage`, (res) => {
+        const data = {
+          message: res.messageJson,
+          time: new Date(res.sentAt),
+          profileImage: res.member.profileImageUrl,
+          targetId: res.memberId,
+          targetNickname: res.member.nickname,
+        };
+        console.log(data);
         setMessages((messages) => [...messages, data]);
-      }
-    });
+      });
+    } else {
+      socket.on(`channelMessage`, (data: messageContent) => {
+        setMessages((messages) => [...messages, data]);
+      });
+    }
 
     return () => {
-      socket.off(`message`);
+      if (type === messageType.DM) {
+        socket.off(`directMessage`);
+      } else {
+        socket.off(`channelMessage`);
+      }
     };
-  }, [channelId]);
+  }, [type]);
 
+  const me: string | null = localStorage.getItem('me');
+  const myNickname = me ? JSON.parse(me).nickname : '';
   return (
     <div className="w-[95%] h-[610px] pt-[20px] bg-chat-color2 rounded-[10px] flex flex-col overflow-y-scroll mt-sm">
       {messages.map((message, idx) => {
-        if (message.nickname === myNickname) {
+        if (message.targetNickname === myNickname) {
           return <MyChat key={message.time.toString()} {...message} />;
         } else {
           let isFirst = false;
-          if (idx != 0 && messages[idx - 1].nickname != message.nickname) {
+          if (
+            idx == 0 ||
+            (idx != 0 &&
+              messages[idx - 1].targetNickname != message.targetNickname)
+          ) {
             isFirst = true;
           }
-          <OtherChat
-            key={message.time.toString()}
-            {...message}
-            isFirst={isFirst}
-          />;
+          return (
+            <OtherChat
+              key={message.time.toString()}
+              {...message}
+              isFirst={isFirst}
+            />
+          );
         }
       })}
+
+      {/* <OtherChat
+        message="hihi"
+        time={new Date()}
+        profileImage="/avatar/avatar-big.svg"
+        isFirst={true}
+        targetId={targetUserId}
+        targetNickname={nickname}
+      />
+
+      <OtherChat
+        message="hihi"
+        time={new Date()}
+        profileImage="/avatar/avatar-big.svg"
+        isFirst={false}
+        targetId={targetUserId}
+        targetNickname={nickname}
+      />
+      <UserStateAnnounce userState={UserState.LEAVE} nickname="hello" /> */}
     </div>
   );
 }

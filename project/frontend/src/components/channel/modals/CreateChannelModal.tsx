@@ -1,3 +1,4 @@
+import { getSocket } from '@/lib/Socket';
 import { useState } from 'react';
 import { ChannelButton } from '../ChannelButton';
 import { ChannelCreateContent } from './ChannelCreateContent';
@@ -19,6 +20,10 @@ export function CreateChannelModal({
 }) {
   const [channelType, setChannelType] = useState(ChannelType.PUBLIC);
   const [isValid, setIsValid] = useState(false);
+  const [inputTitle, setInputTitle] = useState('');
+  const [inputPassword, setInputPassword] = useState('');
+  const [inputSize, setInputSize] = useState(2);
+
   const channelTypeChangeEvent = (channelType: ChannelType) => {
     switch (channelType) {
       case ChannelType.PUBLIC:
@@ -35,6 +40,10 @@ export function CreateChannelModal({
   const closeAndChangeTypePublic = () => {
     setChannelType(ChannelType.PUBLIC);
     closeModal();
+  };
+
+  const sendCreateChannelEvnet = () => {
+    getSocket().emit('createDmChannel', {});
   };
   return (
     <ModalLayout
@@ -61,6 +70,12 @@ export function CreateChannelModal({
               channelType={channelType}
               isValid={isValid}
               setIsValid={setIsValid}
+              inputTitle={inputTitle}
+              setInputTitle={setInputTitle}
+              inputPassword={inputPassword}
+              setInputPassword={setInputPassword}
+              inputSize={inputSize}
+              setInputSize={setInputSize}
             />
           </div>
         </div>

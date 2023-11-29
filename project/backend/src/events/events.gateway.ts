@@ -14,7 +14,14 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChangeActionType } from '../channel/channel.service';
+import { GateWayEvents } from '../common/gateway-events.enum';
 import { idOf } from '../common/Id';
+import {
+  ChannelIdentityDto,
+  ChannelMessageDto,
+  CreateDmChannelDto,
+  DmMessageDto,
+} from './event-request.dto';
 import { EventsService } from './events.service';
 
 interface JwtPayload {
@@ -26,15 +33,11 @@ interface JwtPayload {
   exp: number;
 }
 
-enum ChannelType {
-  NORMAL = 'normal',
-  DM = 'dm',
-}
-
-type ChannelTypeKey = string;
-type ChannelIdKey = string;
-type UserIdKey = string;
-type ClientIdKey = string;
+export type UserSocket = Socket & {
+  data: {
+    userId: string;
+  };
+};
 
 @WebSocketGateway(80, {
   cors: { origin: 'http://localhost:53000', credentials: true },
@@ -52,8 +55,8 @@ export class EventsGateway
     private eventsService: EventsService,
   ) {}
 
-  afterInit(server: Server) {
-    this.eventsService.afterInit(server);
+  async afterInit(server: Server) {
+    await this.eventsService.afterInit(server);
   }
 
   async handleConnection(@ConnectedSocket() client: Socket) {
@@ -61,12 +64,14 @@ export class EventsGateway
       const decoded = this.isValidJwtAndPhase(client);
       const userId = decoded.id.value;
 
-      await this.eventsService.handleConnection(client, idOf(userId));
+      client.data.userId = userId;
+
+      await this.eventsService.handleConnection(client as UserSocket);
     } catch (error) {
       const msg =
         error instanceof WsException ? error.message : 'Unknown Error';
       console.error(error);
-      client.emit('exception', { msg });
+      client.emit(GateWayEvents.Exception, { msg });
       console.log(`인증 실패: ${msg}`);
       client.disconnect();
     }
@@ -76,64 +81,64 @@ export class EventsGateway
     this.eventsService.handleDisconnect(client);
   }
 
-  // no dm
-  @SubscribeMessage('message')
+  // only DM채널
+  @SubscribeMessage(GateWayEvents.ChannelMessage)
   async handleMessage(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() data: { channelId: string; msg: string },
+    @ConnectedSocket() client: UserSocket,
+    @MessageBody() data: ChannelMessageDto,
   ) {
     const { channelId, msg } = data;
     await this.eventsService.sendMessage(client, idOf(channelId), msg);
   }
 
   // only dm
-  @SubscribeMessage('dm')
+  @SubscribeMessage(GateWayEvents.DirectMessage)
   async handleDm(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() data: { memberId: string; msg: string },
+    @ConnectedSocket() client: UserSocket,
+    @MessageBody() data: DmMessageDto,
   ) {
     const { memberId, msg } = data;
     await this.eventsService.handleSendDm(client, idOf(memberId), msg);
   }
 
   // only dmChannel
-  @SubscribeMessage('createDmChannel')
+  @SubscribeMessage(GateWayEvents.CreateDmChannel)
   async handleCreateDmChannel(
-    @ConnectedSocket() client: Socket,
+    @ConnectedSocket() client: UserSocket,
     @MessageBody()
-    data: { info: { nickname?: string; memberId?: string } },
+    data: CreateDmChannelDto,
   ) {
     const { nickname, memberId } = data.info;
 
     await this.eventsService.handleCreateDmChannel(client, nickname, memberId);
   }
 
-  // no dmChannel
-  @SubscribeMessage('join')
+  // only 일반채널
+  @SubscribeMessage(GateWayEvents.Join)
   async handleJoin(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() data: { channelId: string },
+    @ConnectedSocket() client: UserSocket,
+    @MessageBody() data: ChannelIdentityDto,
   ) {
     const { channelId } = data;
 
-    await this.eventsService.handleJoinChannel(client, idOf(channelId));
+    await this.eventsService.handleJoin(client, idOf(channelId));
   }
 
-  // no dmChannel
-  @SubscribeMessage('leave')
+  // only 일반채널
+  @SubscribeMessage(GateWayEvents.Leave)
   async handleLeave(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { channelId: string },
+    @MessageBody() data: ChannelIdentityDto,
   ) {
     const { channelId } = data;
 
-    await this.eventsService.handleLeaveChannel(client, idOf(channelId));
+    await this.eventsService.handleLeave(client, idOf(channelId));
   }
 
-  // no dmChannel
-  @SubscribeMessage('kickBanPromote')
+  // only 일반채널
+  @SubscribeMessage(GateWayEvents.KickBanPromote)
   async handleKick(
-    @ConnectedSocket() client: Socket,
+    @ConnectedSocket() client: UserSocket,
     @MessageBody()
     data: { channelId: string; memberId: string; actionType: ChangeActionType },
   ) {
@@ -149,8 +154,26 @@ export class EventsGateway
 
   // To test
   @SubscribeMessage('triggerNotification')
-  han(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
-    this.server.emit('noti', data);
+  handleNoti(@ConnectedSocket() client: UserSocket, @MessageBody() data: any) {
+    this.server.emit(GateWayEvents.Notification, data);
+  }
+
+  // To test
+  @SubscribeMessage(GateWayEvents.Exception)
+  testException(
+    @ConnectedSocket() _client: UserSocket,
+    @MessageBody() data: any,
+  ) {
+    throw new WsException(`WsException 테스트 중입니다.`);
+  }
+
+  // To test
+  @SubscribeMessage('invite')
+  testOk(
+    @ConnectedSocket() _client: UserSocket,
+    @MessageBody() data: any,
+  ): string {
+    return `ok 테스트 중입니다.`;
   }
 
   private getCookie = (cookies: string, key: string) => {
@@ -158,14 +181,18 @@ export class EventsGateway
     const jwtKeyValue = cookieKeyValues.find((el) => el[0] === key);
     return jwtKeyValue !== undefined ? jwtKeyValue[1] : null;
   };
-  private isValidJwtAndPhase = (client: Socket) => {
+  private isValidJwtAndPhase = (client: UserSocket) => {
     // console.log(client.handshake.headers.cookie);
     if (client.handshake.headers.cookie === undefined) {
-      throw new WsException('인증을 위해 쿠키 필수입니다.');
+      throw new WsException(
+        '헤더에 쿠키가 존재하지 않습니다. 인증을 위해 쿠키 필수입니다.',
+      );
     }
     const jwt = this.getCookie(client.handshake.headers.cookie, 'jwt');
     if (jwt === null) {
-      throw new WsException('jwt 토큰이 쿠키에 없습니다.');
+      throw new WsException(
+        '헤더의 쿠키에서 jwt 토큰을 찾을 수 없습니다. 인증을 위해 jwt 토큰이 필요합니다.',
+      );
     }
 
     const decoded = this.jwtService.verify<JwtPayload>(jwt, {
@@ -174,7 +201,7 @@ export class EventsGateway
 
     if (decoded.phase !== 'complete') {
       throw new WsException(
-        `jwt의 phase가 complete가 아닙니다. (${decoded.phase}).`,
+        `jwt의 phase가 complete가 아닙니다. (${decoded.phase}). 인증된 유저만 접속할 수 있습니다.`,
       );
     }
     return decoded;

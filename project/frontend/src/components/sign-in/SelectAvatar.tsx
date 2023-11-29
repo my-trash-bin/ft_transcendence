@@ -1,12 +1,12 @@
 import Image from 'next/image';
 
 type AvatarProps = {
-  imageUrl: string;
-  isSelected?: boolean;
-  onClick?: () => void;
+  readonly imageUrl: string;
+  readonly isSelected?: boolean;
+  readonly onClick?: () => void;
 };
 
-export default function SelectAvatar({
+export function SelectAvatar({
   imageUrl,
   isSelected = false,
   onClick,

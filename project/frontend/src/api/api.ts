@@ -74,6 +74,34 @@ export interface UserDto {
   statusMessage: string;
 }
 
+export interface UserRelationshipDto {
+  /**
+   * 사용자 ID
+   * @format uuid
+   */
+  id: string;
+  /** 닉네임 */
+  nickname: string;
+  /** 프로필 이미지 URL */
+  profileImageUrl?: string;
+  /**
+   * 가입 시기
+   * @format date-time
+   */
+  joinedAt: string;
+  /** 탈퇴 여부 */
+  isLeaved: boolean;
+  /**
+   * 탈퇴 시기
+   * @format date-time
+   */
+  leavedAt?: string;
+  /** 상태 메시지 */
+  statusMessage: string;
+  /** 관계 */
+  relation: 'friend' | 'block' | 'none' | 'me';
+}
+
 export interface CreateUserDto {
   nickname: string;
   profileImageUrl?: string;
@@ -271,6 +299,15 @@ export interface CreateChannelDto {
   password?: string;
   /** 채널 최대 인원수 */
   capacity: number;
+}
+
+export interface ChannelMemberDto {
+  channelId: string;
+  memberId: string;
+  memberType: 'ADMINISTRATOR' | 'MEMBER' | 'BANNED';
+  /** @format date-time */
+  mutedUntil: string;
+  member: UserDto;
 }
 
 export type QueryParamsType = Record<string | number, any>;
@@ -702,7 +739,7 @@ export class Api<
       },
       params: RequestParams = {},
     ) =>
-      this.request<UserDto[], any>({
+      this.request<UserRelationshipDto[], any>({
         path: `/api/v1/users/search`,
         method: 'GET',
         query: query,
@@ -728,6 +765,25 @@ export class Api<
         path: `/api/v1/users/profile`,
         method: 'GET',
         query: query,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags users
+     * @name UsersControllerGetUsetByNickname
+     * @summary 유저 1명 기본 조회 by 닉네임
+     * @request GET:/api/v1/users/nickname/{nickname}
+     */
+    usersControllerGetUsetByNickname: (
+      nickname: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<UserDto, void>({
+        path: `/api/v1/users/nickname/${nickname}`,
+        method: 'GET',
         format: 'json',
         ...params,
       }),
@@ -962,6 +1018,25 @@ export class Api<
         method: 'POST',
         body: data,
         type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags channel
+     * @name ChannelControllerFindChannelMembersByChannelId
+     * @summary 채널 참여자 목록 반환
+     * @request GET:/api/v1/channel/participant/{channelId}
+     */
+    channelControllerFindChannelMembersByChannelId: (
+      channelId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<ChannelMemberDto[], any>({
+        path: `/api/v1/channel/participant/${channelId}`,
+        method: 'GET',
         format: 'json',
         ...params,
       }),

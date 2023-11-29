@@ -8,15 +8,23 @@ import { messageType } from './MessageContent';
 export function MessageSendBox({
   channelId,
   type,
+  targetUserId,
 }: {
-  channelId: string;
+  channelId?: string;
   type: messageType;
+  targetUserId?: string;
 }) {
   const [message, setMessage] = useState<string>('');
   const sendMessage = () => {
     const socket = getSocket();
-    socket.emit('message', { channelId, type, msg: message });
-    console.log(`send message: ${message}`);
+    if (type === messageType.DM) {
+      console.log('send message', message, targetUserId);
+      socket.emit('directMessage', {
+        msg: message,
+        memberId: targetUserId,
+      });
+    } else socket.emit('channelMessage', { channelId, msg: message });
+
     setMessage('');
   };
 
