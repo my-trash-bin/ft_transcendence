@@ -12,7 +12,7 @@ const avatars: string[] = [
   '/avatar/avatar-small.svg',
 ];
 
-export default function SignIn() {
+export default function SignInPage() {
   const [nickname, setNickname] = useState('');
   const [avatar, setAvatar] = useState('');
 
