@@ -24,19 +24,33 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
   const { api } = useContext(ApiContext);
   const [isChanged, setIsChanged] = useState(false);
   const [profileData, setProfileData] = useState<UserProfileDto>(defaultData);
+  const [password, setPassword] = useState('');
 
   const saveChanges = useCallback(async () => {
     try {
       await api.usersControllerUpdate({
         nickname: profileData.nickname,
+        // profileImageUrl: profileData.profileImageUrl,
+        // statusMessage: profileData.statusMessage,
       });
       fetchData();
       onClose();
     } catch (error) {
       console.error('Error saving changes:', error);
-      alert('// TODO: Handle errors gracefully');
     }
-  }, [api, , profileData.nickname, onClose, fetchData]);
+  }, [api, , profileData, onClose, fetchData]);
+
+  const sendPassword = useCallback(async () => {
+    try {
+      alert('call api to set 2fa password');
+      // await api.usersControllerUpdate({
+      //   password: password,
+      // });
+      onClose();
+    } catch (error) {
+      console.error('Error send password:', error);
+    }
+  }, [onClose]);
 
   const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newNickname = e.target.value;
@@ -60,18 +74,19 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
     setIsChanged(true);
   };
 
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+  };
+
   const textClass = 'font-bold text-xl text-dark-purple leading-loose';
   const buttonClass =
     'w-[80px] h-[30px] rounded-sm border-2 text-center text-black text-lg font-bold hover:bg-light-background self-end';
-  const colorClass = isChanged
-    ? 'bg-default border-dark-purple'
-    : 'bg-gray border-dark-gray';
   return (
     <ModalLayout
       isOpen={isOpen}
       closeModal={onClose}
       width="300px"
-      height="500px"
+      height="550px"
     >
       <div className="w-[100%] h-[100%] relative">
         <div className="p-xl h-[100%] flex flex-col gap-lg justift-center items-center">
@@ -80,42 +95,61 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
             <Image
               src={defaultData.imageUrl}
               alt="avatar"
-              width={150}
-              height={150}
+              width={100}
+              height={100}
             />
           ) : (
             <Image
               src={'/avatar/avatar-black.svg'}
               alt="avatar"
-              width={150}
-              height={150}
+              width={100}
+              height={100}
             />
           )}
           <div className="flex flex-col w-[100%] justify-center">
             <p className={textClass}>닉네임</p>
             <input
               type="text"
-              value={profileData.nickname}
-              onChange={handleNicknameChange}
               placeholder={defaultData.nickname}
+              onChange={handleNicknameChange}
               className="bg-[#f3f0f8] border-2 border-dark-purple-interactive w-[200px]"
             />
             <p className={textClass}>상태메세지</p>
             <input
               type="text"
-              value={profileData.statusMessage}
-              onChange={handleStatusMessageChange}
               placeholder={defaultData.statusMessage}
+              onChange={handleStatusMessageChange}
               className="bg-[#f3f0f8] border-2 border-dark-purple"
             />
+            <button
+              disabled={!isChanged || !isNicknameValid(defaultData.nickname)}
+              onClick={saveChanges}
+              className={`${buttonClass} ${
+                isChanged
+                  ? 'bg-default border-dark-purple'
+                  : 'bg-gray border-dark-gray'
+              } mt-sm`}
+            >
+              수정하기
+            </button>
+            <p className={textClass}>2차 비밀번호 설정</p>
+            <input
+              type="password"
+              onChange={handlePasswordChange}
+              className="bg-[#f3f0f8] border-2 border-dark-purple"
+            />
+            <button
+              disabled={!password}
+              onClick={sendPassword}
+              className={`${buttonClass} ${
+                password
+                  ? 'bg-default border-dark-purple'
+                  : 'bg-gray border-dark-gray'
+              } mt-sm`}
+            >
+              설정하기
+            </button>
           </div>
-          <button
-            disabled={!isChanged || !isNicknameValid(defaultData.nickname)}
-            onClick={saveChanges}
-            className={`${buttonClass} ${colorClass}`}
-          >
-            수정하기
-          </button>
         </div>
       </div>
     </ModalLayout>
