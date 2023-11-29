@@ -1,14 +1,14 @@
 'use client';
 
-import { Api } from '@/api/api';
 import { DmUserList } from '@/components/dm/dm-user/DmUserList';
 import { MessageSearch } from '@/components/dm/message-search/MessageSearch';
+import { fetchMyData } from '@/lib/FetchMyData';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 export default function DmPage() {
   const [searchUsername, setSearchUsername] = useState('');
-  const [error, setError] = useState('');
+  const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const userSearchCallback = (searchUsername: string) => {
@@ -16,17 +16,11 @@ export default function DmPage() {
   };
 
   useEffect(() => {
-    async function FetchMyData() {
-      try {
-        const data = await new Api().api.usersControllerMyProfile();
-        localStorage.setItem('me', JSON.stringify(data.data));
-        setLoading(false);
-      } catch (e) {
-        setError('error!');
-      }
+    try {
+      fetchMyData(setLoading);
+    } catch (e) {
+      setError(true);
     }
-    if (localStorage.getItem('me') === null) FetchMyData();
-    else setLoading(false);
   }, []);
   if (loading) return <div>loading... 👾</div>;
   if (error) return <div>error!</div>;

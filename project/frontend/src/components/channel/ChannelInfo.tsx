@@ -20,7 +20,11 @@ export function ChannelInfo({ channelId }: Readonly<{ channelId: string }>) {
   return (
     <>
       <Portal selector={'#modal-channel'}>
-        <ChannelSettingModal isOpen={isOpen} closeModal={modalClose} />
+        <ChannelSettingModal
+          isOpen={isOpen}
+          closeModal={modalClose}
+          channelId={channelId}
+        />
       </Portal>
       <div className="w-[95%] h-[80px] border-b border-default relative flex justify-center items-center">
         <h3>{channelData.channelName}</h3>

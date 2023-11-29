@@ -33,6 +33,7 @@ export function EnterPasswordModal({
         <form className="flex flex-col items-center">
           <p className="mb-[15px] mt-[20px]">비밀번호 입력</p>
           <input
+            autoComplete="off"
             type="password"
             placeholder="비밀번호를 입력하세요."
             className="pl-[10px] rounded-sm outline-none placeholder:text-[12px] placeholder:text-center w-[200px]"

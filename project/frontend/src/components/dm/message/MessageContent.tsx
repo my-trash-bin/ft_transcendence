@@ -41,8 +41,22 @@ export function MessageContent({ type }: Readonly<{ type: messageType }>) {
         setMessages((messages) => [...messages, data]);
       });
     } else {
-      socket.on(`channelMessage`, (data: messageContent) => {
-        setMessages((messages) => [...messages, data]);
+      socket.on(`channelMessage`, (res) => {
+        console.log(res);
+        // const data = {
+        //   id: res.id,
+        //   message: res.messageJson,
+        //   time: new Date(res.sentAt),
+        //   profileImage: res.member.profileImageUrl,
+        //   targetId: res.memberId,
+        //   targetNickname: res.member.nickname,
+        // };
+        // setMessages((messages) => [...messages, data]);
+      });
+      socket.on('leave', (res) => {
+        const me: string | null = localStorage.getItem('me');
+        const myNickname = me ? JSON.parse(me).nickname : '';
+        console.log(res);
       });
     }
 
@@ -51,6 +65,7 @@ export function MessageContent({ type }: Readonly<{ type: messageType }>) {
         socket.off(`directMessage`);
       } else {
         socket.off(`channelMessage`);
+        socket.off('leave');
       }
     };
   }, [type]);
