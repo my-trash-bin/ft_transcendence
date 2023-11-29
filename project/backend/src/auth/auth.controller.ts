@@ -1,7 +1,9 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
+  Logger,
   Post,
   Request,
   Response,
@@ -108,14 +110,14 @@ export class AuthController {
     const logger = new Logger('Post register');
     const { type, id } = req.user as JwtPayloadPhaseRegister;
     try {
-    const jwtPayload = await this.authService.register(
-      type,
-      id,
-      data.nickname,
-      data.imageUrl,
-    );
+      const jwtPayload = await this.authService.register(
+        type,
+        id,
+        data.nickname,
+        data.imageUrl,
+      );
       logger.debug(`jwtPayLoad: ${jwtPayload}`);
-    this.setCookie(res, jwtPayload);
+      this.setCookie(res, jwtPayload);
       logger.debug('res.redirect2 => welcome => /friend');
       logger.debug('return jwtPayload');
       return jwtPayload;
