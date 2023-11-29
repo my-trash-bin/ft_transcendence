@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useCallback, useContext, useState } from 'react';
+import { useCallback, useContext } from 'react';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { Button } from '../common/Button';
 
@@ -17,39 +17,56 @@ export default function RegisterUser({
 }: RegisterUserProps) {
   const { api } = useContext(ApiContext);
   const router = useRouter();
-  const [formData, setFormData] = useState(new FormData());
+  // const [formData, setFormData] = useState(new FormData());
 
-  const handleFileChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const file = event.target.files?.[0];
-      if (file) {
-        const newFormData = new FormData();
-        newFormData.append('file', file);
-        setFormData(newFormData);
-      }
-    },
-    [],
-  );
+  // const handleFileChange = useCallback(
+  //   (event: React.ChangeEvent<HTMLInputElement>) => {
+  //     const file = event.target.files?.[0];
+  //     if (file) {
+  //       const newFormData = new FormData();
+  //       newFormData.append('file', file);
+  //       setFormData(newFormData);
+  //     }
+  //   },
+  //   [],
+  // );
 
-  const handleSubmitClick = useCallback(async () => {
-    if (!nickname || !formData) {
+  const handleSubmitClick = useCallback(() => {
+    if (!nickname || !imageUrl) {
       alert('// TODO: 닉네임이나 아바타 설정 안 했을 때 에러 메시지 좀 예쁘게');
       return;
     }
-    formData.append('nickname', nickname);
-    console.log(formData);
-    try {
-      const result = await api.authControllerRegister(formData);
+    (async () => {
+      const result = await api.authControllerRegister({
+        nickname,
+        imageUrl,
+      });
       if (!result.ok) {
         console.error({ result });
         alert('// TODO: 뭔가 좀 잘못 됐을 때 에러 메시지 좀 예쁘게');
-      } else {
-        router.push('/friend');
       }
-    } catch (error) {
-      console.error('Error during registration:', error);
-    }
-  }, [api, formData, nickname, router, imageUrl]);
+      router.push('/friend');
+    })();
+  }, [api, imageUrl, nickname, router]);
+  // const handleSubmitClick = useCallback(async () => {
+  //   if (!nickname || !formData) {
+  //     alert('// TODO: 닉네임이나 아바타 설정 안 했을 때 에러 메시지 좀 예쁘게');
+  //     return;
+  //   }
+  //   formData.append('nickname', nickname);
+  //   console.log(formData);
+  //   try {
+  //     const result = await api.authControllerRegister(formData);
+  //     if (!result.ok) {
+  //       console.error({ result });
+  //       alert('// TODO: 뭔가 좀 잘못 됐을 때 에러 메시지 좀 예쁘게');
+  //     } else {
+  //       router.push('/friend');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error during registration:', error);
+  //   }
+  // }, [api, formData, nickname, router, imageUrl]);
 
   return (
     <form

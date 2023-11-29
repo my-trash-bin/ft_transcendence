@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import { useState } from 'react';
 import { Button } from '../common/Button';
 import { SelectAvatar } from './SelectAvatar';
@@ -14,23 +13,23 @@ export default function ChooseAvatar({
   onChooseClick,
 }: ChooseAvatarProps) {
   const [selectedAvatar, setSelectedAvatar] = useState<any>(null);
-  const [uploadImage, setUploadImage] = useState<any>(null);
+  // const [uploadImage, setUploadImage] = useState<any>(null);
 
-  const onChange = (event: any) => {
-    const file = event.target.files[0];
+  // const onChange = (event: any) => {
+  //   const file = event.target.files[0];
 
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target) {
-          setUploadImage(e.target.result);
-          setSelectedAvatar(e.target.result);
-        }
-      };
+  //   if (file) {
+  //     const reader = new FileReader();
+  //     reader.onload = (e) => {
+  //       if (e.target) {
+  //         setUploadImage(e.target.result);
+  //         setSelectedAvatar(e.target.result);
+  //       }
+  //     };
 
-      reader.readAsDataURL(file);
-    }
-  };
+  //     reader.readAsDataURL(file);
+  //   }
+  // };
 
   return (
     <div className="w-2xl h-[400px] bg-light-background rounded-lg flex flex-col justify-center items-center">
@@ -45,7 +44,7 @@ export default function ChooseAvatar({
               onClick={() => setSelectedAvatar(avatar)}
             />
           ))}
-          <div className="border-3 border-dark-purple w-lg h-lg">
+          {/* <div className="border-3 border-dark-purple w-lg h-lg">
             {uploadImage ? (
               <Image
                 src={uploadImage}
@@ -62,7 +61,7 @@ export default function ChooseAvatar({
             name="profile_img"
             // className="w-[120px]"
             onChange={onChange}
-          />
+          /> */}
         </div>
         <div className="self-end">
           <Button
