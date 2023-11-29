@@ -14,8 +14,6 @@ import {
 import {
   ApiBadRequestResponse,
   ApiConflictResponse,
-  ApiCreatedResponse,
-  ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiOkResponse,
   ApiOperation,
@@ -30,7 +28,6 @@ import { Phase, PhaseGuard } from '../auth/phase.guard';
 import { idOf } from '../common/Id';
 import { PongSeasonLogService } from '../pong-season-log/pong-season-log.service';
 import { UserFollowService } from '../user-follow/user-follow.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { NicknameCheckUserDto } from './dto/nickname-check-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import {
@@ -199,22 +196,6 @@ export class UsersController {
       throw new BadRequestException('올바르지 않은 id');
     }
     return result;
-  }
-
-  @Post()
-  @ApiOperation({
-    summary: '유저 생성. 사실 아직 이 테이블의 정확한 기능을 잘...',
-  })
-  @ApiCreatedResponse({
-    description: 'The user has been successfully created.',
-    type: () => UserDto,
-  })
-  @ApiForbiddenResponse({ description: 'Forbidden.' })
-  @ApiConflictResponse({ description: 'Conflict.' })
-  @UseGuards(JwtGuard, PhaseGuard)
-  @Phase('register')
-  async create(@Body() createUserDto: CreateUserDto) {
-    return await this.usersService.create(createUserDto);
   }
 
   @Patch()
