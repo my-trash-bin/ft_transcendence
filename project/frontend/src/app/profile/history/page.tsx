@@ -1,5 +1,5 @@
 'use client';
-import HistoryArticle from '../../../components/profile/history/HistoryArticle';
+import { HistoryArticle } from '../../../components/profile/history/HistoryArticle';
 
 export default function HistoryPage() {
   return (

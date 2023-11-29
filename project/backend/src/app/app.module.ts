@@ -3,6 +3,7 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DevtoolsModule } from '@nestjs/devtools-integration';
 import { JwtModule } from '@nestjs/jwt';
+import { AchievementModule } from '../achievement/achievement.module';
 
 import { AuthModule } from '../auth/auth.module';
 import { ChannelModule } from '../channel/channel.module';
@@ -19,6 +20,7 @@ import { AppController } from './app.controller';
     UserFollowModule,
     PongSeasonLogModule,
     ChannelModule,
+    AchievementModule,
     EventsModule,
     DevtoolsModule.register({
       http: process.env.NODE_ENV !== 'production',

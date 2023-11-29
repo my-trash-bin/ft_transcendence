@@ -6,19 +6,28 @@ export const ChannelCreateContent = ({
   channelType,
   isValid,
   setIsValid,
+  inputTitle,
+  inputPassword,
+  inputSize,
+  setInputTitle,
+  setInputPassword,
+  setInputSize,
 }: {
   channelType: ChannelType;
   isValid: boolean;
   setIsValid: (arg: boolean) => void;
+  inputTitle: string;
+  inputPassword: string;
+  inputSize: number;
+  setInputTitle: (arg: string) => void;
+  setInputPassword: (arg: string) => void;
+  setInputSize: (arg: number) => void;
 }) => {
   const [titleValid, setTitleValid] = useState(false);
   const [passwordValid, setPasswordValid] = useState(
     channelType === ChannelType.PUBLIC,
   );
   const [sizeValid, setSizeValid] = useState(true);
-  const [inputTitle, setInputTitle] = useState('');
-  const [inputPassword, setInputPassword] = useState('');
-  const [inputSize, setInputSize] = useState(2);
 
   useEffect(() => {
     setPasswordValid(channelType === ChannelType.PUBLIC);
@@ -28,7 +37,7 @@ export const ChannelCreateContent = ({
     setInputSize(2);
     setSizeValid(true);
     setIsValid(false);
-  }, [channelType, setIsValid]);
+  }, [channelType, setIsValid, setInputTitle, setInputPassword, setInputSize]);
 
   const validText = 'text-[12px] mt-[5px]';
   const invalidText = 'text-[12px] mt-[5px] text-red-400';

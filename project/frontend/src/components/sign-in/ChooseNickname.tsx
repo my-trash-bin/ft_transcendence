@@ -29,11 +29,8 @@ export default function ChooseNickname({
         nickname: nickname,
       });
       const result: UniqueCheckResponse = response.data;
-      // console.log('result: ', result);
       setIsUnique(result.isUnique);
-    } catch (err) {
-      // console.log('err: ', err);
-    }
+    } catch (err) {}
   };
 
   function handleNicknameChange(e: React.ChangeEvent<HTMLInputElement>) {
