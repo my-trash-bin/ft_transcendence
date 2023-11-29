@@ -212,7 +212,7 @@ export class UsersController {
   @ApiForbiddenResponse({ description: 'Forbidden.' })
   @ApiConflictResponse({ description: 'Conflict.' })
   @UseGuards(JwtGuard, PhaseGuard)
-  @Phase('complete')
+  @Phase('register')
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
