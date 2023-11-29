@@ -37,16 +37,22 @@ export function AllChannelButton({
       <button
         onClick={addUserToChannel}
         className="w-[320px] h-[60px] pl-[15px] pr-[12px]
-     bg-white border border-default rounded-md mb-[10px] shrink-0 flex justify-between items-center"
+     bg-white border border-default rounded-md mb-[10px] shrink-0 flex-row flex items-center justify-between"
       >
-        {type === 'protected' ? (
-          <Image src="/icon/lock.svg" width={25} height={25} alt="lock icon" />
-        ) : (
-          <p className="w-[25]"></p>
-        )}
-
         <p className="self-center text-dark-gray">{channelName}</p>
-        <p className="text-dark-gray">{state}</p>
+        <div className="flex items-center">
+          {type === 'protected' ? (
+            <Image
+              src="/icon/lock.svg"
+              width={25}
+              height={25}
+              alt="lock icon"
+            />
+          ) : (
+            <p className="w-[25]"></p>
+          )}
+          <p className="text-dark-gray ml-[15px]">{state}</p>
+        </div>
       </button>
     </>
   );

@@ -53,7 +53,6 @@ export function ParticipantModal({
           await new Api().api.channelControllerFindChannelMembersByChannelId(
             channelId,
           );
-        console.log(res);
         setFetchData(res.data);
         setIsLoading(false);
       } catch (e) {
