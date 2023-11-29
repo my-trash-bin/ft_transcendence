@@ -1,21 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-// import { JwtService } from '@nestjs/jwt';
 import {
   ConnectedSocket,
   MessageBody,
-  OnGatewayConnection,
-  OnGatewayInit,
+  OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit,
   SubscribeMessage,
-  WebSocketGateway,
-  WebSocketServer,
-  WsException,
+  WebSocketGateway, WebSocketServer,
+  WsException
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChangeActionType } from '../channel/channel.service';
-import { GateWayEvents } from '../common/gateway-events.enum';
 import { idOf } from '../common/Id';
+import { GateWayEvents } from '../common/gateway-events.enum';
+import { GameService, GameState } from '../pong/pong';
 import {
   ChannelIdentityDto,
   ChannelMessageDto,
@@ -42,9 +40,10 @@ export type UserSocket = Socket & {
 @WebSocketGateway(80, {
   cors: { origin: 'http://localhost:53000', credentials: true },
 })
+
 @Injectable()
 export class EventsGateway
-  implements OnGatewayConnection, OnGatewayConnection, OnGatewayInit
+  implements OnGatewayConnection, OnGatewayConnection, OnGatewayInit, OnModuleInit, OnGatewayDisconnect
 {
   @WebSocketServer()
   server!: Server;
@@ -53,14 +52,23 @@ export class EventsGateway
     private jwtService: JwtService,
     private configService: ConfigService,
     private eventsService: EventsService,
+    private gameService: GameService,
   ) {}
 
-  async afterInit(server: Server) {
-    await this.eventsService.afterInit(server);
+  onModuleInit() {
+    this.gameService.onGameUpdate.on('gameState', (gameState: GameState) => {
+      this.server.emit('gameUpdate', gameState);
+    });
   }
+
+  afterInit(server: Server) {
+    this.eventsService.afterInit(server);
+  }
+
 
   async handleConnection(@ConnectedSocket() client: Socket) {
     try {
+      new Logger().debug(`client connected ${client.id}`);
       const decoded = this.isValidJwtAndPhase(client);
       const userId = decoded.id.value;
 
@@ -78,6 +86,7 @@ export class EventsGateway
   }
 
   async handleDisconnect(client: Socket) {
+    new Logger().debug(`Client disconnected: ${client.id}`);
     this.eventsService.handleDisconnect(client);
   }
 
@@ -152,6 +161,19 @@ export class EventsGateway
     );
   }
 
+  // game
+  @SubscribeMessage('joinLobby')
+  handleJoinLobby(@ConnectedSocket() client: Socket) {
+    const playerRole = 'player1';  // 임시로 고정
+    this.server.emit('playerRole', playerRole);
+    // new Logger().debug(`request socket, ${client.id}`);
+  }
+
+  @SubscribeMessage('paddleMove')
+  handlePaddleMove(@MessageBody() data: { direction: 'up' | 'down'; player: 'player1' | 'player2' }, @ConnectedSocket() client: Socket) {
+    this.gameService.handlePaddleMove(data.direction, data.player);
+  }
+  
   // To test
   @SubscribeMessage('triggerNotification')
   handleNoti(@ConnectedSocket() client: UserSocket, @MessageBody() data: any) {
