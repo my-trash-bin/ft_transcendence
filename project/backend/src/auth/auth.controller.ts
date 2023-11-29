@@ -102,11 +102,12 @@ export class AuthController {
   @Post('register')
   async register(
     @Request() req: ExpressRequest,
-    @Response() res: ExpressResponse,
+    @Response({ passthrough: true }) res: ExpressResponse,
     @Body() data: RegisterBody,
   ) {
     console.log('register 진입');
     const { type, id } = req.user as JwtPayloadPhaseRegister;
+    try {
     const jwtPayload = await this.authService.register(
       type,
       id,
@@ -116,6 +117,9 @@ export class AuthController {
     this.setCookie(res, jwtPayload);
     console.log('res.redirect2 => welcome => /friend');
     this.welcome(res, type);
+      return jwtPayload;
+      throw new BadRequestException(`가입 실패: ${error}`);
+    }
   }
 
   @ApiOperation({ summary: '2FA 로그인 용' })
