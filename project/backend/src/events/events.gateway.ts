@@ -55,17 +55,18 @@ export class EventsGateway
     private gameService: GameService,
   ) {}
 
+  // game
   onModuleInit() {
     this.gameService.onGameUpdate.on('gameState', (gameState: GameState) => {
       this.server.emit('gameUpdate', gameState);
     });
   }
-
+  
   afterInit(server: Server) {
     this.eventsService.afterInit(server);
   }
 
-
+  
   async handleConnection(@ConnectedSocket() client: Socket) {
     try {
       new Logger().debug(`client connected ${client.id}`);
@@ -160,7 +161,7 @@ export class EventsGateway
       actionType,
     );
   }
-
+  
   // game
   @SubscribeMessage('joinLobby')
   handleJoinLobby(@ConnectedSocket() client: Socket) {
@@ -173,7 +174,12 @@ export class EventsGateway
   handlePaddleMove(@MessageBody() data: { direction: 'up' | 'down'; player: 'player1' | 'player2' }, @ConnectedSocket() client: Socket) {
     this.gameService.handlePaddleMove(data.direction, data.player);
   }
-  
+
+  @SubscribeMessage('restartGame')
+  handleRestartGame(@ConnectedSocket() client: Socket) {
+    this.gameService.resetGame();
+  }
+
   // To test
   @SubscribeMessage('triggerNotification')
   handleNoti(@ConnectedSocket() client: UserSocket, @MessageBody() data: any) {

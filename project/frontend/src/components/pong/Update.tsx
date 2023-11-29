@@ -18,7 +18,6 @@ const useStore = create<ExtendedGameState>((set) => ({
   isPlayer1: true,
 
   setIsPlayer1: (isPlayer1) => set({ isPlayer1 }),
-
   // 서버로부터 게임 상태 업데이트 수신
   setGameState: (newState) => set({ ...newState }),
 }));
