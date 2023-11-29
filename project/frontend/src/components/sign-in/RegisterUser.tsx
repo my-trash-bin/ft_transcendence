@@ -41,7 +41,7 @@ export default function RegisterUser({
       await api.authControllerRegister({ nickname, imageUrl });
       router.push('/friend');
     } catch (error) {
-      console.error('some error', error);
+      console.error('error', error);
     }
   }, [api, imageUrl, nickname, router]);
 
