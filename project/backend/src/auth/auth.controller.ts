@@ -105,7 +105,7 @@ export class AuthController {
     @Response({ passthrough: true }) res: ExpressResponse,
     @Body() data: RegisterBody,
   ) {
-    console.log('register 진입');
+    const logger = new Logger('Post register');
     const { type, id } = req.user as JwtPayloadPhaseRegister;
     try {
     const jwtPayload = await this.authService.register(
@@ -114,10 +114,13 @@ export class AuthController {
       data.nickname,
       data.imageUrl,
     );
+      logger.debug(`jwtPayLoad: ${jwtPayload}`);
     this.setCookie(res, jwtPayload);
-    console.log('res.redirect2 => welcome => /friend');
-    this.welcome(res, type);
+      logger.debug('res.redirect2 => welcome => /friend');
+      logger.debug('return jwtPayload');
       return jwtPayload;
+    } catch (error) {
+      logger.error(error);
       throw new BadRequestException(`가입 실패: ${error}`);
     }
   }
