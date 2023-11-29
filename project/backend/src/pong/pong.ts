@@ -41,7 +41,21 @@ export class GameService {
   constructor() {
     this.startGameLoop();
   }
-
+  
+  resetGame() {
+    this.gameState.score1 = 0;
+    this.gameState.score2 = 0;
+    this.gameState.gameOver = false;
+    this.resetPosition();
+    this.onGameUpdate.emit('gameState', this.gameState);
+  }
+  
+  private startGameLoop() {
+    setInterval(() => {
+      this.updateGameLogic();
+    }, 1000 / 60); // 초당 60번 업데이트
+  }
+  
   handlePaddleMove(direction: 'up' | 'down', player: 'player1' | 'player2') {
     const deltaY = direction === 'up' ? -PADDLE_MOVE_STEP : PADDLE_MOVE_STEP;
     const paddle = player === 'player1' ? this.gameState.paddle1 : this.gameState.paddle2;
@@ -49,18 +63,11 @@ export class GameService {
     paddle.y = newY;
     this.updateGameLogic();
 }
-  
 
   private checkPaddleBounds(paddleY: number): number {
     const minY = 0;
     const maxY = BOARD_HEIGHT - PADDLE_HEIGHT - 4;
     return Math.min(Math.max(paddleY, minY), maxY);
-  }
-
-  private startGameLoop() {
-    setInterval(() => {
-      this.updateGameLogic();
-    }, 1000 / 30); // 초당 60번 업데이트
   }
 
   getGameState() {
@@ -85,7 +92,7 @@ export class GameService {
 
   private checkBoundaries() {
     // X축 경계 체크
-    if (this.gameState.ball.x < 0 || this.gameState.ball.x > BOARD_WIDTH - BALL_SIZE) {
+    if (this.gameState.ball.x < 4 || this.gameState.ball.x > BOARD_WIDTH - BALL_SIZE - 4) {
       this.handleXAxisBoundary();
     }
 
@@ -97,7 +104,7 @@ export class GameService {
 
   private handleXAxisBoundary() {
     // 점수 업데이트
-    if (this.gameState.ball.x < 0) {
+    if (this.gameState.ball.x < 4) {
       this.gameState.score2++;
     } else {
       this.gameState.score1++;
@@ -107,7 +114,7 @@ export class GameService {
     this.resetPosition();
 
     // 점수 합이 짝수일 때 X축 속도 방향을 반전
-    if ((this.gameState.score1 + this.gameState.score2) % 2 === 0) {
+    if ((this.gameState.score1 + this.gameState.score2) % 2 == 0) {
       this.gameState.velocity.x = -this.gameState.velocity.x;
     }
 
@@ -125,11 +132,9 @@ export class GameService {
   }
 
   private checkGameOver() {
-    if (this.gameState.score1 === 10 || this.gameState.score2 === 10) {
+    if (this.gameState.score1 === 11 || this.gameState.score2 === 11) {
       this.gameState.gameOver = true;
-      // 임시로 ...
-      this.gameState.score1 = 0;
-      this.gameState.score2 = 0;
+      this.onGameUpdate.emit('gameState', this.gameState);
     }
   }
 
@@ -158,3 +163,4 @@ export class GameService {
     return deltaY < PADDLE_HEIGHT / PADDLE_STRIKE ? SMASH_SPEED : DEFAULT_SPEED;
   }
 }
+

@@ -2,32 +2,8 @@ import Image from 'next/image';
 import React, { useEffect } from 'react';
 import usePaddleMovement from './KeyHandle';
 import useStore from './Update';
-import { BALL_SIZE, BOARD_HEIGHT, BOARD_WIDTH, GameState, PADDLE_HEIGHT, PADDLE_WIDTH } from './gameConstants';
+import { BALL_SIZE, DEFAULT_SPEED, BOARD_HEIGHT, BOARD_WIDTH, GameState, PADDLE_HEIGHT, PADDLE_WIDTH } from './gameConstants';
 import { getGameSocket } from './gameSocket';
-
-interface PlayerAvatarProps {
-  avatarUrl: string;
-  playerName: string;
-}
-
-const PlayerAvatar: React.FC<PlayerAvatarProps> = ({
-  avatarUrl,
-  playerName,
-}) => {
-  return (
-    <div className="flex items-center">
-      <div className="relative w-[30px] h-[30px] rounded-full overflow-hidden mr-[10px]">
-        <Image
-          src={avatarUrl}
-          alt={`${playerName} Avatar`}
-          layout="fill"
-          objectFit="cover"
-        />
-      </div>
-      <span className="text-lg font-medium">{playerName}</span>
-    </div>
-  );
-};
 
 const GameBoard: React.FC = () => {
   const { ball, paddle1, paddle2, score1, score2, isPlayer1 } = useStore();
@@ -49,24 +25,14 @@ const GameBoard: React.FC = () => {
     });
 
     socket.on('gameUpdate', (data: GameState) => {
-      useStore.setState({
-        paddle1: data.paddle1,
-        paddle2: data.paddle2,
-        ball: data.ball,
-        velocity: data.velocity,
-        score1: data.score1,
-        score2: data.score2,
-        gameOver: data.gameOver,
-      });
-    // 게임 오버 상태 확인
-    if (data.gameOver) {
-      // 게임 오버 처리 로직
-      // 예시: 게임 오버 화면 표시, 재시작 버튼 제공 등
-      // 이 부분에 실제 게임 오버 화면을 표시하거나, 사용자에게 재시작 옵션을 제공하는 코드를 추가할 수 있습니다.
-    }
+      useStore.setState(data);
+      if (data.gameOver) {
+        // 일단은 끝내자마자 바로 시작하도록 만듦
+        socket.emit('restartGame');
+      }
     });
+
     return () => {
-      // socket.disconnect();
       socket.off('gameUpdate');
       socket.off('playerRole');
     };
@@ -128,6 +94,30 @@ const GameBoard: React.FC = () => {
       </div>
     </div>
   );  
+};
+
+interface PlayerAvatarProps {
+  avatarUrl: string;
+  playerName: string;
+}
+
+const PlayerAvatar: React.FC<PlayerAvatarProps> = ({
+  avatarUrl,
+  playerName,
+}) => {
+  return (
+    <div className="flex items-center">
+      <div className="relative w-[30px] h-[30px] rounded-full overflow-hidden mr-[10px]">
+        <Image
+          src={avatarUrl}
+          alt={`${playerName} Avatar`}
+          layout="fill"
+          objectFit="cover"
+        />
+      </div>
+      <span className="text-lg font-medium">{playerName}</span>
+    </div>
+  );
 };
 
 export default GameBoard;
