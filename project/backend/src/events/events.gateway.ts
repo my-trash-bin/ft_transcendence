@@ -50,6 +50,8 @@ export class EventsGateway
   @WebSocketServer()
   server!: Server;
 
+
+
   constructor(
     private jwtService: JwtService,
     private configService: ConfigService,
@@ -185,7 +187,7 @@ export class EventsGateway
   private normalMatchQueue = new Set<Socket>();
   private itemMatchQueue = new Set<Socket>();
   
-  tryNormalMatch() {
+  private tryNormalMatch() {
     console.log('tryNormalMatch');
     if (this.normalMatchQueue.size >= 2) {
       console.log('Matched!');
@@ -203,7 +205,7 @@ export class EventsGateway
     }
   }
   
-  tryItemMatch() {
+  private tryItemMatch() {
     if (this.itemMatchQueue.size >= 2) {
       const playersIterator = this.itemMatchQueue.values();
       const player1 = playersIterator.next().value;
@@ -218,17 +220,12 @@ export class EventsGateway
       this.server.to(roomName).emit('itemMatchStart', { room: roomName });
     }
   }
-
-  private roomReadyStatus: Record<string, Set<string>> = {};
-
+  
   private createGameRoom(player1: Socket, player2: Socket): string {
     const roomName = generateUniqueRoomName();
     // 룸 생성
     player1.join(roomName);
     player2.join(roomName);
-
-    // 룸별 준비 상태 초기화
-    this.roomReadyStatus[roomName] = new Set([player1.id, player2.id]);
 
     // 방에 클라이언트 추가
     this.server.to(roomName).emit('GoPong', { room: roomName });
@@ -236,26 +233,12 @@ export class EventsGateway
     // playerRole 알림
     this.server.to(player1.id).emit('playerRole', 'player1');
     this.server.to(player2.id).emit('playerRole', 'player2');
-    this.gameService.resetGame();
-    return roomName;
-  }
+    this.server.to('gameRoom').emit('gameStart');
 
-  @SubscribeMessage('ready')
-  handlePlayerReady(@MessageBody() data: { room: string; isPlayer1: boolean }, @ConnectedSocket() client: Socket) {
-    const room = data.room;
-    
-    // 해당 룸의 준비된 플레이어 목록에서 현재 플레이어를 제거
-    this.roomReadyStatus[room]?.delete(client.id);
-  
-    // 특정 룸의 모든 플레이어가 준비되었는지 확인
-    if (this.isRoomReady(room)) {
-      this.server.to(room).emit('gameStart'); // 해당 룸에 게임 시작 알림
-      delete this.roomReadyStatus[room]; // 게임 시작 후 준비 상태 초기화
-    }
-  }
-  
-  private isRoomReady(room: string): boolean {
-    return this.roomReadyStatus[room] && this.roomReadyStatus[room].size === 0;
+    setTimeout(() => {
+      this.gameService.resetGame();
+    }, 3000);
+    return roomName;
   }
 
   @SubscribeMessage('paddleMove')

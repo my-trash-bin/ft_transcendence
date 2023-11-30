@@ -11,30 +11,27 @@ const GameBoard: React.FC = () => {
   const { ball, paddle1, paddle2, score1, score2, isPlayer1, setGameState } = useStore();
   const socket = getGameSocket();
   const router = useRouter();
+  usePaddleMovement();
 
-  const submitReady = () => {
-    console.log(`I'm ready, ${isPlayer1 ? 'player1' : 'player2'}`);
-    socket.emit('ready', { isPlayer1 });
+  const handleGameUpdate = (gameState: GameState) => {
+    if (!gameState.gameStart) {
+      console.log('game not started');
+    } else if (!gameState.gameOver) {
+      setGameState(gameState);
+    } else {
+      console.log('gameOver');
+      router.push('/pong/gameOver');
+    }
   };
 
-  submitReady();
-  usePaddleMovement();
-  useEffect(() => {    
-    const handleGameUpdate = (gameState: GameState) => {
-      if (!gameState.gameOver) {
-        setGameState(gameState);
-      } else {
-        console.log('gameOver');
-        router.push('/pong/gameOver');
-      }
-    };
-
-    const handleGameStart = (gameState: GameState) => {
-      // 나중에 더 구체적으로 바꿀 수 있을 듯
-      gameState.gameOver = false;
-      console.log('gameStart');
-    }
-
+  const handleGameStart = (gameState: GameState) => {
+    // 나중에 더 구체적으로 바꿀 수 있을 듯
+    gameState.gameOver = false;
+    gameState.gameStart = true;
+    console.log('gameStart');
+  }
+  
+  useEffect(() => {
     socket.on('gameUpdate', handleGameUpdate);
     socket.on('gameStart', handleGameStart);
 
@@ -42,7 +39,7 @@ const GameBoard: React.FC = () => {
       socket.off('gameUpdate', handleGameUpdate);
       socket.off('gameStart', handleGameStart);
     };
-  }, [setGameState]);
+  }, []);
 
   return (
     <div className="flex flex-col items-center mt-[50px] font-bold text-dark-purple-interactive text-dark-purple-interactive">
