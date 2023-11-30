@@ -111,8 +111,8 @@ export class ChannelController {
   @ApiOperation({ summary: '채널 정보 반환' })
   @ApiOkResponse({
     description: '채널 정보 및 참여자 목록',
-    type: () => ChannelMemberDto,
-    isArray: true,
+    // type: () => ChannelMemberDto,
+    // isArray: true,
   })
   @UseGuards(JwtGuard, PhaseGuard)
   @Phase('complete')

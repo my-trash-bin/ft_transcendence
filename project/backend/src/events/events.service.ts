@@ -6,12 +6,12 @@ import { DmService } from '../dm/dm.service';
 import { UserFollowService } from '../user-follow/user-follow.service';
 import { UsersService } from '../users/users.service';
 // import { ChatRoomDto, ChatRoomStatusDto } from './chat.dto'
+import { ChannelMember } from '@prisma/client';
 import { Server, Socket } from 'socket.io';
 import { GateWayEvents } from '../common/gateway-events.enum';
 import { MessageWithMemberDto } from '../dm/dto/message-with-member';
 import { UserDto } from '../users/dto/user.dto';
 import {
-  ChannelMemberInfo,
   DmChannelInfoType,
   JoiningChannelInfo,
   LeavingChannelInfo,
@@ -309,7 +309,7 @@ export class EventsService {
 
     const eventName = GateWayEvents.KickBanPromote;
 
-    const data: ChannelMemberInfo = result.data!;
+    const data: ChannelMember & { member: UserDto } = result.data!;
 
     this.broadcastToChannel(type, channelId, [], eventName, {
       type: eventName,

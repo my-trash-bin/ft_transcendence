@@ -76,29 +76,13 @@ export class UsersController {
     }
 
     const userId = id as UserId;
-    const me = (await this.usersService.me(userId))!; // 본인, 타인 통합인듯
+    const me = await this.usersService.me(userId); // 본인, 타인 통합인듯
 
     return {
       phase,
       id: (id as UserId).value,
       me,
     };
-    // const relation = await this.getRelation(userId.value, userId.value);
-    // const seasonLog = await this.pongSeasonLogService.findOne(userId);
-    // const record = {
-    //   win: seasonLog.win,
-    //   lose: seasonLog.lose,
-    //   ratio: seasonLog.winRate,
-    // };
-    // // return new UserProfileDto({
-    //   id: userId,
-    //   me,
-    //   imageUrl: me.profileImageUrl,
-    //   nickname: me.nickname,
-    //   record: new RecordDto(record),
-    //   relation,
-    //   statusMessage: me.statusMessage,
-    // });
   }
 
   @Get()
