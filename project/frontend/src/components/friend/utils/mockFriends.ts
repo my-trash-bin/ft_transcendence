@@ -77,4 +77,4 @@ const mockFriends: UserFollowDto[] = [
   // Add more mock data as needed
 ];
 
-export default mockFriends;
+export default mock;

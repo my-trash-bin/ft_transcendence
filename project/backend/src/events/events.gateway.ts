@@ -10,6 +10,7 @@ import {
   WsException
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { v4 as uuidv4 } from 'uuid';
 import { ChangeActionType } from '../channel/channel.service';
 import { idOf } from '../common/Id';
 import { GateWayEvents } from '../common/gateway-events.enum';
@@ -30,6 +31,7 @@ interface JwtPayload {
   iat: number;
   exp: number;
 }
+
 
 export type UserSocket = Socket & {
   data: {
@@ -161,13 +163,105 @@ export class EventsGateway
       actionType,
     );
   }
-  
+
   // game
-  @SubscribeMessage('joinLobby')
-  handleJoinLobby(@ConnectedSocket() client: Socket) {
-    const playerRole = 'player1';  // 임시로 고정
-    this.server.emit('playerRole', playerRole);
-    // new Logger().debug(`request socket, ${client.id}`);
+  @SubscribeMessage('joinNormalMatch')
+  handleJoinNormalMatch(@ConnectedSocket() client: Socket) {
+    this.normalMatchQueue.add(client);
+    this.tryNormalMatch();
+  }
+  
+  @SubscribeMessage('joinItemMatch')
+  handleJoinItemMatch(@ConnectedSocket() client: Socket) {
+    this.itemMatchQueue.add(client);
+    this.tryItemMatch();
+  }
+
+  // 초대 로직 (나중에!)
+  // @SubscribeMessage('inviteToMatch')
+  // handleInviteToMatch(@MessageBody() data: { inviteeId: string }, @ConnectedSocket() client: Socket) {
+  // }
+  
+  private normalMatchQueue = new Set<Socket>();
+  private itemMatchQueue = new Set<Socket>();
+  
+  tryNormalMatch() {
+    console.log('tryNormalMatch');
+    if (this.normalMatchQueue.size >= 2) {
+      console.log('Matched!');
+      const playersIterator = this.normalMatchQueue.values();
+      const player1 = playersIterator.next().value;
+      const player2 = playersIterator.next().value;
+  
+      this.normalMatchQueue.delete(player1);
+      this.normalMatchQueue.delete(player2);
+  
+      const roomName = this.createGameRoom(player1, player2);
+  
+      // 일반 매치 시작 알림
+      this.server.to(roomName).emit('normalMatchStart', { room: roomName });
+    }
+  }
+  
+  tryItemMatch() {
+    if (this.itemMatchQueue.size >= 2) {
+      const playersIterator = this.itemMatchQueue.values();
+      const player1 = playersIterator.next().value;
+      const player2 = playersIterator.next().value;
+  
+      this.itemMatchQueue.delete(player1);
+      this.itemMatchQueue.delete(player2);
+  
+      const roomName = this.createGameRoom(player1, player2);
+  
+      // 아이템 매치 시작 알림
+      this.server.to(roomName).emit('itemMatchStart', { room: roomName });
+    }
+  }
+
+  private roomReadyStatus: Record<string, Set<string>> = {};
+
+  private createGameRoom(player1: Socket, player2: Socket): string {
+    const roomName = generateUniqueRoomName();
+    // 룸 생성
+    player1.join(roomName);
+    player2.join(roomName);
+
+    // 룸별 준비 상태 초기화
+    this.roomReadyStatus[roomName] = new Set([player1.id, player2.id]);
+
+    // 방에 클라이언트 추가
+    this.server.to(roomName).emit('GoPong', { room: roomName });
+
+    // playerRole 알림
+    this.server.to(player1.id).emit('playerRole', 'player1');
+    this.server.to(player2.id).emit('playerRole', 'player2');
+    this.gameService.resetGame();
+    return roomName;
+  }
+
+
+  // 이 방식도 생각해보기!
+  // const roomName = 'chatRoom1';
+  // io.in(roomName).on('newMessage', (message) => {
+  //   console.log(`New message in ${roomName}: ${message}`);
+  // });
+    @SubscribeMessage('ready')
+  handlePlayerReady(@MessageBody() data: { room: string; isPlayer1: boolean }, @ConnectedSocket() client: Socket) {
+    const room = data.room;
+    
+    // 해당 룸의 준비된 플레이어 목록에서 현재 플레이어를 제거
+    this.roomReadyStatus[room]?.delete(client.id);
+  
+    // 특정 룸의 모든 플레이어가 준비되었는지 확인
+    if (this.isRoomReady(room)) {
+      this.server.to(room).emit('gameStart'); // 해당 룸에 게임 시작 알림
+      delete this.roomReadyStatus[room]; // 게임 시작 후 준비 상태 초기화
+    }
+  }
+  
+  private isRoomReady(room: string): boolean {
+    return this.roomReadyStatus[room] && this.roomReadyStatus[room].size === 0;
   }
 
   @SubscribeMessage('paddleMove')
@@ -234,4 +328,8 @@ export class EventsGateway
     }
     return decoded;
   };
+}
+
+function generateUniqueRoomName(): string {
+  return uuidv4();
 }

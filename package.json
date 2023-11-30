@@ -1,5 +1,8 @@
 {
   "devDependencies": {
     "@types/express": "^4.17.21"
+  },
+  "dependencies": {
+    "uuid": "^9.0.1"
   }
 }

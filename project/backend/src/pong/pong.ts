@@ -1,5 +1,5 @@
 // events.game.ts
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { EventEmitter } from 'events';
 
 // 게임 상수
@@ -51,6 +51,7 @@ export class GameService {
   }
   
   private startGameLoop() {
+    console.log("startGameLoop")
     setInterval(() => {
       this.updateGameLogic();
     }, 1000 / 60); // 초당 60번 업데이트
@@ -58,10 +59,12 @@ export class GameService {
   
   handlePaddleMove(direction: 'up' | 'down', player: 'player1' | 'player2') {
     const deltaY = direction === 'up' ? -PADDLE_MOVE_STEP : PADDLE_MOVE_STEP;
+    
     const paddle = player === 'player1' ? this.gameState.paddle1 : this.gameState.paddle2;
     const newY = this.checkPaddleBounds(paddle.y + deltaY);
     paddle.y = newY;
-    this.updateGameLogic();
+    this.checkPaddleCollisions();
+    this.onGameUpdate.emit('gameState', this.gameState);
 }
 
   private checkPaddleBounds(paddleY: number): number {

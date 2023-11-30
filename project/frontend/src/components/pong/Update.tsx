@@ -14,11 +14,10 @@ const useStore = create<ExtendedGameState>((set) => ({
   paddle2: { x: BOARD_WIDTH - PADDLE_WIDTH - 10, y: 200 },
   score1: 0,
   score2: 0,
-  gameOver: false,
+  gameOver: true,
   isPlayer1: true,
 
   setIsPlayer1: (isPlayer1) => set({ isPlayer1 }),
-  // 서버로부터 게임 상태 업데이트 수신
   setGameState: (newState) => set({ ...newState }),
 }));
 
