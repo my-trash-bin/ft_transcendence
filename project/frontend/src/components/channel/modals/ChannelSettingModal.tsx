@@ -1,7 +1,6 @@
 import { ParticipantModal } from '@/components/channel/modals/ParticipantModal';
 import { SettingModal } from '@/components/channel/modals/SettingModal';
 import { useState } from 'react';
-import { AddModal } from './AddModal';
 import { ModalLayout } from './ModalLayout';
 
 enum ModalType {
@@ -14,6 +13,7 @@ const getModalContent = (
   modalType: ModalType,
   closeModal: () => void,
   setModalType: any,
+  channelId: string,
 ) => {
   const setModalParticipant = () => {
     setModalType(ModalType.PARTICIPANT);
@@ -35,18 +35,12 @@ const getModalContent = (
         <ParticipantModal
           closeModal={closeModal}
           modalStateFunctions={modalStateFunctions}
+          channelId={channelId}
         />
       );
     case ModalType.SETTING:
       return (
         <SettingModal
-          closeModal={closeModal}
-          modalStateFunctions={modalStateFunctions}
-        />
-      );
-    case ModalType.ADD:
-      return (
-        <AddModal
           closeModal={closeModal}
           modalStateFunctions={modalStateFunctions}
         />
@@ -57,9 +51,11 @@ const getModalContent = (
 export function ChannelSettingModal({
   isOpen,
   closeModal,
+  channelId,
 }: {
   isOpen: boolean;
   closeModal: () => void;
+  channelId: string;
 }) {
   const [modalType, setModalType] = useState(ModalType.PARTICIPANT);
   const modalCloseAndSetParticipant = () => {
@@ -70,6 +66,7 @@ export function ChannelSettingModal({
     modalType,
     modalCloseAndSetParticipant,
     setModalType,
+    channelId,
   );
   return (
     <ModalLayout
