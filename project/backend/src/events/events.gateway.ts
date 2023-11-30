@@ -240,13 +240,7 @@ export class EventsGateway
     return roomName;
   }
 
-
-  // 이 방식도 생각해보기!
-  // const roomName = 'chatRoom1';
-  // io.in(roomName).on('newMessage', (message) => {
-  //   console.log(`New message in ${roomName}: ${message}`);
-  // });
-    @SubscribeMessage('ready')
+  @SubscribeMessage('ready')
   handlePlayerReady(@MessageBody() data: { room: string; isPlayer1: boolean }, @ConnectedSocket() client: Socket) {
     const room = data.room;
     

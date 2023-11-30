@@ -4,15 +4,16 @@ import usePaddleMovement from './KeyHandle';
 import useStore from './Update';
 import { BALL_SIZE, BOARD_HEIGHT, BOARD_WIDTH, GameState, PADDLE_HEIGHT, PADDLE_WIDTH } from './gameConstants';
 import { getGameSocket } from './gameSocket';
+import { useRouter } from 'next/navigation';
 
+// npm run build && npx nest start --watch
 const GameBoard: React.FC = () => {
   const { ball, paddle1, paddle2, score1, score2, isPlayer1, setGameState } = useStore();
   const socket = getGameSocket();
+  const router = useRouter();
 
   const submitReady = () => {
-    // 두 플레이어 모두 준비되었다면 게임 시작
     console.log(`I'm ready, ${isPlayer1 ? 'player1' : 'player2'}`);
-    // 여기에 게임 시작 관련 로직 추가
     socket.emit('ready', { isPlayer1 });
   };
 
@@ -22,6 +23,9 @@ const GameBoard: React.FC = () => {
     const handleGameUpdate = (gameState: GameState) => {
       if (!gameState.gameOver) {
         setGameState(gameState);
+      } else {
+        console.log('gameOver');
+        router.push('/pong/gameOver');
       }
     };
 
