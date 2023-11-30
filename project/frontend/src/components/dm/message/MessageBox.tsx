@@ -1,38 +1,30 @@
 import { Api } from '@/api/api';
-import { useEffect, useState } from 'react';
+import { useCallback } from 'react';
+import { useQuery } from 'react-query';
 import { MessageContent, messageType } from './MessageContent';
 import { MessageSendBox } from './MessageSendBox';
 import { UserInfo } from './UserInfo';
 
 export function MessageBox({ username }: { username: string }) {
-  const imageUri = '/avatar/avatar-blue.svg';
-  const [loading, setLoading] = useState<boolean>(true);
-  const [targetUserId, setUserId] = useState<string>('');
-  const [error, setError] = useState<boolean>(false);
+  const apiCall = useCallback(
+    () => new Api().api.usersControllerGetUsetByNickname(username),
+    [username],
+  );
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const data = await new Api().api.usersControllerGetUsetByNickname(
-          username,
-        );
-        setLoading(false);
-        setUserId(data.data.id);
-      } catch (e) {
-        setError(true);
-      }
-    }
-    fetchData();
-  }, [username]);
+  const { isLoading, isError, data } = useQuery('userByNickanme', apiCall);
 
-  if (loading) return <div>loading... 👾</div>;
-  if (error) return <div>error!</div>;
-
+  if (isLoading) return <div>loading... 👾</div>;
+  if (isError) throw new Error('에러가 발생했습니다.');
+  console.log(data);
   return (
     <>
-      <UserInfo imageUri={imageUri} username={username} onActive={false} />
-      <MessageContent type={messageType.DM} nickname={username} />
-      <MessageSendBox type={messageType.DM} targetUserId={targetUserId} />
+      <UserInfo
+        imageUri={data?.data.profileImageUrl}
+        username={data?.data.nickname}
+        onActive={false}
+      />
+      <MessageContent type={messageType.DM} />
+      <MessageSendBox type={messageType.DM} targetUserId={data?.data.id} />
     </>
   );
 }

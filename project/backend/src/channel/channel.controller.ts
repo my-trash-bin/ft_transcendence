@@ -19,6 +19,7 @@ import { idOf } from '../common/Id';
 import { ChannelRoomType, EventsService } from '../events/events.service';
 import { ChannelService } from './channel.service';
 import { ChannelDto } from './dto/channel-dto';
+import { ChannelIdDto } from './dto/channel-id.dto';
 import { ChannelMemberDto } from './dto/channel-members.dto';
 import { ChannelRelationDto } from './dto/channel-relation.dto';
 import { CreateChannelDto } from './dto/create-channel.dto';
@@ -99,6 +100,25 @@ export class ChannelController {
   ): Promise<ChannelMemberDto[]> {
     const result = await this.channelService.findChannelMembersByChannelId(
       idOf(chaennelId),
+    );
+    if (!result.ok) {
+      throw new HttpException(result.error!.message, result.error!.statusCode);
+    }
+    return result.data!;
+  }
+
+  @Get(':channelId')
+  @ApiOperation({ summary: '채널 정보 반환' })
+  @ApiOkResponse({
+    description: '채널 정보 및 참여자 목록',
+    // type: () => ChannelMemberDto,
+    // isArray: true,
+  })
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
+  async findChannelInfo(@Param() param: ChannelIdDto) {
+    const result = await this.channelService.findChannelWithMembers(
+      idOf(param.channelId),
     );
     if (!result.ok) {
       throw new HttpException(result.error!.message, result.error!.statusCode);

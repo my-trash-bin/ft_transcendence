@@ -1,4 +1,5 @@
 import { ChannelMemberType } from '@prisma/client';
+import { UserDto } from '../users/dto/user.dto';
 
 export type MessageInfo = {
   id: string;
@@ -64,4 +65,5 @@ export type LeavingChannelInfo = {
   ownerId: string | null;
   memberCount: number;
   maximumMemberCount: number;
+  member: UserDto;
 };

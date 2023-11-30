@@ -35,8 +35,6 @@ export class UserFollowController {
   @UseGuards(JwtGuard, PhaseGuard)
   @Phase('complete')
   async followUser(@Request() req: ExpressRequest, @Body() dto: TargetUserDto) {
-    console.log('requset');
-    console.log(dto);
     const isBlock = false;
     const result = await this.createOrUpdate(req, dto, isBlock);
     if (!result.ok) {
@@ -166,7 +164,7 @@ export class UserFollowController {
     console.log('createOrUpdate', req.user, dto);
     const userId = (req.user as JwtPayloadPhaseComplete).id;
     const targetUserId = dto.targetUser;
-    return await this.userFollowService.remove(
+    await this.userFollowService.remove(
       idOf(userId.value),
       idOf(targetUserId),
       isBlock,

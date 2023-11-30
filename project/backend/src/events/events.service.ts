@@ -1,17 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { WsException } from '@nestjs/websockets';
 import { ChangeActionType, ChannelService } from '../channel/channel.service';
-import { ChannelId, ClientId, UserId, idOf } from '../common/Id';
+import { ChannelId, ClientId, idOf, UserId } from '../common/Id';
 import { DmService } from '../dm/dm.service';
 import { UserFollowService } from '../user-follow/user-follow.service';
 import { UsersService } from '../users/users.service';
 // import { ChatRoomDto, ChatRoomStatusDto } from './chat.dto'
+import { ChannelMember } from '@prisma/client';
 import { Server, Socket } from 'socket.io';
 import { GateWayEvents } from '../common/gateway-events.enum';
 import { MessageWithMemberDto } from '../dm/dto/message-with-member';
 import { UserDto } from '../users/dto/user.dto';
 import {
-  ChannelMemberInfo,
   DmChannelInfoType,
   JoiningChannelInfo,
   LeavingChannelInfo,
@@ -139,7 +139,10 @@ export class EventsService {
 
     const data: MessageWithMemberDto = result.data!;
 
-    this.broadcastToChannel(type, channelId, blockedIdList, eventName, data);
+    this.broadcastToChannel(type, channelId, blockedIdList, eventName, {
+      type: eventName,
+      data,
+    });
   }
 
   // only DM채널
@@ -180,7 +183,10 @@ export class EventsService {
     const eventName = GateWayEvents.Events;
     const data: DmChannelInfoType = result.data!;
 
-    this.broadcastToUserClients(idOf(userId), eventName, data);
+    this.broadcastToUserClients(idOf(userId), eventName, {
+      type: eventName,
+      data,
+    });
   }
 
   async handleSendDm(client: UserSocket, toId: UserId, msg: string) {
@@ -206,13 +212,10 @@ export class EventsService {
 
     const data: MessageWithMemberDto = result.data!;
 
-    this.broadcastToChannel(
-      type,
-      idOf(channelId),
-      blockedIdList,
-      eventName,
+    this.broadcastToChannel(type, idOf(channelId), blockedIdList, eventName, {
+      type: eventName,
       data,
-    );
+    });
   }
 
   // only 일반채널
@@ -235,7 +238,10 @@ export class EventsService {
 
     const data: JoiningChannelInfo = result.data!;
 
-    this.broadcastToChannel(type, channelId, [], eventName, data);
+    this.broadcastToChannel(type, channelId, [], eventName, {
+      type: eventName,
+      data,
+    });
   }
 
   // only 일반채널
@@ -256,7 +262,10 @@ export class EventsService {
 
     const eventName = GateWayEvents.Leave;
     const data: LeavingChannelInfo = result.data!;
-    this.broadcastToChannel(type, channelId, [], eventName, data);
+    this.broadcastToChannel(type, channelId, [], eventName, {
+      type: eventName,
+      data,
+    });
   }
 
   private getChannel(type?: string, channelId?: ChannelId) {
@@ -300,9 +309,12 @@ export class EventsService {
 
     const eventName = GateWayEvents.KickBanPromote;
 
-    const data: ChannelMemberInfo = result.data!;
+    const data: ChannelMember & { member: UserDto } = result.data!;
 
-    this.broadcastToChannel(type, channelId, [], eventName, data); // 채널에 통보
+    this.broadcastToChannel(type, channelId, [], eventName, {
+      type: eventName,
+      data,
+    }); // 채널에 통보
     this.removeUserFromChannel(
       this.channels[type][channelId.value],
       idOf(userId),

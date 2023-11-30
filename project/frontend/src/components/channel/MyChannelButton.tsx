@@ -9,13 +9,13 @@ export function MyChannelButton({
   id,
 }: Readonly<{
   channelName: string;
-  messageShortcut: string;
-  date: Date;
+  messageShortcut?: string;
+  date?: Date;
   max: number;
   now: number;
   id: string;
 }>) {
-  const dateView = formatAMPM(date);
+  const dateView = date ? formatAMPM(date) : '';
   const state = now + '/' + max;
   return (
     <Link href={`/channel/${id}`}>
@@ -23,10 +23,19 @@ export function MyChannelButton({
         <div className="flex flex-col h-[100%] justify-between">
           <div className="flex flex-row justify-between items-center">
             <p className="text-[22px] text-left">{channelName}</p>
-            <p className="text-[12px] text-right ">{dateView}</p>
+            {date ? <p className="text-[12px] text-right ">{dateView}</p> : ''}
           </div>
           <div className="flex flex-row justify-between items-center">
-            <p className="text-[15px] text-left">{messageShortcut}</p>
+            {messageShortcut ? (
+              <p className="text-[13px] text-left text-slate-500">
+                {messageShortcut}
+              </p>
+            ) : (
+              <p className="text-[13px] text-left text-slate-500">
+                대화내용이 없습니다.
+              </p>
+            )}
+
             <p className="text-[12px] text-right">{state}</p>
           </div>
         </div>

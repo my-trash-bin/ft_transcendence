@@ -16,6 +16,7 @@ export function MessageSendBox({
 }) {
   const [message, setMessage] = useState<string>('');
   const sendMessage = () => {
+    if (message === '') return;
     const socket = getSocket();
     if (type === messageType.DM) {
       console.log('send message', message, targetUserId);
@@ -35,10 +36,20 @@ export function MessageSendBox({
           type="text"
           placeholder="Enter your message"
           onChange={(e) => setMessage(e.target.value)}
+          onKeyUp={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              sendMessage();
+            }
+          }}
           value={message}
           className="bg-chat-color2 outline-none h-[100%] w-[90%] pr-[1%] placeholder:text-center"
         />
-        <button onClick={sendMessage} className="w-[5%] h-[100%] self-end">
+        <button
+          type="button"
+          onClick={sendMessage}
+          className="w-[5%] h-[100%] self-end"
+        >
           <Image
             alt="send icon"
             src="/icon/message-send.svg"

@@ -23,7 +23,7 @@ export class AvatarService {
   ];
 
   constructor() {
-    this.uploadDir = join('..', 'uploads');
+    this.uploadDir = join(__dirname, '..', 'uploads');
     this.ensureUploadDir();
   }
 
@@ -131,12 +131,18 @@ export class AvatarService {
           const hashedFileName = this.generateHashedFileName(data);
           const filePath = join(this.uploadDir, hashedFileName + '.' + ext);
 
+          const returnFilePath = join(
+            'http://localhost:60080',
+            'uploads',
+            hashedFileName + '.' + ext,
+          );
+
           l.log(filePath);
           const { ok, error } = await this.storeFile(filePath, data);
           if (!ok) {
             throw error;
           }
-          resolve(filePath);
+          resolve(returnFilePath);
         } catch (error) {
           reject(error);
         }
