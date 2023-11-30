@@ -1,7 +1,7 @@
 'use client';
-
 import GameButton from '../../components/game/GameButton';
 import { Ranking } from '../../components/game/Ranking';
+import React from 'react';
 
 export default function GamePage() {
   return (
