@@ -22,6 +22,7 @@ export interface GameState {
   score1: number;
   score2: number;
   gameOver: boolean;
+  gameStart: boolean;
 }
 
 @Injectable()
@@ -36,22 +37,27 @@ export class GameService {
     score1: 0,
     score2: 0,
     gameOver: false,
+    gameStart: false,
   };
 
   constructor() {
     this.startGameLoop();
   }
-  
+
   resetGame() {
     this.gameState.score1 = 0;
     this.gameState.score2 = 0;
     this.gameState.gameOver = false;
+    this.gameState.gameStart = true;
     this.resetPosition();
     this.onGameUpdate.emit('gameState', this.gameState);
   }
   
   private startGameLoop() {
     console.log("startGameLoop")
+    if (this.gameState.gameOver) {
+      return;
+    }
     setInterval(() => {
       this.updateGameLogic();
     }, 1000 / 60); // 초당 60번 업데이트

@@ -14,7 +14,8 @@ const useStore = create<ExtendedGameState>((set) => ({
   paddle2: { x: BOARD_WIDTH - PADDLE_WIDTH - 10, y: 200 },
   score1: 0,
   score2: 0,
-  gameOver: true,
+  gameOver: false,
+  gameStart: false,
   isPlayer1: true,
 
   setIsPlayer1: (isPlayer1) => set({ isPlayer1 }),
