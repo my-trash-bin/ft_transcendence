@@ -6,6 +6,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { AchievementModule } from '../achievement/achievement.module';
 
 import { AuthModule } from '../auth/auth.module';
+import { AvatarModule } from '../avatar/avatar.module';
 import { ChannelModule } from '../channel/channel.module';
 import { EventsModule } from '../events/events.module';
 import { PongSeasonLogModule } from '../pong-season-log/pong-season-log.module';
@@ -22,6 +23,7 @@ import { AppController } from './app.controller';
     ChannelModule,
     AchievementModule,
     EventsModule,
+    AvatarModule,
     DevtoolsModule.register({
       http: process.env.NODE_ENV !== 'production',
     }),

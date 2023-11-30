@@ -1,7 +1,9 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
+  Logger,
   Post,
   Request,
   Response,
@@ -19,6 +21,7 @@ import {
 } from 'express';
 
 import { AuthType } from '@prisma/client';
+import { IsString, Matches } from 'class-validator';
 import {
   AuthService,
   JwtPayload,
@@ -32,9 +35,15 @@ import { Phase, PhaseGuard } from './phase.guard';
 class RegisterBody {
   // TODO: 입력 validatuion
   @ApiProperty({ description: '유니크 닉네임' })
+  @IsString()
+  @Matches(/^[A-Za-z0-9_-]{6,12}$/, {
+    message:
+      '닉네임은 6-12자의 영문, 숫자, 하이픈(-), 언더스코어(_)만 사용 가능합니다.',
+  })
   nickname!: string;
 
   @ApiProperty({ description: '프로필 이미지 주소' })
+  @IsString()
   imageUrl!: string;
 }
 
@@ -75,40 +84,47 @@ export class AuthController {
     // 리다이렉션 => /regisster
     switch (jwtPayload['phase']) {
       case 'register':
-        console.log('프론트/sign-in으로 이동!');
+        console.log('res.redirect => /sign-in');
         res.redirect('/sign-in');
         break;
       case '2fa':
-        console.log('/2fa 로 가버려');
+        console.log('res.redirect => /2fa');
         res.redirect('/2fa');
         break;
       case 'complete':
-        console.log('프론트/friend로 이동!');
+        console.log('res.redirect1 => welcome => /friend');
         this.welcome(res, 'FT');
         break;
     }
   }
 
-  // TODO: argument validation
   @ApiOperation({ summary: '회원 가입 요청' })
   @UseGuards(JwtGuard, PhaseGuard)
   @Phase('register')
   @Post('register')
   async register(
     @Request() req: ExpressRequest,
-    @Response() res: ExpressResponse,
+    @Response({ passthrough: true }) res: ExpressResponse,
     @Body() data: RegisterBody,
   ) {
-    console.log('register 진입');
+    const logger = new Logger('Post register');
     const { type, id } = req.user as JwtPayloadPhaseRegister;
-    const jwtPayload = await this.authService.register(
-      type,
-      id,
-      data.nickname,
-      data.imageUrl,
-    );
-    this.setCookie(res, jwtPayload);
-    this.welcome(res, type); // TODO: 이 리다이렉션이 아닌 다른게 필요해보임.
+    try {
+      const jwtPayload = await this.authService.register(
+        type,
+        id,
+        data.nickname,
+        data.imageUrl,
+      );
+      logger.debug(`jwtPayLoad: ${jwtPayload}`);
+      this.setCookie(res, jwtPayload);
+      logger.debug('res.redirect2 => welcome => /friend');
+      logger.debug('return jwtPayload');
+      return jwtPayload;
+    } catch (error) {
+      logger.error(error);
+      throw new BadRequestException(`가입 실패: ${error}`);
+    }
   }
 
   @ApiOperation({ summary: '2FA 로그인 용' })

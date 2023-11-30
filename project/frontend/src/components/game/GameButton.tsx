@@ -22,8 +22,8 @@ const ButtonComponent: React.FC<ButtonComponentProps> = ({ mode }) => {
 
   const bgCSS = 'bg-default-interactive rounded-md';
   const sizeCSS = 'w-xl h-md';
-  const borderCSS = 'border-3 border-dark-purple';
-  const textCSS = 'text-dark-purple font-bold text-h2';
+  const borderCSS = 'border-3 border-dark-purple-interactive';
+  const textCSS = 'text-dark-purple-interactive font-bold text-h2';
   const hoverCSS =
     'cursor-pointer transition-all duration-300 ease-in-out hover:shadow-custom hover:-translate-y-[0.148rem]';
 

@@ -65,5 +65,11 @@ export default <Config>{
       '6': '6px',
       '8': '8px',
     },
+    extend: {
+      fontFamily: {
+        sejong: ['KingSejongInstitute-Regular', 'sans-serif'],
+      },
+    },
   },
+  plugins: [require('@tailwindcss/typography')],
 };

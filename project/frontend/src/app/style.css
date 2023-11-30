@@ -1,3 +1,8 @@
-@import "./tailwind.css";
-@import "./global.css";
-@import "../color.generated.css";
+@import './tailwind.css';
+@import './global.css';
+@import '../color.generated.css';
+
+@font-face {
+  font-family: 'sejong';
+  src: url('/fonts/KingSejongInstitute-Regular.otf') format('truetype');
+}

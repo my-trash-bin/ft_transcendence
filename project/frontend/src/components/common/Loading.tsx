@@ -1,13 +1,13 @@
 import Image from 'next/image';
 
-export function Loading({ width }: { width: number }) {
+export function Loading({ width }: { readonly width: number }) {
   return (
     <Image
       src={'/images/catbus.gif'}
       priority={true}
       alt="avatar"
       width={width}
-      height={200}
+      height={(width * 3) / 5}
     />
   );
 }

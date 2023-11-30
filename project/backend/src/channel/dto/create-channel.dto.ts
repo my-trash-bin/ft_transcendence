@@ -1,5 +1,13 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEnum, IsInt, IsString, Length, Max, Min } from 'class-validator';
+import {
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+  Length,
+  Max,
+  Min,
+} from 'class-validator';
 import { ChannelType } from '../enums/channel-type.enum';
 
 export class CreateChannelDto {
@@ -16,6 +24,7 @@ export class CreateChannelDto {
   @ApiPropertyOptional({ description: '채널 암호', type: String })
   @IsString()
   @Length(6, 12)
+  @IsOptional()
   password?: string | null;
 
   @IsInt()
