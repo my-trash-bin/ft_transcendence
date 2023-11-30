@@ -102,13 +102,6 @@ export interface UserRelationshipDto {
   relation: 'friend' | 'block' | 'none' | 'me';
 }
 
-export interface CreateUserDto {
-  /** 6~12 영문, 숫자 ㅡ하이픈, 언더스코어만 사용가능한 닉네임 */
-  nickname: string;
-  /** 프로필 아바타 이미지 주소 */
-  profileImageUrl?: string;
-}
-
 export interface UpdateUserDto {
   /** 6~12 영문, 숫자 ㅡ하이픈, 언더스코어만 사용가능한 닉네임 */
   nickname?: string;
@@ -741,24 +734,6 @@ export class Api<
      * No description
      *
      * @tags users
-     * @name UsersControllerCreate
-     * @summary 유저 생성. 사실 아직 이 테이블의 정확한 기능을 잘...
-     * @request POST:/api/v1/users
-     */
-    usersControllerCreate: (data: CreateUserDto, params: RequestParams = {}) =>
-      this.request<UserDto, void>({
-        path: `/api/v1/users`,
-        method: 'POST',
-        body: data,
-        type: ContentType.Json,
-        format: 'json',
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags users
      * @name UsersControllerUpdate
      * @summary 유저의 닉네임/프로필이미지링크 변경
      * @request PATCH:/api/v1/users
@@ -1123,6 +1098,21 @@ export class Api<
         path: `/api/v1/achievement/${userId}`,
         method: 'GET',
         format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags avatar
+     * @name AvatarControllerUploadFile
+     * @summary 바이너리 아바타 업로드
+     * @request POST:/api/v1/avatar/upload
+     */
+    avatarControllerUploadFile: (params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/api/v1/avatar/upload`,
+        method: 'POST',
         ...params,
       }),
   };
