@@ -3,6 +3,7 @@
 import { DmUserList } from '@/components/dm/dm-user/DmUserList';
 import { MessageSearch } from '@/components/dm/message-search/MessageSearch';
 import { MessageBox } from '@/components/dm/message/MessageBox';
+import ApiErrorBoundary from '@/components/error/ApiErrorBoundary';
 import { fetchMyData } from '@/lib/FetchMyData';
 import { getSocket } from '@/lib/Socket';
 import Image from 'next/image';
@@ -49,7 +50,7 @@ export default function DmPage({
   if (error) return <div>error!</div>;
 
   return (
-    <>
+    <ApiErrorBoundary>
       <div id="backdrop-root"></div>
       <div className="flex flex-row bg-light-background rounded-[20px] w-[inherit]">
         <div className="w-[380px] h-[750px] border-r flex flex-col items-center">
@@ -60,6 +61,6 @@ export default function DmPage({
           {renderMessageBox}
         </div>
       </div>
-    </>
+    </ApiErrorBoundary>
   );
 }

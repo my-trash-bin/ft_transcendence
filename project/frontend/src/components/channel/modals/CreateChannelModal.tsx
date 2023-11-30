@@ -1,5 +1,6 @@
 import { Api } from '@/api/api';
 import { useState } from 'react';
+import { useMutation } from 'react-query';
 import { ChannelButton } from '../ChannelButton';
 import { ChannelCreateContent } from './ChannelCreateContent';
 import { ChannelSelector } from './ChannelSelector';
@@ -41,31 +42,31 @@ export function CreateChannelModal({
     setChannelType(ChannelType.PUBLIC);
     closeModal();
   };
+  const mutation = useMutation(new Api().api.channelControllerCreate, {
+    onSuccess: () => {
+      closeModal();
+      alert('채널 생성에 성공했습니다.');
+    },
+    onError: () => {
+      alert('채널 생성에 실패했습니다.');
+    },
+  });
 
   const sendCreateChannel = () => {
-    async function sendCreateChannelRequest() {
-      const channelCreateData =
-        channelType !== ChannelType.PUBLIC
-          ? {
-              title: inputTitle,
-              type: channelType,
-              capacity: inputSize,
-              password: inputPassword,
-            }
-          : {
-              title: inputTitle,
-              type: channelType,
-              capacity: inputSize,
-            };
-      try {
-        await new Api().api.channelControllerCreate(channelCreateData);
-        closeModal();
-        alert('채널 생성에 성공했습니다.');
-      } catch (e) {
-        alert('채널 생성에 실패했습니다.');
-      }
-    }
-    sendCreateChannelRequest();
+    const channelCreateData =
+      channelType !== ChannelType.PUBLIC
+        ? {
+            title: inputTitle,
+            type: channelType,
+            capacity: inputSize,
+            password: inputPassword,
+          }
+        : {
+            title: inputTitle,
+            type: channelType,
+            capacity: inputSize,
+          };
+    mutation.mutate(channelCreateData);
   };
   return (
     <ModalLayout
