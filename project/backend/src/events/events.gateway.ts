@@ -4,22 +4,25 @@ import { JwtService } from '@nestjs/jwt';
 import {
   ConnectedSocket,
   MessageBody,
-  OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  OnGatewayInit,
   SubscribeMessage,
-  WebSocketGateway, WebSocketServer,
-  WsException
+  WebSocketGateway,
+  WebSocketServer,
+  WsException,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { v4 as uuidv4 } from 'uuid';
 import { ChangeActionType } from '../channel/channel.service';
-import { idOf } from '../common/Id';
 import { GateWayEvents } from '../common/gateway-events.enum';
+import { idOf } from '../common/Id';
 import { GameService, GameState } from '../pong/pong';
 import {
   ChannelIdentityDto,
-  ChannelMessageDto,
   CreateDmChannelDto,
   DmMessageDto,
+  SendMessageDto,
 } from './event-request.dto';
 import { EventsService } from './events.service';
 
@@ -32,7 +35,6 @@ interface JwtPayload {
   exp: number;
 }
 
-
 export type UserSocket = Socket & {
   data: {
     userId: string;
@@ -42,15 +44,17 @@ export type UserSocket = Socket & {
 @WebSocketGateway(80, {
   cors: { origin: 'http://localhost:53000', credentials: true },
 })
-
 @Injectable()
 export class EventsGateway
-  implements OnGatewayConnection, OnGatewayConnection, OnGatewayInit, OnModuleInit, OnGatewayDisconnect
+  implements
+    OnGatewayConnection,
+    OnGatewayConnection,
+    OnGatewayInit,
+    OnModuleInit,
+    OnGatewayDisconnect
 {
   @WebSocketServer()
   server!: Server;
-
-
 
   constructor(
     private jwtService: JwtService,
@@ -65,12 +69,11 @@ export class EventsGateway
       this.server.emit('gameUpdate', gameState);
     });
   }
-  
+
   afterInit(server: Server) {
     this.eventsService.afterInit(server);
   }
 
-  
   async handleConnection(@ConnectedSocket() client: Socket) {
     try {
       new Logger().debug(`client connected ${client.id}`);
@@ -99,7 +102,7 @@ export class EventsGateway
   @SubscribeMessage(GateWayEvents.ChannelMessage)
   async handleMessage(
     @ConnectedSocket() client: UserSocket,
-    @MessageBody() data: ChannelMessageDto,
+    @MessageBody() data: SendMessageDto,
   ) {
     const { channelId, msg } = data;
     await this.eventsService.sendMessage(client, idOf(channelId), msg);
@@ -172,7 +175,7 @@ export class EventsGateway
     this.normalMatchQueue.add(client);
     this.tryNormalMatch();
   }
-  
+
   @SubscribeMessage('joinItemMatch')
   handleJoinItemMatch(@ConnectedSocket() client: Socket) {
     this.itemMatchQueue.add(client);
@@ -183,10 +186,10 @@ export class EventsGateway
   // @SubscribeMessage('inviteToMatch')
   // handleInviteToMatch(@MessageBody() data: { inviteeId: string }, @ConnectedSocket() client: Socket) {
   // }
-  
+
   private normalMatchQueue = new Set<Socket>();
   private itemMatchQueue = new Set<Socket>();
-  
+
   private tryNormalMatch() {
     console.log('tryNormalMatch');
     if (this.normalMatchQueue.size >= 2) {
@@ -194,33 +197,33 @@ export class EventsGateway
       const playersIterator = this.normalMatchQueue.values();
       const player1 = playersIterator.next().value;
       const player2 = playersIterator.next().value;
-  
+
       this.normalMatchQueue.delete(player1);
       this.normalMatchQueue.delete(player2);
-  
+
       const roomName = this.createGameRoom(player1, player2);
-  
+
       // 일반 매치 시작 알림
       this.server.to(roomName).emit('normalMatchStart', { room: roomName });
     }
   }
-  
+
   private tryItemMatch() {
     if (this.itemMatchQueue.size >= 2) {
       const playersIterator = this.itemMatchQueue.values();
       const player1 = playersIterator.next().value;
       const player2 = playersIterator.next().value;
-  
+
       this.itemMatchQueue.delete(player1);
       this.itemMatchQueue.delete(player2);
-  
+
       const roomName = this.createGameRoom(player1, player2);
-  
+
       // 아이템 매치 시작 알림
       this.server.to(roomName).emit('itemMatchStart', { room: roomName });
     }
   }
-  
+
   private createGameRoom(player1: Socket, player2: Socket): string {
     const roomName = generateUniqueRoomName();
     // 룸 생성
@@ -242,7 +245,11 @@ export class EventsGateway
   }
 
   @SubscribeMessage('paddleMove')
-  handlePaddleMove(@MessageBody() data: { direction: 'up' | 'down'; player: 'player1' | 'player2' }, @ConnectedSocket() client: Socket) {
+  handlePaddleMove(
+    @MessageBody()
+    data: { direction: 'up' | 'down'; player: 'player1' | 'player2' },
+    @ConnectedSocket() client: Socket,
+  ) {
     this.gameService.handlePaddleMove(data.direction, data.player);
   }
 

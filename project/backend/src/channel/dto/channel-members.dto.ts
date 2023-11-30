@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ChannelMemberType } from '@prisma/client';
-import { UserDto } from '../../users/dto/user.dto';
 
 export class ChannelMemberDto {
   @ApiProperty()
@@ -14,7 +13,11 @@ export class ChannelMemberDto {
 
   @ApiProperty({ type: Date })
   mutedUntil!: Date;
-
-  @ApiProperty({ type: UserDto })
-  member!: UserDto;
 }
+
+export const channelMemberDtoSelect = {
+  channelId: true,
+  memberId: true,
+  memberType: true,
+  mutedUntil: true,
+};

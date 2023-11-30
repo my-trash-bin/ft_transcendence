@@ -61,9 +61,9 @@ export class UsersController {
 
   @Get('me')
   @ApiOperation({ summary: '내 정보' })
-  // @ApiOkResponse({
-  //   type: () => UserProfileDto,
-  // })
+  @ApiOkResponse({
+    type: () => ({ phase: String, id: String, me: Object }),
+  })
   @UseGuards(JwtGuard)
   async myProfile(@Request() req: ExpressRequest) {
     const { phase, id } = req.user as JwtPayload;
