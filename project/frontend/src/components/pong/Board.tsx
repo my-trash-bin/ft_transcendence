@@ -13,7 +13,7 @@ const GameBoard: React.FC = () => {
   useEffect(() => {
     const socket = getGameSocket();
     socket.emit('joinLobby');
-
+  
     // 서버로부터 플레이어 역할 정보를 받았을 때
     socket.on('playerRole', (role) => {
       if (role == 'player1') {
