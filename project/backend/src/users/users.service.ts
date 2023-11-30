@@ -1,8 +1,19 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { ChannelMemberType, Prisma } from '@prisma/client';
 import { PrismaService } from '../base/prisma.service';
 import { UserId } from '../common/Id';
-import { isUniqueConstraintError } from '../util/isUniqueConstraintError';
+import {
+  createPrismaErrorMessage,
+  isPrismaUnknownError,
+  isRecordNotFoundError,
+  IsRecordToUpdateNotFoundError,
+  isUniqueConstraintError,
+} from '../util/prismaError';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { RelationStatus } from './dto/user-profile.dto';
@@ -14,92 +25,105 @@ export class UsersService {
   constructor(private prisma: PrismaService) {}
 
   async me(id: UserId) {
-    const followings = await this.prisma.userFollow.findMany({
-      where: {
-        followerId: id.value,
-      },
-    });
-    const blockList = followings
-      .filter(({ isBlock }) => isBlock)
-      .map((el) => el.followeeId);
-    const friends = followings
-      .filter(({ isBlock }) => !isBlock)
-      .map((el) => el.followeeId);
-    const superMe = await this.prisma.user.findUnique({
-      where: { id: id.value },
-      select: {
-        id: true,
-        joinedAt: true,
-        isLeaved: true,
-        nickname: true,
-        profileImageUrl: true,
-        statusMessage: true,
-        following: true,
-        achievements: true,
-        notifications: true,
-        channels: {
-          where: {
-            NOT: { memberType: ChannelMemberType.BANNED },
-          },
-          include: {
-            channel: {
-              select: {
-                id: true,
-                title: true,
-                isPublic: true,
-                password: true,
-                createdAt: true,
-                lastActiveAt: true,
-                ownerId: true,
-                memberCount: true,
-                maximumMemberCount: true,
-                members: true,
-                messages: {
-                  where: {
-                    memberId: { notIn: blockList },
+    try {
+      const followings = await this.prisma.userFollow.findMany({
+        where: {
+          followerId: id.value,
+        },
+      });
+      const blockList = followings
+        .filter(({ isBlock }) => isBlock)
+        .map((el) => el.followeeId);
+      const friends = followings
+        .filter(({ isBlock }) => !isBlock)
+        .map((el) => el.followeeId);
+      const superMe = await this.prisma.user.findUniqueOrThrow({
+        where: { id: id.value },
+        select: {
+          id: true,
+          joinedAt: true,
+          isLeaved: true,
+          nickname: true,
+          profileImageUrl: true,
+          statusMessage: true,
+          following: true,
+          achievements: true,
+          notifications: true,
+          channels: {
+            where: {
+              NOT: { memberType: ChannelMemberType.BANNED },
+            },
+            include: {
+              channel: {
+                select: {
+                  id: true,
+                  title: true,
+                  isPublic: true,
+                  password: true,
+                  createdAt: true,
+                  lastActiveAt: true,
+                  ownerId: true,
+                  memberCount: true,
+                  maximumMemberCount: true,
+                  members: true,
+                  messages: {
+                    where: {
+                      memberId: { notIn: blockList },
+                    },
                   },
                 },
               },
             },
           },
+          dmChannel1: {
+            where: {
+              AND: [
+                {
+                  member1Id: {
+                    notIn: blockList,
+                  },
+                  member2Id: {
+                    notIn: blockList,
+                  },
+                },
+              ],
+            },
+            include: {
+              DMMessage: true,
+            },
+          },
+          dmChannel2: {
+            where: {
+              AND: [
+                {
+                  member1Id: {
+                    notIn: blockList,
+                  },
+                  member2Id: {
+                    notIn: blockList,
+                  },
+                },
+              ],
+            },
+            include: {
+              DMMessage: true,
+            },
+          },
         },
-        dmChannel1: {
-          where: {
-            AND: [
-              {
-                member1Id: {
-                  notIn: blockList,
-                },
-                member2Id: {
-                  notIn: blockList,
-                },
-              },
-            ],
-          },
-          include: {
-            DMMessage: true,
-          },
-        },
-        dmChannel2: {
-          where: {
-            AND: [
-              {
-                member1Id: {
-                  notIn: blockList,
-                },
-                member2Id: {
-                  notIn: blockList,
-                },
-              },
-            ],
-          },
-          include: {
-            DMMessage: true,
-          },
-        },
-      },
-    });
-    return superMe!;
+      });
+      return superMe;
+    } catch (error) {
+      if (
+        IsRecordToUpdateNotFoundError(error) ||
+        isRecordNotFoundError(error)
+      ) {
+        throw new BadRequestException(createPrismaErrorMessage(error));
+      }
+      if (isPrismaUnknownError(error)) {
+        throw new InternalServerErrorException(createPrismaErrorMessage(error));
+      }
+      throw error;
+    }
   }
 
   async create(createUserDto: CreateUserDto): Promise<UserDto> {
@@ -110,14 +134,16 @@ export class UsersService {
           profileImageUrl: createUserDto.profileImageUrl,
         },
       });
-      return new UserDto(prismaUser);
+      return prismaUser;
     } catch (error) {
       if (isUniqueConstraintError(error)) {
-        throw new ConflictException(
-          `Error: Unique constraint failed on the (${
-            error?.meta?.target ?? 'something'
-          }) fields`,
-        );
+        throw new ConflictException(createPrismaErrorMessage(error));
+      }
+      if (IsRecordToUpdateNotFoundError(error)) {
+        throw new BadRequestException(createPrismaErrorMessage(error));
+      }
+      if (isPrismaUnknownError(error)) {
+        throw new InternalServerErrorException(createPrismaErrorMessage(error));
       }
       throw error;
     }
@@ -194,12 +220,14 @@ export class UsersService {
       });
       return new UserDto(prismaUser);
     } catch (error) {
+      if (
+        IsRecordToUpdateNotFoundError(error) ||
+        isRecordNotFoundError(error)
+      ) {
+        throw new BadRequestException(createPrismaErrorMessage(error));
+      }
       if (isUniqueConstraintError(error)) {
-        throw new ConflictException(
-          `Error: Unique constraint failed on the (${
-            error?.meta?.target ?? 'something'
-          }) fields`,
-        );
+        throw new ConflictException(createPrismaErrorMessage(error));
       }
       throw error;
     }
