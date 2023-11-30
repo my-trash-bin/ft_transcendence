@@ -62,6 +62,7 @@ export const ChannelCreateContent = ({
       </div>
       <div className="flex flex-col ml-[20px] mb-[15px]">
         <input
+          autoComplete="off"
           className="w-[200px] h-[25px] pl-[5px] rounded-sm focus:outline-none focus:border-purple-500 focus:ring-purple-500 focus:ring-2 disabled:bg-slate-300"
           type="password"
           disabled={channelType === ChannelType.PUBLIC}

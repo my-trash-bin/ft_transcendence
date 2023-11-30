@@ -1,9 +1,9 @@
 'use client';
 
-import { Api } from '@/api/api';
 import { DmUserList } from '@/components/dm/dm-user/DmUserList';
 import { MessageSearch } from '@/components/dm/message-search/MessageSearch';
 import { MessageBox } from '@/components/dm/message/MessageBox';
+import { fetchMyData } from '@/lib/FetchMyData';
 import { getSocket } from '@/lib/Socket';
 import Image from 'next/image';
 import { ReactNode, useEffect, useState } from 'react';
@@ -13,7 +13,7 @@ export default function DmPage({
 }: Readonly<{ params: { username: string } }>) {
   const [searchUsername, setSearchUsername] = useState('');
   const [renderMessageBox, setRenderMessageBox] = useState<ReactNode>();
-  const [error, setError] = useState('');
+  const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const userSearchCallback = (searchUsername: string) => {
@@ -21,17 +21,11 @@ export default function DmPage({
   };
 
   useEffect(() => {
-    async function FetchMyData() {
-      try {
-        const data = await new Api().api.usersControllerMyProfile();
-        localStorage.setItem('me', JSON.stringify(data.data));
-        setLoading(false);
-      } catch (e) {
-        setError('error!');
-      }
+    try {
+      fetchMyData(setLoading);
+    } catch (e) {
+      setError(true);
     }
-    if (localStorage.getItem('me') === null) FetchMyData();
-    else setLoading(false);
 
     if (params.hasOwnProperty('username'))
       getSocket().emit('createDmChannel', { info: { nickname: 'testUser1' } });

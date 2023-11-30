@@ -1,7 +1,9 @@
 'use client';
+import { AllChannelList } from '@/components/channel/AllChannelList';
 import { ChannelInput } from '@/components/channel/ChannelInput';
-import { ChannelList } from '@/components/channel/ChannelList';
 import { ChannleMessageBox } from '@/components/channel/ChannelMessageBox';
+import { MyChannelList } from '@/components/channel/MyChannelList';
+import { fetchMyData } from '@/lib/FetchMyData';
 import Image from 'next/image';
 import { useState } from 'react';
 
@@ -10,6 +12,18 @@ export default function ChannelHome({
 }: Readonly<{ params: { channelId: string } }>) {
   const [myChannel, setMyChannel] = useState(true);
   const [searchChannel, setSearchChannel] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
+
+  useState(() => {
+    const fetch = async () => {
+      await fetchMyData(setIsLoading);
+    };
+    fetch();
+  });
+  if (isLoading) return <div>loading...</div>;
+  if (isError) return <div>error...</div>;
+
   const renderMessageBox = params.hasOwnProperty('channelId') ? (
     <ChannleMessageBox channelId={params.channelId} />
   ) : (
@@ -33,7 +47,11 @@ export default function ChannelHome({
             setMyChannel={setMyChannel}
             setSearchChannel={setSearchChannel}
           />
-          <ChannelList myChannel={myChannel} searchChannel={searchChannel} />
+          {myChannel ? (
+            <MyChannelList searchChannel={searchChannel} />
+          ) : (
+            <AllChannelList searchChannel={searchChannel} />
+          )}
         </div>
         <div className="w-[520px] h-[750px] flex flex-col items-center">
           {renderMessageBox}

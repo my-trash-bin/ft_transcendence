@@ -1,13 +1,12 @@
-import { Api } from '@/api/api';
+import { Api, UserDto } from '@/api/api';
 import { useEffect, useState } from 'react';
 import { MessageContent, messageType } from './MessageContent';
 import { MessageSendBox } from './MessageSendBox';
 import { UserInfo } from './UserInfo';
 
 export function MessageBox({ username }: { username: string }) {
-  const imageUri = '/avatar/avatar-blue.svg';
   const [loading, setLoading] = useState<boolean>(true);
-  const [targetUserId, setUserId] = useState<string>('');
+  const [targetUserData, setData] = useState<UserDto>();
   const [error, setError] = useState<boolean>(false);
 
   useEffect(() => {
@@ -17,7 +16,7 @@ export function MessageBox({ username }: { username: string }) {
           username,
         );
         setLoading(false);
-        setUserId(data.data.id);
+        setData(data.data);
       } catch (e) {
         setError(true);
       }
@@ -30,9 +29,13 @@ export function MessageBox({ username }: { username: string }) {
 
   return (
     <>
-      <UserInfo imageUri={imageUri} username={username} onActive={false} />
-      <MessageContent type={messageType.DM} nickname={username} />
-      <MessageSendBox type={messageType.DM} targetUserId={targetUserId} />
+      <UserInfo
+        imageUri={targetUserData?.profileImageUrl}
+        username={targetUserData?.nickname}
+        onActive={false}
+      />
+      <MessageContent type={messageType.DM} />
+      <MessageSendBox type={messageType.DM} targetUserId={targetUserData?.id} />
     </>
   );
 }
