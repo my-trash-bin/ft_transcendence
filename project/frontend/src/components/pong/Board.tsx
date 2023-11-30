@@ -2,7 +2,7 @@ import Image from 'next/image';
 import React, { useEffect } from 'react';
 import usePaddleMovement from './KeyHandle';
 import useStore from './Update';
-import { BALL_SIZE, DEFAULT_SPEED, BOARD_HEIGHT, BOARD_WIDTH, GameState, PADDLE_HEIGHT, PADDLE_WIDTH } from './gameConstants';
+import { BALL_SIZE, BOARD_HEIGHT, BOARD_WIDTH, GameState, PADDLE_HEIGHT, PADDLE_WIDTH } from './gameConstants';
 import { getGameSocket } from './gameSocket';
 
 const GameBoard: React.FC = () => {
