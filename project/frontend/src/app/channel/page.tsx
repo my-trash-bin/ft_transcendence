@@ -2,15 +2,15 @@
 import { AllChannelList } from '@/components/channel/AllChannelList';
 import { ChannelInput } from '@/components/channel/ChannelInput';
 import { MyChannelList } from '@/components/channel/MyChannelList';
+import ApiErrorBoundary from '@/components/error/ApiErrorBoundary';
 import Image from 'next/image';
 
 import { useState } from 'react';
 export default function ChannelHome() {
   const [myChannel, setMyChannel] = useState(true);
   const [searchChannel, setSearchChannel] = useState('');
-
   return (
-    <>
+    <ApiErrorBoundary>
       <div id="modal-channel"></div>
       <div
         className={`bg-opacity-50 flex flex-row bg-light-background rounded-[20px] w-[inherit]`}
@@ -37,6 +37,6 @@ export default function ChannelHome() {
           />
         </div>
       </div>
-    </>
+    </ApiErrorBoundary>
   );
 }
