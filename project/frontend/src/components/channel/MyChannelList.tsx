@@ -1,9 +1,9 @@
 import { Api, ChannelDto } from '@/api/api';
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
+import { useQuery } from 'react-query';
 import { MyChannelButton } from './MyChannelButton';
-
 function getLenderData(
-  channelData: ChannelDto[],
+  channelData: any,
   error: boolean,
   setIsModalOpen: (isModalOpen: boolean) => void,
   isModalOpen: boolean,
@@ -12,7 +12,7 @@ function getLenderData(
     return <p> 데이터를 가져오는데 실패했습니다 ☠️....</p>;
   }
 
-  return channelData.map((channel) => (
+  return channelData.map((channel: any) => (
     <MyChannelButton
       key={channel.id}
       id={channel.id}
@@ -25,33 +25,21 @@ function getLenderData(
 
 export function MyChannelList({ searchChannel }: { searchChannel: string }) {
   const [channelData, setChannelData] = useState<ChannelDto[]>([]);
-  const [error, setError] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const apiCall = useCallback(
+    () => new Api().api.channelControllerFindMyChannels(),
+    [],
+  );
+  const { isLoading, isError, data } = useQuery('myChannels', apiCall);
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const { data } = await new Api().api.channelControllerFindMyChannels();
-        setIsLoading(false);
-        setChannelData(data);
-      } catch (e) {
-        setError(true);
-      }
-    }
-    fetchData();
-  }, [searchChannel]);
-
+  if (isLoading) return <p>로딩중...</p>;
+  if (isError) throw new Error('에러가 발생했습니다.');
   let lenderData = getLenderData(
-    channelData,
-    error,
+    data?.data,
+    isError,
     setIsModalOpen,
     isModalOpen,
   );
-
-  if (isLoading) {
-    return <p>로딩중...</p>;
-  }
 
   return (
     <div className="w-[350px] h-[600px] flex-grow-1 flex flex-col items-center gap-sm overflow-y-scroll">

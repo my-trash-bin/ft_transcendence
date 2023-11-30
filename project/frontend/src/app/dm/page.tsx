@@ -6,7 +6,7 @@ import { fetchMyData } from '@/lib/FetchMyData';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
-export default function DmPage() {
+function DmPage() {
   const [searchUsername, setSearchUsername] = useState('');
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -42,3 +42,4 @@ export default function DmPage() {
     </div>
   );
 }
+export default DmPage;

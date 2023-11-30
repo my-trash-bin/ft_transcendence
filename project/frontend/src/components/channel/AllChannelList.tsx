@@ -1,22 +1,18 @@
-import { Api, ChannelDto } from '@/api/api';
-import { useEffect, useState } from 'react';
+import { Api } from '@/api/api';
+import { useCallback, useState } from 'react';
+import { useQuery } from 'react-query';
 import Portal from '../common/Portal';
 import { AllChannelButton } from './AllChannelButton';
 import { EnterPasswordModal } from './modals/EnterPasswordModal';
 import { ParticipationModal } from './modals/ParticipationModal';
 
 function getLenderData(
-  channelData: ChannelDto[],
-  error: boolean,
+  channelData: any,
   setPasswordModalOpen: (isModalOpen: boolean) => void,
   setParticipationModalOpen: (isModalOpen: boolean) => void,
   setSelectedChannel: (channelId: string) => void,
 ) {
-  if (error) {
-    return <p> 데이터를 가져오는데 실패했습니다 ☠️....</p>;
-  }
-
-  return channelData.map((channel) => {
+  return channelData.map((channel: any) => {
     return (
       <AllChannelButton
         key={channel.id}
@@ -34,38 +30,26 @@ function getLenderData(
 }
 
 export function AllChannelList({ searchChannel }: { searchChannel: string }) {
-  const [channelData, setChannelData] = useState<ChannelDto[]>([]);
-  const [error, setError] = useState<boolean>(false);
   const [isPasswordModalOpen, setPasswordModalOpen] = useState<boolean>(false);
   const [isParticipationModalOpen, setParticipationModalOpen] =
     useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [selectedChannel, setSelectedChannel] = useState<string>('');
+  const apiCall = useCallback(
+    () => new Api().api.channelControllerFindAll(),
+    [],
+  );
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const { data } = await new Api().api.channelControllerFindAll();
-        setIsLoading(false);
-        setChannelData(data);
-      } catch (e) {
-        setError(true);
-      }
-    }
-    fetchData();
-  }, [searchChannel]);
+  const { isLoading, isError, data } = useQuery('allChannels', apiCall);
+
+  if (isLoading) return <p>로딩중...</p>;
+  if (isError) throw new Error('에러가 발생했습니다.');
 
   let lenderData = getLenderData(
-    channelData,
-    error,
+    data?.data,
     setPasswordModalOpen,
     setParticipationModalOpen,
     setSelectedChannel,
   );
-
-  if (isLoading) {
-    return <p>로딩중...</p>;
-  }
 
   return (
     <>
