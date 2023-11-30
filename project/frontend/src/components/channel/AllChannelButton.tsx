@@ -49,9 +49,9 @@ export function AllChannelButton({
               alt="lock icon"
             />
           ) : (
-            <p className="w-[25]"></p>
+            ''
           )}
-          <p className="text-dark-gray ml-[15px]">{state}</p>
+          <p className="text-dark-gray ml-[10px]">{state}</p>
         </div>
       </button>
     </>
