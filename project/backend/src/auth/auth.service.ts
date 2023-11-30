@@ -101,6 +101,7 @@ export class AuthService {
   ): Promise<JwtPayload> {
     return await this.prismaService.$transaction(
       async (tx): Promise<JwtPayload> => {
+        // TODO: AuthUser 하나당 한개의 유저를 바란다면 여기서 막으면 된다.
         const auth = await tx.auth.update({
           where: { type_id: { type: authType, id: authId } },
           data: {

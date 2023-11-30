@@ -23,6 +23,12 @@ export function newServiceFailResponse<T>(
   };
 }
 
+export function newServiceFailUnhandledResponse<T>(
+  statusCode: number,
+): ServiceResponse<T> {
+  return newServiceFailResponse('Unhandled error', statusCode);
+}
+
 export function newServiceFailPrismaKnownResponse<T>(
   errorCode: string,
   statusCode: number,
