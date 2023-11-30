@@ -4,21 +4,24 @@ import { JwtService } from '@nestjs/jwt';
 import {
   ConnectedSocket,
   MessageBody,
-  OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  OnGatewayInit,
   SubscribeMessage,
-  WebSocketGateway, WebSocketServer,
-  WsException
+  WebSocketGateway,
+  WebSocketServer,
+  WsException,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChangeActionType } from '../channel/channel.service';
-import { idOf } from '../common/Id';
 import { GateWayEvents } from '../common/gateway-events.enum';
+import { idOf } from '../common/Id';
 import { GameService, GameState } from '../pong/pong';
 import {
   ChannelIdentityDto,
-  ChannelMessageDto,
   CreateDmChannelDto,
   DmMessageDto,
+  SendMessageDto,
 } from './event-request.dto';
 import { EventsService } from './events.service';
 
@@ -40,10 +43,14 @@ export type UserSocket = Socket & {
 @WebSocketGateway(80, {
   cors: { origin: 'http://localhost:53000', credentials: true },
 })
-
 @Injectable()
 export class EventsGateway
-  implements OnGatewayConnection, OnGatewayConnection, OnGatewayInit, OnModuleInit, OnGatewayDisconnect
+  implements
+    OnGatewayConnection,
+    OnGatewayConnection,
+    OnGatewayInit,
+    OnModuleInit,
+    OnGatewayDisconnect
 {
   @WebSocketServer()
   server!: Server;
@@ -61,12 +68,11 @@ export class EventsGateway
       this.server.emit('gameUpdate', gameState);
     });
   }
-  
+
   afterInit(server: Server) {
     this.eventsService.afterInit(server);
   }
 
-  
   async handleConnection(@ConnectedSocket() client: Socket) {
     try {
       new Logger().debug(`client connected ${client.id}`);
@@ -95,7 +101,7 @@ export class EventsGateway
   @SubscribeMessage(GateWayEvents.ChannelMessage)
   async handleMessage(
     @ConnectedSocket() client: UserSocket,
-    @MessageBody() data: ChannelMessageDto,
+    @MessageBody() data: SendMessageDto,
   ) {
     const { channelId, msg } = data;
     await this.eventsService.sendMessage(client, idOf(channelId), msg);
@@ -161,17 +167,21 @@ export class EventsGateway
       actionType,
     );
   }
-  
+
   // game
   @SubscribeMessage('joinLobby')
   handleJoinLobby(@ConnectedSocket() client: Socket) {
-    const playerRole = 'player1';  // 임시로 고정
+    const playerRole = 'player1'; // 임시로 고정
     this.server.emit('playerRole', playerRole);
     // new Logger().debug(`request socket, ${client.id}`);
   }
 
   @SubscribeMessage('paddleMove')
-  handlePaddleMove(@MessageBody() data: { direction: 'up' | 'down'; player: 'player1' | 'player2' }, @ConnectedSocket() client: Socket) {
+  handlePaddleMove(
+    @MessageBody()
+    data: { direction: 'up' | 'down'; player: 'player1' | 'player2' },
+    @ConnectedSocket() client: Socket,
+  ) {
     this.gameService.handlePaddleMove(data.direction, data.player);
   }
 
