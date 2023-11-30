@@ -1,10 +1,11 @@
 import Image from 'next/image';
-import { useCallback, useContext, useState } from 'react';
+import { useCallback, useContext, useState, useEffect } from 'react';
 import { useQuery } from 'react-query';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { ProfileEditModal } from './ProfileEditModal';
 import { TextBox } from './TextBox';
 import { Loading } from '../common/Loading';
+import { Api } from '@/api/api';
 
 export function ProfileBox() {
   const { api } = useContext(ApiContext);
@@ -13,6 +14,25 @@ export function ProfileBox() {
     [],
     useCallback(async () => (await api.usersControllerMyProfile()).data, [api]),
   );
+  // useEffect(() => {
+  //   async function FetchMyData() {
+  //     try {
+  //       const response = await new Api().api.usersControllerMyProfile();
+  //       const data = response.data;
+
+  //       // Use the data as needed
+  //       setMyData(data);
+  //       localStorage.setItem('me', JSON.stringify(data));
+  //       setLoading(false);
+  //     } catch (e) {
+  //       setError('error!');
+  //     }
+  //   }
+  //   FetchMyData();
+  // });
+  useEffect(() => {
+    console.log('data', data);
+  }, [data]);
 
   const handleButtonClick = () => {
     setIsModalOpen(true);
@@ -32,16 +52,24 @@ export function ProfileBox() {
   );
 
   function renderProfileContent() {
-    if (isLoading) return <Loading width={300} />;
+    // if (isLoading) return <Loading width={300} />;
 
-    if (isError || !data) {
-      return <p>Error loading profile data.</p>;
-    }
+    // if (isError) {
+    //   return <p>Error loading profile data.</p>;
+    // }
+    // if (!data) {
+    //   return <p>Fail to get data.</p>;
+    // }
 
     return (
       <div className="flex flex-row ">
-        {data.imageUrl ? (
-          <Image src={data.imageUrl} alt="avatar" width={150} height={150} />
+        {/* {data.me.profileImageUrl ? (
+          <Image
+            src={data.me.profileImageUrl}
+            alt="avatar"
+            width={150}
+            height={150}
+          />
         ) : (
           <Image
             src={'/avatar/avatar-black.svg'}
@@ -51,11 +79,14 @@ export function ProfileBox() {
           />
         )}
         <TextBox
-          nickname={data.nickname}
-          win={data.record.win}
-          lose={data.record.win}
-          ratio={data.record.win}
-          statusMessage={data.statusMessage}
+          nickname={data.me.nickname}
+          // win={data.record.win}
+          // lose={data.record.win}
+          // ratio={data.record.win}
+          win={3}
+          lose={3}
+          ratio={3}
+          statusMessage={data.me.statusMessage}
         />
         <button onClick={handleButtonClick} className={buttonClass}>
           프로필 수정
@@ -65,7 +96,7 @@ export function ProfileBox() {
           onClose={handleModalClose}
           fetchData={refetch}
           defaultData={data}
-        />
+        /> */}
       </div>
     );
   }
