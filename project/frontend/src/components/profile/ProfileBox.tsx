@@ -14,22 +14,6 @@ export function ProfileBox() {
     [],
     useCallback(async () => (await api.usersControllerMyProfile()).data, [api]),
   );
-  // useEffect(() => {
-  //   async function FetchMyData() {
-  //     try {
-  //       const response = await new Api().api.usersControllerMyProfile();
-  //       const data = response.data;
-
-  //       // Use the data as needed
-  //       setMyData(data);
-  //       localStorage.setItem('me', JSON.stringify(data));
-  //       setLoading(false);
-  //     } catch (e) {
-  //       setError('error!');
-  //     }
-  //   }
-  //   FetchMyData();
-  // });
   useEffect(() => {
     console.log('data', data);
   }, [data]);
@@ -52,18 +36,18 @@ export function ProfileBox() {
   );
 
   function renderProfileContent() {
-    // if (isLoading) return <Loading width={300} />;
+    if (isLoading) return <Loading width={300} />;
 
-    // if (isError) {
-    //   return <p>Error loading profile data.</p>;
-    // }
-    // if (!data) {
-    //   return <p>Fail to get data.</p>;
-    // }
+    if (isError) {
+      return <p>Error loading profile data.</p>;
+    }
+    if (!data) {
+      return <p>Fail to get data.</p>;
+    }
 
     return (
       <div className="flex flex-row ">
-        {/* {data.me.profileImageUrl ? (
+        {data.me.profileImageUrl ? (
           <Image
             src={data.me.profileImageUrl}
             alt="avatar"
@@ -96,7 +80,7 @@ export function ProfileBox() {
           onClose={handleModalClose}
           fetchData={refetch}
           defaultData={data}
-        /> */}
+        />
       </div>
     );
   }
