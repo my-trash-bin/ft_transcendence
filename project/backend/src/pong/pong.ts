@@ -1,5 +1,5 @@
 // events.game.ts
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { EventEmitter } from 'events';
 
 // 게임 상수
@@ -22,6 +22,7 @@ export interface GameState {
   score1: number;
   score2: number;
   gameOver: boolean;
+  gameStart: boolean;
 }
 
 @Injectable()
@@ -36,21 +37,27 @@ export class GameService {
     score1: 0,
     score2: 0,
     gameOver: false,
+    gameStart: false,
   };
 
   constructor() {
     this.startGameLoop();
   }
-  
+
   resetGame() {
     this.gameState.score1 = 0;
     this.gameState.score2 = 0;
     this.gameState.gameOver = false;
+    this.gameState.gameStart = true;
     this.resetPosition();
     this.onGameUpdate.emit('gameState', this.gameState);
   }
   
   private startGameLoop() {
+    console.log("startGameLoop")
+    if (this.gameState.gameOver) {
+      return;
+    }
     setInterval(() => {
       this.updateGameLogic();
     }, 1000 / 60); // 초당 60번 업데이트
@@ -58,10 +65,12 @@ export class GameService {
   
   handlePaddleMove(direction: 'up' | 'down', player: 'player1' | 'player2') {
     const deltaY = direction === 'up' ? -PADDLE_MOVE_STEP : PADDLE_MOVE_STEP;
+    
     const paddle = player === 'player1' ? this.gameState.paddle1 : this.gameState.paddle2;
     const newY = this.checkPaddleBounds(paddle.y + deltaY);
     paddle.y = newY;
-    this.updateGameLogic();
+    this.checkPaddleCollisions();
+    this.onGameUpdate.emit('gameState', this.gameState);
 }
 
   private checkPaddleBounds(paddleY: number): number {

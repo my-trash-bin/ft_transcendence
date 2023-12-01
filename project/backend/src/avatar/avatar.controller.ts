@@ -1,10 +1,4 @@
-import {
-  Controller,
-  InternalServerErrorException,
-  Post,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Logger, Post, Req, UseGuards } from '@nestjs/common';
 import {
   ApiBody,
   ApiCreatedResponse,
@@ -18,6 +12,8 @@ import { AvatarService } from './avatar.service';
 @ApiTags('avatar')
 @Controller('/api/v1/avatar')
 export class AvatarController {
+  private readonly logger = new Logger('AvatarContoller');
+
   constructor(private readonly avatarService: AvatarService) {}
 
   @ApiOperation({ summary: '바이너리 아바타 업로드' })
@@ -31,17 +27,11 @@ export class AvatarController {
   async uploadFile(@Req() req: Request) {
     try {
       const filePath = await this.avatarService.uploadBinaryData(req);
-      console.log(filePath);
+      this.logger.log(`업로드 성공: ${filePath}`);
       return { filePath };
-      // res.status(201).json({ filePath });
     } catch (error) {
-      console.error(error);
-      throw new InternalServerErrorException();
-      // {
-      //   "message": "Bad Request",
-      //   "statusCode": 400
-      // }
-      // res.status(500).json({ message: 'Error uploading file', error });
+      this.logger.log(`업로드 실패: ${error}`);
+      throw error;
     }
   }
   // @Post('upload-with-multer')

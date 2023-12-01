@@ -1,5 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Modal from 'react-modal';
+import { getGameSocket } from '../pong/gameSocket';
+import { useRouter } from 'next/navigation';
+import useStore from '../pong/Update';
 
 interface MatchingModalProps {
   isOpen: boolean;
@@ -12,9 +15,42 @@ const MatchingModal: React.FC<MatchingModalProps> = ({
   onClose,
   mode,
 }) => {
-  if (!isOpen) {
-    return null;
-  }
+  const router = useRouter();
+  const socket = getGameSocket();
+  const { setIsPlayer1 } = useStore();
+
+  
+  const handlePlayerRole = (role: string) => {
+    setIsPlayer1(role === 'player1');
+    console.log('playerRole', role);
+    socket.off('playerRole', handlePlayerRole);
+  };
+  
+  socket.on('playerRole', handlePlayerRole);
+
+  useEffect(() => {
+    if (isOpen) {
+      if (mode === 'normal') {
+        socket.emit('joinNormalMatch');
+        console.log('joinNormalMatch');
+      } else if (mode === 'item') {
+        socket.emit('joinItemMatch');
+      }
+
+      const handleGoPong = () => {
+        console.log('GoPong - Redirecting to game room');
+        onClose();
+        router.push('/pong');
+      };
+
+      socket.on('GoPong', handleGoPong);
+      return () => {
+        socket.off('GoPong', handleGoPong);
+      };
+    }
+  }, [isOpen, mode, onClose, router, socket]);
+
+
   const bgCSS = 'bg-default rounded-md';
   const size = 'py-sm px-lg w-[498px] h-[308px]';
   const borderCSS = 'border-dark-purple border-4';

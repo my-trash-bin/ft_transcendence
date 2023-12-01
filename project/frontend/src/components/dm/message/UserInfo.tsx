@@ -5,8 +5,8 @@ export function UserInfo({
   username,
   onActive,
 }: Readonly<{
-  imageUri: string;
-  username: string;
+  imageUri: any;
+  username: any;
   onActive: boolean;
 }>) {
   const active = onActive ? 'Active' : 'Inavtice';
@@ -16,7 +16,7 @@ export function UserInfo({
 
   return (
     <div className="h-[80px] w-[95%] border-b border-default relative">
-      <div className="w-[45px] h-[50px] absolute left-[5%] top-[20%]">
+      <div className="w-[45px] h-[50px] absolute left-[30px] top-[20px]">
         <Image
           alt="userImage"
           src={imageUri}

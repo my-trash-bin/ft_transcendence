@@ -22,8 +22,11 @@ export class ChannelDto {
   @ApiProperty({ example: '채널 이름', description: '채널 제목' })
   title!: string;
 
-  @ApiProperty({ example: 'public', description: '채널 타입' })
-  type!: string;
+  @ApiProperty({ example: 'true', description: '채널 공개 여부' })
+  isPublic!: boolean;
+
+  @ApiProperty({ example: 'false', description: '채널 비밀번호 설정여부' })
+  needPassword!: boolean;
 
   @ApiProperty({
     example: '2023-01-01T00:00:00.000Z',
@@ -56,7 +59,8 @@ export class ChannelDto {
   constructor(channel: Channel) {
     this.id = channel.id;
     this.title = channel.title;
-    this.type = setChannelType(channel.isPublic, channel.password !== null);
+    this.isPublic = channel.isPublic;
+    this.needPassword = channel.password !== null;
     this.createdAt = channel.createdAt;
     this.lastActiveAt = channel.lastActiveAt;
     this.ownerId = channel.ownerId;
@@ -64,3 +68,14 @@ export class ChannelDto {
     this.maximumMemberCount = channel.maximumMemberCount;
   }
 }
+
+export const channelDtoSelect = {
+  id: true,
+  title: true,
+  isPublic: true,
+  createdAt: true,
+  lastActiveAt: true,
+  ownerId: true,
+  memberCount: true,
+  maximumMemberCount: true,
+};
