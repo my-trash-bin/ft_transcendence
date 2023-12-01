@@ -5,10 +5,17 @@ import { useState } from 'react';
 import Portal from '../common/Portal';
 import { ChannelSettingModal } from './modals/ChannelSettingModal';
 
-export function ChannelInfo({ channelId }: Readonly<{ channelId: string }>) {
-  const channelData = {
-    channelName: 'channel name',
-  };
+export function ChannelInfo({
+  channelId,
+  channelData,
+  myAuthority,
+  myNickname,
+}: Readonly<{
+  channelId: string;
+  channelData: any;
+  myAuthority: string;
+  myNickname: any;
+}>) {
   const [isOpen, setIsOpen] = useState(false);
   const modalClose = () => {
     setIsOpen(false);
@@ -24,10 +31,12 @@ export function ChannelInfo({ channelId }: Readonly<{ channelId: string }>) {
           isOpen={isOpen}
           closeModal={modalClose}
           channelId={channelId}
+          myAuthority={myAuthority}
+          myNickname={myNickname}
         />
       </Portal>
       <div className="w-[95%] h-[80px] border-b border-default relative flex justify-center items-center">
-        <h3>{channelData.channelName}</h3>
+        <h3>{channelData.title}</h3>
         <button
           className="absolute right-[15px] top-[25px] w-[25px] h-[30px]"
           onClick={modalOpen}

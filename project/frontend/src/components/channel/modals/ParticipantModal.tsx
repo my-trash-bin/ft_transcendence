@@ -1,21 +1,16 @@
-import { Api, ChannelMemberDto } from '@/api/api';
+import { Api } from '@/api/api';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useCallback } from 'react';
+import { useQuery } from 'react-query';
 import { ModalButtons } from './ModalButtons';
 import { ParticipantCard } from './ParticipantCard';
 
 const getRenderedData = (
-  data: ChannelMemberDto[] | undefined,
-  setMyAuthority: React.Dispatch<React.SetStateAction<string>>,
+  data: any,
   myAuthority: string,
+  myNickname: string,
 ) => {
-  if (data === undefined) return;
-  const me: string | null = localStorage.getItem('me');
-  const myNickname = me ? JSON.parse(me).nickname : '';
   return data.map((p) => {
-    if (p.member.nickname === myNickname && myAuthority === '') {
-      setMyAuthority(p.memberType);
-    }
     return (
       <ParticipantCard
         key={p.member.id}
@@ -32,6 +27,8 @@ export function ParticipantModal({
   closeModal,
   modalStateFunctions,
   channelId,
+  myAuthority,
+  myNickname,
 }: {
   closeModal: () => void;
   modalStateFunctions: {
@@ -40,31 +37,20 @@ export function ParticipantModal({
     setModalAdd: () => void;
   };
   channelId: string;
+  myAuthority: string;
+  myNickname: any;
 }) {
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
-  const [fetchData, setFetchData] = useState<ChannelMemberDto[]>();
-  const [myAuthority, setMyAuthority] = useState<string>('');
+  const apiCall = useCallback(
+    () =>
+      new Api().api.channelControllerFindChannelMembersByChannelId(channelId),
+    [channelId],
+  );
+  const { isLoading, isError, data } = useQuery('channelMembers', apiCall);
 
-  useEffect(() => {
-    async function getChannelParticipant() {
-      try {
-        const res =
-          await new Api().api.channelControllerFindChannelMembersByChannelId(
-            channelId,
-          );
-        setFetchData(res.data);
-        setIsLoading(false);
-      } catch (e) {
-        setIsError(true);
-      }
-    }
-    getChannelParticipant();
-  }, [channelId]);
-  if (isLoading) return <div>로딩중 ... </div>;
-  if (isError) return <div>데이터를 가져오는데 실패했습니다 ...☠️ </div>;
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) throw new Error('Error fetching data');
 
-  const renderedData = getRenderedData(fetchData, setMyAuthority, myAuthority);
+  const renderedData = getRenderedData(data.data, myAuthority, myNickname);
 
   return (
     <>

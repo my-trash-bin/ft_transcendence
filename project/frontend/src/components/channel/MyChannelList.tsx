@@ -4,14 +4,9 @@ import { useQuery } from 'react-query';
 import { MyChannelButton } from './MyChannelButton';
 function getLenderData(
   channelData: any,
-  error: boolean,
   setIsModalOpen: (isModalOpen: boolean) => void,
   isModalOpen: boolean,
 ) {
-  if (error) {
-    return <p> 데이터를 가져오는데 실패했습니다 ☠️....</p>;
-  }
-
   return channelData.map((channel: any) => (
     <MyChannelButton
       key={channel.id}
@@ -34,12 +29,7 @@ export function MyChannelList({ searchChannel }: { searchChannel: string }) {
 
   if (isLoading) return <p>로딩중...</p>;
   if (isError) throw new Error('에러가 발생했습니다.');
-  let lenderData = getLenderData(
-    data?.data,
-    isError,
-    setIsModalOpen,
-    isModalOpen,
-  );
+  let lenderData = getLenderData(data?.data, setIsModalOpen, isModalOpen);
 
   return (
     <div className="w-[350px] h-[600px] flex-grow-1 flex flex-col items-center gap-sm overflow-y-scroll">
