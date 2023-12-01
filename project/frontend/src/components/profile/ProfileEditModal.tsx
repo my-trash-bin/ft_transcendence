@@ -1,6 +1,6 @@
 import { UserProfileDto } from '@/api/api';
 import Image from 'next/image';
-import { useCallback, useContext, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { ModalLayout } from '../channel/modals/ModalLayout';
 
@@ -8,7 +8,7 @@ interface ModalProfileProps {
   isOpen: boolean;
   onClose: () => void;
   fetchData: () => Promise<unknown>;
-  defaultData: UserProfileDto;
+  defaultData: any;
 }
 function isNicknameValid(nickname: string): boolean {
   const nicknameRegex = /^[a-zA-Z0-9\-_]{6,12}$/;
@@ -23,24 +23,30 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
 }) => {
   const { api } = useContext(ApiContext);
   const [isChanged, setIsChanged] = useState(false);
-  const [profileData, setProfileData] = useState<UserProfileDto>(defaultData);
+  const [newData, setNewData] = useState<UserProfileDto>(defaultData);
   const [password, setPassword] = useState('');
 
-  const saveChanges = useCallback(async () => {
+  useEffect(() => {
+    setIsChanged(false);
+    setNewData(defaultData);
+    setPassword('');
+  }, [isOpen, defaultData]);
+
+  const updateProfile = useCallback(async () => {
     try {
       await api.usersControllerUpdate({
-        nickname: profileData.nickname,
-        // profileImageUrl: profileData.profileImageUrl,
-        // statusMessage: profileData.statusMessage,
+        nickname: newData.nickname,
+        // profileImageUrl: newData.profileImageUrl,
+        // statusMessage: newData.statusMessage,
       });
       fetchData();
       onClose();
     } catch (error) {
       console.error('Error saving changes:', error);
     }
-  }, [api, , profileData, onClose, fetchData]);
+  }, [api, , newData, onClose, fetchData]);
 
-  const sendPassword = useCallback(async () => {
+  const updatePassword = useCallback(async () => {
     try {
       alert('call api to set 2fa password');
       // await api.usersControllerUpdate({
@@ -54,8 +60,8 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
 
   const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newNickname = e.target.value;
-    setProfileData((profileData) => ({
-      ...profileData,
+    setNewData((newData) => ({
+      ...newData,
       nickname: newNickname,
     }));
     setIsChanged(false);
@@ -67,8 +73,8 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
   const handleStatusMessageChange = (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    setProfileData((profileData) => ({
-      ...profileData,
+    setNewData((newData) => ({
+      ...newData,
       statusMessage: e.target.value,
     }));
     setIsChanged(true);
@@ -91,9 +97,9 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
       <div className="w-[100%] h-[100%] relative">
         <div className="p-xl h-[100%] flex flex-col gap-lg justift-center items-center">
           <p className="text-h2 font-bold text-dark-purple">프로필 수정</p>
-          {defaultData.imageUrl ? (
+          {defaultData.me.profileImageUrl ? (
             <Image
-              src={defaultData.imageUrl}
+              src={defaultData.me.profileImageUrl}
               alt="avatar"
               width={100}
               height={100}
@@ -110,20 +116,20 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
             <p className={textClass}>닉네임</p>
             <input
               type="text"
-              placeholder={defaultData.nickname}
+              placeholder={defaultData.me.nickname}
               onChange={handleNicknameChange}
               className="bg-[#f3f0f8] border-2 border-dark-purple-interactive w-[200px]"
             />
             <p className={textClass}>상태메세지</p>
             <input
               type="text"
-              placeholder={defaultData.statusMessage}
+              placeholder={defaultData.me.statusMessage}
               onChange={handleStatusMessageChange}
               className="bg-[#f3f0f8] border-2 border-dark-purple"
             />
             <button
-              disabled={!isChanged || !isNicknameValid(defaultData.nickname)}
-              onClick={saveChanges}
+              disabled={!isChanged || !isNicknameValid(newData.nickname)}
+              onClick={updateProfile}
               className={`${buttonClass} ${
                 isChanged
                   ? 'bg-default border-dark-purple'
@@ -140,7 +146,7 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
             />
             <button
               disabled={!password}
-              onClick={sendPassword}
+              onClick={updatePassword}
               className={`${buttonClass} ${
                 password
                   ? 'bg-default border-dark-purple'

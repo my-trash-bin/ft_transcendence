@@ -5,7 +5,6 @@ import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { ProfileEditModal } from './ProfileEditModal';
 import { TextBox } from './TextBox';
 import { Loading } from '../common/Loading';
-import { Api } from '@/api/api';
 
 export function ProfileBox() {
   const { api } = useContext(ApiContext);
@@ -14,9 +13,6 @@ export function ProfileBox() {
     [],
     useCallback(async () => (await api.usersControllerMyProfile()).data, [api]),
   );
-  useEffect(() => {
-    console.log('data', data);
-  }, [data]);
 
   const handleButtonClick = () => {
     setIsModalOpen(true);
