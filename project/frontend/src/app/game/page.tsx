@@ -34,7 +34,9 @@ export default function GamePage() {
           </div>
         </div>
       </div>
-      <div onClick={() => handleModalOpen}>open modal</div>
+      <button className="w-sm h-sm bg-default" onClick={handleModalOpen}>
+        임시 버튼
+      </button>
       <GameFinishModal isOpen={isModalOpen} onClose={handleModalClose} />
     </div>
   );

@@ -4,6 +4,7 @@ const ButtonCVA = cva(['text-center'], {
   variants: {
     size: {
       small: ['w-md h-xs', 'border-2', 'text-lg font-bold', 'rounded-sm'],
+      medium: ['w-lg h-sm', 'border-2', 'text-lg font-bold', 'rounded-sm'],
     },
     color: {
       default: [
