@@ -13,7 +13,9 @@ const queryClientConfig: QueryClientConfig = {
     queries: {
       onError: (error) => {
         console.error(`error from react-query: ${error}`);
-        // location.href = '/';
+        if (error.message === 'Unauthorized') {
+          location.href = '/';
+        }
         throw error;
       },
       retry: 0,
