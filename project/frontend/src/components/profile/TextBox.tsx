@@ -17,8 +17,8 @@ export const TextBox: React.FC<TextBoxProps> = ({
 }) => {
   const textClass = isModal ? 'pl-lg' : 'pl-2xl';
   const boldClass = isModal
-    ? 'font-semibold text-xl text-dark-purple leading-loose'
-    : 'font-semibold text-h3 text-dark-purple leading-loose';
+    ? 'font-semibold font-jeonju text-xl text-dark-purple leading-loose'
+    : 'font-semibold font-jeonju text-h3 text-dark-purple leading-loose';
   const lightClass = 'font-normal text-dark-gray leading-[4]';
   return (
     <div className={textClass}>

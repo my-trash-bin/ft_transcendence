@@ -5,6 +5,7 @@ import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { ProfileEditModal } from './ProfileEditModal';
 import { TextBox } from './TextBox';
 import { Loading } from '../common/Loading';
+import { Button } from '../common/Button';
 
 export function ProfileBox() {
   const { api } = useContext(ApiContext);
@@ -21,7 +22,8 @@ export function ProfileBox() {
     setIsModalOpen(false);
   };
   const buttonClass =
-    'w-lg h-sm bg-default rounded-sm border-2 border-dark-purple text-center text-black text-lg font-bold hover:bg-light-background ' +
+    'w-lg h-sm bg-default rounded-sm border-2 border-dark-purple' +
+    'text-center text-black text-lg font-bold hover:bg-light-background' +
     'absolute top-xl right-xl';
   return (
     <div className="w-[900px] h-xl bg-light-background rounded-lg mb-[30px] relative">
@@ -68,9 +70,9 @@ export function ProfileBox() {
           ratio={3}
           statusMessage={data.me.statusMessage}
         />
-        <button onClick={handleButtonClick} className={buttonClass}>
+        <Button onClick={handleButtonClick} size={'big'}>
           프로필 수정
-        </button>
+        </Button>
         <ProfileEditModal
           isOpen={isModalOpen}
           onClose={handleModalClose}

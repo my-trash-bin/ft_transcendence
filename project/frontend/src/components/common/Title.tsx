@@ -1,12 +1,20 @@
 import { cva, type VariantProps } from 'class-variance-authority';
 
-export const title = cva(['text-h2 font-semibold text-dark-gray absolute'], {
+export const title = cva([''], {
   variants: {
     location: {
-      'top-left': ['top-xl left-xl'],
-      'top-right': ['top-xl right-xl'],
-      'top-center': ['top-2xl left-1/2 transform -translate-x-1/2'],
+      'top-left': ['absolute top-xl left-xl'],
+      'top-right': ['absolute top-xl right-xl'],
+      'top-center': ['absolute top-2xl left-1/2 transform -translate-x-1/2'],
+      none: [],
     },
+    font: {
+      default: ['font-taebaek', 'text-h2 text-dark-gray'],
+    },
+  },
+  defaultVariants: {
+    location: 'none',
+    font: 'default',
   },
 });
 export interface TitleProps extends VariantProps<typeof title> {

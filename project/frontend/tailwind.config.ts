@@ -67,7 +67,10 @@ export default <Config>{
     },
     extend: {
       fontFamily: {
-        sejong: ['KingSejongInstitute-Regular', 'sans-serif'],
+        sejong: ['KingSejongInstitute-Regular'],
+        taebaek: ['TAEBAEKfont'],
+        jeonju: ['JeonjuCraftGoR'],
+        danjo: ['Danjo-bold-Regular'],
       },
     },
   },

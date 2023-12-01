@@ -3,14 +3,20 @@ import { cva, type VariantProps } from 'class-variance-authority';
 const ButtonCVA = cva(['text-center'], {
   variants: {
     size: {
-      small: ['w-md h-xs', 'border-2', 'text-lg font-bold', 'rounded-sm'],
-      medium: ['w-lg h-sm', 'border-2', 'text-lg font-bold', 'rounded-sm'],
+      small: ['w-md h-xs', 'text-lg font-bold', 'font-jeonju'],
+      medium: ['w-lg h-sm', 'text-lg font-bold'],
+      big: [
+        'w-lg h-sm',
+        'text-lg font-bold',
+        'font-jeonju',
+        'absolute top-xl right-xl',
+      ],
     },
     color: {
       default: [
+        'bg-default',
         'hover:bg-light-background',
         'border-dark-purple',
-        'bg-default',
         'text-black',
       ],
       modal: ['hover:bg-white', 'border-dark-purple', 'bg-white', 'text-black'],
@@ -39,7 +45,10 @@ export const Button: React.FC<ButtonProps> = ({
   const color = disabled ? 'disabled' : isModal ? 'modal' : 'default';
   return (
     <button
-      className={ButtonCVA({ size, color })}
+      className={`${ButtonCVA({
+        size,
+        color,
+      })}  rounded-sm border-2`}
       onClick={onClick}
       disabled={disabled}
     >
