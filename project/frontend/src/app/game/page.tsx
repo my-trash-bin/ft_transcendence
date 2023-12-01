@@ -1,9 +1,18 @@
 'use client';
+import { GameFinishModal } from '@/components/game/GameFinishModal';
 import GameButton from '../../components/game/GameButton';
 import { Ranking } from '../../components/game/Ranking';
-import React from 'react';
+import React, { useState } from 'react';
 
 export default function GamePage() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
+  const handleModalOpen = () => {
+    setIsModalOpen(true);
+  };
   return (
     <div className="flex flex-row h-[100%] w-[100%]">
       <div className="w-[100%] h-[100%] bg-light-background rounded-lg">
@@ -25,6 +34,8 @@ export default function GamePage() {
           </div>
         </div>
       </div>
+      <div onClick={() => handleModalOpen}>open modal</div>
+      <GameFinishModal isOpen={isModalOpen} onClose={handleModalClose} />
     </div>
   );
 }
