@@ -45,11 +45,11 @@ export default function RankingCard({
           </div>
         </LongCard>
       </button>
-      <ProfileModal
+      {/* <ProfileModal
         isOpen={isModalOpen}
         onClose={handleModalClose}
         targetId={name}
-      />
+      /> */}
     </div>
   );
 }
