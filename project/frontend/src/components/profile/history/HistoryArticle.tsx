@@ -7,6 +7,7 @@ import { HistoryCard } from './HistoryCard';
 import { mockData } from './mockDataHistory';
 import { Button } from '@/components/common/Button';
 import { useRouter } from 'next/navigation';
+
 export function HistoryArticle() {
   const { api } = useContext(ApiContext);
   const router = useRouter();
@@ -21,7 +22,9 @@ export function HistoryArticle() {
   return (
     <div className="relative">
       <div className="h-[inherit] pt-3xl flex flex-col items-center">
-        <Title location="top-center">최근 전적</Title>
+        <Title location="top-center" font="big">
+          최근 전적
+        </Title>
         <Button onClick={() => router.push('/profile')} size={'big'}>
           돌아가기
         </Button>

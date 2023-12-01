@@ -23,8 +23,8 @@ export default <Config>{
       lg: '16px',
       xl: '18px',
       h3: '20px',
-      h2: '30px',
-      h1: '36px',
+      h2: '24px',
+      h1: '30px',
     },
     spacing: {
       '0': '0',

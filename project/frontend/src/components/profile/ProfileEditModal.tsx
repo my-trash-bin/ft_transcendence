@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { ModalLayout } from '../channel/modals/ModalLayout';
+import { Button } from '../common/Button';
 
 interface ModalProfileProps {
   isOpen: boolean;
@@ -84,9 +85,8 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
     setPassword(e.target.value);
   };
 
-  const textClass = 'font-bold text-xl text-dark-purple leading-loose';
-  const buttonClass =
-    'w-[80px] h-[30px] rounded-sm border-2 text-center text-black text-lg font-bold hover:bg-light-background self-end';
+  const textClass =
+    'font-bold text-xl font-sejong text-dark-purple leading-loose';
   return (
     <ModalLayout
       isOpen={isOpen}
@@ -96,7 +96,7 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
     >
       <div className="w-[100%] h-[100%] relative">
         <div className="p-xl h-[100%] flex flex-col gap-lg justift-center items-center">
-          <p className="text-h2 font-bold text-dark-purple">프로필 수정</p>
+          <p className="text-h2 font-taebaek text-dark-purple">프로필 수정</p>
           {defaultData.me.profileImageUrl ? (
             <Image
               src={defaultData.me.profileImageUrl}
@@ -127,34 +127,25 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
               onChange={handleStatusMessageChange}
               className="bg-[#f3f0f8] border-2 border-dark-purple"
             />
-            <button
-              disabled={!isChanged || !isNicknameValid(newData.nickname)}
-              onClick={updateProfile}
-              className={`${buttonClass} ${
-                isChanged
-                  ? 'bg-default border-dark-purple'
-                  : 'bg-gray border-dark-gray'
-              } mt-sm`}
-            >
-              수정하기
-            </button>
+            <div className="self-end mt-sm">
+              <Button
+                disabled={!isChanged || !isNicknameValid(newData.nickname)}
+                onClick={updateProfile}
+              >
+                수정하기
+              </Button>
+            </div>
             <p className={textClass}>2차 비밀번호 설정</p>
             <input
               type="password"
               onChange={handlePasswordChange}
               className="bg-[#f3f0f8] border-2 border-dark-purple"
             />
-            <button
-              disabled={!password}
-              onClick={updatePassword}
-              className={`${buttonClass} ${
-                password
-                  ? 'bg-default border-dark-purple'
-                  : 'bg-gray border-dark-gray'
-              } mt-sm`}
-            >
-              설정하기
-            </button>
+            <div className="self-end mt-sm">
+              <Button disabled={!password} onClick={updatePassword}>
+                설정하기
+              </Button>
+            </div>
           </div>
         </div>
       </div>

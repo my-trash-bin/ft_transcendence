@@ -1,26 +1,19 @@
 import { cva, type VariantProps } from 'class-variance-authority';
 
-const ButtonCVA = cva(['text-center'], {
+const ButtonCVA = cva(['text-center font-sejong font-semibold'], {
   variants: {
     size: {
-      small: ['w-md h-xs', 'text-lg font-bold', 'font-jeonju'],
-      medium: ['w-lg h-sm', 'text-lg font-bold'],
-      big: [
-        'w-lg h-sm',
-        'text-lg font-bold',
-        'font-jeonju',
-        'absolute top-xl right-xl',
-      ],
+      small: ['w-md h-xs', 'text-md'],
+      medium: ['w-lg h-sm', 'text-lg'],
+      big: ['w-lg h-sm', 'text-lg', 'absolute top-xl right-xl'],
     },
     color: {
       default: [
-        'bg-default',
-        'hover:bg-light-background',
-        'border-dark-purple',
+        'bg-default hover:bg-light-background border-dark-purple',
         'text-black',
       ],
-      modal: ['hover:bg-white', 'border-dark-purple', 'bg-white', 'text-black'],
-      disabled: ['border-dark-gray', 'bg-gray', 'text-white', 'font-semibold'],
+      modal: ['bg-white hover:bg-white border-dark-purple', 'text-black'],
+      disabled: ['bg-gray border-dark-gray', 'text-white'],
     },
   },
   defaultVariants: {

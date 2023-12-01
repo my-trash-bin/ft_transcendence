@@ -13,7 +13,7 @@ export default function FriendPage() {
 
   function className(isActive: boolean): string {
     return (
-      'w-[150px] h-[60px] border-3 rounded-md text-h2 font-bold hover:bg-light-background hover:border-dark-gray' +
+      'w-[120px] h-[50px] border-3 rounded-md text-h2 hover:bg-light-background hover:border-dark-gray font-taebaek' +
       (isActive
         ? ' bg-default border-dark-purple text-dark-purple'
         : ' bg-light-gray border-gray text-gray')

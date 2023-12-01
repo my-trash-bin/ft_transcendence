@@ -10,6 +10,7 @@ export const title = cva([''], {
     },
     font: {
       default: ['font-taebaek', 'text-h2 text-dark-gray'],
+      big: ['font-taebaek', 'text-h1 text-dark-gray'],
     },
   },
   defaultVariants: {
@@ -21,6 +22,6 @@ export interface TitleProps extends VariantProps<typeof title> {
   children?: React.ReactNode;
 }
 
-export const Title: React.FC<TitleProps> = ({ location, children }) => (
-  <div className={title({ location })}>{children}</div>
+export const Title: React.FC<TitleProps> = ({ location, font, children }) => (
+  <div className={title({ location, font })}>{children}</div>
 );

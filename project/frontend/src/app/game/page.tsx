@@ -23,7 +23,7 @@ export default function GamePage() {
               <GameButton mode="normal" />
               <GameButton mode="item" />
             </section>
-            <Title>순위</Title>
+            <Title font="big">순위</Title>
             <Ranking />
           </div>
         </div>
