@@ -223,6 +223,7 @@ export class UsersService {
         data: {
           nickname: updateUserDto.nickname,
           profileImageUrl: updateUserDto.profileImageUrl,
+          statusMessage: updateUserDto.statusMessage,
         },
       });
       return new UserDto(prismaUser);
