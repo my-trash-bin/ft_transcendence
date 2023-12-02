@@ -1,6 +1,7 @@
 import { useCallback, useContext } from 'react';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { CommonCard } from './utils/CommonCard';
+import { Button } from '../common/Button';
 
 interface BlockCardProps {
   readonly nickname: string;
@@ -29,14 +30,7 @@ export function BlockCard({ nickname, imageUrl, id, refetch }: BlockCardProps) {
       id={id}
       refetch={refetch}
     >
-      <button
-        onClick={unblockUser}
-        className={
-          'w-md h-xs bg-default rounded-sm border-2 border-dark-purple text-center text-black text-lg font-bold mr-lg hover:bg-light-background'
-        }
-      >
-        차단 풀기
-      </button>
+      <Button onClick={unblockUser}>차단 풀기</Button>
     </CommonCard>
   );
 }

@@ -3,12 +3,14 @@ import { Loading } from '@/components/common/Loading';
 import { Title } from '@/components/common/Title';
 import { useCallback, useContext } from 'react';
 import { useQuery } from 'react-query';
-import { ProfileButton } from '../ProfileButton';
 import { HistoryCard } from './HistoryCard';
 import { mockData } from './mockDataHistory';
+import { Button } from '@/components/common/Button';
+import { useRouter } from 'next/navigation';
 
 export function HistoryArticle() {
   const { api } = useContext(ApiContext);
+  const router = useRouter();
   const { isLoading, isError, data } = useQuery(
     ['achivement'],
     useCallback(
@@ -16,11 +18,16 @@ export function HistoryArticle() {
       [api],
     ),
   );
+
   return (
     <div className="relative">
       <div className="h-[inherit] pt-3xl flex flex-col items-center">
-        <Title location="top-center">최근 전적</Title>
-        <ProfileButton href="/profile" text="돌아가기" />
+        <Title location="top-center" font="big">
+          최근 전적
+        </Title>
+        <Button onClick={() => router.push('/profile')} size={'big'}>
+          돌아가기
+        </Button>
         <div className="flex flex-col items-center w-[100%] h-[500px] mt-3xl">
           {render()}
         </div>

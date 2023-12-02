@@ -54,6 +54,7 @@ class TwoFactorAuthenticationBody {
 
 @Controller('/api/auth')
 export class AuthController {
+  private logger = new Logger('authContoller');
   constructor(
     private readonly authService: AuthService,
     private readonly jwtService: JwtService,
@@ -77,22 +78,20 @@ export class AuthController {
     @Request() req: ExpressRequest,
     @Response() res: ExpressResponse,
   ): Promise<void> {
-    console.log('test 진입');
+    this.logger.debug(`42/callback: ${req.user}`);
     const jwtPayload = await this.authService.oauth42(req.user);
     this.setCookie(res, jwtPayload);
-    // 인증이된거고 => 인증 == 토큰 => 쿠키
-    // 리다이렉션 => /regisster
     switch (jwtPayload['phase']) {
       case 'register':
-        console.log('res.redirect => /sign-in');
+        this.logger.debug('res.redirect => /sign-in');
         res.redirect('/sign-in');
         break;
       case '2fa':
-        console.log('res.redirect => /2fa');
+        this.logger.debug('res.redirect => /2fa');
         res.redirect('/2fa');
         break;
       case 'complete':
-        console.log('res.redirect1 => welcome => /friend');
+        this.logger.debug('res.redirect1 => welcome => /friend');
         this.welcome(res, 'FT');
         break;
     }
