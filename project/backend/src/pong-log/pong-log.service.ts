@@ -32,11 +32,23 @@ export class PongLogService {
     });
     const filtered = userLogs
       .filter(({ isPlayer1win }) => isPlayer1win !== null)
-      .map(({ player1Id, player2Id, isPlayer1win }) => ({
-        player1Id,
-        player2Id,
-        isPlayer1win,
-      }));
+      .map(
+        ({
+          player1Id,
+          player2Id,
+          isPlayer1win,
+          player1Score,
+          player2Score,
+          createdAt,
+        }) => ({
+          player1Id,
+          player2Id,
+          isPlayer1win,
+          player1Score,
+          player2Score,
+          createdAt,
+        }),
+      );
     const cal = this.calculateStatistics(filtered, id);
     return {
       userLogs,
