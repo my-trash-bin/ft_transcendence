@@ -1,39 +1,18 @@
 'use client';
 
+import withAuth from '@/components/auth/Auth';
 import { DmUserList } from '@/components/dm/dm-user/DmUserList';
 import { MessageSearch } from '@/components/dm/message-search/MessageSearch';
 import { MessageBox } from '@/components/dm/message/MessageBox';
-import ApiErrorBoundary from '@/components/error/ApiErrorBoundary';
-import { fetchMyData } from '@/lib/FetchMyData';
 import { getSocket } from '@/lib/Socket';
 import Image from 'next/image';
-import { ReactNode, useEffect, useState } from 'react';
+import { useState } from 'react';
 
-export default function DmPage({
-  params,
-}: Readonly<{ params: { username: string } }>) {
-  const [searchUsername, setSearchUsername] = useState('');
-  const [renderMessageBox, setRenderMessageBox] = useState<ReactNode>();
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  const userSearchCallback = (searchUsername: string) => {
-    setSearchUsername(searchUsername);
-  };
-
-  useEffect(() => {
-    try {
-      fetchMyData(setLoading);
-    } catch (e) {
-      setError(true);
-    }
-
-    if (params.hasOwnProperty('username'))
-      getSocket().emit('createDmChannel', { info: { nickname: 'testUser1' } });
-
-    const data = params.hasOwnProperty('username') ? (
-      <MessageBox username={params.username} />
-    ) : (
+const getRenderData = (params: any) => {
+  if (params.hasOwnProperty('username'))
+    return <MessageBox username={params.username} />;
+  else
+    return (
       <Image
         alt="dm image"
         src="/images/dm-page.png"
@@ -42,15 +21,24 @@ export default function DmPage({
         height={300}
       />
     );
+};
 
-    setRenderMessageBox(data);
-  }, [params]);
+function DmPage({ params }: Readonly<{ params: { username: string } }>) {
+  const [searchUsername, setSearchUsername] = useState('');
 
-  if (loading) return <div>loading... 👾</div>;
-  if (error) return <div>error!</div>;
+  const userSearchCallback = (searchUsername: string) => {
+    setSearchUsername(searchUsername);
+  };
+
+  if (params.hasOwnProperty('username'))
+    getSocket().emit('createDmChannel', {
+      info: { nickname: params.username },
+    });
+
+  const data = getRenderData(params);
 
   return (
-    <ApiErrorBoundary>
+    <>
       <div id="backdrop-root"></div>
       <div className="flex flex-row bg-light-background rounded-[20px] w-[inherit]">
         <div className="w-[380px] h-[750px] border-r flex flex-col items-center">
@@ -58,9 +46,11 @@ export default function DmPage({
           <DmUserList searchUsername={searchUsername} />
         </div>
         <div className="w-[520px] h-[750px] flex flex-col items-center justify-center">
-          {renderMessageBox}
+          {data}
         </div>
       </div>
-    </ApiErrorBoundary>
+    </>
   );
 }
+
+export default withAuth(DmPage);

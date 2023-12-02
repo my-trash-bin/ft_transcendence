@@ -1,4 +1,5 @@
-import { useProfileAndChannelInfo } from '@/hooks/useProfileAndChannelInfo';
+import { Api } from '@/api/api';
+import { useQuery } from 'react-query';
 import { MessageContent, messageType } from '../dm/message/MessageContent';
 import { MessageSendBox } from '../dm/message/MessageSendBox';
 import { ChannelInfo } from './ChannelInfo';
@@ -6,11 +7,17 @@ import { ChannelInfo } from './ChannelInfo';
 export function ChannleMessageBox({
   channelId,
 }: Readonly<{ channelId: string }>) {
-  const { isLoading, me, channel } = useProfileAndChannelInfo(channelId);
+  const channelApi = () =>
+    new Api().api.channelControllerFindChannelInfo(channelId);
+
+  const { isLoading, data } = useQuery('channelInfo', channelApi);
 
   if (isLoading) return <div>Loading...</div>;
 
-  const myAuthority = channel.members.filter((mem) => {
+  const localMe = localStorage.getItem('me');
+  const me = localMe ? JSON.parse(localMe) : null;
+
+  const myAuthority = data?.data.members.filter((mem) => {
     return mem.memberId === me.id;
   });
   if (isLoading) return <div>Loading...</div>;
@@ -20,11 +27,11 @@ export function ChannleMessageBox({
     <>
       <ChannelInfo
         channelId={channelId}
-        channelData={channel}
+        channelData={data?.data}
         myAuthority={myAuthority[0].memberType}
-        myNickname={me.me.nickname}
+        myNickname={me.nickname}
       />
-      <MessageContent type={messageType.CHANNEL} myNickname={me.me.nickname} />
+      <MessageContent type={messageType.CHANNEL} myNickname={me.nickname} />
       <MessageSendBox channelId={channelId} type={messageType.CHANNEL} />
     </>
   );

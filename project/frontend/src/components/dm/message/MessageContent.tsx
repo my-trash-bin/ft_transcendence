@@ -1,4 +1,4 @@
-import { getSocket } from '@/lib/Socket';
+import { useSocket } from '@/hooks/useSocket';
 import { useEffect, useRef, useState } from 'react';
 import { MyChat } from './MyChat';
 import { OtherChat } from './OtherChat';
@@ -32,31 +32,7 @@ export function MessageContent({
     messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  useEffect(() => {
-    const socket = getSocket();
-
-    if (type === messageType.DM) {
-      socket.on(`directMessage`, (res) => {
-        setMessages((messages) => [...messages, res]);
-      });
-    } else {
-      socket.on(`channelMessage`, (res) => {
-        setMessages((messages) => [...messages, res]);
-      });
-      socket.on('leave', (res) => {
-        console.log(res);
-      });
-    }
-
-    return () => {
-      if (type === messageType.DM) {
-        socket.off(`directMessage`);
-      } else {
-        socket.off(`channelMessage`);
-        socket.off('leave');
-      }
-    };
-  }, [type]);
+  useSocket(type, setMessages);
 
   return (
     <div className="w-[95%] h-[610px] pt-[20px] bg-chat-color2 rounded-[10px] flex flex-col overflow-y-scroll mt-sm">
