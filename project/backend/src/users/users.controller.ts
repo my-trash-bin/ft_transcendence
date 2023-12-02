@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Get,
+  Logger,
   NotFoundException,
   Param,
   Patch,
@@ -14,6 +15,7 @@ import {
 import {
   ApiBadRequestResponse,
   ApiConflictResponse,
+  ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiOkResponse,
   ApiOperation,
@@ -26,9 +28,10 @@ import { JwtPayload, JwtPayloadPhaseComplete } from '../auth/auth.service';
 import { JwtGuard } from '../auth/jwt.guard';
 import { Phase, PhaseGuard } from '../auth/phase.guard';
 import { idOf, UserId } from '../common/Id';
-import { PongSeasonLogService } from '../pong-season-log/pong-season-log.service';
+import { PongLogService } from '../pong-log/pong-log.service';
 import { UserFollowService } from '../user-follow/user-follow.service';
 import { NicknameCheckUserDto } from './dto/nickname-check-user.dto';
+import { TwoFactorPasswordDto } from './dto/two-factor-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import {
   RecordDto,
@@ -53,10 +56,11 @@ class UniqueCheckResponse {
 @ApiTags('users')
 @Controller('/api/v1/users')
 export class UsersController {
+  private logger = new Logger('userController');
   constructor(
     private readonly usersService: UsersService,
     private readonly userFollowService: UserFollowService,
-    private readonly pongSeasonLogService: PongSeasonLogService,
+    private readonly pongLogService: PongLogService,
   ) {}
 
   @Get('me')
@@ -139,14 +143,12 @@ export class UsersController {
       throw new NotFoundException('Invalid Id. (targetUser)');
     }
     const relation = await this.getRelation(userId.value, targetUserId);
+    const userLogs = await this.pongLogService.findOne(idOf(targetUserId));
 
-    const seasonLog = await this.pongSeasonLogService.findOne(
-      idOf(targetUserId),
-    );
     const record = {
-      win: seasonLog.win,
-      lose: seasonLog.lose,
-      ratio: seasonLog.winRate,
+      win: userLogs.wins,
+      lose: userLogs.losses,
+      ratio: userLogs.winRate,
     };
 
     return new UserProfileDto({
@@ -176,6 +178,24 @@ export class UsersController {
       throw new BadRequestException(`올바르지 않은 닉네임: ${nickname}`);
     }
     return result;
+  }
+
+  @Post('set-2fa')
+  @ApiOperation({ summary: '2차 인증 비밀번호 설정' })
+  @ApiCreatedResponse({ description: '2차 인증 비밀번호 설정 성공, 반환값 X' })
+  @ApiUnauthorizedResponse({ description: '인증되지 않은 유저로부터의 요청.' })
+  @ApiBadRequestResponse({ description: '유효하지 않은 비밀번호' })
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
+  async setTwoFactorPassword(
+    @Request() req: ExpressRequest,
+    @Body() dto: TwoFactorPasswordDto,
+  ) {
+    // 닉네임 중복 체크 로직 구현
+    const { id } = req.user as JwtPayloadPhaseComplete;
+    const { password } = dto;
+    this.logger.debug(id, password);
+    await this.usersService.setTwoFactorPassword(id, password);
   }
 
   @Get(':id')
