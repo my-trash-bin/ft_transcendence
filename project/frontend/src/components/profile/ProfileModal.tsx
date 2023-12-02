@@ -8,6 +8,7 @@ import { ModalLayout } from '../channel/modals/ModalLayout';
 import { TextBox } from './TextBox';
 import { CardType, HistoryCard } from './history/HistoryCard';
 import { mockData } from './history/mockDataHistory';
+import { Loading } from '../common/Loading';
 
 interface ModalProfileProps {
   isOpen: boolean;
@@ -191,51 +192,58 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
       width="400px"
       height="500px"
     >
-      <div className="p-xl flex flex-col">
-        {isLoading ? (
-          <p>Loading...</p>
-        ) : isError || !data ? (
-          <p>Error loading profile data.</p>
-        ) : (
-          <div>
-            <div className="flex felx-row">
-              <FriendAvatar imageUrl={data.imageUrl} size={80} />
-              <TextBox
-                nickname={data.nickname}
-                win={record.win}
-                lose={record.lose}
-                ratio={record.ratio}
-                statusMessage={data.statusMessage}
-                isModal={true}
-              />
-            </div>
-            <div className="flex flex-col pt-xl">
-              {mockData.slice(0, 3).map((data) => (
-                <HistoryCard
-                  key={data.key}
-                  user1Name={data.user1Name}
-                  user2Name={data.user2Name}
-                  user1Avatar={data.user1Avatar}
-                  user2Avatar={data.user2Avatar}
-                  user1Score={data.user1Score}
-                  user2Score={data.user2Score}
-                  type={CardType.Small}
-                />
-              ))}
-            </div>
-            <div className="flex flex-col pt-xl gap-md">
-              <div className="flex flex-row gap-3xl justify-center">
-                {handleFriendButton()}
-                {handlerGameButton()}
-              </div>
-              <div className="flex flex-row gap-3xl justify-center">
-                {handleBlockButton()}
-                {handlerDmButton()}
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+      {renderProfileContent()}
     </ModalLayout>
   );
+
+  function renderProfileContent() {
+    if (isLoading) return <Loading width={300} />;
+
+    if (isError) {
+      return <p>Error loading profile data.</p>;
+    }
+    if (!data) {
+      return <p>Fail to get data.</p>;
+    }
+
+    return (
+      <div className="p-xl flex flex-col gap-md">
+        <div className="flex felx-row gap-xl">
+          <FriendAvatar imageUrl={data.imageUrl} size={80} />
+          <TextBox
+            nickname={data.nickname}
+            win={record.win}
+            lose={record.lose}
+            ratio={record.ratio}
+            statusMessage={data.statusMessage}
+            isModal={true}
+          />
+        </div>
+        <div className="flex flex-col">
+          {mockData.slice(0, 3).map((data) => (
+            <HistoryCard
+              key={data.key}
+              user1Name={data.user1Name}
+              user2Name={data.user2Name}
+              user1Avatar={data.user1Avatar}
+              user2Avatar={data.user2Avatar}
+              user1Score={data.user1Score}
+              user2Score={data.user2Score}
+              type={CardType.Small}
+            />
+          ))}
+        </div>
+        <div className="flex flex-col gap-md">
+          <div className="flex flex-row gap-3xl justify-center">
+            {handleFriendButton()}
+            {handlerGameButton()}
+          </div>
+          <div className="flex flex-row gap-3xl justify-center">
+            {handleBlockButton()}
+            {handlerDmButton()}
+          </div>
+        </div>
+      </div>
+    );
+  }
 };
