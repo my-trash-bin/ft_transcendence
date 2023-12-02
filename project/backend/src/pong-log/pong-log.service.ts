@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { PongGameHistory } from '@prisma/client';
 import { PrismaService } from '../base/prisma.service';
 import { GameHistoryId, UserId } from '../common/Id';
@@ -17,6 +17,7 @@ import {
 
 @Injectable()
 export class PongLogService {
+  private logger = new Logger('PongLogService');
   constructor(private prisma: PrismaService) {}
 
   async findOneByUserId(id: UserId) {
@@ -29,7 +30,6 @@ export class PongLogService {
         player2: true,
       },
     });
-    userLogs[0].player1;
     const filtered = userLogs
       .filter(({ isPlayer1win }) => isPlayer1win !== null)
       .map(({ player1Id, player2Id, isPlayer1win }) => ({
