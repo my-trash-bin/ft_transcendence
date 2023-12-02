@@ -12,7 +12,6 @@ interface SearchCardProps {
 export function SearchCard({ data, refetch }: SearchCardProps) {
   const { api } = useContext(ApiContext);
 
-  // console.log(data.relation);
   function handler() {
     if (!data) return <p>error</p>;
     let handler;
@@ -32,11 +31,7 @@ export function SearchCard({ data, refetch }: SearchCardProps) {
       disabled = true;
     }
     return (
-      <Button
-        isModal={true}
-        disabled={disabled}
-        onClick={!disabled ? handler : undefined}
-      >
+      <Button disabled={disabled} onClick={!disabled ? handler : undefined}>
         {content}
       </Button>
     );
