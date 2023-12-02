@@ -13,6 +13,7 @@ export default <Config>{
       full: '9999px',
     },
     fontWeight: {
+      light: '300',
       normal: '400',
       semibold: '600',
       bold: '700',
@@ -71,6 +72,8 @@ export default <Config>{
         taebaek: ['TAEBAEKfont'],
         jeonju: ['JeonjuCraftGoR'],
         danjo: ['Danjo-bold-Regular'],
+        mayo: ['Dovemayo_gothic'],
+        agro: ['SBAggroB'],
       },
     },
   },

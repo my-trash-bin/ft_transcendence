@@ -32,7 +32,7 @@ export function CommonCard({
   return (
     <div className={`${sizeCSS} ${colorCSS} ${alignCSS}`}>
       <FriendAvatar imageUrl={imageUrl} size={60} onClick={handleModalOpen} />
-      <div className="text-left text-black text-h2 font-semibold absolute left-[100px] font-jeonju">
+      <div className="text-left text-black text-h3 absolute left-[100px] font-light font-agro">
         {nickname}
       </div>
       <div className="absolute right-xl flex items-center">{children}</div>

@@ -1,6 +1,6 @@
 import { cva, type VariantProps } from 'class-variance-authority';
 
-const ButtonCVA = cva(['text-center font-sejong font-semibold'], {
+const ButtonCVA = cva(['text-center font-mayo font-semibold'], {
   variants: {
     size: {
       small: ['w-md h-xs', 'text-md'],
