@@ -3,22 +3,22 @@ import { PongGameHistory } from '@prisma/client';
 import { PrismaService } from '../base/prisma.service';
 import { GameHistoryId, UserId } from '../common/Id';
 import {
+  ServiceResponse,
   newServiceFailPrismaKnownResponse,
   newServiceFailUnhandledResponse,
   newServiceOkResponse,
-  ServiceResponse,
 } from '../common/ServiceResponse';
 import {
+  IsRecordToUpdateNotFoundError,
   createPrismaErrorMessage,
   isRecordNotFoundError,
-  IsRecordToUpdateNotFoundError,
   isUniqueConstraintError,
 } from '../util/prismaError';
 
 @Injectable()
 export class PongLogService {
   private logger = new Logger('PongLogService');
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async findOneByUserId(id: UserId) {
     const userLogs = await this.prisma.pongGameHistory.findMany({
@@ -32,11 +32,23 @@ export class PongLogService {
     });
     const filtered = userLogs
       .filter(({ isPlayer1win }) => isPlayer1win !== null)
-      .map(({ player1Id, player2Id, isPlayer1win }) => ({
-        player1Id,
-        player2Id,
-        isPlayer1win,
-      }));
+      .map(
+        ({
+          player1Id,
+          player2Id,
+          isPlayer1win,
+          player1Score,
+          player2Score,
+          createdAt,
+        }) => ({
+          player1Id,
+          player2Id,
+          isPlayer1win,
+          player1Score,
+          player2Score,
+          createdAt,
+        }),
+      );
     const cal = this.calculateStatistics(filtered, id);
     return {
       userLogs,
@@ -103,7 +115,6 @@ export class PongLogService {
         data: {
           player1Score: data.player1Score,
           player2Score: data.player2Score,
-          updatedAt: new Date(),
         },
       });
       return newServiceOkResponse(result);
@@ -135,8 +146,6 @@ export class PongLogService {
           player1Score: data.player1Score,
           player2Score: data.player2Score,
           isPlayer1win: data.isPlayer1Win,
-          endAt: new Date(),
-          updatedAt: new Date(),
         },
       });
       return newServiceOkResponse(result);
@@ -155,7 +164,10 @@ export class PongLogService {
     userLogs: {
       player1Id: string;
       player2Id: string;
-      isPlayer1win: boolean | null;
+      player1Score: number;
+      player2Score: number;
+      isPlayer1win: boolean;
+      createdAt: Date;
     }[],
     id: UserId,
   ) {

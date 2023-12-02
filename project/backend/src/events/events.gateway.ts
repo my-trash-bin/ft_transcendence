@@ -1,4 +1,4 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import {
@@ -14,10 +14,11 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { v4 as uuidv4 } from 'uuid';
+import { PrismaService } from '../base/prisma.service';
 import { ChangeActionType } from '../channel/channel.service';
-import { GateWayEvents } from '../common/gateway-events.enum';
 import { idOf } from '../common/Id';
-import { GameService, GameState } from '../pong/pong';
+import { GateWayEvents } from '../common/gateway-events.enum';
+import { GameState, Pong } from '../pong/pong';
 import {
   ChannelIdentityDto,
   CreateDmChannelDto,
@@ -42,7 +43,7 @@ export type UserSocket = Socket & {
 };
 
 @WebSocketGateway(80, {
-  cors: { origin: 'http://localhost:53000', credentials: true },
+  cors: { origin: process.env.FRONTEND_ORIGIN, credentials: true },
 })
 @Injectable()
 export class EventsGateway
@@ -50,24 +51,20 @@ export class EventsGateway
     OnGatewayConnection,
     OnGatewayConnection,
     OnGatewayInit,
-    OnModuleInit,
     OnGatewayDisconnect
 {
   @WebSocketServer()
   server!: Server;
 
+  private pongMap: Map<string, Pong>;
+
   constructor(
     private jwtService: JwtService,
     private configService: ConfigService,
     private eventsService: EventsService,
-    private gameService: GameService,
-  ) {}
-
-  // game
-  onModuleInit() {
-    this.gameService.onGameUpdate.on('gameState', (gameState: GameState) => {
-      this.server.emit('gameUpdate', gameState);
-    });
+    private prisma: PrismaService,
+  ) {
+    this.pongMap = new Map();
   }
 
   afterInit(server: Server) {
@@ -239,7 +236,18 @@ export class EventsGateway
     this.server.to('gameRoom').emit('gameStart');
 
     setTimeout(() => {
-      this.gameService.resetGame();
+      const player1Id = player1.data.userId;
+      const player2Id = player2.data.userId;
+      const pong = new Pong(this.prisma, player1Id, player2Id, () => {
+        this.pongMap.delete(player1Id);
+        this.pongMap.delete(player2Id);
+      });
+      pong.onGameUpdate.on('gameState', (gameState: GameState) => {
+        player1.emit('gameUpdate', gameState);
+        player2.emit('gameUpdate', gameState);
+      });
+      this.pongMap.set(player1Id, pong);
+      this.pongMap.set(player2Id, pong);
     }, 3000);
     return roomName;
   }
@@ -247,15 +255,13 @@ export class EventsGateway
   @SubscribeMessage('paddleMove')
   handlePaddleMove(
     @MessageBody()
-    data: { direction: 'up' | 'down'; player: 'player1' | 'player2' },
+    data: boolean,
     @ConnectedSocket() client: Socket,
   ) {
-    this.gameService.handlePaddleMove(data.direction, data.player);
-  }
-
-  @SubscribeMessage('restartGame')
-  handleRestartGame(@ConnectedSocket() client: Socket) {
-    this.gameService.resetGame();
+    const playerId = client.data.userId;
+    const pong = this.pongMap.get(playerId);
+    if (!pong) return;
+    pong.handlePaddleMove(data === true, playerId === pong.player1Id);
   }
 
   // To test

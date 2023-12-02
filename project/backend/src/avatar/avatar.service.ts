@@ -157,7 +157,7 @@ export class AvatarService {
           const filePath = join(this.uploadDir, hashedFileName + '.' + ext);
 
           const returnFilePath = join(
-            'http://localhost:60080',
+            'http://localhost:60080', // TODO: change
             'uploads',
             hashedFileName + '.' + ext,
           );
