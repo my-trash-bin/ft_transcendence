@@ -31,10 +31,8 @@ export function ProfileBox() {
   };
 
   return (
-    <div className="w-[900px] h-xl bg-light-background rounded-lg mb-[30px] relative">
-      <div className="h-[inherit] p-2xl flex flex-row items-center">
-        {renderProfileContent()}
-      </div>
+    <div className="w-[900px] h-xl bg-light-background rounded-lg mb-[30px] relative p-lg flex justify-center items-center">
+      {renderProfileContent()}
     </div>
   );
 
@@ -49,8 +47,8 @@ export function ProfileBox() {
     }
 
     return (
-      <div className="flex flex-row gap-2xl">
-        <div className="flex flex-col justify-center items-center gap-md">
+      <div className="flex flex-row justify-center items-center gap-lg w-[100%] h-[100%]">
+        <div className="flex flex-col justify-center items-center gap-md px-2xl">
           {data.me.profileImageUrl ? (
             <Image
               src={data.me.profileImageUrl}
@@ -68,7 +66,7 @@ export function ProfileBox() {
           )}
           <Button onClick={handleOpenAvatar}>아바타 수정</Button>
         </div>
-        <div className="flex flex-col justify-center items-center gap-md">
+        <div className="flex flex-col justify-between rounded-sm bg-default p-xl w-[50%] h-[100%]">
           <TextBox
             nickname={data.me.nickname}
             // win={data.record.win}
@@ -79,7 +77,9 @@ export function ProfileBox() {
             ratio={3}
             statusMessage={data.me.statusMessage}
           />
-          <Button onClick={handleOpenProfile}>프로필 수정</Button>
+          <div className="self-end">
+            <Button onClick={handleOpenProfile}>프로필 수정</Button>
+          </div>
         </div>
         <ProfileEditModal
           isOpen={profileEditModal}
