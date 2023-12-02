@@ -1,3 +1,4 @@
+import { Title } from '../common/Title';
 import { MessageSearchInput } from '../dm/message-search/MessageSearchInput';
 import { SelectChannel } from './SelectChannel';
 
@@ -14,11 +15,9 @@ export function ChannelInput({
     setSearchChannel(searchInput);
   };
   return (
-    <div className="w-[350px] mb-[20px] pt-lg pl-sm">
+    <div className="w-[350px] mb-[20px] pt-lg pl-sm flex flex-col gap-md">
       <div className="flex flex-row justify-between">
-        <h3 className="text-h2 font-semibold text-dark-gray text-left pb-md">
-          채널
-        </h3>
+        <Title font="big">채널</Title>
         <SelectChannel myChannel={myChannel} setMyChannel={setMyChannel} />
       </div>
       <MessageSearchInput

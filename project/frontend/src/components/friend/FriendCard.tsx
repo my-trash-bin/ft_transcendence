@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { Button } from '../common/Button';
 import { FriendSetting } from './FriendSetting';
 import { CommonCard } from './utils/CommonCard';

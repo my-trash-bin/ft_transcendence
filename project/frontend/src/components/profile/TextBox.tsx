@@ -15,21 +15,19 @@ export const TextBox: React.FC<TextBoxProps> = ({
   statusMessage,
   isModal = false,
 }) => {
-  const paddingClass = isModal ? 'pl-lg' : 'pl-2xl';
-  const textClass = `font-semibold font-mayo text-dark-purple leading-loose' + ${
-    isModal ? 'text-xl' : 'text-h3'
-  }`;
-  const lightClass = 'font-normal text-dark-gray leading-[4]';
+  const textSize = isModal ? 'text-xl' : 'text-h3 leading-[2]';
+  const gapSize = isModal ? 'gap-sm' : 'gap.md';
   return (
-    <div className={paddingClass}>
-      <p className={textClass}>
+    <div className={`${gapSize} flex flex-col font-mayo leading-loose`}>
+      <p className={`${textSize} text-dark-purple`}>
         닉네임: {nickname}
         <br />
         전적 : {win}승 {lose}패 {ratio}%
-        <br />
       </p>
-
-      <p className={lightClass}>{statusMessage}</p>
+      <p className={`${textSize} text-dark-gray`}>
+        상태메세지 <br />
+        {statusMessage === '' ? 'no status message' : statusMessage}
+      </p>
     </div>
   );
 };

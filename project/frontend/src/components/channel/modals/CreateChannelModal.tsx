@@ -75,8 +75,10 @@ export function CreateChannelModal({
       width="500px"
       height="400px"
     >
-      <h2 className="text-[25px] mt-[20px] text-center">채널 생성</h2>
-      <form className="w-[inherit] h-[inherit] pt-[30px] pl-[30px] rounded-sm flex flex-col">
+      <h2 className="text-[25px] mt-[20px] text-center text-dark-purple font-taebaek">
+        채널 생성
+      </h2>
+      <form className="w-[inherit] h-[inherit] pt-[30px] pl-[30px] rounded-sm flex flex-col ">
         <div className="flex">
           <div>
             <h3 className="mb-[25px]">채널 타입 : </h3>

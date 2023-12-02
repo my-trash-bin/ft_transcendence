@@ -37,9 +37,9 @@ export function AllChannelButton({
       <button
         onClick={addUserToChannel}
         className="w-[320px] h-[60px] pl-[15px] pr-[12px]
-     bg-white border border-default rounded-md mb-[10px] shrink-0 flex-row flex items-center justify-between"
+     bg-white border border-default rounded-md mb-[10px] shrink-0 flex-row flex items-center justify-between "
       >
-        <p className="self-center text-dark-gray">{channelName}</p>
+        <p className="self-center text-h3">{channelName}</p>
         <div className="flex items-center">
           {!isPublic ? (
             <Image
@@ -51,7 +51,7 @@ export function AllChannelButton({
           ) : (
             ''
           )}
-          <p className="text-dark-gray ml-[10px]">{state}</p>
+          <p className="text-dark-gray ml-[10px] text-md">{state}</p>
         </div>
       </button>
     </>

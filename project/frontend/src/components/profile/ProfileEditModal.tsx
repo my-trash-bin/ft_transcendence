@@ -37,15 +37,14 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
     try {
       await api.usersControllerUpdate({
         nickname: newData.nickname,
-        // profileImageUrl: newData.profileImageUrl,
-        // statusMessage: newData.statusMessage,
+        statusMessage: newData.statusMessage,
       });
       fetchData();
       onClose();
     } catch (error) {
       console.error('Error saving changes:', error);
     }
-  }, [api, , newData, onClose, fetchData]);
+  }, [api, newData, onClose, fetchData]);
 
   const updatePassword = useCallback(async () => {
     try {
@@ -89,8 +88,7 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
     setPassword(e.target.value);
   };
 
-  const textClass =
-    'font-bold text-xl font-sejong text-dark-purple leading-loose';
+  const textClass = 'font-bold text-xl  text-dark-purple leading-loose';
   return (
     <ModalLayout
       isOpen={isOpen}
@@ -145,7 +143,8 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
               onChange={handlePasswordChange}
               className="bg-[#f3f0f8] border-2 border-dark-purple"
             />
-            <div className="self-end mt-sm">
+            <div className="self-end mt-sm flex flex-row gap-sm">
+              <Button onClick={() => alert('remove 2fa api')}>해제하기</Button>
               <Button disabled={!password} onClick={updatePassword}>
                 설정하기
               </Button>

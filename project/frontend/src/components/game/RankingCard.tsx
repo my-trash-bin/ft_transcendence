@@ -33,7 +33,7 @@ export default function RankingCard({
           color={isUser ? 'color' : 'default'}
         >
           <div className={`${alignCSS}`}>
-            <span className="font-sejong">
+            <span className="">
               {rank}. {name}
             </span>
             <Image

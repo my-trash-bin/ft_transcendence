@@ -4,6 +4,7 @@ import { useCallback } from 'react';
 import { useQuery } from 'react-query';
 import { ModalButtons } from './ModalButtons';
 import { ParticipantCard } from './ParticipantCard';
+import { Title } from '@/components/common/Title';
 
 const getRenderedData = (
   data: any,
@@ -61,20 +62,19 @@ export function ParticipantModal({
   );
 
   return (
-    <>
-      <div className="flex flex-row justify-end pt-[10px] pr-[10px]">
-        <button onClick={closeModal}>
-          <Image
-            alt="close modal"
-            src="/icon/cross-small.svg"
-            width={25}
-            height={25}
-          ></Image>
-        </button>
+    <div className="p-sm">
+      <div className="flex flex-row justify-end">
+        <Image
+          alt="close modal"
+          src="/icon/cross-small.svg"
+          width={25}
+          height={25}
+          onClick={closeModal}
+        ></Image>
       </div>
-      <div className="flex flex-col items-center">
-        <h3 className="text-center mb-[10px]">참여자 목록</h3>
-        <div className="w-[300px] h-[380px] flex flex-col items-center overflow-y-scroll">
+      <div className="flex flex-col items-center gap-md">
+        <Title>참여자 목록</Title>
+        <div className="w-[300px] h-[350px] flex flex-col items-center overflow-y-scroll">
           {renderedData}
         </div>
       </div>
@@ -84,6 +84,6 @@ export function ParticipantModal({
         targetChannelId={channelId}
         closeModal={closeModal}
       />
-    </>
+    </div>
   );
 }
