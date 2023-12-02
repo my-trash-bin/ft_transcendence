@@ -16,4 +16,9 @@ export class UpdateUserDto {
   @ApiPropertyOptional({ description: '프로필 아바타 이미지 주소' })
   @IsOptional()
   profileImageUrl?: string;
+
+  @ApiPropertyOptional({ description: '프로필 상태 메세지' })
+  @IsString()
+  @IsOptional()
+  statusMessage?: string;
 }
