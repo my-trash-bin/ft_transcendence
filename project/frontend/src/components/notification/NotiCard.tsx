@@ -70,12 +70,12 @@ export const NotiCard: React.FC<NotiCardProps> = ({ content }) => {
       onMouseLeave={handleMouseLeave}
       onClick={() => handlerFunction()}
     >
-      <div className={`relative ${isHovered ? 'hidden' : 'block'} font-sejong`}>
+      <div className={`relative ${isHovered ? 'hidden' : 'block'} `}>
         <strong>{obj.sourceName}</strong>
         {notificationContent}
       </div>
       <div
-        className={`absolute text-lg font-semibold font-sejong ${
+        className={`absolute text-lg font-semibold  ${
           isHovered ? 'block' : 'hidden'
         } bg-light-purple p-2`}
       >

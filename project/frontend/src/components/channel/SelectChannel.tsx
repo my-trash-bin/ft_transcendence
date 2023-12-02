@@ -16,7 +16,7 @@ export function SelectChannel({
     setMyChannel(false);
   };
   return (
-    <div className="w-[270px] h-[50px] flex flex-row items-center justify-end mr-md">
+    <div className="h-[50px] flex flex-row items-center justify-end mr-md ">
       <div className="pr-sm">
         <div className="w-[140px] h-[30px] pl-[7px] pr-[7px] bg-default rounded-[20px] flex flex-row justify-center gap-sm items-center">
           <button

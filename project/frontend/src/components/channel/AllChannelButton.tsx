@@ -37,7 +37,7 @@ export function AllChannelButton({
       <button
         onClick={addUserToChannel}
         className="w-[320px] h-[60px] pl-[15px] pr-[12px]
-     bg-white border border-default rounded-md mb-[10px] shrink-0 flex-row flex items-center justify-between"
+     bg-white border border-default rounded-md mb-[10px] shrink-0 flex-row flex items-center justify-between "
       >
         <p className="self-center text-dark-gray">{channelName}</p>
         <div className="flex items-center">

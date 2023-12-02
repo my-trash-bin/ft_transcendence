@@ -75,7 +75,7 @@ export default function ChooseNickname({
           },
         }}
       />
-      <h2 className="font-sejong mb-xl">1. 사용하실 닉네임을 입력하세요.</h2>
+      <h2 className=" mb-xl">1. 사용하실 닉네임을 입력하세요.</h2>
       <div className="flex flex-col">
         <div className="flex flex-row">
           <div className="flex flex-col">

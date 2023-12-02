@@ -19,7 +19,7 @@ export function MyChannelButton({
   const state = now + '/' + max;
   return (
     <Link href={`/channel/${id}`}>
-      <button className="w-[320px] h-[90px] bg-white border border-default rounded-md shrink-0 p-sm pl-md">
+      <button className="w-[320px] h-[90px] bg-white border border-default rounded-md shrink-0 p-sm pl-md ">
         <div className="flex flex-col h-[100%] justify-between">
           <div className="flex flex-row justify-between items-center">
             <p className="text-[22px] text-left">{channelName}</p>
