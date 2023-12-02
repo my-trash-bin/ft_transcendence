@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { useCallback, useContext, useState, useEffect } from 'react';
+import { useCallback, useContext, useState } from 'react';
 import { useQuery } from 'react-query';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { ProfileEditModal } from './ProfileEditModal';
@@ -57,16 +57,23 @@ export function ProfileBox() {
             height={150}
           />
         )}
-        <TextBox
-          nickname={data.me.nickname}
-          // win={data.record.win}
-          // lose={data.record.win}
-          // ratio={data.record.win}
-          win={3}
-          lose={3}
-          ratio={3}
-          statusMessage={data.me.statusMessage}
-        />
+        <div className="flex flex-col">
+          <TextBox
+            nickname={data.me.nickname}
+            // win={data.record.win}
+            // lose={data.record.win}
+            // ratio={data.record.win}
+            win={3}
+            lose={3}
+            ratio={3}
+            statusMessage={data.me.statusMessage}
+          />
+          <p className="font-mayo">This is mayo 이것이 마요다 - 버튼용</p>
+          <p className="font-agro">This is agro 이것이 어그로다 - 닉네임용</p>
+          <p className="font-sejong">
+            This is sejong 이것이 세종이다 - 텍스트용
+          </p>
+        </div>
         <Button onClick={handleButtonClick} size={'big'}>
           프로필 수정
         </Button>

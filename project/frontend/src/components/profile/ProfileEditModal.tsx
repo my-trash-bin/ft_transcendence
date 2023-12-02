@@ -49,12 +49,16 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
 
   const updatePassword = useCallback(async () => {
     try {
-      alert('call api to set 2fa password');
       await api.usersControllerSetTwoFactorPassword({
         password: password,
       });
       onClose();
     } catch (error) {
+      if (error.status === 400) {
+        alert(
+          '비밀번호는 6-12자의 영문, 숫자, 하이픈(-), 언더스코어(_)만 사용 가능합니다',
+        );
+      }
       console.error('Error send password:', error);
     }
   }, [onClose, api, password]);

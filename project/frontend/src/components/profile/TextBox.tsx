@@ -28,9 +28,7 @@ export const TextBox: React.FC<TextBoxProps> = ({
         전적 : {win}승 {lose}패 {ratio}%
         <br />
       </p>
-      <p className="font-mayo">This is mayo 이것이 마요다 - 버튼용</p>
-      <p className="font-agro">This is agro 이것이 어그로다 - 닉네임용</p>
-      <p className="font-sejong">This is sejong 이것이 세종이다 - 텍스트용</p>
+
       <p className={lightClass}>{statusMessage}</p>
     </div>
   );
