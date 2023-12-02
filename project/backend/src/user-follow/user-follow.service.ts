@@ -120,7 +120,7 @@ export class UserFollowService {
             followerId: followerId.value,
             followeeId: followeeId.value,
           },
-          isBlock: true,
+          isBlock,
         },
       });
       return userFollow;
