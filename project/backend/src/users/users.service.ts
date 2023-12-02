@@ -205,11 +205,13 @@ export class UsersService {
       (prismaUser) =>
         new UserRelationshipDto(
           prismaUser,
-          this.getRelation(
-            prismaUser.followedBy.length === 0
-              ? undefined
-              : prismaUser.followedBy[0].isBlock,
-          ),
+          prismaUser.id === id.value
+            ? RelationStatus.Me
+            : this.getRelation(
+                prismaUser.followedBy.length === 0
+                  ? undefined
+                  : prismaUser.followedBy[0].isBlock,
+              ),
         ),
     );
   }
@@ -221,6 +223,7 @@ export class UsersService {
         data: {
           nickname: updateUserDto.nickname,
           profileImageUrl: updateUserDto.profileImageUrl,
+          statusMessage: updateUserDto.statusMessage,
         },
       });
       return new UserDto(prismaUser);
