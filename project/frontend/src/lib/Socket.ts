@@ -5,7 +5,7 @@ let socket: Socket | null = null;
 
 export function getSocket() {
   if (!socket) {
-    socket = io('http://localhost:80', {
+    socket = io(process.env.NEXT_PUBLIC_WS_ENDPOINT as string, {
       reconnectionAttempts: 0,
       withCredentials: true,
     });
