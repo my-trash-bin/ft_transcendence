@@ -15,13 +15,13 @@ export const TextBox: React.FC<TextBoxProps> = ({
   statusMessage,
   isModal = false,
 }) => {
-  const paddingClass = isModal ? 'pl-lg' : 'pl-2xl';
+  const paddingClass = isModal ? 'pl-lg' : '';
   const textClass = `font-semibold font-mayo text-dark-purple leading-loose' + ${
     isModal ? 'text-xl' : 'text-h3'
   }`;
   const lightClass = 'font-normal text-dark-gray leading-[4]';
   return (
-    <div className={paddingClass}>
+    <div className={`h-[150px] ${paddingClass}`}>
       <p className={textClass}>
         닉네임: {nickname}
         <br />

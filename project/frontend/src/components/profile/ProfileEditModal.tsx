@@ -37,7 +37,6 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
     try {
       await api.usersControllerUpdate({
         nickname: newData.nickname,
-        // profileImageUrl: newData.profileImageUrl,
         // statusMessage: newData.statusMessage,
       });
       fetchData();

@@ -6,20 +6,28 @@ import { ProfileEditModal } from './ProfileEditModal';
 import { TextBox } from './TextBox';
 import { Loading } from '../common/Loading';
 import { Button } from '../common/Button';
+import { AvatarEditModal } from './AvatarEditModal';
 
 export function ProfileBox() {
   const { api } = useContext(ApiContext);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [profileEditModal, setProfileEditModal] = useState(false);
+  const [avatarEditModal, setAvatarEditModal] = useState(false);
   const { isLoading, isError, data, refetch } = useQuery(
     [],
     useCallback(async () => (await api.usersControllerMyProfile()).data, [api]),
   );
 
-  const handleButtonClick = () => {
-    setIsModalOpen(true);
+  const handleOpenProfile = () => {
+    setProfileEditModal(true);
   };
-  const handleModalClose = () => {
-    setIsModalOpen(false);
+  const handleCloseProfile = () => {
+    setProfileEditModal(false);
+  };
+  const handleOpenAvatar = () => {
+    setAvatarEditModal(true);
+  };
+  const handleCloseAvatar = () => {
+    setAvatarEditModal(false);
   };
 
   return (
@@ -41,23 +49,26 @@ export function ProfileBox() {
     }
 
     return (
-      <div className="flex flex-row ">
-        {data.me.profileImageUrl ? (
-          <Image
-            src={data.me.profileImageUrl}
-            alt="avatar"
-            width={150}
-            height={150}
-          />
-        ) : (
-          <Image
-            src={'/avatar/avatar-black.svg'}
-            alt="avatar"
-            width={150}
-            height={150}
-          />
-        )}
-        <div className="flex flex-col">
+      <div className="flex flex-row gap-2xl">
+        <div className="flex flex-col justify-center items-center gap-md">
+          {data.me.profileImageUrl ? (
+            <Image
+              src={data.me.profileImageUrl}
+              alt="avatar"
+              width={150}
+              height={150}
+            />
+          ) : (
+            <Image
+              src={'/avatar/avatar-black.svg'}
+              alt="avatar"
+              width={150}
+              height={150}
+            />
+          )}
+          <Button onClick={handleOpenAvatar}>아바타 수정</Button>
+        </div>
+        <div className="flex flex-col justify-center items-center gap-md">
           <TextBox
             nickname={data.me.nickname}
             // win={data.record.win}
@@ -68,18 +79,17 @@ export function ProfileBox() {
             ratio={3}
             statusMessage={data.me.statusMessage}
           />
-          <p className="font-mayo">This is mayo 이것이 마요다 - 버튼용</p>
-          <p className="font-agro">This is agro 이것이 어그로다 - 닉네임용</p>
-          <p className="font-sejong">
-            This is sejong 이것이 세종이다 - 텍스트용
-          </p>
+          <Button onClick={handleOpenProfile}>프로필 수정</Button>
         </div>
-        <Button onClick={handleButtonClick} size={'big'}>
-          프로필 수정
-        </Button>
         <ProfileEditModal
-          isOpen={isModalOpen}
-          onClose={handleModalClose}
+          isOpen={profileEditModal}
+          onClose={handleCloseProfile}
+          fetchData={refetch}
+          defaultData={data}
+        />
+        <AvatarEditModal
+          isOpen={avatarEditModal}
+          onClose={handleCloseAvatar}
           fetchData={refetch}
           defaultData={data}
         />
