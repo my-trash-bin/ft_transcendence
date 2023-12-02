@@ -43,7 +43,7 @@ export type UserSocket = Socket & {
 };
 
 @WebSocketGateway(80, {
-  cors: { origin: 'http://localhost:53000', credentials: true },
+  cors: { origin: process.env.FRONTEND_ORIGIN, credentials: true },
 })
 @Injectable()
 export class EventsGateway
