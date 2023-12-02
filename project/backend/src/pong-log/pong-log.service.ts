@@ -4,7 +4,7 @@ import { UserId } from '../common/Id';
 
 @Injectable()
 export class PongLogService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async findOne(id: UserId) {
     const userLogs = await this.prisma.pongGameHistory.findMany({
@@ -31,8 +31,6 @@ export class PongLogService {
       player2Score: number;
       isPlayer1win: boolean;
       createdAt: Date;
-      endAt: Date;
-      updatedAt: Date;
     }[],
     id: UserId,
   ) {

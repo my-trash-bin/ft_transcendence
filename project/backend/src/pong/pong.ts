@@ -1,6 +1,6 @@
 // events.game.ts
-import { Injectable } from '@nestjs/common';
 import { EventEmitter } from 'events';
+import { PrismaService } from '../base/prisma.service';
 
 // 게임 상수
 const BOARD_WIDTH = 800;
@@ -11,67 +11,70 @@ const BALL_SIZE = 15;
 const DEFAULT_SPEED = 3;
 const SMASH_SPEED = 8;
 const PADDLE_STRIKE = 4;
-const PADDLE_MOVE_STEP = 20; 
+const PADDLE_MOVE_STEP = 20;
 // const PADDLE_MOVE_STEP = 0.5; // 움직임의 단계 크기 증가
 
 export interface GameState {
   ball: { x: number; y: number };
   velocity: { x: number; y: number };
-  paddle1: { x: number, y: number };
-  paddle2: { x: number, y: number };
+  paddle1: { x: number; y: number };
+  paddle2: { x: number; y: number };
   score1: number;
   score2: number;
   gameOver: boolean;
   gameStart: boolean;
 }
 
-@Injectable()
-export class GameService {
+export class Pong {
   readonly onGameUpdate = new EventEmitter();
 
-  private gameState: GameState = {
-    ball: { x: BOARD_WIDTH / 2 - BALL_SIZE / 2, y: BOARD_HEIGHT / 2 - BALL_SIZE / 2 },
-    velocity: { x: DEFAULT_SPEED, y: DEFAULT_SPEED / 2 },
-    paddle1: { x: PADDLE_WIDTH + 10, y: 200 },
-    paddle2: { x: BOARD_WIDTH - PADDLE_WIDTH - 10, y: 200 },
-    score1: 0,
-    score2: 0,
-    gameOver: false,
-    gameStart: false,
-  };
+  private gameState: GameState;
 
-  constructor() {
+  constructor(
+    private readonly prisma: PrismaService,
+    public readonly player1Id: string,
+    public readonly player2Id: string,
+    private readonly onEnd: () => void,
+  ) {
+    this.player1Id = player1Id;
+    this.player2Id = player2Id;
+    this.gameState = {
+      ball: {
+        x: BOARD_WIDTH / 2 - BALL_SIZE / 2,
+        y: BOARD_HEIGHT / 2 - BALL_SIZE / 2,
+      },
+      velocity: { x: DEFAULT_SPEED, y: DEFAULT_SPEED / 2 },
+      paddle1: { x: PADDLE_WIDTH + 10, y: 200 },
+      paddle2: { x: BOARD_WIDTH - PADDLE_WIDTH - 10, y: 200 },
+      score1: 0,
+      score2: 0,
+      gameOver: false,
+      gameStart: true,
+    };
+    this.resetPosition();
+    this.onGameUpdate.emit('gameState', this.gameState);
     this.startGameLoop();
   }
 
-  resetGame() {
-    this.gameState.score1 = 0;
-    this.gameState.score2 = 0;
-    this.gameState.gameOver = false;
-    this.gameState.gameStart = true;
-    this.resetPosition();
-    this.onGameUpdate.emit('gameState', this.gameState);
-  }
-  
   private startGameLoop() {
-    console.log("startGameLoop")
+    console.log('startGameLoop');
     if (this.gameState.gameOver) {
       return;
     }
-    setInterval(() => {
-      this.updateGameLogic();
-    }, 1000 / 60); // 초당 60번 업데이트
+    const interval = setInterval(() => {
+      if (this.updateGameLogic()) clearInterval(interval);
+    }, 1000 / 60);
   }
-  
-  handlePaddleMove(direction: 'up' | 'down', player: 'player1' | 'player2') {
-    const deltaY = direction === 'up' ? -PADDLE_MOVE_STEP : PADDLE_MOVE_STEP;
-    
-    const paddle = player === 'player1' ? this.gameState.paddle1 : this.gameState.paddle2;
+
+  handlePaddleMove(directionIsUp: boolean, player1: boolean) {
+    const deltaY = directionIsUp ? -PADDLE_MOVE_STEP : PADDLE_MOVE_STEP;
+
+    const paddle = player1 ? this.gameState.paddle1 : this.gameState.paddle2;
     const newY = this.checkPaddleBounds(paddle.y + deltaY);
     paddle.y = newY;
     this.checkPaddleCollisions();
     this.onGameUpdate.emit('gameState', this.gameState);
-}
+  }
 
   private checkPaddleBounds(paddleY: number): number {
     const minY = 0;
@@ -83,7 +86,7 @@ export class GameService {
     return this.gameState;
   }
 
-  private updateGameLogic() {
+  private updateGameLogic(): boolean {
     // 공의 위치 업데이트
     this.gameState.ball.x += this.gameState.velocity.x;
     this.gameState.ball.y += this.gameState.velocity.y;
@@ -97,16 +100,24 @@ export class GameService {
     // 게임 업데이트
     this.onGameUpdate.emit('gameState', this.gameState);
     // console.log('After update:', this.gameState);
+
+    return this.gameState.gameOver;
   }
 
   private checkBoundaries() {
     // X축 경계 체크
-    if (this.gameState.ball.x < 4 || this.gameState.ball.x > BOARD_WIDTH - BALL_SIZE - 4) {
+    if (
+      this.gameState.ball.x < 4 ||
+      this.gameState.ball.x > BOARD_WIDTH - BALL_SIZE - 4
+    ) {
       this.handleXAxisBoundary();
     }
 
     // Y축 경계 체크
-    if (this.gameState.ball.y < 0 || this.gameState.ball.y > BOARD_HEIGHT - BALL_SIZE - 4) {
+    if (
+      this.gameState.ball.y < 0 ||
+      this.gameState.ball.y > BOARD_HEIGHT - BALL_SIZE - 4
+    ) {
       this.gameState.velocity.y = -this.gameState.velocity.y;
     }
   }
@@ -134,35 +145,59 @@ export class GameService {
   private resetPosition() {
     this.gameState.ball.x = BOARD_WIDTH / 2 - BALL_SIZE / 2;
     this.gameState.ball.y = BOARD_HEIGHT / 2 - BALL_SIZE / 2;
-    this.gameState.velocity.x = DEFAULT_SPEED * (this.gameState.velocity.x < 0 ? -1 : 1);
+    this.gameState.velocity.x =
+      DEFAULT_SPEED * (this.gameState.velocity.x < 0 ? -1 : 1);
     this.gameState.velocity.y = DEFAULT_SPEED / 2;
     this.gameState.paddle1.y = 200;
     this.gameState.paddle2.y = 200;
   }
 
   private checkGameOver() {
-    if (this.gameState.score1 === 11 || this.gameState.score2 === 11) {
+    if (
+      !this.gameState.gameOver &&
+      (this.gameState.score1 === 11 || this.gameState.score2 === 11)
+    ) {
       this.gameState.gameOver = true;
       this.onGameUpdate.emit('gameState', this.gameState);
+      this.prisma.pongGameHistory.create({
+        data: {
+          player1Id: this.player1Id,
+          player2Id: this.player2Id,
+          player1Score: this.gameState.score1,
+          player2Score: this.gameState.score2,
+          isPlayer1win: this.gameState.score1 === 11,
+        },
+      });
+      this.onEnd();
     }
   }
 
   private checkPaddleCollisions() {
     // 플레이어 1의 패들과의 충돌 체크
     const paddle1Center = this.gameState.paddle1.y + PADDLE_HEIGHT / 2;
-    if (this.gameState.ball.x <= this.gameState.paddle1.x &&
-        this.gameState.ball.y + BALL_SIZE >= this.gameState.paddle1.y &&
-        this.gameState.ball.y <= this.gameState.paddle1.y + PADDLE_HEIGHT) {
-      this.gameState.velocity.x = this.checkSmash(paddle1Center, this.gameState.ball.y);
+    if (
+      this.gameState.ball.x <= this.gameState.paddle1.x &&
+      this.gameState.ball.y + BALL_SIZE >= this.gameState.paddle1.y &&
+      this.gameState.ball.y <= this.gameState.paddle1.y + PADDLE_HEIGHT
+    ) {
+      this.gameState.velocity.x = this.checkSmash(
+        paddle1Center,
+        this.gameState.ball.y,
+      );
       this.gameState.ball.x = PADDLE_WIDTH + BALL_SIZE;
     }
 
     // 플레이어 2의 패들과의 충돌 체크
     const paddle2Center = this.gameState.paddle2.y + PADDLE_HEIGHT / 2;
-    if (this.gameState.ball.x + BALL_SIZE >= this.gameState.paddle2.x &&
-        this.gameState.ball.y + BALL_SIZE >= this.gameState.paddle2.y &&
-        this.gameState.ball.y <= this.gameState.paddle2.y + PADDLE_HEIGHT) {
-      this.gameState.velocity.x = -this.checkSmash(paddle2Center, this.gameState.ball.y);
+    if (
+      this.gameState.ball.x + BALL_SIZE >= this.gameState.paddle2.x &&
+      this.gameState.ball.y + BALL_SIZE >= this.gameState.paddle2.y &&
+      this.gameState.ball.y <= this.gameState.paddle2.y + PADDLE_HEIGHT
+    ) {
+      this.gameState.velocity.x = -this.checkSmash(
+        paddle2Center,
+        this.gameState.ball.y,
+      );
       this.gameState.ball.x = BOARD_WIDTH - PADDLE_WIDTH - BALL_SIZE * 2;
     }
   }
@@ -172,4 +207,3 @@ export class GameService {
     return deltaY < PADDLE_HEIGHT / PADDLE_STRIKE ? SMASH_SPEED : DEFAULT_SPEED;
   }
 }
-
