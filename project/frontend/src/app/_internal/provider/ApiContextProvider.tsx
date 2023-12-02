@@ -3,7 +3,7 @@
 import { usePersist } from '@-ft/use-persist';
 import { PropsWithChildren } from 'react';
 
-import { Api, ApiConfig } from '../../../api/api';
+import { ApiConfig } from '@/api/api';
 import { ApiContext } from './ApiContext';
 
 async function customFetch(
