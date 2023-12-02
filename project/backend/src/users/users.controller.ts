@@ -143,7 +143,9 @@ export class UsersController {
       throw new NotFoundException('Invalid Id. (targetUser)');
     }
     const relation = await this.getRelation(userId.value, targetUserId);
-    const userLogs = await this.pongLogService.findOne(idOf(targetUserId));
+    const userLogs = await this.pongLogService.findOneByUserId(
+      idOf(targetUserId),
+    );
 
     const record = {
       win: userLogs.wins,
