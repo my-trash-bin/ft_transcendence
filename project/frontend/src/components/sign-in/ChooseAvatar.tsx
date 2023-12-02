@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '../common/Button';
 import { SelectAvatar } from './SelectAvatar';
 
@@ -14,27 +14,30 @@ export default function ChooseAvatar({
   avatars,
   onChooseClick,
 }: ChooseAvatarProps) {
-  const [selectedAvatar, setSelectedAvatar] = useState<any>(null);
+  const [selectedAvatar, setSelectedAvatar] = useState<string>(() => '');
   const [uploadImage, setUploadImage] = useState<any>(null);
 
   const handleFileChange = async (event: any) => {
     const selectedFile = event.target.files[0];
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      if (e.target) {
-        setUploadImage(e.target.result);
-        setSelectedAvatar(e.target.result);
-      }
-    };
-    reader.readAsDataURL(selectedFile);
-    console.log('uploadImage1: ', uploadImage);
-    // console.log('selectedFile: ', selectedFile);
-
     if (!selectedFile) {
       alert('Please select a file.');
       return;
     }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (e.target) {
+        setUploadImage(e.target.result);
+      }
+    };
+    reader.readAsDataURL(selectedFile);
+    await callApi(selectedFile);
+  };
+
+  useEffect(() => {
+    console.log('Selected Avatar:', selectedAvatar);
+  }, [selectedAvatar]);
+
+  async function callApi(selectedFile: any) {
     try {
       const response = await fetch('/api/v1/avatar/upload', {
         method: 'POST',
@@ -43,16 +46,17 @@ export default function ChooseAvatar({
           'Content-Type': selectedFile.type,
         },
       });
-      console.log('uploadImage2: ', uploadImage);
       if (response.ok) {
         console.log('Upload image successfully');
+        const responseData = await response.json();
+        setSelectedAvatar(responseData.filePath);
       } else {
         console.error('Error uploading file...');
       }
     } catch (error) {
       console.error('Error uploading file:', error);
     }
-  };
+  }
   return (
     <div className="w-2xl h-[400px] bg-light-background rounded-lg flex flex-col justify-center items-center px-2xl">
       <h2 className="font-bold mb-lg">2. 사용하실 아바타를 선택하세요.</h2>
@@ -67,7 +71,7 @@ export default function ChooseAvatar({
         ))}
         <div
           className={`${
-            uploadImage === selectedAvatar && uploadImage
+            uploadImage
               ? 'border-dark-purple'
               : 'border-default hover:border-dark-gray hover:bg-light-background'
           }  w-lg h-lg border-3`}

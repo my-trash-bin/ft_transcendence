@@ -8,15 +8,23 @@ export enum messageType {
   CHANNEL = 'CHANNEL',
 }
 interface messageContent {
-  id: string;
-  message: string;
-  time: Date;
-  profileImage: string;
-  targetNickname: string;
-  targetId: string;
+  type: string;
+  data: {
+    id: string;
+    messageJson: string;
+    sentAt: Date;
+    member: {
+      id: string;
+      nickname: string;
+      profileImageUrl: string;
+    };
+  };
 }
 
-export function MessageContent({ type }: Readonly<{ type: messageType }>) {
+export function MessageContent({
+  type,
+  myNickname,
+}: Readonly<{ type: messageType; myNickname: string }>) {
   const [messages, setMessages] = useState<messageContent[]>([]);
   const messageEndRef = useRef<HTMLDivElement>(null);
 
@@ -29,33 +37,13 @@ export function MessageContent({ type }: Readonly<{ type: messageType }>) {
 
     if (type === messageType.DM) {
       socket.on(`directMessage`, (res) => {
-        const data = {
-          id: res.id,
-          message: res.messageJson,
-          time: new Date(res.sentAt),
-          profileImage: res.member.profileImageUrl,
-          targetId: res.memberId,
-          targetNickname: res.member.nickname,
-        };
-        console.log(res);
-        setMessages((messages) => [...messages, data]);
+        setMessages((messages) => [...messages, res]);
       });
     } else {
       socket.on(`channelMessage`, (res) => {
-        console.log(res);
-        // const data = {
-        //   id: res.id,
-        //   message: res.messageJson,
-        //   time: new Date(res.sentAt),
-        //   profileImage: res.member.profileImageUrl,
-        //   targetId: res.memberId,
-        //   targetNickname: res.member.nickname,
-        // };
-        // setMessages((messages) => [...messages, data]);
+        setMessages((messages) => [...messages, res]);
       });
       socket.on('leave', (res) => {
-        const me: string | null = localStorage.getItem('me');
-        const myNickname = me ? JSON.parse(me).nickname : '';
         console.log(res);
       });
     }
@@ -70,23 +58,39 @@ export function MessageContent({ type }: Readonly<{ type: messageType }>) {
     };
   }, [type]);
 
-  const me: string | null = localStorage.getItem('me');
-  const myNickname = me ? JSON.parse(me).nickname : '';
   return (
     <div className="w-[95%] h-[610px] pt-[20px] bg-chat-color2 rounded-[10px] flex flex-col overflow-y-scroll mt-sm">
       {messages.map((message, idx) => {
-        if (message.targetNickname === myNickname) {
-          return <MyChat key={message.id} {...message} />;
+        if (message.type === 'leave') {
+        } else if (message.data.member.nickname === myNickname) {
+          return (
+            <MyChat
+              key={message.data.id}
+              message={message.data.messageJson}
+              time={new Date(message.data.sentAt)}
+            />
+          );
         } else {
           let isFirst = false;
           if (
             idx == 0 ||
             (idx != 0 &&
-              messages[idx - 1].targetNickname != message.targetNickname)
+              messages[idx - 1].data.member.nickname !=
+                message.data.member.nickname)
           ) {
             isFirst = true;
           }
-          return <OtherChat key={message.id} {...message} isFirst={isFirst} />;
+          return (
+            <OtherChat
+              key={message.data.id}
+              time={new Date(message.data.sentAt)}
+              message={message.data.messageJson}
+              profileImage={message.data.member.profileImageUrl}
+              targetId={message.data.member.id}
+              targetNickname={message.data.member.nickname}
+              isFirst={isFirst}
+            />
+          );
         }
       })}
       <div ref={messageEndRef}></div>

@@ -11,12 +11,14 @@ export const badge = cva(
     'duration-300',
     'ease-in-out',
     'cursor-pointer',
+    'font-sejong',
+    'font-semibold text-center',
   ],
   {
     variants: {
       size: {
-        default: ['font-semibold text-center text-xl'],
-        small: ['font-semibold text-center text-lg'],
+        default: ['text-xl'],
+        small: ['text-lg'],
       },
     },
     defaultVariants: {

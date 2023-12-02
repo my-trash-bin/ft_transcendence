@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 import { ChangeActionType } from '../channel/channel.service';
 
-export class ChannelMessageDto {
+export class SendMessageDto {
   @IsUUID()
   channelId!: string;
 

@@ -6,6 +6,16 @@ export class UserDto {
   @ApiProperty({ description: '사용자 ID', type: String, format: 'uuid' })
   id!: string;
 
+  @ApiProperty({ description: '가입 시기', type: Date })
+  joinedAt: Date;
+
+  @ApiProperty({ description: '탈퇴 여부', type: Boolean })
+  isLeaved: boolean;
+
+  // @ApiPropertyOptional({ description: '탈퇴 시기' }), 옵셔널
+  @ApiProperty({ description: '탈퇴 시기', required: false, type: Date })
+  leavedAt: Date | null;
+
   @ApiProperty({ description: '닉네임', type: String })
   @IsString()
   nickname: string;
@@ -16,16 +26,6 @@ export class UserDto {
     type: String,
   })
   profileImageUrl: string | null;
-
-  @ApiProperty({ description: '가입 시기', type: Date })
-  joinedAt: Date;
-
-  @ApiProperty({ description: '탈퇴 여부', type: Boolean })
-  isLeaved: boolean;
-
-  // @ApiPropertyOptional({ description: '탈퇴 시기' }), 옵셔널
-  @ApiProperty({ description: '탈퇴 시기', required: false, type: Date })
-  leavedAt: Date | null;
 
   @ApiProperty({ description: '상태 메시지' })
   statusMessage!: string;
@@ -46,7 +46,7 @@ export class UserDto {
   }
 }
 
-export const userSelect = {
+export const userDtoSelect = {
   id: true,
   joinedAt: true,
   isLeaved: true,

@@ -1,8 +1,21 @@
-import { ConflictException, Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { ChannelMemberType, Prisma } from '@prisma/client';
+import { scrypt } from 'node:crypto';
 import { PrismaService } from '../base/prisma.service';
 import { UserId } from '../common/Id';
-import { isUniqueConstraintError } from '../util/isUniqueConstraintError';
+import {
+  createPrismaErrorMessage,
+  isPrismaUnknownError,
+  isRecordNotFoundError,
+  IsRecordToUpdateNotFoundError,
+  isUniqueConstraintError,
+} from '../util/prismaError';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { RelationStatus } from './dto/user-profile.dto';
@@ -11,11 +24,111 @@ import { UserDto } from './dto/user.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private readonly configService: ConfigService,
+  ) {}
 
   async me(id: UserId) {
-    const user = await this.prisma.user.findUnique({ where: { id: id.value } });
-    return user ? new UserDto(user) : null;
+    try {
+      const followings = await this.prisma.userFollow.findMany({
+        where: {
+          followerId: id.value,
+        },
+      });
+      const blockList = followings
+        .filter(({ isBlock }) => isBlock)
+        .map((el) => el.followeeId);
+      const friends = followings
+        .filter(({ isBlock }) => !isBlock)
+        .map((el) => el.followeeId);
+      const superMe = await this.prisma.user.findUniqueOrThrow({
+        where: { id: id.value },
+        select: {
+          id: true,
+          joinedAt: true,
+          isLeaved: true,
+          nickname: true,
+          profileImageUrl: true,
+          statusMessage: true,
+          following: true,
+          achievements: true,
+          notifications: true,
+          channels: {
+            where: {
+              NOT: { memberType: ChannelMemberType.BANNED },
+            },
+            include: {
+              channel: {
+                select: {
+                  id: true,
+                  title: true,
+                  isPublic: true,
+                  password: true,
+                  createdAt: true,
+                  lastActiveAt: true,
+                  ownerId: true,
+                  memberCount: true,
+                  maximumMemberCount: true,
+                  members: true,
+                  messages: {
+                    where: {
+                      memberId: { notIn: blockList },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          dmChannel1: {
+            where: {
+              AND: [
+                {
+                  member1Id: {
+                    notIn: blockList,
+                  },
+                  member2Id: {
+                    notIn: blockList,
+                  },
+                },
+              ],
+            },
+            include: {
+              DMMessage: true,
+            },
+          },
+          dmChannel2: {
+            where: {
+              AND: [
+                {
+                  member1Id: {
+                    notIn: blockList,
+                  },
+                  member2Id: {
+                    notIn: blockList,
+                  },
+                },
+              ],
+            },
+            include: {
+              DMMessage: true,
+            },
+          },
+        },
+      });
+      return superMe;
+    } catch (error) {
+      if (
+        IsRecordToUpdateNotFoundError(error) ||
+        isRecordNotFoundError(error)
+      ) {
+        throw new BadRequestException(createPrismaErrorMessage(error));
+      }
+      if (isPrismaUnknownError(error)) {
+        throw new InternalServerErrorException(createPrismaErrorMessage(error));
+      }
+      throw error;
+    }
   }
 
   async create(createUserDto: CreateUserDto): Promise<UserDto> {
@@ -26,14 +139,16 @@ export class UsersService {
           profileImageUrl: createUserDto.profileImageUrl,
         },
       });
-      return new UserDto(prismaUser);
+      return prismaUser;
     } catch (error) {
       if (isUniqueConstraintError(error)) {
-        throw new ConflictException(
-          `Error: Unique constraint failed on the (${
-            error?.meta?.target ?? 'something'
-          }) fields`,
-        );
+        throw new ConflictException(createPrismaErrorMessage(error));
+      }
+      if (IsRecordToUpdateNotFoundError(error)) {
+        throw new BadRequestException(createPrismaErrorMessage(error));
+      }
+      if (isPrismaUnknownError(error)) {
+        throw new InternalServerErrorException(createPrismaErrorMessage(error));
       }
       throw error;
     }
@@ -90,11 +205,13 @@ export class UsersService {
       (prismaUser) =>
         new UserRelationshipDto(
           prismaUser,
-          this.getRelation(
-            prismaUser.followedBy.length === 0
-              ? undefined
-              : prismaUser.followedBy[0].isBlock,
-          ),
+          prismaUser.id === id.value
+            ? RelationStatus.Me
+            : this.getRelation(
+                prismaUser.followedBy.length === 0
+                  ? undefined
+                  : prismaUser.followedBy[0].isBlock,
+              ),
         ),
     );
   }
@@ -106,16 +223,37 @@ export class UsersService {
         data: {
           nickname: updateUserDto.nickname,
           profileImageUrl: updateUserDto.profileImageUrl,
+          statusMessage: updateUserDto.statusMessage,
         },
       });
       return new UserDto(prismaUser);
     } catch (error) {
+      if (
+        IsRecordToUpdateNotFoundError(error) ||
+        isRecordNotFoundError(error)
+      ) {
+        throw new BadRequestException(createPrismaErrorMessage(error));
+      }
       if (isUniqueConstraintError(error)) {
-        throw new ConflictException(
-          `Error: Unique constraint failed on the (${
-            error?.meta?.target ?? 'something'
-          }) fields`,
-        );
+        throw new ConflictException(createPrismaErrorMessage(error));
+      }
+      throw error;
+    }
+  }
+
+  async setTwoFactorPassword(id: UserId, password: string) {
+    const mfaPasswordHash = await this.mfaPasswordHash(password);
+    try {
+      await this.prisma.user.update({
+        where: { id: id.value },
+        data: { mfaPasswordHash },
+      });
+    } catch (error) {
+      if (
+        IsRecordToUpdateNotFoundError(error) ||
+        isRecordNotFoundError(error)
+      ) {
+        throw new BadRequestException(createPrismaErrorMessage(error));
       }
       throw error;
     }
@@ -139,5 +277,19 @@ export class UsersService {
       },
     });
     return prismaUser === null;
+  }
+
+  private mfaPasswordHash(password: string): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      scrypt(
+        password,
+        this.configService.getOrThrow<string>('PASSWORD_SALT'),
+        32,
+        (err, buffer) => {
+          if (err) reject(err);
+          else resolve(buffer.toString());
+        },
+      );
+    });
   }
 }

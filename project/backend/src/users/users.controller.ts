@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Get,
+  Logger,
   NotFoundException,
   Param,
   Patch,
@@ -14,6 +15,7 @@ import {
 import {
   ApiBadRequestResponse,
   ApiConflictResponse,
+  ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiOkResponse,
   ApiOperation,
@@ -22,13 +24,14 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Request as ExpressRequest } from 'express';
-import { JwtPayloadPhaseComplete } from '../auth/auth.service';
+import { JwtPayload, JwtPayloadPhaseComplete } from '../auth/auth.service';
 import { JwtGuard } from '../auth/jwt.guard';
 import { Phase, PhaseGuard } from '../auth/phase.guard';
-import { idOf } from '../common/Id';
-import { PongSeasonLogService } from '../pong-season-log/pong-season-log.service';
+import { idOf, UserId } from '../common/Id';
+import { PongLogService } from '../pong-log/pong-log.service';
 import { UserFollowService } from '../user-follow/user-follow.service';
 import { NicknameCheckUserDto } from './dto/nickname-check-user.dto';
+import { TwoFactorPasswordDto } from './dto/two-factor-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import {
   RecordDto,
@@ -53,39 +56,37 @@ class UniqueCheckResponse {
 @ApiTags('users')
 @Controller('/api/v1/users')
 export class UsersController {
+  private logger = new Logger('userController');
   constructor(
     private readonly usersService: UsersService,
     private readonly userFollowService: UserFollowService,
-    private readonly pongSeasonLogService: PongSeasonLogService,
+    private readonly pongLogService: PongLogService,
   ) {}
 
   @Get('me')
   @ApiOperation({ summary: '내 정보' })
   @ApiOkResponse({
-    type: () => UserProfileDto,
+    type: () => ({ phase: String, id: String, me: Object }),
   })
-  @UseGuards(JwtGuard, PhaseGuard)
-  @Phase('complete')
+  @UseGuards(JwtGuard)
   async myProfile(@Request() req: ExpressRequest) {
-    const userId = (req.user as JwtPayloadPhaseComplete).id;
-    const me = (await this.usersService.findOne(userId))!; // 본인, 타인 통합인듯
-    const relation = await this.getRelation(userId.value, userId.value);
+    const { phase, id } = req.user as JwtPayload;
 
-    const seasonLog = await this.pongSeasonLogService.findOne(userId);
-    const record = {
-      win: seasonLog.win,
-      lose: seasonLog.lose,
-      ratio: seasonLog.winRate,
+    if (phase !== 'complete') {
+      return {
+        phase,
+        id: id as string,
+      };
+    }
+
+    const userId = id as UserId;
+    const me = await this.usersService.me(userId); // 본인, 타인 통합인듯
+
+    return {
+      phase,
+      id: (id as UserId).value,
+      me,
     };
-
-    return new UserProfileDto({
-      id: userId,
-      imageUrl: me.profileImageUrl,
-      nickname: me.nickname,
-      record: new RecordDto(record),
-      relation,
-      statusMessage: me.statusMessage,
-    });
   }
 
   @Get()
@@ -142,14 +143,14 @@ export class UsersController {
       throw new NotFoundException('Invalid Id. (targetUser)');
     }
     const relation = await this.getRelation(userId.value, targetUserId);
-
-    const seasonLog = await this.pongSeasonLogService.findOne(
+    const userLogs = await this.pongLogService.findOneByUserId(
       idOf(targetUserId),
     );
+
     const record = {
-      win: seasonLog.win,
-      lose: seasonLog.lose,
-      ratio: seasonLog.winRate,
+      win: userLogs.wins,
+      lose: userLogs.losses,
+      ratio: userLogs.winRate,
     };
 
     return new UserProfileDto({
@@ -179,6 +180,24 @@ export class UsersController {
       throw new BadRequestException(`올바르지 않은 닉네임: ${nickname}`);
     }
     return result;
+  }
+
+  @Post('set-2fa')
+  @ApiOperation({ summary: '2차 인증 비밀번호 설정' })
+  @ApiCreatedResponse({ description: '2차 인증 비밀번호 설정 성공, 반환값 X' })
+  @ApiUnauthorizedResponse({ description: '인증되지 않은 유저로부터의 요청.' })
+  @ApiBadRequestResponse({ description: '유효하지 않은 비밀번호' })
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
+  async setTwoFactorPassword(
+    @Request() req: ExpressRequest,
+    @Body() dto: TwoFactorPasswordDto,
+  ) {
+    // 닉네임 중복 체크 로직 구현
+    const { id } = req.user as JwtPayloadPhaseComplete;
+    const { password } = dto;
+    this.logger.debug(id, password);
+    await this.usersService.setTwoFactorPassword(id, password);
   }
 
   @Get(':id')

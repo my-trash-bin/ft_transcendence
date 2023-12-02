@@ -39,10 +39,9 @@ export function AllChannelList({ searchChannel }: { searchChannel: string }) {
     [],
   );
 
-  const { isLoading, isError, data } = useQuery('allChannels', apiCall);
+  const { isLoading, data } = useQuery('allChannels', apiCall);
 
   if (isLoading) return <p>로딩중...</p>;
-  if (isError) throw new Error('에러가 발생했습니다.');
 
   let lenderData = getLenderData(
     data?.data,

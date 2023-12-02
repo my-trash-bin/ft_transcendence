@@ -14,6 +14,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class AvatarService {
+  private readonly logger = new Logger('AvatarService');
   private readonly uploadDir: string;
   private readonly maxFileSize: number = 10 * 1024 * 1024; // 10MB
   private readonly allowedMimeTypes: string[] = [
@@ -23,7 +24,7 @@ export class AvatarService {
   ];
 
   constructor() {
-    this.uploadDir = join('..', 'uploads');
+    this.uploadDir = join(__dirname, '..', 'uploads');
     this.ensureUploadDir();
   }
 
@@ -65,7 +66,7 @@ export class AvatarService {
     }
 
     if (file.length > this.maxFileSize) {
-      throw new BadRequestException('파일 사이즈 제한 (10MB) 초과.');
+      throw new BadRequestException('파일 사이즈 제한 초과.');
     }
   }
 
@@ -114,16 +115,40 @@ export class AvatarService {
   }
 
   async uploadBinaryData(req: Request): Promise<string> {
-    const l = new Logger('avatar');
+    this.limitCheckByContentLength(req);
     return new Promise((resolve, reject) => {
       const buffers: Buffer[] = [];
+      let size = 0;
 
-      req.on('data', (chunk: Buffer) => buffers.push(chunk));
+      req.on('data', (chunk: Buffer) => {
+        buffers.push(chunk);
+        size += chunk.length;
+        this.logger.verbose(
+          `chunk ${chunk.length / 1000} kb 수신 => 총 ${size / 1000} kb`,
+        );
+        if (size > this.maxFileSize) {
+          this.logger.verbose(
+            `누적 청크 크기 리미트 초과 ${size / (1000 * 1000)}mb > ${
+              this.maxFileSize / (1000 * 1000)
+            }mb`,
+          );
+          req.pause();
+        }
+      });
+
+      req.on('pause', () => {
+        reject(new BadRequestException('File size exceeds limit.'));
+        setTimeout(() => req.destroy(), 50); // 응답이 전송될 잠깐을 위해서
+      });
 
       req.on('end', async () => {
         try {
           const data = Buffer.concat(buffers);
           const ctype = req.headers['content-type'];
+
+          this.logger.debug(
+            `바이너리 업로드 종료: 크기 ${data.length}, content-type: ${ctype}`,
+          );
 
           this.validateBinaryFile(ctype, data);
 
@@ -131,18 +156,34 @@ export class AvatarService {
           const hashedFileName = this.generateHashedFileName(data);
           const filePath = join(this.uploadDir, hashedFileName + '.' + ext);
 
-          l.log(filePath);
+          const returnFilePath = join(
+            'http://localhost:60080', // TODO: change
+            'uploads',
+            hashedFileName + '.' + ext,
+          );
+
           const { ok, error } = await this.storeFile(filePath, data);
           if (!ok) {
             throw error;
           }
-          resolve(filePath);
+          resolve(returnFilePath);
         } catch (error) {
           reject(error);
         }
       });
 
-      req.on('error', (err) => reject(err));
+      req.on('error', (err) => {
+        this.logger.error(`바이너리 업로드 중 에러 발생: ${err}`);
+        reject(err);
+      });
     });
+  }
+  private limitCheckByContentLength(req: Request) {
+    const contentLength = req.headers['content-length'];
+    if (contentLength && parseInt(contentLength) > this.maxFileSize) {
+      throw new BadRequestException(
+        '파일 사이즈 제한 초과. (by content-length)',
+      );
+    }
   }
 }

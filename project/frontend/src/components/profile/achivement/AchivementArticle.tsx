@@ -3,12 +3,14 @@ import { Loading } from '@/components/common/Loading';
 import { Title } from '@/components/common/Title';
 import { useCallback, useContext } from 'react';
 import { useQuery } from 'react-query';
-import { ProfileButton } from '../ProfileButton';
 import { Badge } from './Badge';
 import { mockAchivementData } from './mockAchivementData';
+import { Button } from '@/components/common/Button';
+import { useRouter } from 'next/navigation';
 
 export function AchivementArticle() {
   const { api } = useContext(ApiContext);
+  const router = useRouter();
   const { isLoading, isError, data } = useQuery(
     ['achivement'],
     useCallback(
@@ -16,11 +18,16 @@ export function AchivementArticle() {
       [api],
     ),
   );
+
   return (
     <div className="relative">
       <div className="h-[inherit] pt-3xl flex flex-col items-center">
-        <Title location="top-center">업적</Title>
-        <ProfileButton href="/profile" text="돌아가기" />
+        <Title location="top-center" font="big">
+          업적
+        </Title>
+        <Button onClick={() => router.push('/profile')} size={'big'}>
+          돌아가기
+        </Button>
         <div className="w-[700px] mt-3xl p-md flex justify-center">
           {render()}
         </div>

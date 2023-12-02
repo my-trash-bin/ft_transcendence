@@ -13,6 +13,7 @@ export default <Config>{
       full: '9999px',
     },
     fontWeight: {
+      light: '300',
       normal: '400',
       semibold: '600',
       bold: '700',
@@ -23,8 +24,8 @@ export default <Config>{
       lg: '16px',
       xl: '18px',
       h3: '20px',
-      h2: '30px',
-      h1: '36px',
+      h2: '24px',
+      h1: '30px',
     },
     spacing: {
       '0': '0',
@@ -67,7 +68,12 @@ export default <Config>{
     },
     extend: {
       fontFamily: {
-        sejong: ['KingSejongInstitute-Regular', 'sans-serif'],
+        sejong: ['KingSejongInstitute-Regular'],
+        taebaek: ['TAEBAEKfont'],
+        jeonju: ['JeonjuCraftGoR'],
+        danjo: ['Danjo-bold-Regular'],
+        mayo: ['Dovemayo_gothic'],
+        agro: ['SBAggroB'],
       },
     },
   },

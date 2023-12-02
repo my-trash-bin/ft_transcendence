@@ -9,7 +9,8 @@ import { AuthModule } from '../auth/auth.module';
 import { AvatarModule } from '../avatar/avatar.module';
 import { ChannelModule } from '../channel/channel.module';
 import { EventsModule } from '../events/events.module';
-import { PongSeasonLogModule } from '../pong-season-log/pong-season-log.module';
+import { NotificationModule } from '../notification/notification.module';
+import { PongLogModule } from '../pong-log/pong-log.module';
 import { UserFollowModule } from '../user-follow/user-follow.module';
 import { UsersModule } from '../users/users.module';
 import { AppController } from './app.controller';
@@ -19,11 +20,12 @@ import { AppController } from './app.controller';
     AuthModule,
     UsersModule,
     UserFollowModule,
-    PongSeasonLogModule,
+    PongLogModule,
     ChannelModule,
     AchievementModule,
     EventsModule,
     AvatarModule,
+    NotificationModule,
     DevtoolsModule.register({
       http: process.env.NODE_ENV !== 'production',
     }),

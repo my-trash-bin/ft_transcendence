@@ -1,19 +1,19 @@
 import { cva, type VariantProps } from 'class-variance-authority';
 
-const ButtonCVA = cva(['text-center'], {
+const ButtonCVA = cva(['text-center font-mayo font-semibold'], {
   variants: {
     size: {
-      small: ['w-md h-xs', 'border-2', 'text-lg font-bold', 'rounded-sm'],
+      small: ['w-md h-xs', 'text-md'],
+      medium: ['w-lg h-sm', 'text-lg'],
+      big: ['w-lg h-sm', 'text-lg', 'absolute top-xl right-xl'],
     },
     color: {
       default: [
-        'hover:bg-light-background',
-        'border-dark-purple',
-        'bg-default',
+        'bg-default hover:bg-light-background border-dark-purple',
         'text-black',
       ],
-      modal: ['hover:bg-white', 'border-dark-purple', 'bg-white', 'text-black'],
-      disabled: ['border-dark-gray', 'bg-gray', 'text-white', 'font-semibold'],
+      modal: ['bg-white hover:bg-white border-dark-purple', 'text-black'],
+      disabled: ['bg-gray border-dark-gray', 'text-white'],
     },
   },
   defaultVariants: {
@@ -38,7 +38,10 @@ export const Button: React.FC<ButtonProps> = ({
   const color = disabled ? 'disabled' : isModal ? 'modal' : 'default';
   return (
     <button
-      className={ButtonCVA({ size, color })}
+      className={`${ButtonCVA({
+        size,
+        color,
+      })}  rounded-sm border-2`}
       onClick={onClick}
       disabled={disabled}
     >

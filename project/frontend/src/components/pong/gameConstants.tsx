@@ -21,4 +21,5 @@ export interface GameState {
   score1: number;
   score2: number;
   gameOver: boolean;
+  gameStart : boolean;
 }

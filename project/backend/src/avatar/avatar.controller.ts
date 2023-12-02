@@ -1,26 +1,39 @@
-import { Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Request, Response } from 'express';
+import { Controller, Logger, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  ApiBody,
+  ApiCreatedResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
+import { Request } from 'express';
 import { JwtGuard } from '../auth/jwt.guard';
 import { AvatarService } from './avatar.service';
 
 @ApiTags('avatar')
 @Controller('/api/v1/avatar')
 export class AvatarController {
+  private readonly logger = new Logger('AvatarContoller');
+
   constructor(private readonly avatarService: AvatarService) {}
 
   @ApiOperation({ summary: '바이너리 아바타 업로드' })
+  @ApiCreatedResponse({
+    description: '이미지 URL 리턴',
+    type: String,
+  })
+  @ApiBody({ description: '바이너리 이미지 파일', type: 'file' })
   @Post('upload')
   @UseGuards(JwtGuard)
-  async uploadFile(@Req() req: Request, @Res() res: Response) {
+  async uploadFile(@Req() req: Request) {
     try {
       const filePath = await this.avatarService.uploadBinaryData(req);
-      res.status(201).json({ filePath });
+      this.logger.log(`업로드 성공: ${filePath}`);
+      return { filePath };
     } catch (error) {
-      res.status(500).json({ message: 'Error uploading file', error });
+      this.logger.log(`업로드 실패: ${error}`);
+      throw error;
     }
   }
-
   // @Post('upload-with-multer')
   // @UseInterceptors(FileInterceptor('file'))
   // @UseGuards(JwtGuard)
