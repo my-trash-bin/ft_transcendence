@@ -1,5 +1,6 @@
 'use client';
 
+import withAuth from '@/components/auth/Auth';
 import { DmUserList } from '@/components/dm/dm-user/DmUserList';
 import { MessageSearch } from '@/components/dm/message-search/MessageSearch';
 import Image from 'next/image';
@@ -30,4 +31,4 @@ function DmPage() {
     </div>
   );
 }
-export default DmPage;
+export default withAuth(DmPage);

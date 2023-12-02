@@ -11,11 +11,12 @@ export function MessageBox({ username }: { username: string }) {
     [username],
   );
 
-  const { isLoading, isError, data } = useQuery('userByNickanme', apiCall);
+  const { isLoading, data } = useQuery('userByNickanme', apiCall);
 
   if (isLoading) return <div>loading... 👾</div>;
-  if (isError) throw new Error('에러가 발생했습니다.');
-  console.log(data);
+
+  const localMe = localStorage.getItem('me');
+  const me = localMe ? JSON.parse(localMe) : null;
   return (
     <>
       <UserInfo
@@ -23,7 +24,7 @@ export function MessageBox({ username }: { username: string }) {
         username={data?.data.nickname}
         onActive={false}
       />
-      <MessageContent type={messageType.DM} />
+      <MessageContent type={messageType.DM} myNickname={me?.nickname} />
       <MessageSendBox type={messageType.DM} targetUserId={data?.data.id} />
     </>
   );

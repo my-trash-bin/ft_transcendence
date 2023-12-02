@@ -20,7 +20,7 @@ function getLenderData(
         channelName={channel.title}
         now={channel.memberCount}
         max={channel.maximumMemberCount}
-        type={channel.type}
+        isPublic={channel.isPublic}
         participateModalOpen={setParticipationModalOpen}
         passwordModalOpen={setPasswordModalOpen}
         setSelectedChannel={setSelectedChannel}
