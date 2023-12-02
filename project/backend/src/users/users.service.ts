@@ -132,11 +132,13 @@ export class UsersService {
   }
 
   async create(createUserDto: CreateUserDto): Promise<UserDto> {
+    const DEFAULT_STATUS_MESSAGE = '안녕하세요! 저와 함께 퐁 게임 하실래요?';
     try {
       const prismaUser = await this.prisma.user.create({
         data: {
           nickname: createUserDto.nickname,
           profileImageUrl: createUserDto.profileImageUrl,
+          statusMessage: DEFAULT_STATUS_MESSAGE,
         },
       });
       return prismaUser;
