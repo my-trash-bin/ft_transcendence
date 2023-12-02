@@ -7,6 +7,8 @@ import { useEffect } from 'react';
 export const useSocket = (type: any, setMessages: any) => {
   useEffect(() => {
     const socket = getSocket();
+    const localMe = localStorage.getItem('me');
+    const me = localMe ? JSON.parse(localMe) : null;
 
     if (type === messageType.DM) {
       socket.on(`directMessage`, (res) => {
@@ -17,10 +19,13 @@ export const useSocket = (type: any, setMessages: any) => {
         setMessages((messages: any) => [...messages, res]);
       });
       socket.on('leave', (res) => {
-        console.log(res);
+        if (res.data.member.id === me.id) {
+          alert('채널에서 나갔습니다.');
+          location.href = '/channel';
+        } else setMessages((messages: any) => [...messages, res]);
       });
       socket.on('join', (res) => {
-        console.log(res);
+        setMessages((messages: any) => [...messages, res]);
       });
     }
 

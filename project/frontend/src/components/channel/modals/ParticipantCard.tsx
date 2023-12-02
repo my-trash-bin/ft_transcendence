@@ -6,13 +6,22 @@ export function ParticipantCard({
   imageUrl,
   type,
   isMyself,
+  channelId,
+  memberId,
 }: {
   nickname: string;
   imageUrl: string | undefined;
   type: string;
   isMyself: boolean;
+  channelId: string;
+  memberId: string;
 }) {
-  const button = type === 'ADMINISTRATOR' && !isMyself ? <SelectPenalty /> : '';
+  const button =
+    type === 'ADMINISTRATOR' && !isMyself ? (
+      <SelectPenalty channelId={channelId} memberId={memberId} />
+    ) : (
+      ''
+    );
   const imagePath = imageUrl ? imageUrl : '';
   return (
     <div className="bg-white mb-[10px] pl-[10px] w-[280px] h-[70px] border border-default rounded-[10px] flex flex-row justify-between shrink-0">

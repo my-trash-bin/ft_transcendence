@@ -2,6 +2,7 @@ import { useSocket } from '@/hooks/useSocket';
 import { useEffect, useRef, useState } from 'react';
 import { MyChat } from './MyChat';
 import { OtherChat } from './OtherChat';
+import { UserStateAnnounce } from './UserStateAnnounce';
 
 export enum messageType {
   DM = 'DM',
@@ -37,7 +38,14 @@ export function MessageContent({
   return (
     <div className="w-[95%] h-[610px] pt-[20px] bg-chat-color2 rounded-[10px] flex flex-col overflow-y-scroll mt-sm">
       {messages.map((message, idx) => {
-        if (message.type === 'leave') {
+        if (message.type === 'leave' || message.type === 'join') {
+          return (
+            <UserStateAnnounce
+              key={message.data.id}
+              nickname={message.data.member.nickname}
+              userState={message.type}
+            />
+          );
         } else if (message.data.member.nickname === myNickname) {
           return (
             <MyChat
