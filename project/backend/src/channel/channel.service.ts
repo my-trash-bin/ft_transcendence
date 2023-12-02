@@ -17,7 +17,7 @@ import {
 } from '../common/ServiceResponse';
 import { MessageWithMemberDto } from '../dm/dto/message-with-member';
 import { LeavingChannelInfo } from '../events/event-response.dto';
-import { UserDto } from '../users/dto/user.dto';
+import { UserDto, userDtoSelect } from '../users/dto/user.dto';
 import {
   createPrismaErrorMessage,
   isPrismaUnknownError,
@@ -25,9 +25,15 @@ import {
   IsRecordToUpdateNotFoundError,
   isUniqueConstraintError,
 } from '../util/prismaError';
-import { ChannelDto } from './dto/channel-dto';
-import { ChannelMemberDto } from './dto/channel-members.dto';
+import {
+  ChannelMemberDto,
+  channelMemberDtoSelect,
+} from './dto/channel-members.dto';
+import { channelMessageDtoSelect } from './dto/channel-message.dto';
 import { ChannelRelationDto } from './dto/channel-relation.dto';
+import { ChannelWithAllInfoDto } from './dto/channel-with-all-info.dto';
+import { ChannelWithMembersDto } from './dto/channel-with-members.dto';
+import { ChannelDto, channelDtoSelect } from './dto/channel.dto';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { ChannelType } from './enums/channel-type.enum';
 
@@ -471,19 +477,72 @@ export class ChannelService {
     }
   }
 
-  async findChannelWithMembers(channelId: ChannelId) {
+  async findChannelWithMembers(
+    channelId: ChannelId,
+  ): Promise<ServiceResponse<ChannelWithMembersDto>> {
     try {
-      const result = await this.prisma.$transaction(async (prisma) => {
-        return await prisma.channel.findUniqueOrThrow({
-          where: {
-            id: channelId.value,
+      const result = await this.prisma.channel.findUniqueOrThrow({
+        where: {
+          id: channelId.value,
+        },
+        select: {
+          ...channelDtoSelect,
+          password: true,
+          members: {
+            select: {
+              ...channelMemberDtoSelect,
+              member: {
+                select: userDtoSelect,
+              },
+            },
           },
-          include: {
-            members: true,
-          },
-        });
+        },
       });
-      return newServiceOkResponse(result);
+      return newServiceOkResponse(new ChannelWithMembersDto(result));
+    } catch (error) {
+      if (
+        IsRecordToUpdateNotFoundError(error) ||
+        isRecordNotFoundError(error)
+      ) {
+        throw new BadRequestException(createPrismaErrorMessage(error));
+      }
+      if (isPrismaUnknownError(error)) {
+        throw new InternalServerErrorException(createPrismaErrorMessage(error));
+      }
+      return newServiceFailPrismaUnKnownResponse(500);
+    }
+  }
+
+  async findChannelWithAllInfo(
+    channelId: ChannelId,
+  ): Promise<ServiceResponse<ChannelWithAllInfoDto>> {
+    try {
+      const result = await this.prisma.channel.findUniqueOrThrow({
+        where: {
+          id: channelId.value,
+        },
+        select: {
+          ...channelDtoSelect,
+          password: true,
+          members: {
+            select: {
+              ...channelMemberDtoSelect,
+              member: {
+                select: userDtoSelect,
+              },
+            },
+          },
+          messages: {
+            select: {
+              ...channelMessageDtoSelect,
+              member: {
+                select: userDtoSelect,
+              },
+            },
+          },
+        },
+      });
+      return newServiceOkResponse(new ChannelWithAllInfoDto(result));
     } catch (error) {
       if (
         IsRecordToUpdateNotFoundError(error) ||
@@ -508,15 +567,7 @@ export class ChannelService {
         },
         include: {
           member: {
-            select: {
-              id: true,
-              joinedAt: true,
-              isLeaved: true,
-              leavedAt: true,
-              nickname: true,
-              profileImageUrl: true,
-              statusMessage: true,
-            },
+            select: userDtoSelect,
           },
         },
       });

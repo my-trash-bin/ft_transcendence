@@ -2,41 +2,44 @@ import Image from 'next/image';
 import React, { useEffect } from 'react';
 import usePaddleMovement from './KeyHandle';
 import useStore from './Update';
-import { BALL_SIZE, DEFAULT_SPEED, BOARD_HEIGHT, BOARD_WIDTH, GameState, PADDLE_HEIGHT, PADDLE_WIDTH } from './gameConstants';
+import { BALL_SIZE, BOARD_HEIGHT, BOARD_WIDTH, GameState, PADDLE_HEIGHT, PADDLE_WIDTH } from './gameConstants';
 import { getGameSocket } from './gameSocket';
+import { useRouter } from 'next/navigation';
 
+// npm run build && npx nest start --watch
 const GameBoard: React.FC = () => {
-  const { ball, paddle1, paddle2, score1, score2, isPlayer1 } = useStore();
+  const { ball, paddle1, paddle2, score1, score2, isPlayer1, setGameState } = useStore();
+  const socket = getGameSocket();
+  const router = useRouter();
   usePaddleMovement();
-  const { setIsPlayer1 } = useStore();
 
+  const handleGameUpdate = (gameState: GameState) => {
+    if (!gameState.gameStart) {
+      console.log('game not started');
+    } else if (!gameState.gameOver) {
+      setGameState(gameState);
+    } else {
+      console.log('gameOver');
+      router.push('/pong/gameOver');
+    }
+  };
+
+  const handleGameStart = (gameState: GameState) => {
+    // 나중에 더 구체적으로 바꿀 수 있을 듯
+    gameState.gameOver = false;
+    gameState.gameStart = true;
+    console.log('gameStart');
+  }
+  
   useEffect(() => {
-    const socket = getGameSocket();
-    socket.emit('joinLobby');
-
-    // 서버로부터 플레이어 역할 정보를 받았을 때
-    socket.on('playerRole', (role) => {
-      if (role == 'player1') {
-        setIsPlayer1(true);
-      } else {
-        setIsPlayer1(false);
-      }
-      console.log(`Am I player 1? ${isPlayer1}`);
-    });
-
-    socket.on('gameUpdate', (data: GameState) => {
-      useStore.setState(data);
-      if (data.gameOver) {
-        // 일단은 끝내자마자 바로 시작하도록 만듦
-        socket.emit('restartGame');
-      }
-    });
+    socket.on('gameUpdate', handleGameUpdate);
+    socket.on('gameStart', handleGameStart);
 
     return () => {
-      socket.off('gameUpdate');
-      socket.off('playerRole');
+      socket.off('gameUpdate', handleGameUpdate);
+      socket.off('gameStart', handleGameStart);
     };
-  }, [setIsPlayer1, isPlayer1]);
+  }, []);
 
   return (
     <div className="flex flex-col items-center mt-[50px] font-bold text-dark-purple-interactive text-dark-purple-interactive">
@@ -49,7 +52,8 @@ const GameBoard: React.FC = () => {
         />
   
         {/* 점수판 (중앙) */}
-        <span className="text-2xl">{score1} : {score2}</span>
+        <span className="text-2xl">{isPlayer1 ? score2 : score1} : {isPlayer1 ? score1 : score2}</span>
+        {/* <span className="text-2xl">{score1} : {score2}</span> */}
   
         {/* 현재 플레이어 아바타 (오른쪽에 항상 표시) */}
         <PlayerAvatar
@@ -68,27 +72,28 @@ const GameBoard: React.FC = () => {
             height: BALL_SIZE,
             left: isPlayer1 ? `${BOARD_WIDTH - PADDLE_WIDTH - 10 - ball.x}px` : `${ball.x}px`,
             top: `${ball.y}px`
-          }} />
-  
-        {/* 현재 플레이어의 패들 */}
-        <div className={`absolute bg-dark-purple-interactive rounded-md`}
-          style={{
-            width: PADDLE_WIDTH,
-            height: PADDLE_HEIGHT,
-            left: isPlayer1 ? 'auto' : '10px',
-            right: isPlayer1 ? '10px' : 'auto',
-            top: `${isPlayer1 ? paddle1.y : paddle2.y}px`,
           }}
         />
   
-        {/* 상대 플레이어의 패들 */}
+        {/* 상대 플레이어의 패들 내가 1이라면 2, 2라면 1*/}
+        <div className={`absolute bg-dark-gray rounded-md`}
+          style={{
+            width: PADDLE_WIDTH,
+            height: PADDLE_HEIGHT,
+            left: '10px',
+            right: 'auto',
+            top: `${isPlayer1 ? paddle2.y : paddle1.y}px`,
+          }}
+        />
+
+        {/* 현재 플레이어의 패들 : 1이면 1, 2이면 2*/}
         <div className={`absolute bg-dark-purple-interactive rounded-md`}
           style={{
             width: PADDLE_WIDTH,
             height: PADDLE_HEIGHT,
-            left: isPlayer1 ? '10px' : 'auto',
-            right: isPlayer1 ? 'auto' : '10px',
-            top: `${isPlayer1 ? paddle2.y : paddle1.y}px`,
+            left: 'auto',
+            right: '10px',
+            top: `${isPlayer1 ? paddle1.y : paddle2.y}px`,
           }}
         />
       </div>

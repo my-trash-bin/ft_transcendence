@@ -11,7 +11,7 @@ import {
   newServiceFailResponse,
   newServiceOkResponse,
 } from '../common/ServiceResponse';
-import { userSelect } from '../users/dto/user.dto';
+import { userDtoSelect } from '../users/dto/user.dto';
 import {
   createPrismaErrorMessage,
   isPrismaUnknownError,
@@ -87,7 +87,7 @@ export class UserFollowService {
       select: {
         isBlock: !isBlock, // isBlock이 undefined면 isBlock까지 필요
         followOrBlockedAt: true,
-        followee: { select: userSelect },
+        followee: { select: userDtoSelect },
       },
     });
   }
@@ -120,7 +120,7 @@ export class UserFollowService {
             followerId: followerId.value,
             followeeId: followeeId.value,
           },
-          isBlock: true,
+          isBlock,
         },
       });
       return userFollow;

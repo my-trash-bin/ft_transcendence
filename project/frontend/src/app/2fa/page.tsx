@@ -23,12 +23,15 @@ export default function TwofactorPage() {
       });
       if (!result.ok) {
         console.error({ result });
-        alert('알 수 없는 문제가 발생했습니다.');
       } else {
         router.push('/friend');
       }
     } catch (error) {
-      alert('알 수 없는 문제가 발생했습니다.');
+      if (error.status === 401) {
+        alert('비밀번호 오류입니다. 다시 입력하세요!');
+      } else {
+        alert('알 수 없는 오류입니다!');
+      }
       console.error('Error during 2fa login:', error);
     }
   }, [api, password, router]);

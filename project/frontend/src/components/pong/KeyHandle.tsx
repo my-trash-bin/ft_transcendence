@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { getGameSocket } from './gameSocket';
 import useStore from './Update';
+import { getGameSocket } from './gameSocket';
 
 const usePaddleMovement = () => {
   const { isPlayer1 } = useStore();
@@ -11,9 +11,9 @@ const usePaddleMovement = () => {
     const handleKeyDown = (event: KeyboardEvent) => {
       const playerRole = isPlayer1 ? 'player1' : 'player2';
       if (event.key === 'w' || event.key === 'ArrowUp') {
-        socket.emit('paddleMove', { direction: 'up', player: playerRole });
+        socket.emit('paddleMove', true);
       } else if (event.key === 's' || event.key === 'ArrowDown') {
-        socket.emit('paddleMove', { direction: 'down', player: playerRole });
+        socket.emit('paddleMove', false);
       }
     };
 

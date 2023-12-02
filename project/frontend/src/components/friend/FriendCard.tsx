@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Button } from '../common/Button';
 import { FriendSetting } from './FriendSetting';
 import { CommonCard } from './utils/CommonCard';
+import { useRouter } from 'next/navigation';
 
 interface FriendCardProps {
   readonly nickname: string;
@@ -16,6 +17,8 @@ export function FriendCard({
   id,
   refetch,
 }: FriendCardProps) {
+  const router = useRouter();
+
   return (
     <CommonCard
       imageUrl={imageUrl}
@@ -23,16 +26,11 @@ export function FriendCard({
       id={id}
       refetch={refetch}
     >
-      <Button onClick={() => alert('call game start api')}>게임하기</Button>
-      <Link
-        href={'/dm'}
-        className={
-          'w-md h-xs bg-default rounded-sm border-2 border-dark-purple text-center text-black text-lg font-bold mx-lg hover:bg-light-background'
-        }
-      >
-        메세지
-      </Link>
-      <FriendSetting targetId={id} refetch={refetch} />
+      <div className="flex flex-row justify-center items-center gap-md">
+        <Button onClick={() => alert('call game start api')}>게임하기</Button>
+        <Button onClick={() => router.push('/dm')}>메세지</Button>
+        <FriendSetting targetId={id} refetch={refetch} />
+      </div>
     </CommonCard>
   );
 }

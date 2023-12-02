@@ -4,7 +4,9 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { ChannelMemberType, Prisma } from '@prisma/client';
+import { scrypt } from 'node:crypto';
 import { PrismaService } from '../base/prisma.service';
 import { UserId } from '../common/Id';
 import {
@@ -22,7 +24,10 @@ import { UserDto } from './dto/user.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private readonly configService: ConfigService,
+  ) {}
 
   async me(id: UserId) {
     try {
@@ -200,11 +205,13 @@ export class UsersService {
       (prismaUser) =>
         new UserRelationshipDto(
           prismaUser,
-          this.getRelation(
-            prismaUser.followedBy.length === 0
-              ? undefined
-              : prismaUser.followedBy[0].isBlock,
-          ),
+          prismaUser.id === id.value
+            ? RelationStatus.Me
+            : this.getRelation(
+                prismaUser.followedBy.length === 0
+                  ? undefined
+                  : prismaUser.followedBy[0].isBlock,
+              ),
         ),
     );
   }
@@ -216,6 +223,7 @@ export class UsersService {
         data: {
           nickname: updateUserDto.nickname,
           profileImageUrl: updateUserDto.profileImageUrl,
+          statusMessage: updateUserDto.statusMessage,
         },
       });
       return new UserDto(prismaUser);
@@ -228,6 +236,24 @@ export class UsersService {
       }
       if (isUniqueConstraintError(error)) {
         throw new ConflictException(createPrismaErrorMessage(error));
+      }
+      throw error;
+    }
+  }
+
+  async setTwoFactorPassword(id: UserId, password: string) {
+    const mfaPasswordHash = await this.mfaPasswordHash(password);
+    try {
+      await this.prisma.user.update({
+        where: { id: id.value },
+        data: { mfaPasswordHash },
+      });
+    } catch (error) {
+      if (
+        IsRecordToUpdateNotFoundError(error) ||
+        isRecordNotFoundError(error)
+      ) {
+        throw new BadRequestException(createPrismaErrorMessage(error));
       }
       throw error;
     }
@@ -251,5 +277,19 @@ export class UsersService {
       },
     });
     return prismaUser === null;
+  }
+
+  private mfaPasswordHash(password: string): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      scrypt(
+        password,
+        this.configService.getOrThrow<string>('PASSWORD_SALT'),
+        32,
+        (err, buffer) => {
+          if (err) reject(err);
+          else resolve(buffer.toString());
+        },
+      );
+    });
   }
 }
