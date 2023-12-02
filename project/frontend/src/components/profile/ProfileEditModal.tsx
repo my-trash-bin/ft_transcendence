@@ -50,14 +50,14 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
   const updatePassword = useCallback(async () => {
     try {
       alert('call api to set 2fa password');
-      // await api.usersControllerUpdate({
-      //   password: password,
-      // });
+      await api.usersControllerSetTwoFactorPassword({
+        password: password,
+      });
       onClose();
     } catch (error) {
       console.error('Error send password:', error);
     }
-  }, [onClose]);
+  }, [onClose, api, password]);
 
   const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newNickname = e.target.value;
