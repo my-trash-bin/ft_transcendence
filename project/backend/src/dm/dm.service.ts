@@ -115,7 +115,7 @@ export class DmService {
   async getDMChannelMessagesByNickname(
     userId: UserId,
     nickname: string,
-  ): Promise<ServiceResponse<MessageWithMemberDto[]>> {
+  ): Promise<ServiceResponse<any[]>> {
     try {
       const targetUser = await this.prisma.user.findUniqueOrThrow({
         where: { nickname },
@@ -145,7 +145,14 @@ export class DmService {
           });
         },
       );
-      return newServiceOkResponse(result);
+      return newServiceOkResponse(
+        result.map((el) => {
+          return {
+            type: 'directMessage',
+            data: el,
+          };
+        }),
+      );
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         return newServiceFailPrismaKnownResponse(error.code, 400);
