@@ -261,6 +261,23 @@ export class UsersService {
     }
   }
 
+  async unsetTwoFactorPassword(id: UserId) {
+    try {
+      await this.prisma.user.update({
+        where: { id: id.value },
+        data: { mfaPasswordHash: null },
+      });
+    } catch (error) {
+      if (
+        IsRecordToUpdateNotFoundError(error) ||
+        isRecordNotFoundError(error)
+      ) {
+        throw new BadRequestException(createPrismaErrorMessage(error));
+      }
+      throw error;
+    }
+  }
+
   remove(id: string) {
     return `This action removes a #${id} user`;
   }

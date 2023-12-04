@@ -9,10 +9,10 @@ import { EventsService } from './events.service';
 
 @Module({
   imports: [
-    UsersModule,
-    UserFollowModule,
+    forwardRef(() => UsersModule),
+    forwardRef(() => UserFollowModule),
     forwardRef(() => ChannelModule),
-    DmModule,
+    forwardRef(() => DmModule),
     BaseModule,
   ],
   providers: [EventsGateway, EventsService],
