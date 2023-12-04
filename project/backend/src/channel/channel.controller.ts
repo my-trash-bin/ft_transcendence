@@ -16,6 +16,7 @@ import { JwtPayloadPhaseComplete } from '../auth/auth.service';
 import { JwtGuard } from '../auth/jwt.guard';
 import { Phase, PhaseGuard } from '../auth/phase.guard';
 import { idOf } from '../common/Id';
+import { MessageWithMemberDto } from '../dm/dto/message-with-member';
 import { ChannelRoomType, EventsService } from '../events/events.service';
 import { ChannelService } from './channel.service';
 import { ChannelIdDto } from './dto/channel-id.dto';
@@ -24,6 +25,7 @@ import { ChannelRelationDto } from './dto/channel-relation.dto';
 import { ChannelWithAllInfoDto } from './dto/channel-with-all-info.dto';
 import { ChannelDto } from './dto/channel.dto';
 import { CreateChannelDto } from './dto/create-channel.dto';
+import { ParticipateChannelDto } from './dto/participate-channel.dto';
 
 @ApiTags('channel')
 @Controller('/api/v1/channel')
@@ -124,6 +126,32 @@ export class ChannelController {
       throw new HttpException(result.error!.message, result.error!.statusCode);
     }
     return result.data!;
+  }
+
+  @Get('messages/:channelId')
+  @ApiOkResponse({
+    type: () => MessageWithMemberDto,
+    isArray: true,
+  })
+  @UseGuards(JwtGuard, PhaseGuard)
+  async getChannelMessages(@Param('channelId') channelId: string) {
+    const result = await this.channelService.getChannelMessages(channelId);
+    if (!result.ok) {
+      throw new HttpException(result.error!.message, result.error!.statusCode);
+    }
+    return result.data!;
+  }
+
+  @Post('/participate')
+  @ApiOkResponse({})
+  @UseGuards(JwtGuard, PhaseGuard)
+  async participateChannel(
+    @Body() dto: ParticipateChannelDto,
+    @Request() req: ExpressRequest,
+  ) {
+    const userId = (req.user as JwtPayloadPhaseComplete).id;
+
+    const result = await this.channelService.participate(userId.value, dto);
   }
 
   // @Get('participand/:cheenlId')

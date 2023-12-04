@@ -1,12 +1,12 @@
 export enum UserState {
-  LEAVE = 'LEAVE',
-  JOIN = 'JOIN',
+  LEAVE = 'leave',
+  JOIN = 'join',
 }
 
 export function UserStateAnnounce({
   userState,
   nickname,
-}: Readonly<{ userState: UserState; nickname: string }>) {
+}: Readonly<{ userState: any; nickname: string }>) {
   return (
     <>
       {userState === UserState.LEAVE ? (

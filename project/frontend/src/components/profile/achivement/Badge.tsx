@@ -11,7 +11,7 @@ export const badge = cva(
     'duration-300',
     'ease-in-out',
     'cursor-pointer',
-    'font-sejong',
+    '',
     'font-semibold text-center',
   ],
   {
