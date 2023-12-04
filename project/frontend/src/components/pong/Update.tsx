@@ -17,7 +17,7 @@ const useStore = create<ExtendedGameState>((set) => ({
   gameOver: false,
   gameStart: false,
   isPlayer1: true,
-  mode: 'normal',
+  isItemMode: false,
 
   setIsPlayer1: (isPlayer1) => set({ isPlayer1 }),
   setGameState: (newState) => set({ ...newState }),

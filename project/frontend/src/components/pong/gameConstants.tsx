@@ -22,5 +22,5 @@ export interface GameState {
   score2: number;
   gameOver: boolean;
   gameStart : boolean;
-  mode: 'normal' | 'item';
+  isItemMode: boolean;
 }

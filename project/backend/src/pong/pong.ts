@@ -12,7 +12,7 @@ const DEFAULT_SPEED = 3;
 const SMASH_SPEED = 8;
 const PADDLE_STRIKE = 4;
 const PADDLE_MOVE_STEP = 20;
-const GAME_OVER = 3;
+const GAME_OVER = 2;
 // const PADDLE_MOVE_STEP = 0.5; // 움직임의 단계 크기 증가
 
 export interface GameState {
@@ -24,7 +24,7 @@ export interface GameState {
   score2: number;
   gameOver: boolean;
   gameStart: boolean;
-  mode?: string;
+  isItemMode: boolean;
   item?: { x: number; y: number };
 }
 
@@ -37,6 +37,7 @@ export class Pong {
     private readonly prisma: PrismaService,
     public readonly player1Id: string,
     public readonly player2Id: string,
+    private IsItemMode: boolean,
     private readonly onEnd: () => void,
   ) {
     this.player1Id = player1Id;
@@ -53,18 +54,21 @@ export class Pong {
       score2: 0,
       gameOver: false,
       gameStart: true,
+      isItemMode: false,
     };
     this.resetPosition();
     this.onGameUpdate.emit('gameState', this.gameState);
     this.startGameLoop();
   }
 
-  setgameMode(mode: string) {
-    this.gameState.mode = mode;
+  setIsItemMode (mode: boolean) {
+    this.gameState.isItemMode = mode;
   }
 
   private startGameLoop() {
     console.log('startGameLoop');
+    console.log('startGameLoop - isItemMode:', this.gameState.isItemMode);
+    this.setIsItemMode(this.IsItemMode);
     if (this.gameState.gameOver) {
       return;
     }
@@ -94,6 +98,7 @@ export class Pong {
   }
 
   private updateGameLogic(): boolean {
+    console.log('updateGameLogic - isItemMode:', this.gameState.isItemMode);
     // 공의 위치 업데이트
     this.gameState.ball.x += this.gameState.velocity.x;
     this.gameState.ball.y += this.gameState.velocity.y;

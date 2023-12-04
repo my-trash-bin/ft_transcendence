@@ -1,8 +1,8 @@
+import { useRouter } from 'next/navigation';
 import React, { useEffect } from 'react';
 import Modal from 'react-modal';
-import { getGameSocket } from '../pong/gameSocket';
-import { useRouter } from 'next/navigation';
 import useStore from '../pong/Update';
+import { getGameSocket } from '../pong/gameSocket';
 
 interface MatchingModalProps {
   isOpen: boolean;
@@ -34,13 +34,13 @@ const MatchingModal: React.FC<MatchingModalProps> = ({
   const handleGoPong = () => {
     onClose();
     router.push('/pong');
-  }
+  };
 
   const handlePlayerRole = (role: string) => {
     setIsPlayer1(role === 'player1');
     console.log('playerRole', role);
     socket.off('playerRole', handlePlayerRole);
-  }
+  };
   useEffect(() => {
     socket.on('GoPong', handleGoPong);
     socket.on('playerRole', handlePlayerRole);

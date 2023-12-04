@@ -198,14 +198,7 @@ export class EventsGateway
       this.normalMatchQueue.delete(player1);
       this.normalMatchQueue.delete(player2);
 
-      const roomName = this.createGameRoom(player1, player2);
-      const pong = new Pong(this.prisma, player1.data.userId, player2.data.userId, () => {
-        this.pongMap.delete(player1.data.userId);
-        this.pongMap.delete(player2.data.userId);
-      });
-      pong?.setgameMode('normal');
-      this.pongMap.set(player1.data.userId, pong);
-      this.pongMap.set(player2.data.userId, pong);
+      this.createGameRoom(player1, player2, false);
     }
   }
 
@@ -218,35 +211,25 @@ export class EventsGateway
       this.itemMatchQueue.delete(player1);
       this.itemMatchQueue.delete(player2);
 
-      const roomName = this.createGameRoom(player1, player2);
-      const pong = new Pong(this.prisma, player1.data.userId, player2.data.userId, () => {
-        this.pongMap.delete(player1.data.userId);
-        this.pongMap.delete(player2.data.userId);
-      });
-      pong?.setgameMode('item');
-      this.pongMap.set(player1.data.userId, pong);
-      this.pongMap.set(player2.data.userId, pong);
+      this.createGameRoom(player1, player2, true);
     }
   }
 
-  private createGameRoom(player1: Socket, player2: Socket): string {
+  private createGameRoom(player1: Socket, player2: Socket, mode: boolean): void {
+    // 룸 생성 및 클라이언트 추가
     const roomName = generateUniqueRoomName();
-    // 룸 생성
     player1.join(roomName);
     player2.join(roomName);
-
-    // 방에 클라이언트 추가
     this.server.to(roomName).emit('GoPong', { room: roomName });
 
     // playerRole 알림
     this.server.to(player1.id).emit('playerRole', 'player1');
     this.server.to(player2.id).emit('playerRole', 'player2');
-    this.server.to('gameRoom').emit('gameStart');
 
     setTimeout(() => {
       const player1Id = player1.data.userId;
       const player2Id = player2.data.userId;
-      const pong = new Pong(this.prisma, player1Id, player2Id, () => {
+      const pong = new Pong(this.prisma, player1Id, player2Id, mode, () => {
         this.pongMap.delete(player1Id);
         this.pongMap.delete(player2Id);
       });
@@ -257,7 +240,6 @@ export class EventsGateway
       this.pongMap.set(player1Id, pong);
       this.pongMap.set(player2Id, pong);
     }, 3000);
-    return roomName;
   }
 
   @SubscribeMessage('paddleMove')

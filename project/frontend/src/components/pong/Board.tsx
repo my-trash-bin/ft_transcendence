@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import React, { useEffect } from 'react';
+import React, { use, useEffect } from 'react';
 import usePaddleMovement from './KeyHandle';
 import useStore from './Update';
 import { BALL_SIZE, BOARD_HEIGHT, BOARD_WIDTH, GameState, PADDLE_HEIGHT, PADDLE_WIDTH } from './gameConstants';
@@ -8,34 +8,30 @@ import { useRouter } from 'next/navigation';
 
 // npm run build && npx nest start --watch
 const NormalBoard: React.FC = () => {
-  const { ball, paddle1, paddle2, score1, score2, isPlayer1, setGameState } = useStore();
+  const { ball, paddle1, paddle2, score1, score2, isPlayer1, setGameState} = useStore();
   const socket = getGameSocket();
   const router = useRouter();
+
+  // console.log('mode = ', useStore.getState().mode);
+
   usePaddleMovement();
+
   const handleGameUpdate = (gameState: GameState) => {
     if (!gameState.gameStart) {
       console.log('game not started');
     } else if (!gameState.gameOver) {
       setGameState(gameState);
+      console.log('isItemMode = ', gameState.isItemMode);
     } else {
       console.log('gameOver');
       router.push('/pong/gameOver');
     }
   };
-
-  const handleGameStart = (gameState: GameState) => {
-    // 나중에 더 구체적으로 바꿀 수 있을 듯
-    gameState.gameOver = false;
-    gameState.gameStart = true;
-    console.log('gameStart');
-  }
   useEffect(() => {
     socket.on('gameUpdate', handleGameUpdate);
-    socket.on('gameStart', handleGameStart);
 
     return () => {
       socket.off('gameUpdate', handleGameUpdate);
-      socket.off('gameStart', handleGameStart);
     };
   }, []);
 
