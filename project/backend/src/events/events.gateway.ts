@@ -199,9 +199,13 @@ export class EventsGateway
       this.normalMatchQueue.delete(player2);
 
       const roomName = this.createGameRoom(player1, player2);
-
-      // 일반 매치 시작 알림
-      this.server.to(roomName).emit('normalMatchStart', { room: roomName });
+      const pong = new Pong(this.prisma, player1.data.userId, player2.data.userId, () => {
+        this.pongMap.delete(player1.data.userId);
+        this.pongMap.delete(player2.data.userId);
+      });
+      pong?.setgameMode('normal');
+      this.pongMap.set(player1.data.userId, pong);
+      this.pongMap.set(player2.data.userId, pong);
     }
   }
 
@@ -215,9 +219,13 @@ export class EventsGateway
       this.itemMatchQueue.delete(player2);
 
       const roomName = this.createGameRoom(player1, player2);
-
-      // 아이템 매치 시작 알림
-      this.server.to(roomName).emit('itemMatchStart', { room: roomName });
+      const pong = new Pong(this.prisma, player1.data.userId, player2.data.userId, () => {
+        this.pongMap.delete(player1.data.userId);
+        this.pongMap.delete(player2.data.userId);
+      });
+      pong?.setgameMode('item');
+      this.pongMap.set(player1.data.userId, pong);
+      this.pongMap.set(player2.data.userId, pong);
     }
   }
 

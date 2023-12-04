@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useRouter } from 'next/navigation'; // 'next/router'를 사용합니다.
+import { useRouter } from 'next/navigation';
 
 const GameEnd = () => {
   const router = useRouter();

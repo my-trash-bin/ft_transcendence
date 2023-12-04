@@ -31,18 +31,7 @@ const MatchingModal: React.FC<MatchingModalProps> = ({
     }
   }, [isOpen, onClose, router, socket]);
 
-  const handleNormalMatch = () => {
-    console.log('normalMatch');
-  }
-
-  const handleItemMatch = () => {
-    console.log('itemMatch');
-  }
-
-  const { setMode } = useStore();
   const handleGoPong = () => {
-    console.log('GoPong - Redirecting to game room, mode:', mode, 'ID:', Math.random());
-    setMode(mode);
     onClose();
     router.push('/pong');
   }
@@ -53,13 +42,9 @@ const MatchingModal: React.FC<MatchingModalProps> = ({
     socket.off('playerRole', handlePlayerRole);
   }
   useEffect(() => {
-    socket.on('normalMatchStart', handleNormalMatch);
-    socket.on('itemMatchStart', handleItemMatch);
     socket.on('GoPong', handleGoPong);
     socket.on('playerRole', handlePlayerRole);
     return () => {
-      socket.off('normalMatchStart', handleNormalMatch);
-      socket.off('itemMatchStart', handleItemMatch);
       socket.off('GoPong', handleGoPong);
       socket.off('playerRole', handlePlayerRole);
     };

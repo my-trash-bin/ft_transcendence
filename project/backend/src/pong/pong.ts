@@ -12,6 +12,7 @@ const DEFAULT_SPEED = 3;
 const SMASH_SPEED = 8;
 const PADDLE_STRIKE = 4;
 const PADDLE_MOVE_STEP = 20;
+const GAME_OVER = 3;
 // const PADDLE_MOVE_STEP = 0.5; // 움직임의 단계 크기 증가
 
 export interface GameState {
@@ -23,6 +24,8 @@ export interface GameState {
   score2: number;
   gameOver: boolean;
   gameStart: boolean;
+  mode?: string;
+  item?: { x: number; y: number };
 }
 
 export class Pong {
@@ -54,6 +57,10 @@ export class Pong {
     this.resetPosition();
     this.onGameUpdate.emit('gameState', this.gameState);
     this.startGameLoop();
+  }
+
+  setgameMode(mode: string) {
+    this.gameState.mode = mode;
   }
 
   private startGameLoop() {
@@ -155,7 +162,7 @@ export class Pong {
   private checkGameOver() {
     if (
       !this.gameState.gameOver &&
-      (this.gameState.score1 === 11 || this.gameState.score2 === 11)
+      (this.gameState.score1 === GAME_OVER || this.gameState.score2 === GAME_OVER)
     ) {
       this.gameState.gameOver = true;
       this.onGameUpdate.emit('gameState', this.gameState);
@@ -165,7 +172,7 @@ export class Pong {
           player2Id: this.player2Id,
           player1Score: this.gameState.score1,
           player2Score: this.gameState.score2,
-          isPlayer1win: this.gameState.score1 === 11,
+          isPlayer1win: this.gameState.score1 === GAME_OVER,
         },
       });
       this.onEnd();

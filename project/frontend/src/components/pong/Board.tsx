@@ -8,13 +8,10 @@ import { useRouter } from 'next/navigation';
 
 // npm run build && npx nest start --watch
 const NormalBoard: React.FC = () => {
-  const { ball, paddle1, paddle2, score1, score2, isPlayer1, setGameState, mode } = useStore();
+  const { ball, paddle1, paddle2, score1, score2, isPlayer1, setGameState } = useStore();
   const socket = getGameSocket();
   const router = useRouter();
   usePaddleMovement();
-
-  // console.log('mode', mode);
-
   const handleGameUpdate = (gameState: GameState) => {
     if (!gameState.gameStart) {
       console.log('game not started');
