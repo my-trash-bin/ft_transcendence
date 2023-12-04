@@ -11,10 +11,14 @@ import {
 const queryClientConfig: QueryClientConfig = {
   defaultOptions: {
     queries: {
-      refetchIntervalInBackground: false,
-      refetchOnReconnect: false,
-      refetchOnMount: false,
-      refetchOnWindowFocus: false,
+      onError: (error) => {
+        console.error(`error from react-query: ${error}`);
+        if (error.message === 'Unauthorized') {
+          location.href = '/';
+        }
+        throw error;
+      },
+      retry: 0,
     },
   },
 };

@@ -6,27 +6,30 @@ import { AllChannelButton } from './AllChannelButton';
 import { EnterPasswordModal } from './modals/EnterPasswordModal';
 import { ParticipationModal } from './modals/ParticipationModal';
 
-function getLenderData(
+function getRenderData(
   channelData: any,
   setPasswordModalOpen: (isModalOpen: boolean) => void,
   setParticipationModalOpen: (isModalOpen: boolean) => void,
   setSelectedChannel: (channelId: string) => void,
+  searchChannel: string,
 ) {
-  return channelData.map((channel: any) => {
-    return (
-      <AllChannelButton
-        key={channel.id}
-        id={channel.id}
-        channelName={channel.title}
-        now={channel.memberCount}
-        max={channel.maximumMemberCount}
-        type={channel.type}
-        participateModalOpen={setParticipationModalOpen}
-        passwordModalOpen={setPasswordModalOpen}
-        setSelectedChannel={setSelectedChannel}
-      />
-    );
-  });
+  const filteredData = channelData.filter((channel: any) =>
+    channel.title.includes(searchChannel),
+  );
+
+  return filteredData.map((channel: any) => (
+    <AllChannelButton
+      key={channel.id}
+      id={channel.id}
+      channelName={channel.title}
+      now={channel.memberCount}
+      max={channel.maximumMemberCount}
+      isPublic={channel.isPublic}
+      participateModalOpen={setParticipationModalOpen}
+      passwordModalOpen={setPasswordModalOpen}
+      setSelectedChannel={setSelectedChannel}
+    />
+  ));
 }
 
 export function AllChannelList({ searchChannel }: { searchChannel: string }) {
@@ -39,16 +42,16 @@ export function AllChannelList({ searchChannel }: { searchChannel: string }) {
     [],
   );
 
-  const { isLoading, isError, data } = useQuery('allChannels', apiCall);
+  const { isLoading, data } = useQuery('allChannels', apiCall);
 
   if (isLoading) return <p>로딩중...</p>;
-  if (isError) throw new Error('에러가 발생했습니다.');
 
-  let lenderData = getLenderData(
+  let renderData = getRenderData(
     data?.data,
     setPasswordModalOpen,
     setParticipationModalOpen,
     setSelectedChannel,
+    searchChannel,
   );
 
   return (
@@ -69,7 +72,7 @@ export function AllChannelList({ searchChannel }: { searchChannel: string }) {
       </Portal>
 
       <div className="w-[350px] h-[600px] flex-grow-1 flex flex-col items-center gap-sm overflow-y-scroll">
-        {lenderData}
+        {renderData}
       </div>
     </>
   );

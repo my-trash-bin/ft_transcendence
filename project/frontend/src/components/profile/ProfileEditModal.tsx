@@ -88,8 +88,7 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
     setPassword(e.target.value);
   };
 
-  const textClass =
-    'font-bold text-xl font-sejong text-dark-purple leading-loose';
+  const textClass = 'font-bold text-xl  text-dark-purple leading-loose';
   return (
     <ModalLayout
       isOpen={isOpen}

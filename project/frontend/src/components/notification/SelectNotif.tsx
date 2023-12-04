@@ -14,7 +14,7 @@ export function SelectNotif({
     setShowAll(true);
   };
   return (
-    <div className="w-[140px] h-[30px] pl-[7px] pr-[7px] bg-default rounded-[20px] flex flex-row justify-center gap-sm items-center font-sejong">
+    <div className="w-[140px] h-[30px] pl-[7px] pr-[7px] bg-default rounded-[20px] flex flex-row justify-center gap-sm items-center ">
       <button
         className={`w-[58px] h-[20px] text-[13px] bg-white rounded-[20px]  ${unread}`}
         onClick={changeToUnread}

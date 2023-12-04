@@ -26,23 +26,14 @@ export function DmUser({
           />
           <div className="flex flex-col h-[100%] w-[100%] justify-between">
             <div className="flex flex-row justify-between items-center">
-              <p className="text-[22px] text-left">{nickname}</p>
+              <p className="text-[22px] text-left  font-semibold">{nickname}</p>
               <p className="text-[12px] text-right ">{dateView}</p>
             </div>
             <div className="flex flex-row justify-between items-center">
-              <p className="text-[15px] text-left">{messageShortcut}</p>
+              <p className="text-[15px] text-left ">{messageShortcut}</p>
             </div>
           </div>
         </div>
-        {/* <p className="absolute left-[70px] bottom-[55px] text-[22px]">
-          {nickname}
-        </p>
-        <p className="absolute left-[70px] bottom-[20px] text-[14px]">
-          {messageShortcut}
-        </p>
-        <p className="absolute text-[12px] left-[265px] bottom-[70px]">
-          {dateView}
-        </p> */}
       </button>
     </Link>
   );
