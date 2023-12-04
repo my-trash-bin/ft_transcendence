@@ -9,20 +9,20 @@ import { PrismaService } from '../base/prisma.service';
 import { ChannelId, UserId } from '../common/Id';
 import { ServiceError } from '../common/ServiceError';
 import {
+  ServiceResponse,
   newServiceFailPrismaUnKnownResponse,
   newServiceFailResponse,
   newServiceFailUnhandledResponse,
   newServiceOkResponse,
-  ServiceResponse,
 } from '../common/ServiceResponse';
 import { MessageWithMemberDto } from '../dm/dto/message-with-member';
 import { LeavingChannelInfo } from '../events/event-response.dto';
 import { UserDto, userDtoSelect } from '../users/dto/user.dto';
 import {
+  IsRecordToUpdateNotFoundError,
   createPrismaErrorMessage,
   isPrismaUnknownError,
   isRecordNotFoundError,
-  IsRecordToUpdateNotFoundError,
   isUniqueConstraintError,
 } from '../util/prismaError';
 import {
@@ -569,6 +569,32 @@ export class ChannelService {
           member: {
             select: userDtoSelect,
           },
+        },
+      });
+      return newServiceOkResponse(result);
+    } catch (error) {
+      if (isPrismaUnknownError(error)) {
+        throw new InternalServerErrorException(createPrismaErrorMessage(error));
+      }
+      return newServiceFailPrismaUnKnownResponse(500);
+    }
+  }
+
+  async getChannelMessages(
+    channelId: string,
+  ): Promise<ServiceResponse<MessageWithMemberDto[]>> {
+    try {
+      const result = await this.prisma.channelMessage.findMany({
+        where: {
+          channelId: channelId,
+        },
+        include: {
+          member: {
+            select: userDtoSelect,
+          },
+        },
+        orderBy: {
+          sentAt: 'asc',
         },
       });
       return newServiceOkResponse(result);

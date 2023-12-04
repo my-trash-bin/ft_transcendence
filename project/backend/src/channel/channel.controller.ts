@@ -16,6 +16,7 @@ import { JwtPayloadPhaseComplete } from '../auth/auth.service';
 import { JwtGuard } from '../auth/jwt.guard';
 import { Phase, PhaseGuard } from '../auth/phase.guard';
 import { idOf } from '../common/Id';
+import { MessageWithMemberDto } from '../dm/dto/message-with-member';
 import { ChannelRoomType, EventsService } from '../events/events.service';
 import { ChannelService } from './channel.service';
 import { ChannelIdDto } from './dto/channel-id.dto';
@@ -120,6 +121,20 @@ export class ChannelController {
     const result = await this.channelService.findChannelWithAllInfo(
       idOf(param.channelId),
     );
+    if (!result.ok) {
+      throw new HttpException(result.error!.message, result.error!.statusCode);
+    }
+    return result.data!;
+  }
+
+  @Get('messages/:channelId')
+  @ApiOkResponse({
+    type: () => MessageWithMemberDto,
+    isArray: true,
+  })
+  @UseGuards(JwtGuard, PhaseGuard)
+  async getChannelMessages(@Param('channelId') channelId: string) {
+    const result = await this.channelService.getChannelMessages(channelId);
     if (!result.ok) {
       throw new HttpException(result.error!.message, result.error!.statusCode);
     }
