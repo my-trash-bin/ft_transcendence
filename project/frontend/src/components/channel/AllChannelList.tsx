@@ -2,7 +2,7 @@ import { Api } from '@/api/api';
 import { useCallback, useState } from 'react';
 import { useQuery } from 'react-query';
 import Portal from '../common/Portal';
-import { AllChannelButton } from './AllChannelButton';
+import { AllChannelCard } from './AllChannelCard';
 import { EnterPasswordModal } from './modals/EnterPasswordModal';
 import { ParticipationModal } from './modals/ParticipationModal';
 
@@ -18,7 +18,7 @@ function getRenderData(
   );
 
   return filteredData.map((channel: any) => (
-    <AllChannelButton
+    <AllChannelCard
       key={channel.id}
       id={channel.id}
       channelName={channel.title}

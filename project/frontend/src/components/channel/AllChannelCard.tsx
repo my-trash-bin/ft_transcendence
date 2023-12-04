@@ -1,6 +1,6 @@
 import Image from 'next/image';
 
-export function AllChannelButton({
+export function AllChannelCard({
   id,
   channelName,
   now,
