@@ -62,6 +62,16 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
     }
   }, [onClose, api, password]);
 
+  const unsetPassword = useCallback(async () => {
+    try {
+      await api.usersControllerUnsetTwoFactorPassword({});
+      onClose();
+    } catch (error) {
+      alert('뭔가 에러');
+      console.error('Error unset password:', error);
+    }
+  }, [onClose, api]);
+
   const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newNickname = e.target.value;
     setNewData((newData) => ({
@@ -144,7 +154,7 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
               className="bg-[#f3f0f8] border-2 border-dark-purple"
             />
             <div className="self-end mt-sm flex flex-row gap-sm">
-              <Button onClick={() => alert('remove 2fa api')}>해제하기</Button>
+              <Button onClick={unsetPassword}>해제하기</Button>
               <Button disabled={!password} onClick={updatePassword}>
                 설정하기
               </Button>

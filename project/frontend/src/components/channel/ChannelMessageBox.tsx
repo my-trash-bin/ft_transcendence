@@ -21,7 +21,6 @@ export function ChannleMessageBox({
     return mem.memberId === me.id;
   });
   if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>Error...</div>;
   if (myAuthority.length === 0) throw new Error('Error fetching data');
 
   return (
@@ -32,7 +31,11 @@ export function ChannleMessageBox({
         myAuthority={myAuthority[0].memberType}
         myNickname={me.nickname}
       />
-      <MessageContent type={messageType.CHANNEL} myNickname={me.nickname} />
+      <MessageContent
+        channelId={channelId}
+        type={messageType.CHANNEL}
+        myNickname={me.nickname}
+      />
       <MessageSendBox channelId={channelId} type={messageType.CHANNEL} />
     </>
   );

@@ -1,7 +1,7 @@
 import { Api } from '@/api/api';
 import { useCallback, useState } from 'react';
 import { useQuery } from 'react-query';
-import { MyChannelButton } from './MyChannelButton';
+import { MyChannelCard } from './MyChannelCard';
 
 function getRenderData(channelData: any, searchChannel: string) {
   const filteredData = channelData.filter((channel: any) =>
@@ -9,7 +9,7 @@ function getRenderData(channelData: any, searchChannel: string) {
   );
 
   return filteredData.map((channel: any) => (
-    <MyChannelButton
+    <MyChannelCard
       key={channel.id}
       id={channel.id}
       channelName={channel.title}

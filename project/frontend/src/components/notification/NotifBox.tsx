@@ -2,7 +2,9 @@ import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { NotiCard } from './NotiCard';
 import { SelectNotif } from './SelectNotif';
-import mockNotifications from './mockNoti';
+import { useCallback, useContext } from 'react';
+import { useQuery } from 'react-query';
+import { ApiContext } from '../../app/_internal/provider/ApiContext';
 
 export function NotifBox({
   active,
@@ -12,8 +14,21 @@ export function NotifBox({
   setActive: Function;
 }) {
   const boxRef = useRef<HTMLDivElement>(null);
-  const data = mockNotifications;
   const [showAll, setShowAll] = useState(false);
+
+  const { api } = useContext(ApiContext);
+  const { isLoading, isError, data, refetch } = useQuery(
+    ['fetchNotifications'],
+    useCallback(async () => {
+      if (active) {
+        return (await api.notificationControllerFindManyAndUpdateRead()).data;
+      }
+    }, [api, active]),
+    {
+      enabled: active,
+    },
+  );
+
   useEffect(() => {
     function handleClickOutside(event: any) {
       if (boxRef.current && !boxRef.current.contains(event.target)) {
@@ -48,18 +63,19 @@ export function NotifBox({
             onClick={() => alert('refetch')}
           />
         </div>
-        {data.map((val) => {
-          if (showAll || !val.isRead) {
-            return (
-              <NotiCard
-                key={val.id}
-                isRead={val.isRead}
-                content={val.contentJson}
-              />
-            );
-          }
-          return null;
-        })}
+        {data &&
+          data.map((val) => {
+            if (showAll || !val.isRead) {
+              return (
+                <NotiCard
+                  key={val.id}
+                  isRead={val.isRead}
+                  content={val.contentJson}
+                />
+              );
+            }
+            return null;
+          })}
       </div>
     )
   );

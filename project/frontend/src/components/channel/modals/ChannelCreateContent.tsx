@@ -57,7 +57,7 @@ export const ChannelCreateContent = ({
           value={inputTitle}
         ></input>
         <p className={titleValid ? validText : invalidText}>
-          2 ~ 15자 이내로 입력해 주세요. (특수문자 제외)
+          6 ~ 20자 이내로 입력해 주세요. (특수문자 제외)
         </p>
       </div>
       <div className="flex flex-col ml-[20px] mb-[15px]">
