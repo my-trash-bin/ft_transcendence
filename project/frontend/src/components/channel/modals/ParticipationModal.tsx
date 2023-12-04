@@ -1,18 +1,38 @@
 import Image from 'next/image';
 import { ModalLayout } from './ModalLayout';
+import { useCallback, useContext } from 'react';
+import { ApiContext } from '@/app/_internal/provider/ApiContext';
+import { useRouter } from 'next/navigation';
 
 export function ParticipationModal({
   isModalOpen,
   setIsModalOpen,
   targetChannelId,
+  targetChannelType,
 }: Readonly<{
   isModalOpen: boolean;
   setIsModalOpen: (isOpen: boolean) => void;
   targetChannelId: string;
+  targetChannelType: string;
 }>) {
+  const { api } = useContext(ApiContext);
+  const router = useRouter();
   const closeModal = () => {
     setIsModalOpen(false);
   };
+
+  const participateChannel = useCallback(async () => {
+    try {
+      await api.channelControllerParticipateChannel({
+        type: targetChannelType === 'public' ? 'public' : 'protected',
+        channelId: targetChannelId,
+      });
+      console.log('Participate channel successfully');
+      router.push(`/channel/${targetChannelId}`);
+    } catch (error) {
+      console.error('Error participate channel:', error);
+    }
+  }, [api, targetChannelId, targetChannelType, router]);
 
   return (
     <ModalLayout
@@ -35,6 +55,7 @@ export function ParticipationModal({
           <button
             type="button"
             className="mt-[30px] pl-[20px] pr-[20px] w-[200px] h-[35px] bg-dark-purple rounded-md text-white"
+            onClick={participateChannel}
           >
             확인
           </button>

@@ -49,8 +49,7 @@ export function MessageContent({
     }
   }, [data]);
 
-  console.log('messages', messages);
-  console.log('messages', messages);
+  // console.log('messages', messages);
   useEffect(() => {
     messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);

@@ -10,33 +10,37 @@ function getRenderData(
   channelData: any,
   setPasswordModalOpen: (isModalOpen: boolean) => void,
   setParticipationModalOpen: (isModalOpen: boolean) => void,
-  setSelectedChannel: (channelId: string) => void,
+  setSelectedChannelId: (channelId: string) => void,
+  setSelectedChannelType: (channelType: string) => void,
   searchChannel: string,
 ) {
   const filteredData = channelData.filter((channel: any) =>
     channel.title.includes(searchChannel),
   );
-
-  return filteredData.map((channel: any) => (
-    <AllChannelCard
-      key={channel.id}
-      id={channel.id}
-      channelName={channel.title}
-      now={channel.memberCount}
-      max={channel.maximumMemberCount}
-      isPublic={channel.isPublic}
-      participateModalOpen={setParticipationModalOpen}
-      passwordModalOpen={setPasswordModalOpen}
-      setSelectedChannel={setSelectedChannel}
-    />
-  ));
+  return filteredData.map((channel: any) => {
+    return (
+      <AllChannelCard
+        key={channel.id}
+        id={channel.id}
+        channelName={channel.title}
+        now={channel.memberCount}
+        max={channel.maximumMemberCount}
+        isPublic={channel.isPublic}
+        participateModalOpen={setParticipationModalOpen}
+        passwordModalOpen={setPasswordModalOpen}
+        setSelectedChannelId={setSelectedChannelId}
+        setSelectedChannelType={setSelectedChannelType}
+      />
+    );
+  });
 }
 
 export function AllChannelList({ searchChannel }: { searchChannel: string }) {
   const [isPasswordModalOpen, setPasswordModalOpen] = useState<boolean>(false);
   const [isParticipationModalOpen, setParticipationModalOpen] =
     useState<boolean>(false);
-  const [selectedChannel, setSelectedChannel] = useState<string>('');
+  const [selectedChannelId, setSelectedChannelId] = useState<string>('');
+  const [selectedChannelType, setSelectedChannelType] = useState<string>('');
   const apiCall = useCallback(
     () => new Api().api.channelControllerFindAll(),
     [],
@@ -50,7 +54,8 @@ export function AllChannelList({ searchChannel }: { searchChannel: string }) {
     data?.data,
     setPasswordModalOpen,
     setParticipationModalOpen,
-    setSelectedChannel,
+    setSelectedChannelId,
+    setSelectedChannelType,
     searchChannel,
   );
 
@@ -60,14 +65,15 @@ export function AllChannelList({ searchChannel }: { searchChannel: string }) {
         <EnterPasswordModal
           isModalOpen={isPasswordModalOpen}
           setIsModalOpen={setPasswordModalOpen}
-          targetChannelId={selectedChannel}
+          targetChannelId={selectedChannelId}
         />
       </Portal>
       <Portal selector={'#modal-channel'}>
         <ParticipationModal
           isModalOpen={isParticipationModalOpen}
           setIsModalOpen={setParticipationModalOpen}
-          targetChannelId={selectedChannel}
+          targetChannelId={selectedChannelId}
+          targetChannelType={selectedChannelType}
         />
       </Portal>
 
