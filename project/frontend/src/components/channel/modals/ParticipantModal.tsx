@@ -10,6 +10,7 @@ const getRenderedData = (
   data: any,
   myAuthority: string,
   myNickname: string,
+  channelId: string,
 ) => {
   return data.map((p) => {
     return (
@@ -19,6 +20,8 @@ const getRenderedData = (
         imageUrl={p.member.profileImageUrl}
         type={myAuthority}
         isMyself={p.member.nickname === myNickname}
+        channelId={channelId}
+        memberId={p.member.id}
       />
     );
   });
@@ -51,7 +54,12 @@ export function ParticipantModal({
   if (isLoading) return <div>Loading...</div>;
   if (isError) throw new Error('Error fetching data');
 
-  const renderedData = getRenderedData(data.data, myAuthority, myNickname);
+  const renderedData = getRenderedData(
+    data?.data,
+    myAuthority,
+    myNickname,
+    channelId,
+  );
 
   return (
     <div className="p-sm">
