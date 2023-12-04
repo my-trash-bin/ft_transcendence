@@ -199,6 +199,55 @@ const testInfo = {
     },
   ],
 };
+
+const achievements = [
+  {
+    imageUrl: '/achivement/bell.png',
+    title: '손님',
+    description: '토토로퐁에 가입 완료!',
+  },
+  {
+    imageUrl: '/achivement/party.png',
+    title: '리더',
+    description: '채널을 1번 이상 생성!',
+  },
+  {
+    imageUrl: '/achivement/reindeer.png',
+    title: '방랑자',
+    description: '채널을 5번 이상 생성!',
+  },
+  {
+    imageUrl: '/achivement/santa.png',
+    title: '게임러버',
+    description: '게임 5회 이상 플레이!',
+  },
+  {
+    imageUrl: '/achivement/snowflake.png',
+    title: '출석왕',
+    description: '출석 5회 이상 성공!',
+  },
+  {
+    imageUrl: '/achivement/snowman.png',
+    title: '인싸',
+    description: '친구 30명 이상!',
+  },
+  {
+    imageUrl: '/achivement/star.png',
+    title: '중꺾마',
+    description: '2연패 후 3연승 성공!',
+  },
+  {
+    imageUrl: '/achivement/tree.png',
+    title: '게임왕',
+    description: '랭킹 1위 성공!',
+  },
+  {
+    imageUrl: '/achivement/wreath.png',
+    title: '수다왕',
+    description: '메시지 100번 이상 전송 성공!',
+  },
+];
+
 const prisma = new PrismaClient();
 
 async function main() {
@@ -210,8 +259,7 @@ async function main() {
   await prisma.userAchievement.deleteMany();
   await prisma.achievement.deleteMany();
 
-  await prisma.pongSeasonLog.deleteMany();
-  await prisma.pongLiveGame.deleteMany();
+  await prisma.pongGameHistory.deleteMany();
 
   await prisma.channelMessage.deleteMany();
   await prisma.channelInvitation.deleteMany();
@@ -227,6 +275,10 @@ async function main() {
   const testAuthUsers = getSimpleAuthUsers(testInfo.numOfUser);
 
   await prisma.$transaction(async (prisma) => {
+    // 0. 9개의 업정 생성
+    await prisma.achievement.createMany({
+      data: achievements,
+    });
     // 1. 10명의 유저 생성
     await prisma.auth.createMany({
       data: testAuthUsers.map(({ type, id, metadataJson }) => ({

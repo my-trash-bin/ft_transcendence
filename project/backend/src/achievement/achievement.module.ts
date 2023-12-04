@@ -1,10 +1,11 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { BaseModule } from '../base/base.module';
-import { AchievementService } from './achievement.service';
+import { NotificationModule } from '../notification/notification.module';
 import { AchievementController } from './achievement.controller';
+import { AchievementService } from './achievement.service';
 
 @Module({
-  imports: [BaseModule],
+  imports: [BaseModule, forwardRef(() => NotificationModule)],
   providers: [AchievementService],
   exports: [AchievementService],
   controllers: [AchievementController],

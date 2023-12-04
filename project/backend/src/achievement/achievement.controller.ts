@@ -1,15 +1,26 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Logger,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { WsException } from '@nestjs/websockets';
 import { Request as ExpressRequset } from 'express';
 import { JwtPayloadPhaseComplete } from '../auth/auth.service';
 import { JwtGuard } from '../auth/jwt.guard';
 import { Phase, PhaseGuard } from '../auth/phase.guard';
+import { idOf } from '../common/Id';
 import { AchievementService } from './achievement.service';
+import { GrantAchievementDto } from './dto/achievement-request.dto';
 import { AchievementWithReceived } from './dto/achievement-with-received.dto';
 @ApiTags('achievement')
 @Controller('/api/v1/achievement')
 export class AchievementController {
+  private logger = new Logger('AchievementController');
   constructor(private readonly achievementService: AchievementService) {}
 
   @Get()
@@ -60,13 +71,23 @@ export class AchievementController {
   //   return await this.achievementService.findByUser(idOf(userId));
   // }
 
-  // // 테스트 용도
-  // @Post(':userId')
-  // @ApiOperation({ summary: 'user에게 업적 부여' })
-  // @UseGuards(JwtGuard, PhaseGuard)
-  // @Phase('complete')
-  // async grantAchievement(@Body() dto: GrantAchievementDto) {
-  //   const { title, userId } = dto;
-  //   return await this.achievementService.grantAchievement(idOf(userId), title);
-  // }
+  // TODO: 테스트 용도, 삭제 OR 주석처리
+  @Post()
+  @ApiOperation({ summary: 'user에게 업적 부여' })
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
+  async grantAchievement(@Body() dto: GrantAchievementDto) {
+    const { title, userId } = dto;
+
+    const result = await this.achievementService.grantAchievement(
+      idOf(userId),
+      title,
+    );
+
+    if (!result.ok) {
+      throw result.error!;
+    }
+
+    return result.data!;
+  }
 }
