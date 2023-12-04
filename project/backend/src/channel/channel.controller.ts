@@ -151,7 +151,7 @@ export class ChannelController {
   ) {
     const userId = (req.user as JwtPayloadPhaseComplete).id;
 
-    const result = await this.channelService.participate(userId.value, dto);
+    await this.channelService.participate(userId.value, dto);
   }
 
   // @Get('participand/:cheenlId')

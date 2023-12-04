@@ -617,7 +617,8 @@ export class ChannelService {
   }
   async participate(userId: string, dto: ParticipateChannelDto) {
     try {
-      await this.checkUserAlreadyInChannel(userId, dto.channelId);
+      const res = await this.checkUserAlreadyInChannel(userId, dto.channelId);
+      if (res) return;
       if (dto.type == ChannelType.Public)
         return await this.participateUserToChannel(userId, dto);
 
@@ -631,7 +632,7 @@ export class ChannelService {
       if (!channel?.password)
         throw new InternalServerErrorException('비밀번호가 없습니다.');
       const match = await bcrypt.compare(dto.password, channel.password);
-      if (match) return await this.participateUserToChannel(userId, dto);
+      if (match) await this.participateUserToChannel(userId, dto);
       else throw new BadRequestException('비밀번호가 틀렸습니다.');
     } catch (error) {
       if (isPrismaUnknownError(error)) {
@@ -649,7 +650,8 @@ export class ChannelService {
         memberId: userId,
       },
     });
-    if (result) throw new BadRequestException('이미 참여한 채널입니다.');
+    if (result) return true;
+    else return false;
   }
 
   private async participateUserToChannel(

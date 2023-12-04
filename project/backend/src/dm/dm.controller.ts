@@ -50,4 +50,13 @@ export class DmController {
     );
     return res!.data;
   }
+
+  @Get()
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
+  async getMyDmList(@Request() req: ExpressRequest) {
+    const userId = (req.user as JwtPayloadPhaseComplete).id;
+    const res = await this.dmService.getMyDmList(userId.value);
+    return res;
+  }
 }
