@@ -34,7 +34,7 @@ export function NotifBox({
           'w-[250px] h-[400px] fixed left-[100px] bottom-[50px] \
         rounded-[5px] border-3 border-dark-purple bg-default \
         felx flex-col items-center justify-center \
-        overflow-y-scroll'
+        overflow-y-scroll z-[10]'
         }
       >
         <div className="flex flex-row justify-between">

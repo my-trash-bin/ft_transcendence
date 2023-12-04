@@ -2,13 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { DMChannelAssociation, DMMessage } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { PrismaService } from '../base/prisma.service';
-import { UserId } from '../common/Id';
+import { idOf, UserId } from '../common/Id';
 import {
   newServiceFailPrismaKnownResponse,
   newServiceFailResponse,
   newServiceOkResponse,
   ServiceResponse,
 } from '../common/ServiceResponse';
+import { userDtoSelect } from '../users/dto/user.dto';
 import { MessageWithMemberDto } from './dto/message-with-member';
 
 @Injectable()
@@ -111,6 +112,68 @@ export class DmService {
     }
   }
 
+  async getDMChannelMessagesByNickname(
+    userId: UserId,
+    nickname: string,
+  ): Promise<ServiceResponse<MessageWithMemberDto[]>> {
+    try {
+      const targetUser = await this.prisma.user.findUniqueOrThrow({
+        where: { nickname },
+      });
+      const channelResult = await this.findOrCraeteDmChannel(
+        userId,
+        idOf(targetUser.id),
+      );
+      if (!channelResult.ok) {
+        return { ok: false, error: channelResult.error };
+      }
+      const result = await this.prisma.$transaction(
+        async (prismaTransaction) => {
+          const channelId = channelResult.data!.id;
+          return await prismaTransaction.dMMessage.findMany({
+            where: {
+              channelId,
+            },
+            include: {
+              member: {
+                select: userDtoSelect,
+              },
+            },
+          });
+        },
+      );
+      return newServiceOkResponse(result);
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        return newServiceFailPrismaKnownResponse(error.code, 400);
+      }
+      return newServiceFailResponse('Unknown Error', 500);
+    }
+  }
+
+  // async getDMChannelMessages(
+  //   userId: UserId,
+  //   targetId: UserId,
+  // ): Promise<ServiceResponse<DMMessage[]>> {
+  //   const result = await this.findOrCraeteDmChannel(userId, targetId);
+  //   if (!result.ok) {
+  //     return { ok: false, error: result.error };
+  //   }
+  //   try {
+  //     const prismaDmMessages = await this.prisma.dMMessage.findMany({
+  //       where: {
+  //         channelId: result.data!.id,
+  //       },
+  //     });
+  //     return newServiceOkResponse(prismaDmMessages);
+  //   } catch (error) {
+  //     if (error instanceof PrismaClientKnownRequestError) {
+  //       return newServiceFailPrismaKnownResponse(error.code, 400);
+  //     }
+  //     return newServiceFailResponse('Unknown Error', 500);
+  //   }
+  // }
+
   async getDMChannelsWithMessages(userId: UserId, take?: number) {
     const userSelect = {
       id: true,
@@ -136,12 +199,8 @@ export class DmService {
         },
         select: {
           id: true,
-          member1: {
-            select: {
-              id: true,
-            },
-          }, // 둘 중 내꺼 아닌것 하나.
-          member2: { select: userSelect }, // 둘 중 내꺼 아닌것 하나.
+          member1: { select: userSelect },
+          member2: { select: userSelect },
           DMMessage: {
             take,
             orderBy: {
@@ -154,3 +213,8 @@ export class DmService {
     return associationsWithMessages;
   }
 }
+// id          String   @id @default(uuid()) @db.Uuid
+// channelId   String   @db.Uuid
+// memberId    String   @db.Uuid
+// sentAt      DateTime @default(now())
+// messageJson String

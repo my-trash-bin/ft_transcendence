@@ -210,9 +210,6 @@ async function main() {
   await prisma.userAchievement.deleteMany();
   await prisma.achievement.deleteMany();
 
-  await prisma.pongSeasonLog.deleteMany();
-  await prisma.pongLiveGame.deleteMany();
-
   await prisma.channelMessage.deleteMany();
   await prisma.channelInvitation.deleteMany();
   await prisma.channelMember.deleteMany();
