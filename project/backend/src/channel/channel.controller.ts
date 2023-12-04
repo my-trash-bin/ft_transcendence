@@ -142,7 +142,7 @@ export class ChannelController {
     return result.data!;
   }
 
-  @Post('/par')
+  @Post('/participate')
   @ApiOkResponse({})
   @UseGuards(JwtGuard, PhaseGuard)
   async participateChannel(
@@ -152,9 +152,6 @@ export class ChannelController {
     const userId = (req.user as JwtPayloadPhaseComplete).id;
 
     const result = await this.channelService.participate(userId.value, dto);
-    // if (!result.ok) {
-    // throw new HttpException(result.error!.message, result.error!.statusCode);
-    // }
   }
 
   // @Get('participand/:cheenlId')
