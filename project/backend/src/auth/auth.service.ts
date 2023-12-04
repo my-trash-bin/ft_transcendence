@@ -1,11 +1,15 @@
 import { scrypt } from 'node:crypto';
 
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AuthType } from '@prisma/client';
 
 import { PrismaService } from '../base/prisma.service';
 import { idOf, UserId } from '../common/Id';
+import {
+  isRecordNotFoundError,
+  IsRecordToUpdateNotFoundError,
+} from '../util/prismaError';
 
 // After OAuth, if user not exists
 export interface JwtPayloadPhaseRegister {
@@ -99,25 +103,50 @@ export class AuthService {
     nickname: string,
     imageUrl: string,
   ): Promise<JwtPayload> {
-    return await this.prismaService.$transaction(
-      async (tx): Promise<JwtPayload> => {
-        // TODO: AuthUser 하나당 한개의 유저를 바란다면 여기서 막으면 된다.
-        const auth = await tx.auth.update({
-          where: { type_id: { type: authType, id: authId } },
-          data: {
-            user: {
-              create: {
-                nickname,
-                profileImageUrl: imageUrl,
+    const DEFAULT_STATUS_MESSAGE = '안녕하세요! 저와 함께 퐁 게임 하실래요?';
+    const DEFAULT_CREATE_ACHIEVEMENT_UUID =
+      '00000000-0000-0000-0000-000000000000';
+    try {
+      return await this.prismaService.$transaction(
+        async (tx): Promise<JwtPayload> => {
+          // TODO: AuthUser 하나당 한개의 유저를 바란다면 여기서 막으면 된다.
+          const auth = await tx.auth.update({
+            where: {
+              type_id: {
+                type: authType,
+                id: authId,
+              },
+              user: null,
+            },
+            data: {
+              user: {
+                create: {
+                  nickname,
+                  profileImageUrl: imageUrl,
+                  statusMessage: DEFAULT_STATUS_MESSAGE,
+                  achievements: {
+                    create: {
+                      achievementId: DEFAULT_CREATE_ACHIEVEMENT_UUID,
+                    },
+                  },
+                },
               },
             },
-          },
-          select: { user: { select: { id: true } } },
-        });
-        const { id } = auth!.user!;
-        return { phase: 'complete', id: idOf(id) };
-      },
-    );
+            select: { user: { select: { id: true } } },
+          });
+          const id = auth.user!.id as string;
+          return { phase: 'complete', id: idOf(id) };
+        },
+      );
+    } catch (error) {
+      if (
+        IsRecordToUpdateNotFoundError(error) ||
+        isRecordNotFoundError(error)
+      ) {
+        throw new BadRequestException('이미 가입된 계정이 존재합니다.');
+      }
+      throw error;
+    }
   }
 
   async twoFactorAuthentication(

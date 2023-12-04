@@ -277,7 +277,10 @@ async function main() {
   await prisma.$transaction(async (prisma) => {
     // 0. 9개의 업정 생성
     await prisma.achievement.createMany({
-      data: achievements,
+      data: achievements.map((el, idx) => ({
+        ...el,
+        id: getSimpleUuid(getOneHexUpperDigits(idx)),
+      })),
     });
     // 1. 10명의 유저 생성
     await prisma.auth.createMany({
@@ -292,6 +295,13 @@ async function main() {
         id: userId,
         nickname,
         profileImageUrl,
+      })),
+    });
+    // 1.2 10명의 유저의 생성 업적 부여
+    await prisma.userAchievement.createMany({
+      data: testAuthUsers.map(({ userId }) => ({
+        userId,
+        achievementId: getSimpleUuid(getOneHexUpperDigits(0)),
       })),
     });
     // 2. 적당한 관계 형성
