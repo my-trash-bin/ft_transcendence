@@ -35,7 +35,7 @@ export function AchivementBox() {
 
     const filteredData = data?.filter((badge) => badge.isMine);
 
-    console.log(filteredData);
+    // console.log(filteredData);s
     if (filteredData?.length === 0 || !filteredData)
       return (
         <p className="self-center text-center">아직 획득한 업적이 없습니다. </p>
