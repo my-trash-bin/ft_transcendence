@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { DMChannelAssociation, DMMessage } from '@prisma/client';
+import { DMChannelAssociation, DMMessage, Prisma } from '@prisma/client';
+
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { PrismaService } from '../base/prisma.service';
 import { UserId, idOf } from '../common/Id';
@@ -162,6 +163,61 @@ export class DmService {
       }
       return newServiceFailResponse('Unknown Error', 500);
     }
+  }
+
+  async getMyDmList(userId: string) {
+    const dmChannelIds = await this.prisma.dMChannelAssociation.findMany({
+      where: {
+        OR: [{ member1Id: userId }, { member2Id: userId }],
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    const channelIdList = dmChannelIds.map(({ id }) => id);
+
+    const result: any = await this.getDmMessages(channelIdList);
+    const otherUserId = result.map((el: any) => {
+      if (el.member1Id === userId) {
+        return el.member2Id;
+      } else return el.member1Id;
+    });
+
+    const otherUsers = await this.prisma.user.findMany({
+      where: {
+        id: {
+          in: otherUserId,
+        },
+      },
+    });
+    const userProfileMap = new Map();
+    otherUsers.map((el) => {
+      userProfileMap.set(el.id, el);
+    });
+
+    return result.map((el: any) => {
+      const otherUserId = el.member1Id === userId ? el.member2Id : el.member1Id;
+      return {
+        channelId: el.channelId,
+        sentAt: el.sentAt,
+        messagePreview: el.messageJson,
+        profileImage: userProfileMap.get(otherUserId).profileImageUrl,
+        nickname: userProfileMap.get(otherUserId).nickname,
+      };
+    });
+  }
+
+  async getDmMessages(channelIdList: string[]) {
+    return await this.prisma.$queryRaw`SELECT DISTINCT ON ("channelId") *
+    FROM "DMMessage"
+    JOIN "DMChannelAssociation" ON "DMMessage"."channelId" = "DMChannelAssociation"."id"
+    JOIN "User" ON "DMChannelAssociation"."member1Id" = "User"."id"
+    WHERE "channelId" = ANY (${Prisma.sql`ARRAY[${Prisma.join(
+      channelIdList,
+      ', ',
+    )}]::uuid[]`})
+    ORDER BY "channelId", "sentAt" DESC`;
   }
 
   // async getDMChannelMessages(
