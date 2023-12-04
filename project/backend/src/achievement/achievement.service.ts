@@ -1,12 +1,52 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { Achievement } from '@prisma/client';
 import { PrismaService } from '../base/prisma.service';
 import { UserId } from '../common/Id';
+import {
+  newServiceFailUnhandledResponse,
+  newServiceOkResponse,
+  ServiceResponse,
+} from '../common/ServiceResponse';
+import { AchievementWithReceived } from './dto/achievement-with-received.dto';
 import { UserAchievementDto } from './dto/user-achievement.dto';
 
 @Injectable()
 export class AchievementService {
+  private logger = new Logger('AchievementService');
   constructor(private prisma: PrismaService) {}
+
+  async findAllWithReceived(
+    userId: UserId,
+  ): Promise<ServiceResponse<AchievementWithReceived[]>> {
+    try {
+      const result = await this.prisma.$transaction(async (prisma) => {
+        const achievements = await prisma.achievement.findMany({
+          include: {
+            achievedUsers: {
+              where: {
+                userId: userId.value,
+              },
+            },
+          },
+        });
+        return achievements.map((achieve) => ({
+          id: achieve.id,
+          title: achieve.title,
+          imageUrl: achieve.imageUrl,
+          description: achieve.description,
+          isMine: achieve.achievedUsers.length !== 0,
+        }));
+      });
+      this.logger.debug(result);
+      return newServiceOkResponse(result);
+    } catch (error) {
+      return newServiceFailUnhandledResponse(400);
+    }
+  }
 
   async findAll(): Promise<Achievement[]> {
     try {
