@@ -2,12 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { DMChannelAssociation, DMMessage } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { PrismaService } from '../base/prisma.service';
-import { idOf, UserId } from '../common/Id';
+import { UserId, idOf } from '../common/Id';
 import {
+  ServiceResponse,
   newServiceFailPrismaKnownResponse,
   newServiceFailResponse,
   newServiceOkResponse,
-  ServiceResponse,
 } from '../common/ServiceResponse';
 import { userDtoSelect } from '../users/dto/user.dto';
 import { MessageWithMemberDto } from './dto/message-with-member';
@@ -138,6 +138,9 @@ export class DmService {
               member: {
                 select: userDtoSelect,
               },
+            },
+            orderBy: {
+              sentAt: 'asc',
             },
           });
         },

@@ -5,8 +5,8 @@ import { DmService } from './dm.service';
 
 @Module({
   imports: [BaseModule],
+  controllers: [DmController],
   providers: [DmService],
   exports: [DmService],
-  controllers: [DmController],
 })
 export class DmModule {}
