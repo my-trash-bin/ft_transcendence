@@ -31,7 +31,11 @@ export function ChannleMessageBox({
         myAuthority={myAuthority[0].memberType}
         myNickname={me.nickname}
       />
-      <MessageContent type={messageType.CHANNEL} myNickname={me.nickname} />
+      <MessageContent
+        channelId={channelId}
+        type={messageType.CHANNEL}
+        myNickname={me.nickname}
+      />
       <MessageSendBox channelId={channelId} type={messageType.CHANNEL} />
     </>
   );
