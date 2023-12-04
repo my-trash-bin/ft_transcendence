@@ -6,22 +6,23 @@ import { UserStateAnnounce } from './UserStateAnnounce';
 import { useCallback, useContext } from 'react';
 import { useQuery } from 'react-query';
 import { ApiContext } from '@/app/_internal/provider/ApiContext';
+import { AnyARecord } from 'dns';
 
 export enum messageType {
   DM = 'DM',
   CHANNEL = 'CHANNEL',
 }
 interface messageContent {
-  // type: string;
-  // data: {
-  id: string;
-  messageJson: string;
-  sentAt: Date;
-  member: {
+  type: string;
+  data: {
     id: string;
-    nickname: string;
-    profileImageUrl: string;
-    // };
+    messageJson: string;
+    sentAt: Date;
+    member: {
+      id: string;
+      nickname: string;
+      profileImageUrl: string;
+    };
   };
 }
 
@@ -34,22 +35,26 @@ export function MessageContent({
   const messageEndRef = useRef<HTMLDivElement>(null);
 
   const { api } = useContext(ApiContext);
-  const { isLoading, isError, data, refetch } = useQuery(
-    [],
+  const { data: initialData, refetch } = useQuery(
+    ['fetchMessage'],
     useCallback(
       async () =>
         (await api.channelControllerGetChannelMessages(channelId)).data,
       [api, channelId],
     ),
+    { enabled: false },
   );
 
   useEffect(() => {
-    if (data) {
-      setMessages((messages: any) => [...messages, ...data]);
-    }
-  }, [data]);
+    refetch();
+  }, [channelId, refetch]);
 
-  // console.log('messages', messages);
+  useEffect(() => {
+    if (initialData) {
+      setMessages((prevMessages: any) => [...prevMessages, ...initialData]);
+    }
+  }, [initialData]);
+
   useEffect(() => {
     messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -59,21 +64,20 @@ export function MessageContent({
   return (
     <div className="w-[95%] h-[610px] pt-[20px] bg-chat-color2 rounded-[10px] flex flex-col overflow-y-scroll mt-sm">
       {messages.map((message, idx) => {
-        // if (message.type === 'leave' || message.type === 'join') {
-        //   return (
-        //     <UserStateAnnounce
-        //       key={message.data.id}
-        //       nickname={message.data.member.nickname}
-        //       userState={message.type}
-        //     />
-        //   );
-        // } else if (message.data.member.nickname === myNickname) {
-        if (message.member.nickname === myNickname) {
+        if (message.type === 'leave' || message.type === 'join') {
+          return (
+            <UserStateAnnounce
+              key={message.data.id}
+              nickname={message.data.member.nickname}
+              userState={message.type}
+            />
+          );
+        } else if (message.data.member.nickname === myNickname) {
           return (
             <MyChat
-              key={message.id}
-              message={message.messageJson}
-              time={new Date(message.sentAt)}
+              key={message.data.id}
+              message={message.data.messageJson}
+              time={new Date(message.data.sentAt)}
             />
           );
         } else {
@@ -81,18 +85,19 @@ export function MessageContent({
           if (
             idx == 0 ||
             (idx != 0 &&
-              messages[idx - 1].member.nickname != message.member.nickname)
+              messages[idx - 1].data.member.nickname !=
+                message.data.member.nickname)
           ) {
             isFirst = true;
           }
           return (
             <OtherChat
-              key={message.id}
-              time={new Date(message.sentAt)}
-              message={message.messageJson}
-              profileImage={message.member.profileImageUrl}
-              targetId={message.member.id}
-              targetNickname={message.member.nickname}
+              key={message.data.id}
+              time={new Date(message.data.sentAt)}
+              message={message.data.messageJson}
+              profileImage={message.data.member.profileImageUrl}
+              targetId={message.data.member.id}
+              targetNickname={message.data.member.nickname}
               isFirst={isFirst}
             />
           );
