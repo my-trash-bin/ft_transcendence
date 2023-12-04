@@ -21,7 +21,6 @@ export function ChannleMessageBox({
     return mem.memberId === me.id;
   });
   if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>Error...</div>;
   if (myAuthority.length === 0) throw new Error('Error fetching data');
 
   return (
