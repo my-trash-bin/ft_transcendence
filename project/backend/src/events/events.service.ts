@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { WsException } from '@nestjs/websockets';
 import { ChangeActionType, ChannelService } from '../channel/channel.service';
-import { ChannelId, ClientId, idOf, UserId } from '../common/Id';
+import { ChannelId, ClientId, UserId, idOf } from '../common/Id';
 import { DmService } from '../dm/dm.service';
 import { UserFollowService } from '../user-follow/user-follow.service';
 import { UsersService } from '../users/users.service';
@@ -370,6 +370,7 @@ export class EventsService {
     eventName: string,
     data: any,
   ) {
+    new Logger().log(data);
     this.getChannelArray(type, channelId)
       ?.filter((userId) =>
         blockedIdList.every((blockedId) => blockedId !== userId),
