@@ -19,15 +19,6 @@ const MatchingModal: React.FC<MatchingModalProps> = ({
   const socket = getGameSocket();
   const { setIsPlayer1 } = useStore();
 
-  
-  const handlePlayerRole = (role: string) => {
-    setIsPlayer1(role === 'player1');
-    console.log('playerRole', role);
-    socket.off('playerRole', handlePlayerRole);
-  };
-  
-  socket.on('playerRole', handlePlayerRole);
-
   useEffect(() => {
     if (isOpen) {
       if (mode === 'normal') {
@@ -35,21 +26,44 @@ const MatchingModal: React.FC<MatchingModalProps> = ({
         console.log('joinNormalMatch');
       } else if (mode === 'item') {
         socket.emit('joinItemMatch');
+        console.log('joinItemMatch');
       }
-
-      const handleGoPong = () => {
-        console.log('GoPong - Redirecting to game room');
-        onClose();
-        router.push('/pong');
-      };
-
-      socket.on('GoPong', handleGoPong);
-      return () => {
-        socket.off('GoPong', handleGoPong);
-      };
     }
-  }, [isOpen, mode, onClose, router, socket]);
+  }, [isOpen, onClose, router, socket]);
 
+  const handleNormalMatch = () => {
+    console.log('normalMatch');
+  }
+
+  const handleItemMatch = () => {
+    console.log('itemMatch');
+  }
+
+  const { setMode } = useStore();
+  const handleGoPong = () => {
+    console.log('GoPong - Redirecting to game room, mode:', mode, 'ID:', Math.random());
+    setMode(mode);
+    onClose();
+    router.push('/pong');
+  }
+
+  const handlePlayerRole = (role: string) => {
+    setIsPlayer1(role === 'player1');
+    console.log('playerRole', role);
+    socket.off('playerRole', handlePlayerRole);
+  }
+  useEffect(() => {
+    socket.on('normalMatchStart', handleNormalMatch);
+    socket.on('itemMatchStart', handleItemMatch);
+    socket.on('GoPong', handleGoPong);
+    socket.on('playerRole', handlePlayerRole);
+    return () => {
+      socket.off('normalMatchStart', handleNormalMatch);
+      socket.off('itemMatchStart', handleItemMatch);
+      socket.off('GoPong', handleGoPong);
+      socket.off('playerRole', handlePlayerRole);
+    };
+  }, []);
 
   const bgCSS = 'bg-default rounded-md';
   const size = 'py-sm px-lg w-[498px] h-[308px]';

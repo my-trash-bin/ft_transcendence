@@ -3,7 +3,9 @@ import { GameState, BOARD_HEIGHT, BOARD_WIDTH, BALL_SIZE, PADDLE_WIDTH, DEFAULT_
 
 interface ExtendedGameState extends GameState {
   isPlayer1: boolean;
+  mode: 'normal' | 'item' | null;
   setIsPlayer1: (isPlayer1: boolean) => void;
+  setMode: (mode: 'normal' | 'item' | null) => void;
   setGameState: (newState: GameState) => void;
 }
 
@@ -17,8 +19,10 @@ const useStore = create<ExtendedGameState>((set) => ({
   gameOver: false,
   gameStart: false,
   isPlayer1: true,
+  mode: null,
 
   setIsPlayer1: (isPlayer1) => set({ isPlayer1 }),
+  setMode: (mode) => set({ mode }),
   setGameState: (newState) => set({ ...newState }),
 }));
 

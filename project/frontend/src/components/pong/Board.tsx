@@ -7,11 +7,13 @@ import { getGameSocket } from './gameSocket';
 import { useRouter } from 'next/navigation';
 
 // npm run build && npx nest start --watch
-const GameBoard: React.FC = () => {
-  const { ball, paddle1, paddle2, score1, score2, isPlayer1, setGameState } = useStore();
+const NormalBoard: React.FC = () => {
+  const { ball, paddle1, paddle2, score1, score2, isPlayer1, setGameState, mode } = useStore();
   const socket = getGameSocket();
   const router = useRouter();
   usePaddleMovement();
+
+  // console.log('mode', mode);
 
   const handleGameUpdate = (gameState: GameState) => {
     if (!gameState.gameStart) {
@@ -30,7 +32,6 @@ const GameBoard: React.FC = () => {
     gameState.gameStart = true;
     console.log('gameStart');
   }
-  
   useEffect(() => {
     socket.on('gameUpdate', handleGameUpdate);
     socket.on('gameStart', handleGameStart);
@@ -50,31 +51,31 @@ const GameBoard: React.FC = () => {
           avatarUrl="/avatar/avatar-black.svg"
           playerName={isPlayer1 ? "Player2" : "Player1"}
         />
-  
+
         {/* 점수판 (중앙) */}
         <span className="text-2xl">{isPlayer1 ? score2 : score1} : {isPlayer1 ? score1 : score2}</span>
         {/* <span className="text-2xl">{score1} : {score2}</span> */}
-  
+
         {/* 현재 플레이어 아바타 (오른쪽에 항상 표시) */}
         <PlayerAvatar
           avatarUrl="/avatar/avatar-black.svg"
           playerName={isPlayer1 ? "Player1" : "Player2"}
         />
       </div>
-  
+
       {/* 게임 보드 */}
       <div className="border-2 border-dark-purple-interactive relative rounded-md bg-white mt-[10px]"
         style={{ width: BOARD_WIDTH, height: BOARD_HEIGHT }} >
-  
+
         {/* 공 */}
         <div className="absolute bg-dark-purple-interactive rounded-full"
-          style={{ width: BALL_SIZE, 
+          style={{ width: BALL_SIZE,
             height: BALL_SIZE,
             left: isPlayer1 ? `${BOARD_WIDTH - PADDLE_WIDTH - 10 - ball.x}px` : `${ball.x}px`,
             top: `${ball.y}px`
           }}
         />
-  
+
         {/* 상대 플레이어의 패들 내가 1이라면 2, 2라면 1*/}
         <div className={`absolute bg-dark-gray rounded-md`}
           style={{
@@ -98,7 +99,7 @@ const GameBoard: React.FC = () => {
         />
       </div>
     </div>
-  );  
+  );
 };
 
 interface PlayerAvatarProps {
@@ -125,4 +126,4 @@ const PlayerAvatar: React.FC<PlayerAvatarProps> = ({
   );
 };
 
-export default GameBoard;
+export default NormalBoard;
