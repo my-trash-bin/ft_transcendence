@@ -25,6 +25,7 @@ import { ChannelRelationDto } from './dto/channel-relation.dto';
 import { ChannelWithAllInfoDto } from './dto/channel-with-all-info.dto';
 import { ChannelDto } from './dto/channel.dto';
 import { CreateChannelDto } from './dto/create-channel.dto';
+import { ParticipateChannelDto } from './dto/participate-channel.dto';
 
 @ApiTags('channel')
 @Controller('/api/v1/channel')
@@ -139,6 +140,21 @@ export class ChannelController {
       throw new HttpException(result.error!.message, result.error!.statusCode);
     }
     return result.data!;
+  }
+
+  @Post('/par')
+  @ApiOkResponse({})
+  @UseGuards(JwtGuard, PhaseGuard)
+  async participateChannel(
+    @Body() dto: ParticipateChannelDto,
+    @Request() req: ExpressRequest,
+  ) {
+    const userId = (req.user as JwtPayloadPhaseComplete).id;
+
+    const result = await this.channelService.participate(userId.value, dto);
+    // if (!result.ok) {
+    // throw new HttpException(result.error!.message, result.error!.statusCode);
+    // }
   }
 
   // @Get('participand/:cheenlId')

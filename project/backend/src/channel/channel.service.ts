@@ -5,6 +5,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { ChannelMember, ChannelMemberType } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../base/prisma.service';
 import { ChannelId, UserId } from '../common/Id';
 import { ServiceError } from '../common/ServiceError';
@@ -35,6 +36,7 @@ import { ChannelWithAllInfoDto } from './dto/channel-with-all-info.dto';
 import { ChannelWithMembersDto } from './dto/channel-with-members.dto';
 import { ChannelDto, channelDtoSelect } from './dto/channel.dto';
 import { CreateChannelDto } from './dto/create-channel.dto';
+import { ParticipateChannelDto } from './dto/participate-channel.dto';
 import { ChannelType } from './enums/channel-type.enum';
 
 export enum ChangeActionType {
@@ -103,6 +105,9 @@ export class ChannelService {
     { type, title, password, capacity }: CreateChannelDto,
   ): Promise<ServiceResponse<ChannelDto>> {
     try {
+      if (password) {
+        password = await bcrypt.hash(password, 10);
+      }
       const prismaChannel = await this.prisma.channel.create({
         data: {
           title,
@@ -604,6 +609,56 @@ export class ChannelService {
       }
       return newServiceFailPrismaUnKnownResponse(500);
     }
+  }
+  async participate(userId: string, dto: ParticipateChannelDto) {
+    try {
+      await this.checkUserAlreadyInChannel(userId, dto.channelId);
+      if (dto.type == ChannelType.Public)
+        return await this.participateUserToChannel(userId, dto);
+
+      if (!dto.password)
+        throw new BadRequestException('비밀번호가 필요합니다.');
+      const channel = await this.prisma.channel.findUnique({
+        where: {
+          id: dto.channelId,
+        },
+      });
+      if (!channel?.password)
+        throw new InternalServerErrorException('비밀번호가 없습니다.');
+      const match = await bcrypt.compare(dto.password, channel.password);
+      if (match) return await this.participateUserToChannel(userId, dto);
+      else throw new BadRequestException('비밀번호가 틀렸습니다.');
+    } catch (error) {
+      if (isPrismaUnknownError(error)) {
+        throw new InternalServerErrorException(createPrismaErrorMessage(error));
+      }
+      if (error instanceof BadRequestException) throw error;
+      return newServiceFailPrismaUnKnownResponse(500);
+    }
+  }
+
+  private async checkUserAlreadyInChannel(userId: string, channelId: string) {
+    const result = await this.prisma.channelMember.findFirst({
+      where: {
+        channelId: channelId,
+        memberId: userId,
+      },
+    });
+    if (result) throw new BadRequestException('이미 참여한 채널입니다.');
+  }
+
+  private async participateUserToChannel(
+    userId: string,
+    dto: ParticipateChannelDto,
+  ) {
+    const result = await this.prisma.channelMember.create({
+      data: {
+        channelId: dto.channelId,
+        memberId: userId,
+        memberType: ChannelMemberType.MEMBER,
+      },
+    });
+    return newServiceOkResponse(result);
   }
 
   private async kickUser(
