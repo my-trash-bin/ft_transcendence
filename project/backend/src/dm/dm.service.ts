@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { DMChannelAssociation, DMMessage } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { PrismaService } from '../base/prisma.service';
@@ -14,6 +14,7 @@ import { MessageWithMemberDto } from './dto/message-with-member';
 
 @Injectable()
 export class DmService {
+  private logger = new Logger('DmService');
   constructor(private prisma: PrismaService) {}
 
   async findAllDmChannels() {
@@ -43,8 +44,10 @@ export class DmService {
             member2Id: member2Id.value,
           },
         });
+      this.logger.debug('ok');
       return newServiceOkResponse(prismaDmChannelAssociation);
     } catch (error) {
+      this.logger.debug('fail');
       return newServiceFailResponse('Unknown Error', 500);
     }
   }
@@ -115,7 +118,7 @@ export class DmService {
   async getDMChannelMessagesByNickname(
     userId: UserId,
     nickname: string,
-  ): Promise<ServiceResponse<MessageWithMemberDto[]>> {
+  ): Promise<ServiceResponse<any[]>> {
     try {
       const targetUser = await this.prisma.user.findUniqueOrThrow({
         where: { nickname },
@@ -145,7 +148,14 @@ export class DmService {
           });
         },
       );
-      return newServiceOkResponse(result);
+      return newServiceOkResponse(
+        result.map((el) => {
+          return {
+            type: 'directMessage',
+            data: el,
+          };
+        }),
+      );
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         return newServiceFailPrismaKnownResponse(error.code, 400);

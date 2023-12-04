@@ -48,6 +48,6 @@ export class DmController {
       userId,
       nickname || '',
     );
-    return res;
+    return res!.data;
   }
 }

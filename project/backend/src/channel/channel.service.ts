@@ -585,11 +585,9 @@ export class ChannelService {
     }
   }
 
-  async getChannelMessages(
-    channelId: string,
-  ): Promise<ServiceResponse<MessageWithMemberDto[]>> {
+  async getChannelMessages(channelId: string): Promise<ServiceResponse<any[]>> {
     try {
-      const result = await this.prisma.channelMessage.findMany({
+      let result = await this.prisma.channelMessage.findMany({
         where: {
           channelId: channelId,
         },
@@ -602,7 +600,14 @@ export class ChannelService {
           sentAt: 'asc',
         },
       });
-      return newServiceOkResponse(result);
+      return newServiceOkResponse(
+        result.map((el) => {
+          return {
+            type: 'channelMessage',
+            data: el,
+          };
+        }),
+      );
     } catch (error) {
       if (isPrismaUnknownError(error)) {
         throw new InternalServerErrorException(createPrismaErrorMessage(error));

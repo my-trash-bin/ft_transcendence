@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { WsException } from '@nestjs/websockets';
 import { ChangeActionType, ChannelService } from '../channel/channel.service';
-import { ChannelId, ClientId, idOf, UserId } from '../common/Id';
+import { ChannelId, ClientId, UserId, idOf } from '../common/Id';
 import { DmService } from '../dm/dm.service';
 import { UserFollowService } from '../user-follow/user-follow.service';
 import { UsersService } from '../users/users.service';
@@ -18,15 +18,6 @@ import {
 } from './event-response.dto';
 import { UserSocket } from './events.gateway';
 
-interface JwtPayload {
-  phase: string;
-  id: {
-    value: string; // uuid
-  };
-  iat: number;
-  exp: number;
-}
-
 export enum ChannelRoomType {
   NORMAL = 'normal',
   DM = 'dm',
@@ -41,7 +32,7 @@ type ClientIdKey = string;
 export class EventsService {
   server!: Server;
 
-  // private channels!: Record<string, Record<string, string[]>>;
+  private logger = new Logger('EventsService');
   private channels!: Record<
     ChannelRoomTypeKey,
     Record<ChannelIdKey, Set<UserIdKey>>
@@ -379,6 +370,7 @@ export class EventsService {
     eventName: string,
     data: any,
   ) {
+    new Logger().log(data);
     this.getChannelArray(type, channelId)
       ?.filter((userId) =>
         blockedIdList.every((blockedId) => blockedId !== userId),
