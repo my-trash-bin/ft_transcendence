@@ -45,7 +45,7 @@ export function ProfileBox() {
     if (!data) {
       return <p>Fail to get data.</p>;
     }
-
+    // console.log('data', data);
     return (
       <div className="flex flex-row justify-center items-center gap-lg w-[100%] h-[100%]">
         <div className="flex flex-col justify-center items-center gap-md px-2xl">
