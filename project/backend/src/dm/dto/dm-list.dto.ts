@@ -1,6 +1,6 @@
 import { DMMessage } from '@prisma/client';
 
-class DmChannelMessageDto {
+export class DmChannelMessageDto {
   channelId!: string;
   sentAt!: Date;
   messagePreview!: string;

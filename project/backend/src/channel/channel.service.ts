@@ -16,6 +16,7 @@ import {
   newServiceFailUnhandledResponse,
   newServiceOkResponse,
 } from '../common/ServiceResponse';
+import { DmService } from '../dm/dm.service';
 import { MessageWithMemberDto } from '../dm/dto/message-with-member';
 import { LeavingChannelInfo } from '../events/event-response.dto';
 import { UserDto, userDtoSelect } from '../users/dto/user.dto';
@@ -68,7 +69,10 @@ export type JoinChannelInfoType = {
 
 @Injectable()
 export class ChannelService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private readonly dmService: DmService,
+  ) {}
 
   // Channel
   async findAll() {
@@ -585,8 +589,12 @@ export class ChannelService {
     }
   }
 
-  async getChannelMessages(channelId: string): Promise<ServiceResponse<any[]>> {
+  async getChannelMessages(
+    channelId: string,
+    userId: UserId,
+  ): Promise<ServiceResponse<any[]>> {
     try {
+      const blockList = await this.dmService.getBlockUserList(userId);
       let result = await this.prisma.channelMessage.findMany({
         where: {
           channelId: channelId,
@@ -601,12 +609,18 @@ export class ChannelService {
         },
       });
       return newServiceOkResponse(
-        result.map((el) => {
-          return {
-            type: 'channelMessage',
-            data: el,
-          };
-        }),
+        result
+          .filter((el) => {
+            return !blockList.find(
+              (block) => block.followeeId === el.member.id,
+            );
+          })
+          .map((el) => {
+            return {
+              type: 'channelMessage',
+              data: el,
+            };
+          }),
       );
     } catch (error) {
       if (isPrismaUnknownError(error)) {
