@@ -7,7 +7,8 @@ const BOARD_WIDTH = 800;
 const BOARD_HEIGHT = 500;
 const PADDLE_WIDTH = 10;
 const PADDLE_HEIGHT = 80;
-const SMALL_PADDLE_HEIGHT = 40;
+const SMALL_PADDLE_HEIGHT = 50;
+const SMALL_PADDLE_STRIKE = 2;
 const BALL_SIZE = 15;
 const DEFAULT_SPEED = 3;
 const SMASH_SPEED = 8;
@@ -116,11 +117,11 @@ export class Pong {
 
     if (type === 3) {
       maxY = BOARD_HEIGHT - SMALL_PADDLE_HEIGHT - 4;
-      return Math.min(Math.max(paddleY, minY), maxY);
     } else {
       maxY = BOARD_HEIGHT - PADDLE_HEIGHT - 4;
-      return Math.min(Math.max(paddleY, minY), maxY);
     }
+
+    return Math.min(Math.max(paddleY, minY), maxY);
   }
 
   getGameState() {
@@ -129,11 +130,12 @@ export class Pong {
 
   private moveBall() {
     if (this.gameState.ball.type === 1) {
-      this.gameState.velocity.x *= 2;
-      this.gameState.velocity.y *= 2;
+      this.gameState.ball.x += this.gameState.velocity.x * 1.5;
+      this.gameState.ball.y += this.gameState.velocity.y;
+    } else {
+      this.gameState.ball.x += this.gameState.velocity.x;
+      this.gameState.ball.y += this.gameState.velocity.y;
     }
-    this.gameState.ball.x += this.gameState.velocity.x;
-    this.gameState.ball.y += this.gameState.velocity.y;
   }
 
   private updateGameLogic(): boolean {
@@ -215,9 +217,7 @@ export class Pong {
 
   private gameInit() {
     this.resetPosition();
-    this.gameState.ball.type = 0;
-    this.gameState.paddle1.type = 0;
-    this.gameState.paddle2.type = 0;
+    this.gameState.pongItem = { x: 0, y: 0, type: 0 };
   }
 
   private resetPosition() {
@@ -228,7 +228,9 @@ export class Pong {
     this.gameState.velocity.y = DEFAULT_SPEED / 2;
     this.gameState.paddle1.y = 200;
     this.gameState.paddle2.y = 200;
-    this.gameState.pongItem = { x: 0, y: 0, type: 0 };
+    this.gameState.ball.type = 0;
+    this.gameState.paddle1.type = 0;
+    this.gameState.paddle2.type = 0;
   }
 
   private checkGameOver() {
@@ -268,11 +270,12 @@ export class Pong {
       const itemTop = item.y;
       const itemBottom = item.y + ITEM_SIZE;
 
+      // 아이템 충돌 감지
       const isCollision =
-        ballRight > itemLeft &&
-        ballLeft < itemRight &&
-        ballBottom > itemTop &&
-        ballTop < itemBottom;
+        ballRight >= itemLeft &&
+        ballLeft <= itemRight &&
+        ballBottom >= itemTop &&
+        ballTop <= itemBottom;
 
       if (isCollision) {
         console.log('item collision');
@@ -284,7 +287,8 @@ export class Pong {
 
   private checkPaddleCollisions() {
     // 플레이어 1의 패들과의 충돌 체크
-    const paddleHeight = this.gameState.paddle1.type === 3 ? SMALL_PADDLE_HEIGHT : PADDLE_HEIGHT;
+    const paddleHeight =
+      this.gameState.paddle1.type === 3 ? SMALL_PADDLE_HEIGHT : PADDLE_HEIGHT;
     const paddle1Center = this.gameState.paddle1.y + paddleHeight / 2;
     if (
       this.gameState.ball.x <= this.gameState.paddle1.x &&
@@ -296,6 +300,7 @@ export class Pong {
         this.gameState.ball.y,
       );
       this.gameState.ball.x = PADDLE_WIDTH + BALL_SIZE;
+      this.gameState.paddle1.type = this.gameState.ball.type;
     }
 
     // 플레이어 2의 패들과의 충돌 체크
@@ -310,21 +315,22 @@ export class Pong {
         this.gameState.ball.y,
       );
       this.gameState.ball.x = BOARD_WIDTH - PADDLE_WIDTH - BALL_SIZE * 2;
+      this.gameState.paddle2.type = this.gameState.ball.type;
     }
   }
 
   private checkSmash(paddleCenter: number, ballY: number): number {
-    const paddleHeight = this.gameState.paddle1.type === 3 ? SMALL_PADDLE_HEIGHT : PADDLE_HEIGHT;
-    const paddleStrike = this.gameState.paddle1.type === 3 ? PADDLE_STRIKE / 2 : PADDLE_STRIKE;
+    const paddleHeight =
+      this.gameState.paddle1.type === 3 ? SMALL_PADDLE_HEIGHT : PADDLE_HEIGHT;
+    const paddleStrike =
+      this.gameState.paddle1.type === 3 ? SMALL_PADDLE_STRIKE : PADDLE_STRIKE;
     const deltaY = Math.abs(ballY - paddleCenter);
     if (this.gameState.pongItem.type === 1) {
       return deltaY < paddleHeight / paddleStrike
         ? SMASH_SPEED * 1.2
         : DEFAULT_SPEED;
     } else {
-      return deltaY < paddleHeight / paddleStrike
-        ? SMASH_SPEED
-        : DEFAULT_SPEED;
+      return deltaY < paddleHeight / paddleStrike ? SMASH_SPEED : DEFAULT_SPEED;
     }
   }
 }

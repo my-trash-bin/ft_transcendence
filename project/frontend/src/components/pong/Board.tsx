@@ -11,6 +11,7 @@ import {
   ITEM_SIZE,
   PADDLE_HEIGHT,
   PADDLE_WIDTH,
+  SMALL_PADDLE_HEIGHT,
 } from './gameConstants';
 import { getGameSocket } from './gameSocket';
 
@@ -37,11 +38,21 @@ const Board: React.FC = () => {
       console.log('game not started');
     } else if (!gameState.gameOver) {
       setGameState(gameState);
+      if (gameState.ball.type != 0) {
+        console.log('ball type', gameState.ball.type);
+      }
+      if (gameState.paddle1.type != 0) {
+        console.log('paddle1 type', gameState.paddle1.type);
+      }
+      if (gameState.paddle2.type != 0) {
+        console.log('paddle2 type', gameState.paddle2.type);
+      }
     } else {
       console.log('gameOver');
       router.push('/pong/gameOver');
     }
   };
+
   useEffect(() => {
     socket.on('gameUpdate', handleGameUpdate);
 
@@ -77,36 +88,10 @@ const Board: React.FC = () => {
         className="border-2 border-dark-purple-interactive relative rounded-md bg-white mt-[10px]"
         style={{ width: BOARD_WIDTH, height: BOARD_HEIGHT }}
       >
-        {/*
-          공
-          type = 0 -> bg-dark-purple-interactive
-          type = 1 -> #ea580c (주황색)
-          type = 2 -> #facc15 (황금색)
-          type = 3 -> bg-dark-purple-interactive
-
-        */}
-        <div
-          className="absolute bg-dark-purple-interactive rounded-full"
-          style={{
-            width: BALL_SIZE,
-            height: BALL_SIZE,
-            left: isPlayer1
-              ? `${BOARD_WIDTH - PADDLE_WIDTH - 10 - ball.x}px`
-              : `${ball.x}px`,
-            top: `${ball.y}px`,
-          }}
-        />
-
-        {/*
-          아이템 랜더링
-          type = 1 -> ./pong/1
-          type = 2 -> ./pong/2
-          type = 3 -> ./pong/3
-          pongItem == undefined -> 아이템 없음, 아이템 지우기
-        */}
+        {/* 아이템 */}
         {isItemMode && pongItem.type != 0 && (
           <div
-            className="absolute rounded-md"
+            className="absolute"
             style={{
               width: `${ITEM_SIZE}px`,
               height: `${ITEM_SIZE}px`,
@@ -125,12 +110,31 @@ const Board: React.FC = () => {
           </div>
         )}
 
-        {/* 상대 플레이어의 패들 내가 1이라면 2, 2라면 1*/}
+        {/* 공 */}
         <div
-          className={`absolute bg-dark-gray rounded-md`}
+          className={`absolute rounded-full ${getBallColor(ball.type)}`}
+          style={{
+            width: BALL_SIZE,
+            height: BALL_SIZE,
+            left: isPlayer1
+              ? `${BOARD_WIDTH - PADDLE_WIDTH - 10 - ball.x}px`
+              : `${ball.x}px`,
+            top: `${ball.y}px`,
+          }}
+        />
+
+        {/*
+          paddle type = 3 -> paddle height = SMALL_PADDLE_HEIGHT
+          paddle type = 0 -> paddle height = PADDLE_HEIGHT
+        */}
+        {/* 상대 플레이어의 패들 내가 1이라면 2, 2라면 1 */}
+        <div
+          className="absolute bg-dark-gray rounded-md"
           style={{
             width: PADDLE_WIDTH,
-            height: PADDLE_HEIGHT,
+            height: isPlayer1
+              ? getPaddleHeight(paddle2.type)
+              : getPaddleHeight(paddle1.type),
             left: '10px',
             right: 'auto',
             top: `${isPlayer1 ? paddle2.y : paddle1.y}px`,
@@ -139,10 +143,12 @@ const Board: React.FC = () => {
 
         {/* 현재 플레이어의 패들 : 1이면 1, 2이면 2*/}
         <div
-          className={`absolute bg-dark-purple-interactive rounded-md`}
+          className="absolute bg-dark-purple-interactive rounded-md"
           style={{
             width: PADDLE_WIDTH,
-            height: PADDLE_HEIGHT,
+            height: isPlayer1
+              ? getPaddleHeight(paddle1.type)
+              : getPaddleHeight(paddle2.type),
             left: 'auto',
             right: '10px',
             top: `${isPlayer1 ? paddle1.y : paddle2.y}px`,
@@ -175,6 +181,24 @@ const PlayerAvatar: React.FC<PlayerAvatarProps> = ({
       <span className="text-lg font-medium">{playerName}</span>
     </div>
   );
+};
+
+const getBallColor = (type: number) => {
+  switch (type) {
+    case 1:
+      return 'bg-ball-pink'; // 핑크색
+    case 2:
+      return 'bg-ball-gold'; // 황금색
+    case 3:
+      return 'bg-ball-indigo'; // 하늘색
+    default:
+      return 'bg-dark-purple-interactive'; // 기본 색상
+  }
+};
+
+const getPaddleHeight = (type: number) => {
+  if (type === 3) return SMALL_PADDLE_HEIGHT;
+  return PADDLE_HEIGHT;
 };
 
 export default Board;

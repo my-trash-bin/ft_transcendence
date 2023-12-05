@@ -5,6 +5,7 @@ export const BOARD_HEIGHT = 500;
 // 패들
 export const PADDLE_WIDTH = 10;
 export const PADDLE_HEIGHT = 80;
+export const SMALL_PADDLE_HEIGHT = 50;
 export const PADDLE_SPEED = 5;
 export const PADDLE_STRIKE = 4;
 
@@ -19,7 +20,7 @@ export const ITEM_SIZE = 100;
 // type 0: 아이템 없음
 // type 1: 공 스피드 증가
 // type 2: 점수 2배
-// type 3: 패들 크기 감소
+// type 3: 패들 크기 증가
 
 export interface GameState {
   ball: { x: number; y: number; type: number };
