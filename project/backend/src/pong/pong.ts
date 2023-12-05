@@ -59,7 +59,7 @@ export class Pong {
       isItemMode: false,
       pongItem: { x: 0, y: 0, type: 0 },
     };
-    this.resetPosition();
+    this.gameInit();
     this.onGameUpdate.emit('gameState', this.gameState);
     this.startGameLoop();
   }
@@ -176,8 +176,10 @@ export class Pong {
   private doubleScore() {
     if (this.gameState.ball.x < 4) {
       this.gameState.score2 += 2;
+      this.gameState.paddle1.type = 0;
     } else {
       this.gameState.score1 += 2;
+      this.gameState.paddle2.type = 0;
     }
   }
 
@@ -188,8 +190,10 @@ export class Pong {
     }
     if (this.gameState.ball.x < 4) {
       this.gameState.score2++;
+      this.gameState.paddle1.type = 0;
     } else {
       this.gameState.score1++;
+      this.gameState.paddle2.type = 0;
     }
   }
 
@@ -209,17 +213,22 @@ export class Pong {
     this.checkGameOver();
   }
 
+  private gameInit() {
+    this.resetPosition();
+    this.gameState.ball.type = 0;
+    this.gameState.paddle1.type = 0;
+    this.gameState.paddle2.type = 0;
+  }
+
   private resetPosition() {
     this.gameState.ball.x = BOARD_WIDTH / 2 - BALL_SIZE / 2;
     this.gameState.ball.y = BOARD_HEIGHT / 2 - BALL_SIZE / 2;
-    this.gameState.ball.type = 0;
     this.gameState.velocity.x =
       DEFAULT_SPEED * (this.gameState.velocity.x < 0 ? -1 : 1);
     this.gameState.velocity.y = DEFAULT_SPEED / 2;
     this.gameState.paddle1.y = 200;
-    this.gameState.paddle1.type = 0;
     this.gameState.paddle2.y = 200;
-    this.gameState.paddle2.type = 0;
+    this.gameState.pongItem = { x: 0, y: 0, type: 0 };
   }
 
   private checkGameOver() {
@@ -275,11 +284,12 @@ export class Pong {
 
   private checkPaddleCollisions() {
     // 플레이어 1의 패들과의 충돌 체크
-    const paddle1Center = this.gameState.paddle1.y + PADDLE_HEIGHT / 2;
+    const paddleHeight = this.gameState.paddle1.type === 3 ? SMALL_PADDLE_HEIGHT : PADDLE_HEIGHT;
+    const paddle1Center = this.gameState.paddle1.y + paddleHeight / 2;
     if (
       this.gameState.ball.x <= this.gameState.paddle1.x &&
       this.gameState.ball.y + BALL_SIZE >= this.gameState.paddle1.y &&
-      this.gameState.ball.y <= this.gameState.paddle1.y + PADDLE_HEIGHT
+      this.gameState.ball.y <= this.gameState.paddle1.y + paddleHeight
     ) {
       this.gameState.velocity.x = this.checkSmash(
         paddle1Center,
@@ -289,11 +299,11 @@ export class Pong {
     }
 
     // 플레이어 2의 패들과의 충돌 체크
-    const paddle2Center = this.gameState.paddle2.y + PADDLE_HEIGHT / 2;
+    const paddle2Center = this.gameState.paddle2.y + paddleHeight / 2;
     if (
       this.gameState.ball.x + BALL_SIZE >= this.gameState.paddle2.x &&
       this.gameState.ball.y + BALL_SIZE >= this.gameState.paddle2.y &&
-      this.gameState.ball.y <= this.gameState.paddle2.y + PADDLE_HEIGHT
+      this.gameState.ball.y <= this.gameState.paddle2.y + paddleHeight
     ) {
       this.gameState.velocity.x = -this.checkSmash(
         paddle2Center,
@@ -304,13 +314,15 @@ export class Pong {
   }
 
   private checkSmash(paddleCenter: number, ballY: number): number {
+    const paddleHeight = this.gameState.paddle1.type === 3 ? SMALL_PADDLE_HEIGHT : PADDLE_HEIGHT;
+    const paddleStrike = this.gameState.paddle1.type === 3 ? PADDLE_STRIKE / 2 : PADDLE_STRIKE;
     const deltaY = Math.abs(ballY - paddleCenter);
     if (this.gameState.pongItem.type === 1) {
-      return deltaY < PADDLE_HEIGHT / PADDLE_STRIKE
+      return deltaY < paddleHeight / paddleStrike
         ? SMASH_SPEED * 1.2
         : DEFAULT_SPEED;
     } else {
-      return deltaY < PADDLE_HEIGHT / PADDLE_STRIKE
+      return deltaY < paddleHeight / paddleStrike
         ? SMASH_SPEED
         : DEFAULT_SPEED;
     }

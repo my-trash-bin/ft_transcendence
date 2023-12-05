@@ -252,6 +252,10 @@ export class EventsGateway
     data: boolean,
     @ConnectedSocket() client: Socket,
   ) {
+    if (client.data.userId === undefined) return;
+    if (!this.pongMap.has(client.data.userId)) return;
+    if (this.pongMap.get(client.data.userId) === undefined) return;
+    if (this.pongMap.get(client.data.userId)?.getGameState().gameStart === false) return;
     const playerId = client.data.userId;
     const pong = this.pongMap.get(playerId);
     if (!pong) return;
