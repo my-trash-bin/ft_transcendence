@@ -4,7 +4,6 @@ import { Title } from '@/components/common/Title';
 import { useCallback, useContext } from 'react';
 import { useQuery } from 'react-query';
 import { Badge } from './Badge';
-import { mockAchivementData } from './mockAchivementData';
 import { Button } from '@/components/common/Button';
 import { useRouter } from 'next/navigation';
 
@@ -12,9 +11,9 @@ export function AchivementArticle() {
   const { api } = useContext(ApiContext);
   const router = useRouter();
   const { isLoading, isError, data } = useQuery(
-    ['achivement'],
+    ['fetchAchievement2'],
     useCallback(
-      async () => (await api.userFollowControllerFindFriends()).data,
+      async () => (await api.achievementControllerFindAll()).data,
       [api],
     ),
   );
@@ -50,12 +49,12 @@ export function AchivementArticle() {
 
     return (
       <div className="grid grid-cols-3 w-[700px] h-[500px] gap-xl p-md overflow-y-scroll">
-        {mockAchivementData.map((badge) => (
+        {data?.map((badge) => (
           <Badge
-            key={badge.key}
-            nameContent={badge.name}
-            commentContent={badge.explanation}
-            imageURL={badge.imageURL}
+            key={badge.id}
+            nameContent={badge.title}
+            commentContent={badge.description}
+            imageURL={badge.imageUrl}
             isMine={badge.isMine}
           />
         ))}

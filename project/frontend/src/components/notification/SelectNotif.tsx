@@ -2,8 +2,8 @@ export function SelectNotif({
   showAll,
   setShowAll,
 }: {
-  showAll: boolean;
-  setShowAll: (param: boolean) => void;
+  readonly showAll: boolean;
+  readonly setShowAll: (param: boolean) => void;
 }) {
   const unread = !showAll ? 'text-chat-color1 shadow-md' : 'text-dark-gray';
   const all = showAll ? 'text-chat-color1 shadow-md' : 'text-dark-gray';

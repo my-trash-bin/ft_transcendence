@@ -16,8 +16,8 @@ import { Server, Socket } from 'socket.io';
 import { v4 as uuidv4 } from 'uuid';
 import { PrismaService } from '../base/prisma.service';
 import { ChangeActionType } from '../channel/channel.service';
-import { idOf } from '../common/Id';
 import { GateWayEvents } from '../common/gateway-events.enum';
+import { idOf } from '../common/Id';
 import { GameState, Pong } from '../pong/pong';
 import {
   ChannelIdentityDto,
@@ -57,6 +57,7 @@ export class EventsGateway
   server!: Server;
 
   private pongMap: Map<string, Pong>;
+  private logger = new Logger('eventsGateway');
 
   constructor(
     private jwtService: JwtService,
@@ -73,25 +74,28 @@ export class EventsGateway
 
   async handleConnection(@ConnectedSocket() client: Socket) {
     try {
-      new Logger().debug(`client connected ${client.id}`);
+      this.logger.debug(`새로운 클라이언트 ${client.id} 접속 시도`);
       const decoded = this.isValidJwtAndPhase(client);
       const userId = decoded.id.value;
 
       client.data.userId = userId;
 
       await this.eventsService.handleConnection(client as UserSocket);
+
+      this.logger.log(
+        `유저(${userId})의 새로운 클라이언트 접속: client.id ${client.id}`,
+      );
     } catch (error) {
       const msg =
         error instanceof WsException ? error.message : 'Unknown Error';
-      console.error(error);
+      this.logger.error(`핸드쉐이크 실패: client.id ${client.id}`);
       client.emit(GateWayEvents.Exception, { msg });
-      console.log(`인증 실패: ${msg}`);
       client.disconnect();
     }
   }
 
   async handleDisconnect(client: Socket) {
-    new Logger().debug(`Client disconnected: ${client.id}`);
+    this.logger.debug(`Client disconnected: ${client.id}`);
     this.eventsService.handleDisconnect(client);
   }
 

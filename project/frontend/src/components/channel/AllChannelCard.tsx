@@ -1,6 +1,6 @@
 import Image from 'next/image';
 
-export function AllChannelButton({
+export function AllChannelCard({
   id,
   channelName,
   now,
@@ -8,7 +8,8 @@ export function AllChannelButton({
   isPublic,
   passwordModalOpen,
   participateModalOpen,
-  setSelectedChannel,
+  setSelectedChannelId,
+  setSelectedChannelType,
 }: Readonly<{
   id: string;
   channelName: string;
@@ -17,15 +18,18 @@ export function AllChannelButton({
   isPublic: boolean;
   passwordModalOpen: (isModalOpen: boolean) => void;
   participateModalOpen: (isModalOpen: boolean) => void;
-  setSelectedChannel: (channelId: string) => void;
+  setSelectedChannelId: (channelId: string) => void;
+  setSelectedChannelType: (channelType: string) => void;
 }>) {
   const state = now + '/' + max;
 
   const addUserToChannel = () => {
-    setSelectedChannel(id);
+    setSelectedChannelId(id);
     if (isPublic) {
+      setSelectedChannelType('public');
       participateModalOpen(true);
     } else {
+      setSelectedChannelType('private');
       passwordModalOpen(true);
       // if(password)
       //   getSocket().emit('join', { channelId: id, password: password });
