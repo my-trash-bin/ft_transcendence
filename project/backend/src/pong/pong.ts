@@ -17,16 +17,16 @@ const ITEM_SIZE = 100;
 const GAME_OVER = 10;
 
 export interface GameState {
-  ball: { x: number; y: number, type: number };
+  ball: { x: number; y: number; type: number };
   velocity: { x: number; y: number };
-  paddle1: { x: number; y: number, type: number };
-  paddle2: { x: number; y: number, type: number };
+  paddle1: { x: number; y: number; type: number };
+  paddle2: { x: number; y: number; type: number };
   score1: number;
   score2: number;
   gameOver: boolean;
   gameStart: boolean;
   isItemMode: boolean;
-  itemMap: { x: number; y: number, type: number };
+  pongItem: { x: number; y: number; type: number };
 }
 
 export class Pong {
@@ -57,7 +57,7 @@ export class Pong {
       gameOver: false,
       gameStart: true,
       isItemMode: false,
-      itemMap: { x: 0, y: 0, type: 0 },
+      pongItem: { x: 0, y: 0, type: 0 },
     };
     this.resetPosition();
     this.onGameUpdate.emit('gameState', this.gameState);
@@ -73,12 +73,12 @@ export class Pong {
     const type = Math.floor(Math.random() * 3) + 1;
 
     // new item
-    this.gameState.itemMap = { x, y, type };
+    this.gameState.pongItem = { x, y, type };
 
     return false;
   }
 
-  setIsItemMode (mode: boolean) {
+  setIsItemMode(mode: boolean) {
     this.gameState.isItemMode = mode;
   }
 
@@ -184,7 +184,7 @@ export class Pong {
   private updateScore() {
     if (this.gameState.ball.type === 2) {
       this.doubleScore();
-      return ;
+      return;
     }
     if (this.gameState.ball.x < 4) {
       this.gameState.score2++;
@@ -228,7 +228,7 @@ export class Pong {
       (this.gameState.score1 >= GAME_OVER || this.gameState.score2 >= GAME_OVER)
     ) {
       this.gameState.gameOver = true;
-      this.gameState.itemMap = { x: 0, y: 0, type: 0 };
+      this.gameState.pongItem = { x: 0, y: 0, type: 0 };
       this.onGameUpdate.emit('gameState', this.gameState);
       this.prisma.pongGameHistory.create({
         data: {
@@ -244,7 +244,7 @@ export class Pong {
   }
 
   private checkItemCollision() {
-    if (!this.gameState.isItemMode || !this.gameState.itemMap || this.gameState.itemMap.type === 0) {
+    if (!this.gameState.isItemMode || this.gameState.pongItem.type === 0) {
       return;
     }
     const ballLeft = this.gameState.ball.x;
@@ -252,23 +252,26 @@ export class Pong {
     const ballTop = this.gameState.ball.y;
     const ballBottom = this.gameState.ball.y + BALL_SIZE;
 
-    const item = this.gameState.itemMap;
+    const item = this.gameState.pongItem;
     if (item) {
       const itemLeft = item.x;
       const itemRight = item.x + ITEM_SIZE;
       const itemTop = item.y;
       const itemBottom = item.y + ITEM_SIZE;
 
-      const isCollision = ballRight > itemLeft && ballLeft < itemRight && ballBottom > itemTop && ballTop < itemBottom;
+      const isCollision =
+        ballRight > itemLeft &&
+        ballLeft < itemRight &&
+        ballBottom > itemTop &&
+        ballTop < itemBottom;
 
       if (isCollision) {
         console.log('item collision');
         this.gameState.ball.type = item.type;
-        this.gameState.itemMap = { x: 0, y: 0, type: 0 };
+        this.gameState.pongItem = { x: 0, y: 0, type: 0 };
       }
     }
   }
-
 
   private checkPaddleCollisions() {
     // 플레이어 1의 패들과의 충돌 체크
@@ -302,10 +305,14 @@ export class Pong {
 
   private checkSmash(paddleCenter: number, ballY: number): number {
     const deltaY = Math.abs(ballY - paddleCenter);
-    if (this.gameState.itemMap.type === 1) {
-      return deltaY < PADDLE_HEIGHT / PADDLE_STRIKE ? SMASH_SPEED * 1.2 : DEFAULT_SPEED;
+    if (this.gameState.pongItem.type === 1) {
+      return deltaY < PADDLE_HEIGHT / PADDLE_STRIKE
+        ? SMASH_SPEED * 1.2
+        : DEFAULT_SPEED;
     } else {
-      return deltaY < PADDLE_HEIGHT / PADDLE_STRIKE ? SMASH_SPEED : DEFAULT_SPEED;
+      return deltaY < PADDLE_HEIGHT / PADDLE_STRIKE
+        ? SMASH_SPEED
+        : DEFAULT_SPEED;
     }
   }
 }

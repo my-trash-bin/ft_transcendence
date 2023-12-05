@@ -1,14 +1,32 @@
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import React, { useEffect } from 'react';
 import usePaddleMovement from './KeyHandle';
 import useStore from './Update';
-import { BALL_SIZE, ITEM_SIZE, BOARD_HEIGHT, BOARD_WIDTH, GameState, PADDLE_HEIGHT, PADDLE_WIDTH } from './gameConstants';
+import {
+  BALL_SIZE,
+  BOARD_HEIGHT,
+  BOARD_WIDTH,
+  GameState,
+  ITEM_SIZE,
+  PADDLE_HEIGHT,
+  PADDLE_WIDTH,
+} from './gameConstants';
 import { getGameSocket } from './gameSocket';
-import { useRouter } from 'next/navigation';
 
 // npm run build && npx nest start --watch
 const Board: React.FC = () => {
-  const { ball, paddle1, paddle2, score1, score2, isPlayer1, setGameState, itemMap, isItemMode} = useStore();
+  const {
+    ball,
+    paddle1,
+    paddle2,
+    score1,
+    score2,
+    isPlayer1,
+    setGameState,
+    pongItem,
+    isItemMode,
+  } = useStore();
   const socket = getGameSocket();
   const router = useRouter();
 
@@ -39,29 +57,43 @@ const Board: React.FC = () => {
         {/* 상대방 플레이어 아바타 (왼쪽에 항상 표시) */}
         <PlayerAvatar
           avatarUrl="/avatar/avatar-black.svg"
-          playerName={isPlayer1 ? "Player2" : "Player1"}
+          playerName={isPlayer1 ? 'Player2' : 'Player1'}
         />
 
         {/* 점수판 (중앙) */}
-        <span className="text-2xl">{isPlayer1 ? score2 : score1} : {isPlayer1 ? score1 : score2}</span>
+        <span className="text-2xl">
+          {isPlayer1 ? score2 : score1} : {isPlayer1 ? score1 : score2}
+        </span>
 
         {/* 현재 플레이어 아바타 (오른쪽에 항상 표시) */}
         <PlayerAvatar
           avatarUrl="/avatar/avatar-black.svg"
-          playerName={isPlayer1 ? "Player1" : "Player2"}
+          playerName={isPlayer1 ? 'Player1' : 'Player2'}
         />
       </div>
 
       {/* 게임 보드 */}
-      <div className="border-2 border-dark-purple-interactive relative rounded-md bg-white mt-[10px]"
-        style={{ width: BOARD_WIDTH, height: BOARD_HEIGHT }} >
+      <div
+        className="border-2 border-dark-purple-interactive relative rounded-md bg-white mt-[10px]"
+        style={{ width: BOARD_WIDTH, height: BOARD_HEIGHT }}
+      >
+        {/*
+          공
+          type = 0 -> bg-dark-purple-interactive
+          type = 1 -> #ea580c (주황색)
+          type = 2 -> #facc15 (황금색)
+          type = 3 -> bg-dark-purple-interactive
 
-        {/* 공 */}
-        <div className="absolute bg-dark-purple-interactive rounded-full"
-          style={{ width: BALL_SIZE,
+        */}
+        <div
+          className="absolute bg-dark-purple-interactive rounded-full"
+          style={{
+            width: BALL_SIZE,
             height: BALL_SIZE,
-            left: isPlayer1 ? `${BOARD_WIDTH - PADDLE_WIDTH - 10 - ball.x}px` : `${ball.x}px`,
-            top: `${ball.y}px`
+            left: isPlayer1
+              ? `${BOARD_WIDTH - PADDLE_WIDTH - 10 - ball.x}px`
+              : `${ball.x}px`,
+            top: `${ball.y}px`,
           }}
         />
 
@@ -70,21 +102,23 @@ const Board: React.FC = () => {
           type = 1 -> ./pong/1
           type = 2 -> ./pong/2
           type = 3 -> ./pong/3
-          itemMap == undefined -> 아이템 없음, 아이템 지우기
+          pongItem == undefined -> 아이템 없음, 아이템 지우기
         */}
-        {isItemMode && itemMap.type != 0 && (
+        {isItemMode && pongItem.type != 0 && (
           <div
             className="absolute rounded-md"
             style={{
               width: `${ITEM_SIZE}px`,
               height: `${ITEM_SIZE}px`,
-              left: isPlayer1 ? `${BOARD_WIDTH - PADDLE_WIDTH - 10 - itemMap.x}px` : `${itemMap.x}px`,
-              top: `${itemMap.y}px`
+              left: isPlayer1
+                ? `${BOARD_WIDTH - PADDLE_WIDTH - 10 - pongItem.x}px`
+                : `${pongItem.x}px`,
+              top: `${pongItem.y}px`,
             }}
           >
             <Image
-              src={`/item/${itemMap.type}.png`}
-              alt={`Item type ${itemMap.type}`}
+              src={`/item/${pongItem.type}.png`}
+              alt={`Item type ${pongItem.type}`}
               layout="fill"
               objectFit="cover"
             />
@@ -92,7 +126,8 @@ const Board: React.FC = () => {
         )}
 
         {/* 상대 플레이어의 패들 내가 1이라면 2, 2라면 1*/}
-        <div className={`absolute bg-dark-gray rounded-md`}
+        <div
+          className={`absolute bg-dark-gray rounded-md`}
           style={{
             width: PADDLE_WIDTH,
             height: PADDLE_HEIGHT,
@@ -103,7 +138,8 @@ const Board: React.FC = () => {
         />
 
         {/* 현재 플레이어의 패들 : 1이면 1, 2이면 2*/}
-        <div className={`absolute bg-dark-purple-interactive rounded-md`}
+        <div
+          className={`absolute bg-dark-purple-interactive rounded-md`}
           style={{
             width: PADDLE_WIDTH,
             height: PADDLE_HEIGHT,

@@ -22,14 +22,14 @@ export const ITEM_SIZE = 100;
 // type 3: 패들 크기 감소
 
 export interface GameState {
-  ball: { x: number; y: number, type: number };
+  ball: { x: number; y: number; type: number };
   velocity: { x: number; y: number };
-  paddle1: { x: number; y: number, type: number };
-  paddle2: { x: number; y: number, type: number };
+  paddle1: { x: number; y: number; type: number };
+  paddle2: { x: number; y: number; type: number };
   score1: number;
   score2: number;
   gameOver: boolean;
-  gameStart : boolean;
+  gameStart: boolean;
   isItemMode: boolean;
-  itemMap: { x: number; y: number, type: number };
+  pongItem: { x: number; y: number; type: number };
 }
