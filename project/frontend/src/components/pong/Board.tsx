@@ -1,18 +1,16 @@
 import Image from 'next/image';
-import React, { use, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import usePaddleMovement from './KeyHandle';
 import useStore from './Update';
-import { BALL_SIZE, BOARD_HEIGHT, BOARD_WIDTH, GameState, PADDLE_HEIGHT, PADDLE_WIDTH } from './gameConstants';
+import { BALL_SIZE, ITEM_SIZE, BOARD_HEIGHT, BOARD_WIDTH, GameState, PADDLE_HEIGHT, PADDLE_WIDTH } from './gameConstants';
 import { getGameSocket } from './gameSocket';
 import { useRouter } from 'next/navigation';
 
 // npm run build && npx nest start --watch
-const NormalBoard: React.FC = () => {
-  const { ball, paddle1, paddle2, score1, score2, isPlayer1, setGameState} = useStore();
+const Board: React.FC = () => {
+  const { ball, paddle1, paddle2, score1, score2, isPlayer1, setGameState, itemMap, isItemMode} = useStore();
   const socket = getGameSocket();
   const router = useRouter();
-
-  // console.log('mode = ', useStore.getState().mode);
 
   usePaddleMovement();
 
@@ -21,7 +19,6 @@ const NormalBoard: React.FC = () => {
       console.log('game not started');
     } else if (!gameState.gameOver) {
       setGameState(gameState);
-      console.log('isItemMode = ', gameState.isItemMode);
     } else {
       console.log('gameOver');
       router.push('/pong/gameOver');
@@ -47,7 +44,6 @@ const NormalBoard: React.FC = () => {
 
         {/* 점수판 (중앙) */}
         <span className="text-2xl">{isPlayer1 ? score2 : score1} : {isPlayer1 ? score1 : score2}</span>
-        {/* <span className="text-2xl">{score1} : {score2}</span> */}
 
         {/* 현재 플레이어 아바타 (오른쪽에 항상 표시) */}
         <PlayerAvatar
@@ -68,6 +64,32 @@ const NormalBoard: React.FC = () => {
             top: `${ball.y}px`
           }}
         />
+
+        {/*
+          아이템 랜더링
+          type = 1 -> ./pong/1
+          type = 2 -> ./pong/2
+          type = 3 -> ./pong/3
+        */}
+        {isItemMode && itemMap && (
+          <div
+            className="absolute rounded-md"
+            style={{
+              width: `${ITEM_SIZE}px`,
+              height: `${ITEM_SIZE}px`,
+              left: isPlayer1 ? `${BOARD_WIDTH - PADDLE_WIDTH - 10 - itemMap.x}px` : `${itemMap.x}px`,
+              top: `${itemMap.y}px`
+            }}
+          >
+            <Image
+              src={`/item/${itemMap.type}.png`}
+              alt={`Item type ${itemMap.type}`}
+              layout="fill"
+              objectFit="cover"
+            />
+          </div>
+        )}
+
 
         {/* 상대 플레이어의 패들 내가 1이라면 2, 2라면 1*/}
         <div className={`absolute bg-dark-gray rounded-md`}
@@ -119,4 +141,4 @@ const PlayerAvatar: React.FC<PlayerAvatarProps> = ({
   );
 };
 
-export default NormalBoard;
+export default Board;

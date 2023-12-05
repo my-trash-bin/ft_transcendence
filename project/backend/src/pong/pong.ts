@@ -12,7 +12,8 @@ const DEFAULT_SPEED = 3;
 const SMASH_SPEED = 8;
 const PADDLE_STRIKE = 4;
 const PADDLE_MOVE_STEP = 20;
-const GAME_OVER = 2;
+const ITEM_SIZE = 100;
+const GAME_OVER = 10;
 // const PADDLE_MOVE_STEP = 0.5; // 움직임의 단계 크기 증가
 
 export interface GameState {
@@ -25,7 +26,8 @@ export interface GameState {
   gameOver: boolean;
   gameStart: boolean;
   isItemMode: boolean;
-  item?: { x: number; y: number };
+  itemMap?: { x: number; y: number, type: number };
+  applyItem: number;
 }
 
 export class Pong {
@@ -55,10 +57,25 @@ export class Pong {
       gameOver: false,
       gameStart: true,
       isItemMode: false,
+      applyItem: 0,
     };
     this.resetPosition();
     this.onGameUpdate.emit('gameState', this.gameState);
     this.startGameLoop();
+  }
+
+  private makeItemRandomPosition(): boolean {
+    // item position = 200 ~ 600, 100 ~ 400
+    const x = Math.floor(Math.random() * (600 - 200 + 1)) + 200;
+    const y = Math.floor(Math.random() * (400 - 100 + 1)) + 100;
+
+    // random type = 1, 2, 3
+    const type = Math.floor(Math.random() * 3) + 1;
+
+    // new item
+    this.gameState.itemMap = { x, y, type };
+
+    return false;
   }
 
   setIsItemMode (mode: boolean) {
@@ -67,14 +84,20 @@ export class Pong {
 
   private startGameLoop() {
     console.log('startGameLoop');
-    console.log('startGameLoop - isItemMode:', this.gameState.isItemMode);
-    this.setIsItemMode(this.IsItemMode);
     if (this.gameState.gameOver) {
       return;
     }
+
+    this.setIsItemMode(this.IsItemMode);
     const interval = setInterval(() => {
       if (this.updateGameLogic()) clearInterval(interval);
     }, 1000 / 60);
+
+    if (this.gameState.isItemMode) {
+      const itemInterval = setInterval(() => {
+        if (this.makeItemRandomPosition()) clearInterval(itemInterval);
+      }, 3000);
+    }
   }
 
   handlePaddleMove(directionIsUp: boolean, player1: boolean) {
@@ -98,10 +121,12 @@ export class Pong {
   }
 
   private updateGameLogic(): boolean {
-    console.log('updateGameLogic - isItemMode:', this.gameState.isItemMode);
     // 공의 위치 업데이트
     this.gameState.ball.x += this.gameState.velocity.x;
     this.gameState.ball.y += this.gameState.velocity.y;
+
+    // 아이템 충돌 체크
+    this.checkItemCollision();
 
     // 경계 체크 및 처리
     this.checkBoundaries();
@@ -162,6 +187,7 @@ export class Pong {
     this.gameState.velocity.y = DEFAULT_SPEED / 2;
     this.gameState.paddle1.y = 200;
     this.gameState.paddle2.y = 200;
+    this.gameState.applyItem = 0;
   }
 
   private checkGameOver() {
@@ -183,6 +209,32 @@ export class Pong {
       this.onEnd();
     }
   }
+
+  private checkItemCollision() {
+    if (!this.gameState.isItemMode || !this.gameState.itemMap) {
+      return;
+    }
+    const ballLeft = this.gameState.ball.x;
+    const ballRight = this.gameState.ball.x + BALL_SIZE;
+    const ballTop = this.gameState.ball.y;
+    const ballBottom = this.gameState.ball.y + BALL_SIZE;
+
+    const item = this.gameState.itemMap;
+    if (item) {
+      const itemLeft = item.x;
+      const itemRight = item.x + ITEM_SIZE;
+      const itemTop = item.y;
+      const itemBottom = item.y + ITEM_SIZE;
+
+      const isCollision = ballRight > itemLeft && ballLeft < itemRight && ballBottom > itemTop && ballTop < itemBottom;
+
+      if (isCollision) {
+        this.gameState.applyItem = item.type;
+        this.gameState.itemMap = undefined;
+      }
+    }
+  }
+
 
   private checkPaddleCollisions() {
     // 플레이어 1의 패들과의 충돌 체크

@@ -13,6 +13,9 @@ export const BALL_SIZE = 15;
 export const DEFAULT_SPEED = 3;
 export const SMASH_SPEED = 8;
 
+// 아이템
+export const ITEM_SIZE = 100;
+
 export interface GameState {
   ball: { x: number; y: number };
   velocity: { x: number; y: number };
@@ -23,4 +26,6 @@ export interface GameState {
   gameOver: boolean;
   gameStart : boolean;
   isItemMode: boolean;
+  itemMap?: { x: number; y: number, type: number };
+  applyItem: number;
 }
