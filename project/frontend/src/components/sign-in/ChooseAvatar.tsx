@@ -33,7 +33,6 @@ export default function ChooseAvatar({
         reader.onload = (e) => {
           if (e.target) {
             setUploadImage(e.target.result);
-            // setSelectedAvatar(e.target.result);
           }
         };
         reader.readAsDataURL(selectedFile);
@@ -81,7 +80,7 @@ export default function ChooseAvatar({
             uploadImage
               ? 'border-dark-purple'
               : 'border-default hover:border-dark-gray hover:bg-light-background'
-          }  w-lg h-lg border-3`}
+          }  w-lg h-lg border-3 inline-block overflow-x-hidden overflow-y-hidden`}
         >
           {uploadImage ? (
             <Image
