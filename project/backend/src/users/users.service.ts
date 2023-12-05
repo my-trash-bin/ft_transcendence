@@ -3,6 +3,7 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ChannelMemberType, Prisma } from '@prisma/client';
@@ -16,7 +17,6 @@ import {
   IsRecordToUpdateNotFoundError,
   isUniqueConstraintError,
 } from '../util/prismaError';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { RelationStatus } from './dto/user-profile.dto';
 import { UserRelationshipDto } from './dto/user-relationship.dto';
@@ -24,6 +24,7 @@ import { UserDto } from './dto/user.dto';
 
 @Injectable()
 export class UsersService {
+  private logger = new Logger('UsersService');
   constructor(
     private prisma: PrismaService,
     private readonly configService: ConfigService,
@@ -131,30 +132,29 @@ export class UsersService {
     }
   }
 
-  async create(createUserDto: CreateUserDto): Promise<UserDto> {
-    const DEFAULT_STATUS_MESSAGE = '안녕하세요! 저와 함께 퐁 게임 하실래요?';
-    try {
-      const prismaUser = await this.prisma.user.create({
-        data: {
-          nickname: createUserDto.nickname,
-          profileImageUrl: createUserDto.profileImageUrl,
-          statusMessage: DEFAULT_STATUS_MESSAGE,
-        },
-      });
-      return prismaUser;
-    } catch (error) {
-      if (isUniqueConstraintError(error)) {
-        throw new ConflictException(createPrismaErrorMessage(error));
-      }
-      if (IsRecordToUpdateNotFoundError(error)) {
-        throw new BadRequestException(createPrismaErrorMessage(error));
-      }
-      if (isPrismaUnknownError(error)) {
-        throw new InternalServerErrorException(createPrismaErrorMessage(error));
-      }
-      throw error;
-    }
-  }
+  // auth의 register가 가입의 역할을 수행함
+  // async create(createUserDto: CreateUserDto): Promise<UserDto> {
+  //   try {
+  //     const prismaUser = await this.prisma.user.create({
+  //       data: {
+  //         nickname: createUserDto.nickname,
+  //         profileImageUrl: createUserDto.profileImageUrl,
+  //       },
+  //     });
+  //     return prismaUser;
+  //   } catch (error) {
+  //     if (isUniqueConstraintError(error)) {
+  //       throw new ConflictException(createPrismaErrorMessage(error));
+  //     }
+  //     if (IsRecordToUpdateNotFoundError(error)) {
+  //       throw new BadRequestException(createPrismaErrorMessage(error));
+  //     }
+  //     if (isPrismaUnknownError(error)) {
+  //       throw new InternalServerErrorException(createPrismaErrorMessage(error));
+  //     }
+  //     throw error;
+  //   }
+  // }
 
   async findAll(): Promise<UserDto[]> {
     const prismaUsers = await this.prisma.user.findMany({
@@ -249,6 +249,23 @@ export class UsersService {
       await this.prisma.user.update({
         where: { id: id.value },
         data: { mfaPasswordHash },
+      });
+    } catch (error) {
+      if (
+        IsRecordToUpdateNotFoundError(error) ||
+        isRecordNotFoundError(error)
+      ) {
+        throw new BadRequestException(createPrismaErrorMessage(error));
+      }
+      throw error;
+    }
+  }
+
+  async unsetTwoFactorPassword(id: UserId) {
+    try {
+      await this.prisma.user.update({
+        where: { id: id.value },
+        data: { mfaPasswordHash: null },
       });
     } catch (error) {
       if (

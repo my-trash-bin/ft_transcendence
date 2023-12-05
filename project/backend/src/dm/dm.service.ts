@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import { DMChannelAssociation, DMMessage } from '@prisma/client';
+import { Injectable, Logger } from '@nestjs/common';
+import { DMChannelAssociation, DMMessage, Prisma } from '@prisma/client';
+
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { PrismaService } from '../base/prisma.service';
 import { UserId, idOf } from '../common/Id';
@@ -14,6 +15,7 @@ import { MessageWithMemberDto } from './dto/message-with-member';
 
 @Injectable()
 export class DmService {
+  private logger = new Logger('DmService');
   constructor(private prisma: PrismaService) {}
 
   async findAllDmChannels() {
@@ -43,8 +45,10 @@ export class DmService {
             member2Id: member2Id.value,
           },
         });
+      this.logger.debug('ok');
       return newServiceOkResponse(prismaDmChannelAssociation);
     } catch (error) {
+      this.logger.debug('fail');
       return newServiceFailResponse('Unknown Error', 500);
     }
   }
@@ -115,11 +119,14 @@ export class DmService {
   async getDMChannelMessagesByNickname(
     userId: UserId,
     nickname: string,
-  ): Promise<ServiceResponse<MessageWithMemberDto[]>> {
+  ): Promise<ServiceResponse<any[]>> {
     try {
       const targetUser = await this.prisma.user.findUniqueOrThrow({
         where: { nickname },
       });
+      const blockList = await this.getBlockUserList(userId);
+      const isBlock = blockList.find((el) => el.followeeId === targetUser.id);
+      if (isBlock) return newServiceOkResponse([]);
       const channelResult = await this.findOrCraeteDmChannel(
         userId,
         idOf(targetUser.id),
@@ -145,13 +152,92 @@ export class DmService {
           });
         },
       );
-      return newServiceOkResponse(result);
+      return newServiceOkResponse(
+        result.map((el) => {
+          return {
+            type: 'directMessage',
+            data: el,
+          };
+        }),
+      );
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         return newServiceFailPrismaKnownResponse(error.code, 400);
       }
       return newServiceFailResponse('Unknown Error', 500);
     }
+  }
+
+  async getMyDmList(userId: string) {
+    try {
+      const dmChannelIds = await this.prisma.dMChannelAssociation.findMany({
+        where: {
+          OR: [{ member1Id: userId }, { member2Id: userId }],
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      const channelIdList = dmChannelIds.map(({ id }) => id);
+
+      const result: any = await this.getDmMessages(channelIdList);
+      const otherUserId = result.map((el: any) => {
+        if (el.member1Id === userId) {
+          return el.member2Id;
+        } else return el.member1Id;
+      });
+
+      const otherUsers = await this.prisma.user.findMany({
+        where: {
+          id: {
+            in: otherUserId,
+          },
+        },
+      });
+      const userProfileMap = new Map();
+      otherUsers.map((el) => {
+        userProfileMap.set(el.id, el);
+      });
+
+      return result.map((el: any) => {
+        const otherUserId =
+          el.member1Id === userId ? el.member2Id : el.member1Id;
+        return {
+          channelId: el.channelId,
+          sentAt: el.sentAt,
+          messagePreview: el.messageJson,
+          profileImage: userProfileMap.get(otherUserId).profileImageUrl,
+          nickname: userProfileMap.get(otherUserId).nickname,
+        };
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        return newServiceFailPrismaKnownResponse(error.code, 400);
+      }
+      return newServiceFailResponse('Unknown Error', 500);
+    }
+  }
+
+  private async getDmMessages(channelIdList: string[]) {
+    return await this.prisma.$queryRaw`SELECT DISTINCT ON ("channelId") *
+    FROM "DMMessage"
+    JOIN "DMChannelAssociation" ON "DMMessage"."channelId" = "DMChannelAssociation"."id"
+    JOIN "User" ON "DMChannelAssociation"."member1Id" = "User"."id"
+    WHERE "channelId" = ANY (${Prisma.sql`ARRAY[${Prisma.join(
+      channelIdList,
+      ', ',
+    )}]::uuid[]`})
+    ORDER BY "channelId", "sentAt" DESC`;
+  }
+
+  async getBlockUserList(userId: UserId) {
+    const res = await this.prisma.userFollow.findMany({
+      where: {
+        followerId: userId.value,
+      },
+    });
+    return res.filter((el) => el.isBlock);
   }
 
   // async getDMChannelMessages(

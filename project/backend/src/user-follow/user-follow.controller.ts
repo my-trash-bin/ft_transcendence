@@ -20,6 +20,7 @@ import { JwtPayloadPhaseComplete } from '../auth/auth.service';
 import { JwtGuard } from '../auth/jwt.guard';
 import { Phase, PhaseGuard } from '../auth/phase.guard';
 import { idOf } from '../common/Id';
+import { NotificationService } from '../notification/notification.service';
 import { TargetUserDto } from './dto/create-user-follow.dto';
 import { UserFollowDto } from './dto/user-follow.dto';
 import { UserFollowService } from './user-follow.service';
@@ -27,7 +28,10 @@ import { UserFollowService } from './user-follow.service';
 @ApiTags('friends')
 @Controller('/api/v1/friends')
 export class UserFollowController {
-  constructor(private readonly userFollowService: UserFollowService) {}
+  constructor(
+    private readonly userFollowService: UserFollowService,
+    private readonly notificationService: NotificationService,
+  ) {}
 
   @Post('request')
   @ApiOperation({ summary: '유저의 친구 요청' })
@@ -40,6 +44,14 @@ export class UserFollowController {
     if (!result.ok) {
       throw new BadRequestException(result!.error?.message);
     }
+    await this.notificationService.create(
+      idOf(dto.targetUser),
+      JSON.stringify({
+        type: 'newFriend',
+        sourceId: (req.user as JwtPayloadPhaseComplete).id.value,
+        sourceName: result.data!.follower.nickname,
+      }),
+    );
     return result!.data;
   }
 
@@ -67,7 +79,7 @@ export class UserFollowController {
     @Body() dto: TargetUserDto,
   ) {
     const isBlock = false;
-    this.delete(req, dto, isBlock);
+    await this.delete(req, dto, isBlock);
   }
 
   @Post('unblock')
@@ -80,7 +92,7 @@ export class UserFollowController {
     @Body() dto: TargetUserDto,
   ) {
     const isBlock = true;
-    this.delete(req, dto, isBlock);
+    await this.delete(req, dto, isBlock);
   }
 
   @Get('')

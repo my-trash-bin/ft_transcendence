@@ -4,7 +4,6 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { NotifBox } from './NotifBox';
 
-// TODO : call api to fetch noti table
 export function Notification() {
   const [isHovered, setIsHovered] = useState(false);
   const [active, setActive] = useState(false);
@@ -33,7 +32,6 @@ export function Notification() {
         onClick={() => {
           setActive(!active);
           setNewNotif(false);
-          // TODO : socket.emit that notification was read
         }}
       />
       {newNotif ? (

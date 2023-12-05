@@ -12,6 +12,7 @@ import { JwtPayloadPhaseComplete } from '../auth/auth.service';
 import { JwtGuard } from '../auth/jwt.guard';
 import { Phase, PhaseGuard } from '../auth/phase.guard';
 import { DmService } from './dm.service';
+import { DmChannelMessageDto } from './dto/dm-list.dto';
 import { MessageWithMemberDto } from './dto/message-with-member';
 
 @ApiTags('dm')
@@ -48,6 +49,19 @@ export class DmController {
       userId,
       nickname || '',
     );
+    return res!.data;
+  }
+
+  @Get()
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
+  @ApiOkResponse({
+    type: () => DmChannelMessageDto,
+    isArray: true,
+  })
+  async getMyDmList(@Request() req: ExpressRequest) {
+    const userId = (req.user as JwtPayloadPhaseComplete).id;
+    const res = await this.dmService.getMyDmList(userId.value);
     return res;
   }
 }

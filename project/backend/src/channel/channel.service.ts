@@ -16,6 +16,7 @@ import {
   newServiceFailUnhandledResponse,
   newServiceOkResponse,
 } from '../common/ServiceResponse';
+import { DmService } from '../dm/dm.service';
 import { MessageWithMemberDto } from '../dm/dto/message-with-member';
 import { LeavingChannelInfo } from '../events/event-response.dto';
 import { UserDto, userDtoSelect } from '../users/dto/user.dto';
@@ -68,7 +69,10 @@ export type JoinChannelInfoType = {
 
 @Injectable()
 export class ChannelService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private readonly dmService: DmService,
+  ) {}
 
   // Channel
   async findAll() {
@@ -587,9 +591,11 @@ export class ChannelService {
 
   async getChannelMessages(
     channelId: string,
-  ): Promise<ServiceResponse<MessageWithMemberDto[]>> {
+    userId: UserId,
+  ): Promise<ServiceResponse<any[]>> {
     try {
-      const result = await this.prisma.channelMessage.findMany({
+      const blockList = await this.dmService.getBlockUserList(userId);
+      let result = await this.prisma.channelMessage.findMany({
         where: {
           channelId: channelId,
         },
@@ -602,7 +608,20 @@ export class ChannelService {
           sentAt: 'asc',
         },
       });
-      return newServiceOkResponse(result);
+      return newServiceOkResponse(
+        result
+          .filter((el) => {
+            return !blockList.find(
+              (block) => block.followeeId === el.member.id,
+            );
+          })
+          .map((el) => {
+            return {
+              type: 'channelMessage',
+              data: el,
+            };
+          }),
+      );
     } catch (error) {
       if (isPrismaUnknownError(error)) {
         throw new InternalServerErrorException(createPrismaErrorMessage(error));
@@ -612,7 +631,8 @@ export class ChannelService {
   }
   async participate(userId: string, dto: ParticipateChannelDto) {
     try {
-      await this.checkUserAlreadyInChannel(userId, dto.channelId);
+      const res = await this.checkUserAlreadyInChannel(userId, dto.channelId);
+      if (res) return;
       if (dto.type == ChannelType.Public)
         return await this.participateUserToChannel(userId, dto);
 
@@ -626,7 +646,7 @@ export class ChannelService {
       if (!channel?.password)
         throw new InternalServerErrorException('비밀번호가 없습니다.');
       const match = await bcrypt.compare(dto.password, channel.password);
-      if (match) return await this.participateUserToChannel(userId, dto);
+      if (match) await this.participateUserToChannel(userId, dto);
       else throw new BadRequestException('비밀번호가 틀렸습니다.');
     } catch (error) {
       if (isPrismaUnknownError(error)) {
@@ -644,7 +664,8 @@ export class ChannelService {
         memberId: userId,
       },
     });
-    if (result) throw new BadRequestException('이미 참여한 채널입니다.');
+    if (result) return true;
+    else return false;
   }
 
   private async participateUserToChannel(

@@ -3,6 +3,10 @@ import { useEffect, useRef, useState } from 'react';
 import { MyChat } from './MyChat';
 import { OtherChat } from './OtherChat';
 import { UserStateAnnounce } from './UserStateAnnounce';
+import { useCallback, useContext } from 'react';
+import { useQuery } from 'react-query';
+import { ApiContext } from '@/app/_internal/provider/ApiContext';
+import { AnyARecord } from 'dns';
 
 export enum messageType {
   DM = 'DM',
@@ -23,11 +27,33 @@ interface messageContent {
 }
 
 export function MessageContent({
+  channelId,
   type,
   myNickname,
-}: Readonly<{ type: messageType; myNickname: string }>) {
+}: Readonly<{ channelId: string; type: messageType; myNickname: string }>) {
   const [messages, setMessages] = useState<messageContent[]>([]);
   const messageEndRef = useRef<HTMLDivElement>(null);
+
+  const { api } = useContext(ApiContext);
+  const { data: initialData, refetch } = useQuery(
+    ['fetchMessage'],
+    useCallback(
+      async () =>
+        (await api.channelControllerGetChannelMessages(channelId)).data,
+      [api, channelId],
+    ),
+    { enabled: false },
+  );
+
+  useEffect(() => {
+    refetch();
+  }, [channelId, refetch]);
+
+  useEffect(() => {
+    if (initialData) {
+      setMessages((prevMessages: any) => [...prevMessages, ...initialData]);
+    }
+  }, [initialData]);
 
   useEffect(() => {
     messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });

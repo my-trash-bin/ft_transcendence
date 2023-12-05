@@ -134,8 +134,15 @@ export class ChannelController {
     isArray: true,
   })
   @UseGuards(JwtGuard, PhaseGuard)
-  async getChannelMessages(@Param('channelId') channelId: string) {
-    const result = await this.channelService.getChannelMessages(channelId);
+  async getChannelMessages(
+    @Param('channelId') channelId: string,
+    @Request() req: ExpressRequest,
+  ) {
+    const userId = (req.user as JwtPayloadPhaseComplete).id;
+    const result = await this.channelService.getChannelMessages(
+      channelId,
+      userId,
+    );
     if (!result.ok) {
       throw new HttpException(result.error!.message, result.error!.statusCode);
     }
@@ -151,7 +158,7 @@ export class ChannelController {
   ) {
     const userId = (req.user as JwtPayloadPhaseComplete).id;
 
-    const result = await this.channelService.participate(userId.value, dto);
+    await this.channelService.participate(userId.value, dto);
   }
 
   // @Get('participand/:cheenlId')

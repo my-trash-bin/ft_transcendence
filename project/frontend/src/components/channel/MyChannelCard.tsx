@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { formatAMPM } from '../dm/utils/FromatAmPm';
-export function MyChannelButton({
+export function MyChannelCard({
   channelName,
   messageShortcut,
   date,

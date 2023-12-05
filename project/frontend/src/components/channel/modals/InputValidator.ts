@@ -4,8 +4,8 @@ export const inputValidator = (identifier: string, value: string): boolean => {
   switch (identifier) {
     case 'title':
       if (
-        value.length > 15 ||
-        value.length < 2 ||
+        value.length > 20 ||
+        value.length < 6 ||
         specialCharRegex.test(value)
       ) {
         return false;

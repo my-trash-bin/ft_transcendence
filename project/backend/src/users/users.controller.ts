@@ -200,6 +200,20 @@ export class UsersController {
     await this.usersService.setTwoFactorPassword(id, password);
   }
 
+  @Post('unset-2fa')
+  @ApiOperation({ summary: '2차 인증 비밀번호 해제' })
+  @ApiCreatedResponse({
+    description: '2차 인증 비밀번호 설정 해제 성공, 반환값 X',
+  })
+  @ApiUnauthorizedResponse({ description: '인증되지 않은 유저로부터의 요청.' })
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
+  async unsetTwoFactorPassword(@Request() req: ExpressRequest) {
+    // 닉네임 중복 체크 로직 구현
+    const { id } = req.user as JwtPayloadPhaseComplete;
+    await this.usersService.unsetTwoFactorPassword(id);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: '유저 1명 기본 조회' })
   @ApiOkResponse({ description: '유저 객체 하나 반환', type: () => UserDto })
