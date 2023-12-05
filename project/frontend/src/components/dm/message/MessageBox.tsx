@@ -5,7 +5,7 @@ import { MessageContent, messageType } from './MessageContent';
 import { MessageSendBox } from './MessageSendBox';
 import { UserInfo } from './UserInfo';
 
-export function MessageBox({ username }: { username: string }) {
+export function MessageBox({ username }: { readonly username: string }) {
   const apiCall = useCallback(
     () => new Api().api.usersControllerGetUsetByNickname(username),
     [username],
@@ -24,7 +24,11 @@ export function MessageBox({ username }: { username: string }) {
         username={data?.data.nickname}
         onActive={false}
       />
-      <MessageContent type={messageType.DM} myNickname={me?.nickname} />
+      <MessageContent
+        type={messageType.DM}
+        myNickname={me?.nickname}
+        targetName={username}
+      />
       <MessageSendBox type={messageType.DM} targetUserId={data?.data.id} />
     </>
   );

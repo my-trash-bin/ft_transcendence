@@ -1,18 +1,16 @@
+import { ApiContext } from '@/app/_internal/provider/ApiContext';
 import { useSocket } from '@/hooks/useSocket';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { useQuery } from 'react-query';
 import { MyChat } from './MyChat';
 import { OtherChat } from './OtherChat';
 import { UserStateAnnounce } from './UserStateAnnounce';
-import { useCallback, useContext } from 'react';
-import { useQuery } from 'react-query';
-import { ApiContext } from '@/app/_internal/provider/ApiContext';
-import { AnyARecord } from 'dns';
 
 export enum messageType {
   DM = 'DM',
   CHANNEL = 'CHANNEL',
 }
-interface messageContent {
+interface MessageContentInterface {
   type: string;
   data: {
     id: string;
@@ -30,18 +28,27 @@ export function MessageContent({
   channelId,
   type,
   myNickname,
-}: Readonly<{ channelId: string; type: messageType; myNickname: string }>) {
-  const [messages, setMessages] = useState<messageContent[]>([]);
+  targetName,
+}: Readonly<{
+  channelId?: string;
+  type: messageType;
+  myNickname: string;
+  targetName?: string;
+}>) {
+  const [messages, setMessages] = useState<MessageContentInterface[]>([]);
   const messageEndRef = useRef<HTMLDivElement>(null);
 
   const { api } = useContext(ApiContext);
+
   const { data: initialData, refetch } = useQuery(
-    ['fetchMessage'],
-    useCallback(
-      async () =>
-        (await api.channelControllerGetChannelMessages(channelId)).data,
-      [api, channelId],
-    ),
+    ['fetchChannelMsg'],
+    useCallback(async () => {
+      if (type === messageType.DM && targetName) {
+        return (await api.dmControllerGetDmChannelMessages(targetName)).data;
+      } else if (channelId) {
+        return (await api.channelControllerGetChannelMessages(channelId)).data;
+      }
+    }, [api, channelId, type, targetName]),
     { enabled: false },
   );
 
