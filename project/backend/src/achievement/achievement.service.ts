@@ -48,7 +48,7 @@ export class AchievementService {
           isMine: achieve.achievedUsers.length !== 0,
         }));
       });
-      this.logger.debug(result);
+      // this.logger.debug(result);
       return newServiceOkResponse(result);
     } catch (error) {
       return newServiceFailUnhandledResponse(400);

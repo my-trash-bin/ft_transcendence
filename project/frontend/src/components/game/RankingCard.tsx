@@ -1,7 +1,6 @@
 import Image from 'next/image';
 import { useState } from 'react';
 import { LongCard } from '../common/LongCard';
-import { ProfileModal } from '../profile/ProfileModal';
 
 interface RankingCardProps {
   readonly rank: number;
@@ -16,13 +15,10 @@ export default function RankingCard({
   avatar,
   isUser,
 }: RankingCardProps) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [, setIsModalOpen] = useState(false);
 
   const handleButtonClick = () => {
     setIsModalOpen(true);
-  };
-  const handleModalClose = () => {
-    setIsModalOpen(false);
   };
   const alignCSS = 'flex items-center justify-between w-[600px]';
   return (
@@ -45,11 +41,6 @@ export default function RankingCard({
           </div>
         </LongCard>
       </button>
-      {/* <ProfileModal
-        isOpen={isModalOpen}
-        onClose={handleModalClose}
-        targetId={name}
-      /> */}
     </div>
   );
 }
