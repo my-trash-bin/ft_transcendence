@@ -150,6 +150,23 @@ export class ChannelService {
     id: UserId,
     channelId: ChannelId,
   ): Promise<ServiceResponse<JoinChannelInfoType>> {
+    const select = {
+      ...channelDtoSelect,
+      members: {
+        select: {
+          memberId: true,
+          memberType: true,
+          mutedUntil: true,
+          member: {
+            select: {
+              id: true,
+              nickname: true,
+              profileImageUrl: true,
+            },
+          },
+        },
+      },
+    };
     try {
       const result = await this.prisma.$transaction(async (prisma) => {
         const channel = await prisma.channel.findUniqueOrThrow({
@@ -166,6 +183,13 @@ export class ChannelService {
         });
 
         if (channel.members) {
+          //
+          if (channel.members[0].memberType !== ChannelMemberType.BANNED) {
+            return await prisma.channel.findUniqueOrThrow({
+              where: { id: channelId.value },
+              select,
+            });
+          }
           throw new ServiceError(
             channel.members[0].memberType === ChannelMemberType.BANNED
               ? '밴된 유저는 채널에 들어갈 수 없습니다.'
@@ -187,37 +211,14 @@ export class ChannelService {
           },
         });
 
-        return prisma.channel.update({
+        return await prisma.channel.update({
           where: { id: channelId.value },
           data: {
             memberCount: {
               increment: 1,
             },
           },
-          select: {
-            id: true,
-            title: true,
-            isPublic: true,
-            createdAt: true,
-            lastActiveAt: true,
-            ownerId: true,
-            memberCount: true,
-            maximumMemberCount: true,
-            members: {
-              select: {
-                memberId: true,
-                memberType: true,
-                mutedUntil: true,
-                member: {
-                  select: {
-                    id: true,
-                    nickname: true,
-                    profileImageUrl: true,
-                  },
-                },
-              },
-            },
-          },
+          select,
         });
       });
       return newServiceOkResponse(result);
@@ -257,15 +258,7 @@ export class ChannelService {
           },
           include: {
             member: {
-              select: {
-                id: true,
-                joinedAt: true,
-                isLeaved: true,
-                leavedAt: true,
-                nickname: true,
-                profileImageUrl: true,
-                statusMessage: true,
-              },
+              select: userDtoSelect,
             },
             channel: {
               select: {

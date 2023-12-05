@@ -1,4 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { AchievementService } from '../achievement/achievement.service';
 import { PrismaService } from '../base/prisma.service';
 import { UserId } from '../common/Id';
 import {
@@ -18,7 +19,10 @@ import {
 
 @Injectable()
 export class UserFollowService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private achievementService: AchievementService,
+  ) {}
 
   async createOrUpdate(
     followerId: UserId,
@@ -56,6 +60,20 @@ export class UserFollowService {
           followOrBlockedAt: true,
         },
       });
+      const count = await this.prismaService.userFollow.count({
+        where: {
+          followerId: followerId.value,
+          isBlock: false,
+        },
+      });
+      if (isBlock) {
+        await this.achievementService.checkGrantAchievement(followeeId, [
+          {
+            eventType: 'newFriend',
+            eventValue: count,
+          },
+        ]);
+      }
       return newServiceOkResponse(result);
     } catch (error) {
       if (

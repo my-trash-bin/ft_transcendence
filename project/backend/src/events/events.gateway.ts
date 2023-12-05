@@ -95,7 +95,7 @@ export class EventsGateway
   }
 
   async handleDisconnect(client: Socket) {
-    this.logger.debug(`Client disconnected: ${client.id}`);
+    this.logger.log(`Client disconnected: ${client.id}`);
     this.eventsService.handleDisconnect(client);
   }
 
