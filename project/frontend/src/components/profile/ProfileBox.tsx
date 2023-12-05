@@ -2,11 +2,11 @@ import Image from 'next/image';
 import { useCallback, useContext, useState } from 'react';
 import { useQuery } from 'react-query';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
+import { Button } from '../common/Button';
+import { Loading } from '../common/Loading';
+import { AvatarEditModal } from './AvatarEditModal';
 import { ProfileEditModal } from './ProfileEditModal';
 import { TextBox } from './TextBox';
-import { Loading } from '../common/Loading';
-import { Button } from '../common/Button';
-import { AvatarEditModal } from './AvatarEditModal';
 
 export function ProfileBox() {
   const { api } = useContext(ApiContext);
@@ -42,10 +42,10 @@ export function ProfileBox() {
     if (isError) {
       return <p>Error loading profile data.</p>;
     }
+    // console.log('data', data);
     if (!data) {
       return <p>Fail to get data.</p>;
     }
-    // console.log('data', data);
     return (
       <div className="flex flex-row justify-center items-center gap-lg w-[100%] h-[100%]">
         <div className="flex flex-col justify-center items-center gap-md px-2xl">

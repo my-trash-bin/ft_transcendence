@@ -10,6 +10,7 @@ import {
 import { getGameSocket } from './gameSocket';
 
 // npm run build && npx nest start --watch
+
 const Board: React.FC = () => {
   const {
     ball, paddle1, paddle2, score1, score2,
@@ -25,15 +26,6 @@ const Board: React.FC = () => {
       console.log('game not started');
     } else if (!gameState.gameOver) {
       setGameState(gameState);
-      if (gameState.ball.type != 0) {
-        console.log('ball type', gameState.ball.type);
-      }
-      if (gameState.paddle1.type != 0) {
-        console.log('paddle1 type', gameState.paddle1.type);
-      }
-      if (gameState.paddle2.type != 0) {
-        console.log('paddle2 type', gameState.paddle2.type);
-      }
     } else {
       console.log('gameOver');
       router.push('/pong/gameOver');
@@ -42,7 +34,6 @@ const Board: React.FC = () => {
 
   useEffect(() => {
     socket.on('gameUpdate', handleGameUpdate);
-
     return () => {
       socket.off('gameUpdate', handleGameUpdate);
     };
@@ -75,25 +66,34 @@ const Board: React.FC = () => {
         className="border-2 border-dark-purple-interactive relative rounded-md bg-white mt-[10px]"
         style={{ width: BOARD_WIDTH, height: BOARD_HEIGHT }}
       >
-        {/* 아이템 */}
         {isItemMode && pongItem.type != 0 && (
           <div
-            className="absolute"
+            className={`absolute rounded-md border-3 ${getBallColor(pongItem.type)}`}
             style={{
               width: `${ITEM_SIZE}px`,
               height: `${ITEM_SIZE}px`,
               left: isPlayer1
-                ? `${BOARD_WIDTH - PADDLE_WIDTH - 10 - pongItem.x}px`
+                ? `${BOARD_WIDTH - PADDLE_WIDTH - 10 - ITEM_SIZE - pongItem.x}px` // 위치 조정
                 : `${pongItem.x}px`,
               top: `${pongItem.y}px`,
             }}
           >
-            <Image
-              src={`/item/${pongItem.type}.png`}
-              alt={`Item type ${pongItem.type}`}
-              layout="fill"
-              objectFit="cover"
-            />
+            <div
+              className="absolute"
+              style={{
+                width: `${ITEM_SIZE - 12}px`,
+                height: `${ITEM_SIZE - 12}px`,
+                left: `3px`,
+                top: `3px`,
+              }}
+            >
+              <Image
+                src={`/item/${pongItem.type}.png`}
+                alt={`Item type ${pongItem.type}`}
+                layout="fill"
+                objectFit="cover"
+              />
+            </div>
           </div>
         )}
 
@@ -169,6 +169,7 @@ const PlayerAvatar: React.FC<PlayerAvatarProps> = ({
     </div>
   );
 };
+
 
 const getBallColor = (type: number) => {
   switch (type) {

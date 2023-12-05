@@ -66,9 +66,9 @@ export class Pong {
   }
 
   private makeItemRandomPosition(): boolean {
-    // item position = 200 ~ 600, 100 ~ 400
-    const x = Math.floor(Math.random() * (600 - 200 + 1)) + 200;
-    const y = Math.floor(Math.random() * (400 - 100 + 1)) + 100;
+    // item position = 200 ~ 600, 150 ~ 400
+    const x = Math.floor(Math.random() * (600 - 150 + 1)) + 150;
+    const y = Math.floor(Math.random() * (400 - 150 + 1)) + 150;
 
     // random type = 1, 2, 3
     const type = Math.floor(Math.random() * 3) + 1;
