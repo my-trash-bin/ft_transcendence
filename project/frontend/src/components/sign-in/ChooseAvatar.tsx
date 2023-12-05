@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Button } from '../common/Button';
 import { SelectAvatar } from './SelectAvatar';
 
@@ -19,23 +19,30 @@ export default function ChooseAvatar({
 
   const handleFileChange = async (event: any) => {
     const selectedFile = event.target.files[0];
-    if (!selectedFile) {
-      alert('Please select a file.');
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      if (e.target) {
-        setUploadImage(e.target.result);
-      }
-    };
-    reader.readAsDataURL(selectedFile);
-    await callApi(selectedFile);
-  };
+    if (selectedFile) {
+      const maxSize = 10 * 1024 * 1024; // 10MB
 
-  useEffect(() => {
-    console.log('Selected Avatar:', selectedAvatar);
-  }, [selectedAvatar]);
+      if (selectedFile.size > maxSize) {
+        alert(
+          'File size exceeds the maximum allowed size (1MB). Please choose a smaller file.',
+        );
+        event.target.value = null;
+        return;
+      } else {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if (e.target) {
+            setUploadImage(e.target.result);
+            // setSelectedAvatar(e.target.result);
+          }
+        };
+        reader.readAsDataURL(selectedFile);
+        await callApi(selectedFile);
+      }
+    } else {
+      alert('Please select a file.');
+    }
+  };
 
   async function callApi(selectedFile: any) {
     try {
