@@ -1,5 +1,8 @@
 'use client';
 
+import { ApiContext } from '@/app/_internal/provider/ApiContext';
+import { useCallback, useContext } from 'react';
+import { useQuery } from 'react-query';
 import { DmUser } from './DmUser';
 
 interface DmUser {
@@ -9,66 +12,37 @@ interface DmUser {
   latestTime: Date;
 }
 
+function getRenderData(userData: any, searchUser: string) {
+  const filteredData = userData.filter((user: any) =>
+    user.nickname.includes(searchUser),
+  );
+
+  return filteredData.map((val: any) => (
+    <DmUser
+      key={val.nickname}
+      imageUri={val.profileImage}
+      nickname={val.nickname}
+      messageShortcut={val.messagePreview}
+      date={val.sentAt}
+    />
+  ));
+}
+
 export function DmUserList({
   searchUsername,
 }: Readonly<{ searchUsername: string }>) {
-  // let dmRenderData: DmUser[] = data.dmUser.map((val: any) => {
-  //   return {
-  //     nickname: val.nickname,
-  //     profileImageUrl: val.profileImageUrl,
-  //     preViewMessage:
-  //       val.preViewMessage.length > 25
-  //         ? val.preViewMessage.slice(0, 22) + '...'
-  //         : val.preViewMessage,
-  //     latestTime: val.latestTime,
-  //   };
-  // });
-  let dmRenderData: DmUser[] = [
-    {
-      nickname: 'test1',
-      profileImageUrl: '/avatar/avatar-big.svg',
-      preViewMessage: 'test1',
-      latestTime: new Date(),
-    },
-    {
-      nickname: 'test2',
-      profileImageUrl: '/avatar/avatar-big.svg',
-      preViewMessage: 'test2',
-      latestTime: new Date(),
-    },
-    {
-      nickname: 'test3',
-      profileImageUrl: '/avatar/avatar-big.svg',
-      preViewMessage: 'test3',
-      latestTime: new Date(),
-    },
-    {
-      nickname: 'test4',
-      profileImageUrl: '/avatar/avatar-big.svg',
-      preViewMessage: 'test4',
-      latestTime: new Date(),
-    },
-  ];
+  const { api } = useContext(ApiContext);
+  const { isLoading, data } = useQuery(
+    [],
+    useCallback(async () => (await api.dmControllerGetMyDmList()).data, [api]),
+  );
 
-  if (searchUsername) {
-    dmRenderData = dmRenderData.filter((val) =>
-      val.nickname.includes(searchUsername),
-    );
-  }
+  if (isLoading) return <p>로딩중...</p>;
+  const renderData = getRenderData(data, searchUsername);
 
   return (
     <div className="w-[350px] h-[600px] flex-grow-1 flex flex-col items-center gap-sm overflow-y-scroll">
-      {dmRenderData.map((val) => {
-        return (
-          <DmUser
-            key={val.nickname}
-            imageUri={val.profileImageUrl}
-            nickname={val.nickname}
-            messageShortcut={val.preViewMessage}
-            date={val.latestTime}
-          />
-        );
-      })}
+      {renderData}
     </div>
   );
 }
