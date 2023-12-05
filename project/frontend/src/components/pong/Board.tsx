@@ -4,29 +4,16 @@ import React, { useEffect } from 'react';
 import usePaddleMovement from './KeyHandle';
 import useStore from './Update';
 import {
-  BALL_SIZE,
-  BOARD_HEIGHT,
-  BOARD_WIDTH,
-  GameState,
-  ITEM_SIZE,
-  PADDLE_HEIGHT,
-  PADDLE_WIDTH,
-  SMALL_PADDLE_HEIGHT,
+  BALL_SIZE, BOARD_HEIGHT, BOARD_WIDTH, GameState, ITEM_SIZE,
+  PADDLE_HEIGHT, PADDLE_WIDTH, SMALL_PADDLE_HEIGHT,
 } from './gameConstants';
 import { getGameSocket } from './gameSocket';
 
 // npm run build && npx nest start --watch
 const Board: React.FC = () => {
   const {
-    ball,
-    paddle1,
-    paddle2,
-    score1,
-    score2,
-    isPlayer1,
-    setGameState,
-    pongItem,
-    isItemMode,
+    ball, paddle1, paddle2, score1, score2,
+    isPlayer1, setGameState, pongItem, isItemMode,
   } = useStore();
   const socket = getGameSocket();
   const router = useRouter();
@@ -188,7 +175,7 @@ const getBallColor = (type: number) => {
     case 1:
       return 'bg-ball-pink'; // 핑크색
     case 2:
-      return 'bg-ball-gold'; // 황금색
+      return 'bg-ball-gold'; // 노랑색
     case 3:
       return 'bg-ball-indigo'; // 하늘색
     default:
