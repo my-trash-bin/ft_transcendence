@@ -1,8 +1,8 @@
+import { useRouter } from 'next/navigation';
 import React, { useEffect } from 'react';
 import Modal from 'react-modal';
-import { getGameSocket } from '../pong/gameSocket';
-import { useRouter } from 'next/navigation';
 import useStore from '../pong/Update';
+import { getGameSocket } from '../pong/gameSocket';
 
 interface MatchingModalProps {
   isOpen: boolean;
@@ -19,15 +19,6 @@ const MatchingModal: React.FC<MatchingModalProps> = ({
   const socket = getGameSocket();
   const { setIsPlayer1 } = useStore();
 
-  
-  const handlePlayerRole = (role: string) => {
-    setIsPlayer1(role === 'player1');
-    console.log('playerRole', role);
-    socket.off('playerRole', handlePlayerRole);
-  };
-  
-  socket.on('playerRole', handlePlayerRole);
-
   useEffect(() => {
     if (isOpen) {
       if (mode === 'normal') {
@@ -35,21 +26,29 @@ const MatchingModal: React.FC<MatchingModalProps> = ({
         console.log('joinNormalMatch');
       } else if (mode === 'item') {
         socket.emit('joinItemMatch');
+        console.log('joinItemMatch');
       }
-
-      const handleGoPong = () => {
-        console.log('GoPong - Redirecting to game room');
-        onClose();
-        router.push('/pong');
-      };
-
-      socket.on('GoPong', handleGoPong);
-      return () => {
-        socket.off('GoPong', handleGoPong);
-      };
     }
-  }, [isOpen, mode, onClose, router, socket]);
+  }, [isOpen, onClose, router, socket]);
 
+  const handleGoPong = () => {
+    onClose();
+    router.push('/pong');
+  };
+
+  const handlePlayerRole = (role: string) => {
+    setIsPlayer1(role === 'player1');
+    console.log('playerRole', role);
+    socket.off('playerRole', handlePlayerRole);
+  };
+  useEffect(() => {
+    socket.on('GoPong', handleGoPong);
+    socket.on('playerRole', handlePlayerRole);
+    return () => {
+      socket.off('GoPong', handleGoPong);
+      socket.off('playerRole', handlePlayerRole);
+    };
+  }, []);
 
   const bgCSS = 'bg-default rounded-md';
   const size = 'py-sm px-lg w-[498px] h-[308px]';
