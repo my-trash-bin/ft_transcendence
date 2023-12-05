@@ -49,21 +49,23 @@ export function ProfileBox() {
     return (
       <div className="flex flex-row justify-center items-center gap-lg w-[100%] h-[100%]">
         <div className="flex flex-col justify-center items-center gap-md px-2xl">
-          {data.me.profileImageUrl ? (
-            <Image
-              src={data.me.profileImageUrl}
-              alt="avatar"
-              width={150}
-              height={150}
-            />
-          ) : (
-            <Image
-              src={'/avatar/avatar-black.svg'}
-              alt="avatar"
-              width={150}
-              height={150}
-            />
-          )}
+          <div className="w-[150px] h-[150px] inline-block overflow-x-hidden overflow-y-hidden">
+            {data.me.profileImageUrl ? (
+              <Image
+                src={data.me.profileImageUrl}
+                alt="avatar"
+                width={150}
+                height={150}
+              />
+            ) : (
+              <Image
+                src={'/avatar/avatar-black.svg'}
+                alt="avatar"
+                width={150}
+                height={150}
+              />
+            )}
+          </div>
           <Button onClick={handleOpenAvatar}>아바타 수정</Button>
         </div>
         <div className="flex flex-col justify-between rounded-sm bg-default p-xl w-[50%] h-[100%]">
