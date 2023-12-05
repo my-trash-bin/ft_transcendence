@@ -1,6 +1,5 @@
-import { UserProfileDto } from '@/api/api';
 import Image from 'next/image';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useState } from 'react';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { ModalLayout } from '../channel/modals/ModalLayout';
 import { Button } from '../common/Button';
@@ -103,7 +102,7 @@ export const AvatarEditModal: React.FC<ModalProfileProps> = ({
                 uploadImage
                   ? 'border-dark-purple'
                   : 'border-default hover:border-dark-gray hover:bg-light-background'
-              }  w-lg h-lg border-3`}
+              }  w-lg h-lg border-3 inline-block overflow-x-hidden overflow-y-hidden`}
             >
               {uploadImage ? (
                 <Image
