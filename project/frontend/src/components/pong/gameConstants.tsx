@@ -16,16 +16,20 @@ export const SMASH_SPEED = 8;
 // 아이템
 export const ITEM_SIZE = 100;
 
+// type 0: 아이템 없음
+// type 1: 공 스피드 증가
+// type 2: 점수 2배
+// type 3: 패들 크기 감소
+
 export interface GameState {
-  ball: { x: number; y: number };
+  ball: { x: number; y: number, type: number };
   velocity: { x: number; y: number };
-  paddle1: { x: number; y: number };
-  paddle2: { x: number; y: number };
+  paddle1: { x: number; y: number, type: number };
+  paddle2: { x: number; y: number, type: number };
   score1: number;
   score2: number;
   gameOver: boolean;
   gameStart : boolean;
   isItemMode: boolean;
-  itemMap?: { x: number; y: number, type: number };
-  applyItem: number;
+  itemMap: { x: number; y: number, type: number };
 }

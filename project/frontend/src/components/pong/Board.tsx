@@ -70,8 +70,9 @@ const Board: React.FC = () => {
           type = 1 -> ./pong/1
           type = 2 -> ./pong/2
           type = 3 -> ./pong/3
+          itemMap == undefined -> 아이템 없음, 아이템 지우기
         */}
-        {isItemMode && itemMap && (
+        {isItemMode && itemMap.type != 0 && (
           <div
             className="absolute rounded-md"
             style={{
@@ -89,7 +90,6 @@ const Board: React.FC = () => {
             />
           </div>
         )}
-
 
         {/* 상대 플레이어의 패들 내가 1이라면 2, 2라면 1*/}
         <div className={`absolute bg-dark-gray rounded-md`}
