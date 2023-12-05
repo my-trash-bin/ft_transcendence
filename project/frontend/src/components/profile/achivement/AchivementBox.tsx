@@ -25,7 +25,7 @@ export function AchivementBox() {
         <Button onClick={() => router.push('/profile/achivement')} size={'big'}>
           더보기
         </Button>
-        <div className="w-[100%] h-[100%] pt-xl ">{render()}</div>
+        <div className="w-[100%] pt-xl flex justify-center">{render()}</div>
       </div>
     </div>
   );
@@ -35,7 +35,7 @@ export function AchivementBox() {
 
     const filteredData = data?.filter((badge) => badge.isMine);
 
-    // console.log(filteredData);s
+    // console.log(filteredData);
     if (filteredData?.length === 0 || !filteredData)
       return (
         <p className="self-center text-center">아직 획득한 업적이 없습니다. </p>
