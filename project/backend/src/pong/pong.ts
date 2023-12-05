@@ -15,7 +15,6 @@ const PADDLE_STRIKE = 4;
 const PADDLE_MOVE_STEP = 20;
 const ITEM_SIZE = 100;
 const GAME_OVER = 10;
-// const PADDLE_MOVE_STEP = 0.5; // 움직임의 단계 크기 증가
 
 export interface GameState {
   ball: { x: number; y: number, type: number };
@@ -115,15 +114,13 @@ export class Pong {
     const minY = 0;
     let maxY: number;
 
-    switch (type) {
-      case 3:
-        maxY = BOARD_HEIGHT - SMALL_PADDLE_HEIGHT - 4;
-        break;
-      default:
-        maxY = BOARD_HEIGHT - PADDLE_HEIGHT - 4;
-        break;
+    if (type === 3) {
+      maxY = BOARD_HEIGHT - SMALL_PADDLE_HEIGHT - 4;
+      return Math.min(Math.max(paddleY, minY), maxY);
+    } else {
+      maxY = BOARD_HEIGHT - PADDLE_HEIGHT - 4;
+      return Math.min(Math.max(paddleY, minY), maxY);
     }
-    return Math.min(Math.max(paddleY, minY), maxY);
   }
 
   getGameState() {
@@ -131,13 +128,9 @@ export class Pong {
   }
 
   private moveBall() {
-    switch (this.gameState.ball.type) {
-      case 1:
-        this.gameState.velocity.x *= 2;
-        this.gameState.velocity.y *= 2;
-        break;
-      default:
-        break;
+    if (this.gameState.ball.type === 1) {
+      this.gameState.velocity.x *= 2;
+      this.gameState.velocity.y *= 2;
     }
     this.gameState.ball.x += this.gameState.velocity.x;
     this.gameState.ball.y += this.gameState.velocity.y;
@@ -158,7 +151,6 @@ export class Pong {
 
     // 게임 업데이트
     this.onGameUpdate.emit('gameState', this.gameState);
-    // console.log('After update:', this.gameState);
 
     return this.gameState.gameOver;
   }
@@ -181,25 +173,23 @@ export class Pong {
     }
   }
 
-  private updateScore() {
+  private doubleScore() {
     if (this.gameState.ball.x < 4) {
-      switch (this.gameState.ball.type) {
-        case 2:
-          this.gameState.score2 += 2;
-          break;
-        default:
-          this.gameState.score2++;
-          break;
-      }
+      this.gameState.score2 += 2;
     } else {
-      switch (this.gameState.ball.type) {
-        case 2:
-          this.gameState.score1 += 2;
-          break;
-        default:
-          this.gameState.score1++;
-          break;
-      }
+      this.gameState.score1 += 2;
+    }
+  }
+
+  private updateScore() {
+    if (this.gameState.ball.type === 2) {
+      this.doubleScore();
+      return ;
+    }
+    if (this.gameState.ball.x < 4) {
+      this.gameState.score2++;
+    } else {
+      this.gameState.score1++;
     }
   }
 
@@ -312,11 +302,10 @@ export class Pong {
 
   private checkSmash(paddleCenter: number, ballY: number): number {
     const deltaY = Math.abs(ballY - paddleCenter);
-    switch (this.gameState.itemMap?.type) {
-      case 1:
-        return deltaY < PADDLE_HEIGHT / PADDLE_STRIKE ? SMASH_SPEED * 2 : DEFAULT_SPEED;
-      default:
-        return deltaY < PADDLE_HEIGHT / PADDLE_STRIKE ? SMASH_SPEED : DEFAULT_SPEED;
+    if (this.gameState.itemMap.type === 1) {
+      return deltaY < PADDLE_HEIGHT / PADDLE_STRIKE ? SMASH_SPEED * 1.2 : DEFAULT_SPEED;
+    } else {
+      return deltaY < PADDLE_HEIGHT / PADDLE_STRIKE ? SMASH_SPEED : DEFAULT_SPEED;
     }
   }
 }
