@@ -1,12 +1,13 @@
 import { scrypt } from 'node:crypto';
 
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AuthType } from '@prisma/client';
 
 import { PrismaService } from '../base/prisma.service';
 import { idOf, UserId } from '../common/Id';
 import {
+  createPrismaErrorMessage,
   isRecordNotFoundError,
   IsRecordToUpdateNotFoundError,
 } from '../util/prismaError';
@@ -37,6 +38,7 @@ export type JwtPayload =
 
 @Injectable()
 export class AuthService {
+  private logger = new Logger('AuthService');
   constructor(
     private readonly prismaService: PrismaService,
     private readonly configService: ConfigService,
@@ -109,14 +111,13 @@ export class AuthService {
     try {
       return await this.prismaService.$transaction(
         async (tx): Promise<JwtPayload> => {
-          // TODO: AuthUser 하나당 한개의 유저를 바란다면 여기서 막으면 된다.
           const auth = await tx.auth.update({
             where: {
               type_id: {
                 type: authType,
                 id: authId,
               },
-              user: null,
+              user: null, // 이제 Auth 계정 하나당 User는 하나만 생성 가능합니다.
             },
             data: {
               user: {
@@ -135,16 +136,23 @@ export class AuthService {
             select: { user: { select: { id: true } } },
           });
           const id = auth.user!.id as string;
+          this.logger.log(
+            `Auth ${authId}의 User 생성 성공: 유저아이디 ${auth.user?.id}, 닉네임: ${nickname}}`,
+          );
           return { phase: 'complete', id: idOf(id) };
         },
       );
     } catch (error) {
+      // this.logger.error(error);
       if (
         IsRecordToUpdateNotFoundError(error) ||
         isRecordNotFoundError(error)
       ) {
-        throw new BadRequestException('이미 가입된 계정이 존재합니다.');
+        const errorMessage = `Auth 정보가 올바르지 않거나 이미 가입된 User가 존재합니다.`;
+        this.logger.debug(createPrismaErrorMessage(error));
+        throw new BadRequestException(errorMessage);
       }
+      this.logger.debug(`Post register 요청 실패: 알 수 없는 에러`);
       throw error;
     }
   }

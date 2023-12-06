@@ -5,12 +5,18 @@ import {
   Get,
   HttpException,
   InternalServerErrorException,
+  Logger,
   Param,
   Post,
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Request as ExpressRequest } from 'express';
 import { JwtPayloadPhaseComplete } from '../auth/auth.service';
 import { JwtGuard } from '../auth/jwt.guard';
@@ -20,16 +26,20 @@ import { MessageWithMemberDto } from '../dm/dto/message-with-member';
 import { ChannelRoomType, EventsService } from '../events/events.service';
 import { ChannelService } from './channel.service';
 import { ChannelIdDto } from './dto/channel-id.dto';
+import { ChannelMemberDetailDto } from './dto/channel-member-detail.dto';
 import { ChannelMemberDto } from './dto/channel-members.dto';
 import { ChannelRelationDto } from './dto/channel-relation.dto';
 import { ChannelWithAllInfoDto } from './dto/channel-with-all-info.dto';
 import { ChannelDto } from './dto/channel.dto';
 import { CreateChannelDto } from './dto/create-channel.dto';
+import { JoinedChannelInfoDto } from './dto/joined-channel-info.dto';
+import { kickBanPromoteMuteRequsetDto } from './dto/kick-ban-promote-mute-requset.dto';
 import { ParticipateChannelDto } from './dto/participate-channel.dto';
 
 @ApiTags('channel')
 @Controller('/api/v1/channel')
 export class ChannelController {
+  private logger = new Logger('ChannelController');
   constructor(
     private readonly channelService: ChannelService,
     private readonly eventsService: EventsService,
@@ -99,10 +109,10 @@ export class ChannelController {
   @UseGuards(JwtGuard, PhaseGuard)
   @Phase('complete')
   async findChannelMembersByChannelId(
-    @Param('channelId') chaennelId: string,
+    @Param('channelId') channelId: string,
   ): Promise<ChannelMemberDto[]> {
     const result = await this.channelService.findChannelMembersByChannelId(
-      idOf(chaennelId),
+      idOf(channelId),
     );
     if (!result.ok) {
       throw new HttpException(result.error!.message, result.error!.statusCode);
@@ -129,11 +139,13 @@ export class ChannelController {
   }
 
   @Get('messages/:channelId')
+  @ApiOperation({ summary: '특정 채널 채팅 목록 반환' })
   @ApiOkResponse({
     type: () => MessageWithMemberDto,
     isArray: true,
   })
   @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
   async getChannelMessages(
     @Param('channelId') channelId: string,
     @Request() req: ExpressRequest,
@@ -150,15 +162,49 @@ export class ChannelController {
   }
 
   @Post('/participate')
-  @ApiOkResponse({})
+  @ApiOperation({ summary: '채널 참여하기 with 비번' })
+  @ApiCreatedResponse({
+    type: () => JoinedChannelInfoDto,
+  })
   @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
   async participateChannel(
     @Body() dto: ParticipateChannelDto,
     @Request() req: ExpressRequest,
   ) {
     const userId = (req.user as JwtPayloadPhaseComplete).id;
 
-    await this.channelService.participate(userId.value, dto);
+    return await this.channelService.participate(userId.value, dto);
+  }
+
+  @Post('/kickBanPromoteMute')
+  @ApiOperation({ summary: '채널 참여자 상태 변경' })
+  @ApiCreatedResponse({
+    type: () => ChannelMemberDetailDto,
+  })
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
+  async kickBanPromoteMute(
+    @Body() dto: kickBanPromoteMuteRequsetDto,
+    @Request() req: ExpressRequest,
+  ) {
+    const userId = (req.user as JwtPayloadPhaseComplete).id;
+    const { channelId, targetUserId, actionType } = dto;
+    this.logger.debug(userId.value, channelId, targetUserId, actionType);
+    const result = await this.channelService.changeMemberStatus(
+      userId,
+      idOf(channelId),
+      idOf(targetUserId),
+      actionType,
+    );
+    if (!result.ok) {
+      if (result.error!.statusCode === 500) {
+        throw new InternalServerErrorException(result.error!.message);
+      }
+      throw new BadRequestException(result.error!.message);
+    }
+
+    return result.data!;
   }
 
   // @Get('participand/:cheenlId')

@@ -13,18 +13,28 @@ import {
   newServiceOkResponse,
   ServiceResponse,
 } from '../common/ServiceResponse';
-import { NotificationService } from '../notification/notification.service';
 import { AchievementWithReceived } from './dto/achievement-with-received.dto';
-import { NotificationDto } from './dto/notification.dto';
-import { UserAchievementDto } from './dto/user-achievement.dto';
+import { UserAchievementWithAchievementDto } from './dto/user-achievement-with-achievement.dto';
 
 @Injectable()
 export class AchievementService {
   private logger = new Logger('AchievementService');
-  constructor(
-    private prisma: PrismaService,
-    private notiService: NotificationService,
-  ) {}
+  private monitorEvents: Record<string, Record<number, string>> = {
+    newMessage: {
+      100: '수다왕',
+    },
+    newFriend: {
+      30: '인싸',
+    },
+    newChannel: {
+      1: '리더',
+      5: '방랑자',
+    },
+    endGame: {
+      5: '게임러버',
+    },
+  };
+  constructor(private prisma: PrismaService) {}
 
   async findAllWithReceived(
     userId: UserId,
@@ -63,7 +73,9 @@ export class AchievementService {
     }
   }
 
-  async findByUser(userId: UserId): Promise<UserAchievementDto[]> {
+  async findByUser(
+    userId: UserId,
+  ): Promise<UserAchievementWithAchievementDto[]> {
     try {
       return await this.prisma.userAchievement.findMany({
         where: {
@@ -78,13 +90,35 @@ export class AchievementService {
     }
   }
 
+  async checkGrantAchievement(
+    userId: UserId,
+    eventDatas: { eventType: string; eventValue: number }[],
+  ): Promise<UserAchievementWithAchievementDto[]> {
+    const promises = eventDatas.reduce(
+      (prev, cur) =>
+        cur.eventType in this.monitorEvents &&
+        cur.eventValue in this.monitorEvents[cur.eventType]
+          ? [
+              ...prev,
+              this.grantAchievement(
+                userId,
+                this.monitorEvents[cur.eventType][cur.eventValue],
+              ),
+            ]
+          : [...prev],
+      [] as Promise<ServiceResponse<UserAchievementWithAchievementDto>>[],
+    );
+    const r = await Promise.all(promises);
+    return r.filter((result) => result.ok).map((result) => result.data!);
+  }
+
   async grantAchievement(
     userId: UserId,
     achievementTitle: string,
-  ): Promise<ServiceResponse<NotificationDto>> {
+  ): Promise<ServiceResponse<UserAchievementWithAchievementDto>> {
     // Transaction 시작
     try {
-      const achievement = await this.prisma.$transaction(
+      const userAchievement = await this.prisma.$transaction(
         async (prismaTransaction) => {
           // Achievement 조회
           const achievement = await prismaTransaction.achievement.findFirst({
@@ -113,26 +147,19 @@ export class AchievementService {
           }
 
           // Achievement 부여
-          await prismaTransaction.userAchievement.create({
+          return await prismaTransaction.userAchievement.create({
             data: {
               userId: userId.value,
               achievementId: achievement.id,
             },
+            include: {
+              achievement: true,
+            },
           });
-
-          return achievement;
         },
       );
-
-      // Notification 생성
-      return await this.notiService.create(
-        userId,
-        JSON.stringify({
-          type: 'newAchievement',
-          sourceId: achievement.id,
-          sourceName: achievement.title,
-        }),
-      );
+      // noti 삭제
+      return newServiceOkResponse(userAchievement);
     } catch (error) {
       if (error instanceof ServiceError) {
         this.logger.debug(

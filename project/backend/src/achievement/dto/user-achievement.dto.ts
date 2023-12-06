@@ -1,6 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { AchievementDto } from './achievement.dto';
 
 export class UserAchievementDto {
   @ApiProperty({ example: 'uuid-for-user', description: 'User ID' })
@@ -17,7 +15,10 @@ export class UserAchievementDto {
     description: 'Achievement Attained Date',
   })
   achievedAt!: Date;
-
-  @Type(() => AchievementDto)
-  achievement!: AchievementDto;
 }
+
+export const userAchievementSelect = {
+  userId: true,
+  achievementId: true,
+  achievedAt: true,
+};
