@@ -21,6 +21,10 @@ export const ITEM_SIZE = 100;
 // type 1: 공 스피드 증가
 // type 2: 점수 2배
 // type 3: 패들 크기 증가
+export interface PlayerInfo {
+  nickname: string;
+  avatarUrl: string;
+}
 
 export interface GameState {
   ball: { x: number; y: number; type: number };

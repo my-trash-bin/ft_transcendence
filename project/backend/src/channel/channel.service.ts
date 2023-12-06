@@ -1,13 +1,16 @@
 import {
   BadRequestException,
   ConflictException,
+  HttpException,
   Injectable,
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { ChannelMemberType } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import * as bcrypt from 'bcrypt';
+import { scrypt } from 'crypto';
 import { PrismaService } from '../base/prisma.service';
 import { ChannelId, UserId } from '../common/Id';
 import { ServiceError } from '../common/ServiceError';
@@ -30,6 +33,7 @@ import {
   isRecordNotFoundError,
   isUniqueConstraintError,
 } from '../util/prismaError';
+import { ChangeMemberStatusResultDto } from './dto/change-member-status-result.dto';
 import { ChannelMemberDetailDto } from './dto/channel-member-detail.dto';
 import {
   ChannelMemberDto,
@@ -78,6 +82,7 @@ export class ChannelService {
   private logger = new Logger('ChannelService');
   constructor(
     private prisma: PrismaService,
+    private configService: ConfigService,
     private readonly dmService: DmService,
   ) {}
 
@@ -111,6 +116,7 @@ export class ChannelService {
     return prismaChannelRelations.map((el) => new ChannelRelationDto(el));
   }
 
+  // TODO: 암호화해서 넣기
   async create(
     id: UserId,
     { type, title, password, capacity }: CreateChannelDto,
@@ -309,7 +315,7 @@ export class ChannelService {
     channelId: ChannelId,
     targetId: UserId,
     actionType: ChangeActionType,
-  ): Promise<ServiceResponse<ChannelMemberDetailDto>> {
+  ): Promise<ServiceResponse<ChangeMemberStatusResultDto>> {
     try {
       const result = await this.prisma.$transaction(async (prisma) => {
         // 유저가 그 방의 ADMINISTRATOR 여야 하고, 상대가 방에 있는 OWNER가 아닌 유저
@@ -322,7 +328,7 @@ export class ChannelService {
           throw new ServiceError('Invalid channelId', 400);
         }
 
-        const user = await prisma.channelMember.findUnique({
+        const triggerUser = await prisma.channelMember.findUnique({
           where: {
             channelId_memberId: {
               channelId: channelId.value,
@@ -332,10 +338,13 @@ export class ChannelService {
               not: ChannelMemberType.BANNED,
             },
           },
+          include: {
+            member: true,
+          },
         });
 
         // 2. 방에 속한 유저만이 행동을 트리거 할 수 있다.
-        if (user === null) {
+        if (triggerUser === null) {
           throw new ServiceError(
             '방에 존재하지 않는 유저는 kick/ban/promote 할 수 없습니다.',
             400,
@@ -345,12 +354,15 @@ export class ChannelService {
         const targetUser = await prisma.channelMember.findUnique({
           where: {
             channelId_memberId: {
-              channelId: targetId.value,
-              memberId: id.value,
+              channelId: channelId.value,
+              memberId: targetId.value,
             },
             memberType: {
               not: ChannelMemberType.BANNED,
             },
+          },
+          include: {
+            member: true,
           },
         });
 
@@ -361,6 +373,9 @@ export class ChannelService {
             400,
           );
         }
+
+        // this.logger.debug(`triggerUser: ${JSON.stringify(triggerUser)}`);
+        // this.logger.debug(`targetUser: ${JSON.stringify(targetUser)}`);
 
         // 4. Owner는 명령의 대상이 될 수 없음
         const { ownerId } = prismaChannel;
@@ -375,7 +390,9 @@ export class ChannelService {
         const isOwner = id.value === ownerId;
 
         // 6. 권한 체크
-        if (!this.checkPermissions(user.memberType, actionType, isOwner)) {
+        if (
+          !this.checkPermissions(triggerUser.memberType, actionType, isOwner)
+        ) {
           throw new ServiceError(
             `${actionType} 할 수 있는 권한이 존재하지 않습니다.`,
             400,
@@ -384,7 +401,7 @@ export class ChannelService {
 
         // 7. 수행
         if (actionType === ChangeActionType.KICK) {
-          return await this.kickUser(channelId, targetId);
+          await this.kickUser(channelId, targetId);
         } else {
           const memberType =
             actionType === ChangeActionType.BANNED
@@ -396,15 +413,21 @@ export class ChannelService {
             actionType === ChangeActionType.MUTE
               ? this.getMutedDateTime()
               : undefined;
-          return await this.banOrPromoteOrMuteUser(
+          await this.banOrPromoteOrMuteUser(
             channelId,
             targetId,
             memberType,
             mutedUntil,
           );
         }
+        return {
+          triggerUser: triggerUser.member,
+          targetUser: targetUser.member,
+          channelId: prismaChannel.id,
+          actionType,
+        };
       });
-      return result;
+      return newServiceOkResponse(result);
     } catch (error) {
       if (error instanceof ServiceError) {
         return { ok: false, error };
@@ -644,11 +667,19 @@ export class ChannelService {
   }
   async participate(userId: string, dto: ParticipateChannelDto) {
     try {
-      const alreadyIn = await this.checkUserAlreadyInChannel(
-        userId,
-        dto.channelId,
-      );
-      if (alreadyIn || dto.type == ChannelType.Public)
+      const channelMember = await this.prisma.channelMember.findUnique({
+        where: {
+          channelId_memberId: {
+            channelId: dto.channelId,
+            memberId: userId,
+          },
+        },
+      });
+      if (channelMember?.memberType === ChannelMemberType.BANNED) {
+        throw new ServiceError('밴된 유저는 방에 들어갈 수 없습니다.', 403);
+      }
+      if (channelMember !== null || dto.type == ChannelType.Public)
+        // 이미 방에 들어가 있거나, 퍼블릭방.
         return await this.participateUserToChannel(userId, dto);
 
       if (!dto.password) throw new ServiceError('비밀번호가 필요합니다.', 400);
@@ -658,13 +689,16 @@ export class ChannelService {
         },
       });
       if (!channel?.password)
-        throw new InternalServerErrorException('비밀번호가 없습니다.');
+        throw new ServiceError('비밀번호가 없습니다.', 403);
       const match = await bcrypt.compare(dto.password, channel.password);
       if (!match) {
         throw new ServiceError('비밀번호가 틀렸습니다.', 400);
       }
       return await this.participateUserToChannel(userId, dto);
     } catch (error) {
+      if (error instanceof ServiceError) {
+        throw new HttpException(error.message, error.statusCode);
+      }
       if (error instanceof PrismaClientKnownRequestError) {
         this.logger.debug(error.code);
       }
@@ -681,7 +715,6 @@ export class ChannelService {
         );
         throw new BadRequestException(createPrismaErrorMessage(error));
       }
-      if (error instanceof ServiceError) throw error;
       throw new InternalServerErrorException('Unknown Error');
     }
   }
@@ -854,5 +887,18 @@ export class ChannelService {
   }
   private isUserInChannel(type: ChannelMemberType) {
     return type !== ChannelMemberType.BANNED;
+  }
+  private mfaPasswordHash(password: string): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      scrypt(
+        password,
+        this.configService.getOrThrow<string>('PASSWORD_SALT'),
+        32,
+        (err, buffer) => {
+          if (err) reject(err);
+          else resolve(buffer.toString());
+        },
+      );
+    });
   }
 }
