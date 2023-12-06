@@ -6,6 +6,7 @@ import {
   DEFAULT_SPEED,
   GameState,
   PADDLE_WIDTH,
+  PlayerInfo,
 } from './gameConstants';
 
 interface ExtendedGameState extends GameState {
@@ -13,6 +14,10 @@ interface ExtendedGameState extends GameState {
   setIsPlayer1: (isPlayer1: boolean) => void;
   setGameState: (newState: GameState) => void;
   setGameOver: (gameOver: boolean) => void;
+  player1Info: PlayerInfo;
+  player2Info: PlayerInfo;
+  setplayer1Info: (playerInfo: PlayerInfo) => void;
+  setplayer2Info: (playerInfo: PlayerInfo) => void;
 }
 
 const useStore = create<ExtendedGameState>((set) => ({
@@ -31,10 +36,14 @@ const useStore = create<ExtendedGameState>((set) => ({
   isPlayer1: true,
   isItemMode: false,
   pongItem: { x: 0, y: 0, type: 0 },
+  player1Info: { nickname: '', avatarUrl: '' },
+  player2Info: { nickname: '', avatarUrl: '' },
 
   setIsPlayer1: (isPlayer1) => set({ isPlayer1 }),
   setGameState: (newState) => set({ ...newState }),
   setGameOver: (gameOver) => set({ gameOver }),
+  setplayer1Info: (playerInfo) => set({ player1Info: playerInfo }),
+  setplayer2Info: (playerInfo) => set({ player2Info: playerInfo }),
 }));
 
 export default useStore;
