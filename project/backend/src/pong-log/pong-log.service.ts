@@ -16,6 +16,7 @@ import {
 } from '../util/prismaError';
 import { HistoryStaticDto } from './dto/history-static.dto';
 import { PongLogDto } from './dto/pong-log.dto';
+import { RankingRecordDto } from './dto/ranking-record.dto';
 
 @Injectable()
 export class PongLogService {
@@ -162,6 +163,45 @@ export class PongLogService {
       }
       return newServiceFailUnhandledResponse(400);
     }
+  }
+
+  async getRanking(): Promise<RankingRecordDto[]> {
+    const gameHistories = await this.prisma.pongGameHistory.findMany();
+
+    const playerStats = new Map<
+      string,
+      { wins: number; losses: number; winRate: number; totalGames: number }
+    >();
+
+    gameHistories.forEach((game) => {
+      this.updateStats(playerStats, game.player1Id, game.isPlayer1win);
+      this.updateStats(playerStats, game.player2Id, !game.isPlayer1win);
+    });
+
+    // 통계를 배열로 변환하고 랭킹 정렬
+    const ranking = Array.from(playerStats.entries()).map(
+      ([playerId, stats]) => ({
+        playerId,
+        ...stats,
+        winRate:
+          stats.totalGames === 0 ? 0 : (stats.wins / stats.totalGames) * 100,
+      }),
+    );
+
+    ranking.sort((a, b) => b.winRate - a.winRate || b.wins - a.wins);
+
+    return ranking;
+  }
+
+  private updateStats(
+    statsMap: Map<string, any>,
+    playerId: string,
+    isWin: boolean,
+  ): void {
+    const stats = statsMap.get(playerId) || { wins: 0, losses: 0, games: 0 };
+    stats.totalGames += 1;
+    isWin ? (stats.wins += 1) : (stats.losses += 1);
+    stats.winRate = statsMap.set(playerId, stats);
   }
 
   private calculateStatistics(
