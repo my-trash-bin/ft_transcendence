@@ -78,20 +78,20 @@ export class AuthController {
     @Request() req: ExpressRequest,
     @Response() res: ExpressResponse,
   ): Promise<void> {
-    this.logger.debug(`42/callback: ${req.user}`);
     const jwtPayload = await this.authService.oauth42(req.user);
     this.setCookie(res, jwtPayload);
+    this.logger.debug(`oauth42 코드 jwtPayload ${JSON.stringify(jwtPayload)}`);
     switch (jwtPayload['phase']) {
       case 'register':
-        this.logger.debug('res.redirect => /sign-in');
+        this.logger.debug('리다이렉트 => /sign-in');
         res.redirect('/sign-in');
         break;
       case '2fa':
-        this.logger.debug('res.redirect => /2fa');
+        this.logger.debug('리다이렉트 => /2fa');
         res.redirect('/2fa');
         break;
       case 'complete':
-        this.logger.debug('res.redirect1 => welcome => /friend');
+        this.logger.debug('리다이렉트 => welcome => /friend');
         this.welcome(res, 'FT');
         break;
     }

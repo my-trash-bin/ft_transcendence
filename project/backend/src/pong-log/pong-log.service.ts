@@ -3,24 +3,28 @@ import { PongGameHistory } from '@prisma/client';
 import { PrismaService } from '../base/prisma.service';
 import { GameHistoryId, UserId } from '../common/Id';
 import {
-  ServiceResponse,
   newServiceFailPrismaKnownResponse,
   newServiceFailUnhandledResponse,
   newServiceOkResponse,
+  ServiceResponse,
 } from '../common/ServiceResponse';
 import {
-  IsRecordToUpdateNotFoundError,
   createPrismaErrorMessage,
   isRecordNotFoundError,
+  IsRecordToUpdateNotFoundError,
   isUniqueConstraintError,
 } from '../util/prismaError';
+import { HistoryStaticDto } from './dto/history-static.dto';
+import { PongLogDto } from './dto/pong-log.dto';
 
 @Injectable()
 export class PongLogService {
   private logger = new Logger('PongLogService');
   constructor(private readonly prisma: PrismaService) {}
 
-  async findOneByUserId(id: UserId) {
+  async findOneByUserId(
+    id: UserId,
+  ): Promise<HistoryStaticDto & { userLogs: PongLogDto[] }> {
     const userLogs = await this.prisma.pongGameHistory.findMany({
       where: {
         OR: [{ player1Id: id.value }, { player2Id: id.value }],
@@ -170,7 +174,7 @@ export class PongLogService {
       createdAt: Date;
     }[],
     id: UserId,
-  ) {
+  ): HistoryStaticDto {
     const userId = id.value;
 
     let wins = 0;

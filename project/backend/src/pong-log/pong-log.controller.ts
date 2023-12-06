@@ -11,6 +11,7 @@ import { JwtGuard } from '../auth/jwt.guard';
 import { Phase, PhaseGuard } from '../auth/phase.guard';
 import { idOf } from '../common/Id';
 import { FindOneParam } from '../users/dto/user-request.dto';
+import { UserHistoryDto } from './dto/user-history.dto';
 import { PongLogService } from './pong-log.service';
 
 @ApiTags('pong-log')
@@ -45,7 +46,7 @@ export class PongLogController {
   @ApiOperation({ summary: '유저 1명 기록 모두 조회' })
   @ApiOkResponse({
     description: '유저 1명의 로그 반환',
-    // type: () => PongSeasonLogDto,
+    type: () => UserHistoryDto,
   })
   @ApiBadRequestResponse({ description: '올바르지 않은 id' })
   @ApiUnauthorizedResponse({ description: '인증되지 않은 사용자' })
@@ -53,7 +54,6 @@ export class PongLogController {
   @Phase('complete')
   async findOneByUserId(@Param() param: FindOneParam) {
     const { id } = param;
-    const userLogs = await this.pongLogService.findOneByUserId(idOf(id));
-    return userLogs;
+    return await this.pongLogService.findOneByUserId(idOf(id));
   }
 }
