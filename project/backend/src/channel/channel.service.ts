@@ -1,14 +1,12 @@
 import {
   BadRequestException,
   ConflictException,
-  HttpException,
   Injectable,
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ChannelMemberType } from '@prisma/client';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import * as bcrypt from 'bcrypt';
 import { scrypt } from 'crypto';
 import { PrismaService } from '../base/prisma.service';
@@ -27,7 +25,6 @@ import { LeavingChannelInfo } from '../events/event-response.dto';
 import { userDtoSelect } from '../users/dto/user.dto';
 import {
   createPrismaErrorMessage,
-  IsForeignKeyConstraintFailError,
   isPrismaUnknownError,
   isRecordNotFoundError,
   IsRecordToUpdateNotFoundError,
@@ -46,7 +43,6 @@ import { ChannelWithMembersDto } from './dto/channel-with-members.dto';
 import { ChannelDto, channelDtoSelect } from './dto/channel.dto';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { JoinedChannelInfoDto } from './dto/joined-channel-info.dto';
-import { ParticipateChannelDto } from './dto/participate-channel.dto';
 import { ChannelType } from './enums/channel-type.enum';
 
 export enum ChangeActionType {
@@ -229,7 +225,8 @@ export class ChannelService {
   async joinChannel(
     id: UserId,
     channelId: ChannelId,
-  ): Promise<ServiceResponse<JoinChannelInfoType>> {
+    password?: string | null,
+  ): Promise<ServiceResponse<JoinedChannelInfoDto>> {
     const select = {
       ...channelDtoSelect,
       members: {
@@ -248,7 +245,7 @@ export class ChannelService {
       },
     };
     try {
-      const result = await this.prisma.$transaction(async (prisma) => {
+      const info = await this.prisma.$transaction(async (prisma) => {
         const channel = await prisma.channel.findUniqueOrThrow({
           where: {
             id: channelId.value,
@@ -263,26 +260,29 @@ export class ChannelService {
         });
 
         if (channel.members) {
-          //
           if (channel.members[0].memberType !== ChannelMemberType.BANNED) {
-            return await prisma.channel.findUniqueOrThrow({
-              where: { id: channelId.value },
-              select,
-            });
+            // 이미 들어가 있는 사용자 => 채널 정보만 리턴.
+            return await this.getJoinedChannelInfo(id, channelId);
           }
-          throw new ServiceError(
-            channel.members[0].memberType === ChannelMemberType.BANNED
-              ? '밴된 유저는 채널에 들어갈 수 없습니다.'
-              : '이미 해당 채널에 들어가 있습니다.',
-            400,
-          );
+          throw new ServiceError('밴된 유저는 채널에 들어갈 수 없습니다.', 400);
         }
 
-        // TODO: 사용자 수가 0일떄는?
         if (channel.memberCount >= channel.maximumMemberCount) {
           throw new ServiceError('최대 사용자 수 초과', 400);
         }
 
+        if (!channel.isPublic) {
+          throw new ServiceError('private 방에는 접속 할 수 없습니다.', 400);
+        }
+
+        if (
+          channel.password &&
+          (!password || !(await bcrypt.compare(password, channel.password)))
+        ) {
+          throw new ServiceError('올바른 비밀번호 입력이 필요합니다.', 400);
+        }
+
+        // prisma.
         await prisma.channelMember.create({
           data: {
             channelId: channelId.value,
@@ -290,35 +290,23 @@ export class ChannelService {
             memberType: ChannelMemberType.MEMBER,
           },
         });
-
-        return await prisma.channel.update({
+        await this.prisma.channel.update({
           where: { id: channelId.value },
           data: {
             memberCount: {
               increment: 1,
             },
           },
-          select,
         });
+        return await this.getJoinedChannelInfo(id, channelId);
       });
-      return newServiceOkResponse(result);
+
+      return newServiceOkResponse(info);
     } catch (error) {
       if (error instanceof ServiceError) {
         return { ok: false, error };
       }
-      if (isUniqueConstraintError(error)) {
-        throw new ConflictException(createPrismaErrorMessage(error));
-      }
-      if (
-        IsRecordToUpdateNotFoundError(error) ||
-        isRecordNotFoundError(error)
-      ) {
-        throw new BadRequestException(createPrismaErrorMessage(error));
-      }
-      if (isPrismaUnknownError(error)) {
-        throw new InternalServerErrorException(createPrismaErrorMessage(error));
-      }
-      return newServiceFailUnhandledResponse(500);
+      return newServiceFailUnhandledResponse(400);
     }
   }
 
@@ -732,59 +720,65 @@ export class ChannelService {
       return newServiceFailPrismaUnKnownResponse(500);
     }
   }
-  async participate(userId: string, dto: ParticipateChannelDto) {
-    try {
-      const channelMember = await this.prisma.channelMember.findUnique({
-        where: {
-          channelId_memberId: {
-            channelId: dto.channelId,
-            memberId: userId,
-          },
-        },
-      });
-      if (channelMember?.memberType === ChannelMemberType.BANNED) {
-        throw new ServiceError('밴된 유저는 방에 들어갈 수 없습니다.', 403);
-      }
-      if (channelMember !== null || dto.type == ChannelType.Public)
-        // 이미 방에 들어가 있거나, 퍼블릭방.
-        return await this.participateUserToChannel(userId, dto);
+  // async participate(userId: string, dto: ParticipateChannelDto) {
+  //   try {
+  //     const channelMember = await this.prisma.channelMember.findUnique({
+  //       where: {
+  //         channelId_memberId: {
+  //           channelId: dto.channelId,
+  //           memberId: userId,
+  //         },
+  //       },
+  //     });
+  //     if (channelMember?.memberType === ChannelMemberType.BANNED) {
+  //       throw new ServiceError('밴된 유저는 방에 들어갈 수 없습니다.', 403);
+  //     }
+  //     if (channelMember !== null || dto.type == ChannelType.Public)
+  //       // 이미 방에 들어가 있거나, 퍼블릭방.
+  //       return await this.participateUserToChannel(
+  //         idOf(userId),
+  //         idOf(dto.channelId),
+  //       );
 
-      if (!dto.password) throw new ServiceError('비밀번호가 필요합니다.', 400);
-      const channel = await this.prisma.channel.findUnique({
-        where: {
-          id: dto.channelId,
-        },
-      });
-      if (!channel?.password)
-        throw new ServiceError('비밀번호가 없습니다.', 403);
-      const match = await bcrypt.compare(dto.password, channel.password);
-      if (!match) {
-        throw new ServiceError('비밀번호가 틀렸습니다.', 400);
-      }
-      return await this.participateUserToChannel(userId, dto);
-    } catch (error) {
-      if (error instanceof ServiceError) {
-        throw new HttpException(error.message, error.statusCode);
-      }
-      if (error instanceof PrismaClientKnownRequestError) {
-        this.logger.debug(error.code);
-      }
-      if (
-        isUniqueConstraintError(error) ||
-        isRecordNotFoundError(error) ||
-        IsRecordToUpdateNotFoundError(error) ||
-        IsForeignKeyConstraintFailError(error)
-      ) {
-        this.logger.debug(
-          `잘못된 입력으로 인한 프리즈마 에러${
-            error.code
-          } 발생: ${createPrismaErrorMessage(error)}`,
-        );
-        throw new BadRequestException(createPrismaErrorMessage(error));
-      }
-      throw new InternalServerErrorException('Unknown Error');
-    }
-  }
+  //     if (!dto.password) throw new ServiceError('비밀번호가 필요합니다.', 400);
+  //     const channel = await this.prisma.channel.findUnique({
+  //       where: {
+  //         id: dto.channelId,
+  //       },
+  //     });
+  //     if (!channel?.password)
+  //       throw new ServiceError('비밀번호가 없습니다.', 403);
+  //     const match = await bcrypt.compare(dto.password, channel.password);
+  //     if (!match) {
+  //       throw new ServiceError('비밀번호가 틀렸습니다.', 400);
+  //     }
+  //     return await this.participateUserToChannel(
+  //       idOf(userId),
+  //       idOf(dto.channelId),
+  //     );
+  //   } catch (error) {
+  //     if (error instanceof ServiceError) {
+  //       throw new HttpException(error.message, error.statusCode);
+  //     }
+  //     if (error instanceof PrismaClientKnownRequestError) {
+  //       this.logger.debug(error.code);
+  //     }
+  //     if (
+  //       isUniqueConstraintError(error) ||
+  //       isRecordNotFoundError(error) ||
+  //       IsRecordToUpdateNotFoundError(error) ||
+  //       IsForeignKeyConstraintFailError(error)
+  //     ) {
+  //       this.logger.debug(
+  //         `잘못된 입력으로 인한 프리즈마 에러${
+  //           error.code
+  //         } 발생: ${createPrismaErrorMessage(error)}`,
+  //       );
+  //       throw new BadRequestException(createPrismaErrorMessage(error));
+  //     }
+  //     throw new InternalServerErrorException('Unknown Error');
+  //   }
+  // }
 
   private async checkUserAlreadyInChannel(userId: string, channelId: string) {
     const result = await this.prisma.channelMember.findFirst({
@@ -797,26 +791,20 @@ export class ChannelService {
     else return false;
   }
 
-  private async participateUserToChannel(
-    userId: string,
-    dto: ParticipateChannelDto,
+  private async getJoinedChannelInfo(
+    userId: UserId,
+    channelId: ChannelId,
   ): Promise<JoinedChannelInfoDto> {
-    const channelMember = await this.prisma.channelMember.upsert({
+    const channelMember = await this.prisma.channelMember.findUniqueOrThrow({
       where: {
         channelId_memberId: {
-          channelId: dto.channelId,
-          memberId: userId,
+          channelId: channelId.value,
+          memberId: userId.value,
         },
       },
-      create: {
-        channelId: dto.channelId,
-        memberId: userId,
-        memberType: ChannelMemberType.MEMBER,
-      },
-      update: {},
     });
     const result = await this.prisma.channel.findUniqueOrThrow({
-      where: { id: dto.channelId },
+      where: { id: channelId.value },
       include: {
         members: {
           include: {

@@ -206,8 +206,12 @@ export class ChannelController {
     @Request() req: ExpressRequest,
   ) {
     const userId = (req.user as JwtPayloadPhaseComplete).id;
-
-    return await this.channelService.participate(userId.value, dto);
+    const { type, channelId, password } = dto;
+    return await this.channelService.joinChannel(
+      userId,
+      idOf(channelId),
+      password,
+    );
   }
 
   @Post('/kickBanPromoteMute')
