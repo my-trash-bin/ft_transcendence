@@ -1,8 +1,9 @@
 'use client';
+import loginAuth from '@/components/auth/LoginAuth';
 import Navbar from '@/components/common/Navbar';
 import FriendAvatar from '@/components/friend/utils/FriendAvatar';
 
-export default function Page() {
+function Page() {
   const CSS =
     'bg-default-interactive rounded-md w-xl h-md ' +
     'border-3 border-dark-purple ' +
@@ -31,3 +32,5 @@ export default function Page() {
     </div>
   );
 }
+
+export default loginAuth(Page);
