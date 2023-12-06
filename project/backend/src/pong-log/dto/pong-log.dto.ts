@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { PongGameHistory } from '@prisma/client';
 
 export class PongLogDto {
   @ApiProperty({ description: '레코드 UUID' })
@@ -21,4 +22,14 @@ export class PongLogDto {
 
   @ApiProperty({ description: '레코드 생성 일자', type: Date })
   createdAt!: Date;
+
+  constructor(input: PongGameHistory) {
+    this.id = input.id;
+    this.player1Id = input.player1Id;
+    this.player2Id = input.player2Id;
+    this.player1Score = input.player1Score;
+    this.player2Score = input.player2Score;
+    this.isPlayer1win = input.isPlayer1win;
+    this.createdAt = input.createdAt;
+  }
 }

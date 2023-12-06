@@ -12,8 +12,9 @@ import { JwtGuard } from '../auth/jwt.guard';
 import { Phase, PhaseGuard } from '../auth/phase.guard';
 import { idOf } from '../common/Id';
 import { FindOneParam } from '../users/dto/user-request.dto';
-import { RankingRecordDto } from './dto/ranking-record.dto';
-import { UserHistoryDto } from './dto/user-history.dto';
+import { PongLogDtoWithPlayerDto } from './dto/pong-log-with-player.dto';
+import { PongLogDto } from './dto/pong-log.dto';
+import { PongLogRankingRecordDto } from './dto/pong-long-ranking-record.dto';
 import { PongLogService } from './pong-log.service';
 
 @ApiTags('pong-log')
@@ -25,7 +26,7 @@ export class PongLogController {
   @ApiOperation({ summary: '랭킹 정보 반환' })
   @ApiOkResponse({
     description: '승률 상위 부터 제공',
-    type: () => RankingRecordDto,
+    type: () => PongLogRankingRecordDto,
     isArray: true,
   })
   @ApiUnauthorizedResponse({ description: '인증되지 않은 사용자' })
@@ -40,7 +41,7 @@ export class PongLogController {
   @ApiOperation({ summary: '게임 1개의 로그 조회' })
   @ApiOkResponse({
     description: '유저 1개의 로그 반환',
-    // type: () => PongSeasonLogDto,
+    type: () => PongLogDto,
   })
   @ApiBadRequestResponse({ description: '올바르지 않은 id' })
   @ApiUnauthorizedResponse({ description: '인증되지 않은 사용자' })
@@ -64,14 +65,15 @@ export class PongLogController {
   @ApiOperation({ summary: '유저 1명 기록 모두 조회' })
   @ApiOkResponse({
     description: '유저 1명의 로그 반환',
-    type: () => UserHistoryDto,
+    type: () => PongLogDtoWithPlayerDto,
+    isArray: true,
   })
   @ApiUnauthorizedResponse({ description: '인증되지 않은 사용자' })
   @ApiForbiddenResponse({ description: '권한이 없는 사용자(by jwt.phase)' })
   @UseGuards(JwtGuard, PhaseGuard)
   @Phase('complete')
-  async findOneByUserId(@Param() param: FindOneParam) {
+  async getUserGameHistories(@Param() param: FindOneParam) {
     const { id } = param;
-    return await this.pongLogService.findOneByUserId(idOf(id));
+    return await this.pongLogService.getUserGameHistories(idOf(id));
   }
 }
