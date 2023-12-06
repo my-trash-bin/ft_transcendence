@@ -11,7 +11,7 @@ export function BlockCardList({
 }) {
   const { api } = useContext(ApiContext);
   const { isLoading, isError, data, refetch } = useQuery(
-    ['blockList'],
+    'blockList',
     useCallback(
       async () => (await api.userFollowControllerFindBlocks()).data,
       [api],

@@ -18,7 +18,7 @@ export function NotifBox({
 
   const { api } = useContext(ApiContext);
   const { isLoading, isError, data, refetch } = useQuery(
-    ['fetchNotifications'],
+    'fetchNotifications',
     useCallback(async () => {
       if (active) {
         return (await api.notificationControllerFindManyAndUpdateRead()).data;

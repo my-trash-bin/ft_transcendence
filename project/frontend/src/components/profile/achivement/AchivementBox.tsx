@@ -11,7 +11,7 @@ export function AchivementBox() {
   const router = useRouter();
   const { api } = useContext(ApiContext);
   const { isLoading, data } = useQuery(
-    ['fetchAchievement1'],
+    'fetchAchievement1',
     useCallback(
       async () => (await api.achievementControllerFindAll()).data,
       [api],

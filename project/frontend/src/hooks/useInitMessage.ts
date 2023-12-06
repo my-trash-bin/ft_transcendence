@@ -15,7 +15,7 @@ export const useInitMessage = (
   const { api } = useContext(ApiContext);
 
   const { data: initialData, refetch } = useQuery(
-    ['fetchChannelMsg'],
+    'fetchChannelMsg',
     useCallback(async () => {
       if (type === messageType.DM && targetName) {
         return (await api.dmControllerGetDmChannelMessages(targetName)).data;

@@ -21,8 +21,8 @@ export default function withChannelAuth(Component: any) {
             window.location.href = '/channel';
           }
 
-          if (e?.error?.statusCode === 401) window.location.href = '/';
-          else if (e?.error?.statusCode === 403) console.log('error!! = ', e);
+          if (e?.error?.statusCode === 401 || e?.error?.statusCode == 403)
+            window.location.href = '/';
         }
       };
 
