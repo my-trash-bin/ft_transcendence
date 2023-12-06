@@ -42,7 +42,7 @@ export type UserSocket = Socket & {
   };
 };
 
-@WebSocketGateway(80, {
+@WebSocketGateway(parseInt(process.env.WS_PORT as string), {
   cors: { origin: process.env.FRONTEND_ORIGIN, credentials: true },
 })
 @Injectable()
@@ -235,11 +235,18 @@ export class EventsGateway
       };
     } catch (error) {
       console.error('플레이어 정보를 가져오는 데 실패했습니다:', error);
-      return { nickname: 'player', avatarUrl: '../frontend/public/avatar/avartar-black.svg' };
+      return {
+        nickname: 'player',
+        avatarUrl: '../frontend/public/avatar/avartar-black.svg',
+      };
     }
   }
 
-  private async emitPlayerInfo(player1Id: string, player2Id: string, roomName: string) {
+  private async emitPlayerInfo(
+    player1Id: string,
+    player2Id: string,
+    roomName: string,
+  ) {
     const player1Info = await this.fetchPlayerInfo(player1Id);
     this.server.to(roomName).emit('player1Info', player1Info);
 

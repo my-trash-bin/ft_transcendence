@@ -34,6 +34,7 @@ export class Pong {
   readonly onGameUpdate = new EventEmitter();
 
   private gameState: GameState;
+  private player1Won: boolean;
 
   constructor(
     private readonly prisma: PrismaService,
@@ -44,6 +45,7 @@ export class Pong {
   ) {
     this.player1Id = player1Id;
     this.player2Id = player2Id;
+    this.player1Won = false;
 
     this.gameState = {
       ball: {
@@ -92,7 +94,24 @@ export class Pong {
 
     this.setIsItemMode(this.IsItemMode);
     const interval = setInterval(() => {
-      if (this.updateGameLogic()) clearInterval(interval);
+      if (this.updateGameLogic()) {
+        clearInterval(interval);
+        (async () => {
+          try {
+            this.prisma.pongGameHistory.create({
+              data: {
+                player1Id: this.player1Id,
+                player2Id: this.player2Id,
+                player1Score: this.gameState.score1,
+                player2Score: this.gameState.score2,
+                isPlayer1win: this.gameState.score1 === GAME_OVER,
+              },
+            });
+          } finally {
+            this.onEnd();
+          }
+        })();
+      }
     }, 1000 / 60);
 
     if (this.gameState.isItemMode) {
@@ -246,18 +265,9 @@ export class Pong {
         this.gameState.score2 = GAME_OVER;
       }
       this.gameState.gameOver = true;
+      this.player1Won = this.gameState.score1 === GAME_OVER;
       this.gameState.pongItem = { x: 0, y: 0, type: 0 };
       this.onGameUpdate.emit('gameState', this.gameState);
-      this.prisma.pongGameHistory.create({
-        data: {
-          player1Id: this.player1Id,
-          player2Id: this.player2Id,
-          player1Score: this.gameState.score1,
-          player2Score: this.gameState.score2,
-          isPlayer1win: this.gameState.score1 === GAME_OVER,
-        },
-      });
-      this.onEnd();
     }
   }
 
