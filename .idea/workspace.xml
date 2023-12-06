@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="b731c806-cb21-445c-8ed8-26fafa06f405" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/project/frontend/src/components/notification/mockNoti.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/project/frontend/src/components/profile/achivement/mockAchivementData.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/backend/src/achievement/dto/achievement-request.dto.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/backend/src/achievement/dto/achievement-with-received.dto.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/backend/src/channel/dto/participate-channel.dto.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/backend/src/dm/dm.controller.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/backend/src/dm/dto/dm-list.dto.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/backend/src/util/isUniqueConstraintError.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/frontend/src/components/channel/AllChannelCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/project/frontend/src/components/channel/AllChannelButton.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/frontend/src/components/channel/MyChannelCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/project/frontend/src/components/channel/MyChannelButton.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/frontend/src/components/profile/AvatarEditModal.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/frontend/src/hooks/useSocket.ts" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="2Z9CSpFsyJmgZmmZ0gsraKk1fCD" />
+  <component name="ProjectViewState">
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="b731c806-cb21-445c-8ed8-26fafa06f405" name="Changes" comment="" />
+      <created>1701824912030</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1701824912030</updated>
+      <workItem from="1701824913556" duration="2000" />
+    </task>
+    <servers />
+  </component>
+</project>
