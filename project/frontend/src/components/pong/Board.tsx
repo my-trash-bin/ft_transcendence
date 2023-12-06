@@ -151,10 +151,7 @@ interface PlayerAvatarProps {
   playerName: string;
 }
 
-const PlayerAvatar: React.FC<PlayerAvatarProps> = ({
-  avatarUrl,
-  playerName,
-}) => {
+const PlayerAvatar: React.FC<PlayerAvatarProps> = React.memo(({ avatarUrl, playerName }) => {
   return (
     <div className="flex items-center">
       <div className="relative w-[30px] h-[30px] rounded-full overflow-hidden mr-[10px]">
@@ -168,8 +165,7 @@ const PlayerAvatar: React.FC<PlayerAvatarProps> = ({
       <span className="text-lg font-medium">{playerName}</span>
     </div>
   );
-};
-
+});
 
 const getBallColor = (type: number) => {
   switch (type) {
