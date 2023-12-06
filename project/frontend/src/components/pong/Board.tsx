@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React, { useEffect } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import usePaddleMovement from './KeyHandle';
 import useStore from './Update';
 import {
@@ -37,7 +37,15 @@ const Board: React.FC = () => {
     return () => {
       socket.off('gameUpdate', handleGameUpdate);
     };
-  }, []);
+  }, [socket, handleGameUpdate]);
+
+  const ballColor = useMemo(() => getBallColor(ball.type), [ball.type]);
+
+  const getPaddleHeight = (type: number) => {
+    return useMemo(() => {
+      return type === 3 ? SMALL_PADDLE_HEIGHT : PADDLE_HEIGHT;
+    }, [type]);
+  };
 
   return (
     <div className="flex flex-col items-center mt-[50px] font-bold text-dark-purple-interactive text-dark-purple-interactive">
@@ -68,7 +76,7 @@ const Board: React.FC = () => {
       >
         {isItemMode && pongItem.type != 0 && (
           <div
-            className={`absolute rounded-md border-3 ${getBallColor(pongItem.type)}`}
+            className={`absolute rounded-md border-3 ${ballColor}`}
             style={{
               width: `${ITEM_SIZE}px`,
               height: `${ITEM_SIZE}px`,
@@ -99,7 +107,7 @@ const Board: React.FC = () => {
 
         {/* 공 */}
         <div
-          className={`absolute rounded-full ${getBallColor(ball.type)}`}
+          className={`absolute rounded-full ${ballColor}`}
           style={{
             width: BALL_SIZE,
             height: BALL_SIZE,
@@ -146,6 +154,19 @@ const Board: React.FC = () => {
   );
 };
 
+const getBallColor = (type: number) => {
+  switch (type) {
+    case 1:
+      return 'bg-ball-pink';
+    case 2:
+      return 'bg-ball-gold';
+    case 3:
+      return 'bg-ball-indigo';
+    default:
+      return 'bg-dark-purple-interactive';
+  }
+};
+
 interface PlayerAvatarProps {
   avatarUrl: string;
   playerName: string;
@@ -166,23 +187,5 @@ const PlayerAvatar: React.FC<PlayerAvatarProps> = React.memo(({ avatarUrl, playe
     </div>
   );
 });
-
-const getBallColor = (type: number) => {
-  switch (type) {
-    case 1:
-      return 'bg-ball-pink'; // 핑크색
-    case 2:
-      return 'bg-ball-gold'; // 노랑색
-    case 3:
-      return 'bg-ball-indigo'; // 하늘색
-    default:
-      return 'bg-dark-purple-interactive'; // 기본 색상
-  }
-};
-
-const getPaddleHeight = (type: number) => {
-  if (type === 3) return SMALL_PADDLE_HEIGHT;
-  return PADDLE_HEIGHT;
-};
 
 export default Board;
