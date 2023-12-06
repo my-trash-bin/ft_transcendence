@@ -29,10 +29,7 @@ const preloadImages = (imagePaths: string[], callback: () => void) => {
     img.src = path;
   });
 };
-// export const Player1Info: PlayerInfo;
-// export const Player2Info: PlayerInfo = player2Info;
 
-// npm run build && npx nest start --watch
 const Board: React.FC = () => {
   const {
     ball, paddle1, paddle2, score1, score2,
@@ -55,6 +52,7 @@ const Board: React.FC = () => {
       setGameState(gameState);
     } else {
       console.log('gameOver');
+      setGameState(gameState);
       useStore.setState({ gameOver: true });
       router.push('/game');
     }

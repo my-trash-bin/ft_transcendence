@@ -15,7 +15,7 @@ const SMASH_SPEED = 8;
 const PADDLE_STRIKE = 4;
 const PADDLE_MOVE_STEP = 20;
 const ITEM_SIZE = 100;
-const GAME_OVER = 10;
+const GAME_OVER = 1;
 
 export interface GameState {
   ball: { x: number; y: number; type: number };
@@ -239,6 +239,12 @@ export class Pong {
       !this.gameState.gameOver &&
       (this.gameState.score1 >= GAME_OVER || this.gameState.score2 >= GAME_OVER)
     ) {
+      if (this.gameState.score1 >= GAME_OVER) {
+        this.gameState.score1 = GAME_OVER;
+      }
+      if (this.gameState.score2 >= GAME_OVER) {
+        this.gameState.score2 = GAME_OVER;
+      }
       this.gameState.gameOver = true;
       this.gameState.pongItem = { x: 0, y: 0, type: 0 };
       this.onGameUpdate.emit('gameState', this.gameState);
