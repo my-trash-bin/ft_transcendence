@@ -11,11 +11,7 @@ import { ChangeMemberStatusResultDto } from '../channel/dto/change-member-status
 import { GateWayEvents } from '../common/gateway-events.enum';
 import { MessageWithMemberDto } from '../dm/dto/message-with-member';
 import { UserDto } from '../users/dto/user.dto';
-import {
-  DmChannelInfoType,
-  JoiningChannelInfo,
-  LeavingChannelInfo,
-} from './event-response.dto';
+import { DmChannelInfoType, LeavingChannelInfo } from './event-response.dto';
 import { UserSocket } from './events.gateway';
 
 export enum ChannelRoomType {
@@ -227,7 +223,7 @@ export class EventsService {
 
     const eventName = GateWayEvents.Join;
 
-    const data: JoiningChannelInfo = result.data!;
+    const data = result.data!;
 
     this.broadcastToChannel(type, channelId, [], eventName, {
       type: eventName,

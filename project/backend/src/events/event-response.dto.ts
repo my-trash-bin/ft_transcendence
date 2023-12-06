@@ -1,4 +1,8 @@
 import { ChannelMemberType } from '@prisma/client';
+import { ChannelMemberDetailDto } from '../channel/dto/channel-member-detail.dto';
+import { ChannelMemberDto } from '../channel/dto/channel-members.dto';
+import { ChannelMessageDto } from '../channel/dto/channel-message.dto';
+import { ChannelDto } from '../channel/dto/channel.dto';
 import { UserDto } from '../users/dto/user.dto';
 
 export type MessageInfo = {
@@ -35,24 +39,10 @@ export type ChannelMemberInfo = {
 };
 
 export type JoiningChannelInfo = {
-  id: string;
-  title: string;
-  isPublic: boolean;
-  createdAt: Date;
-  lastActiveAt: Date;
-  ownerId: string | null;
-  memberCount: number;
-  maximumMemberCount: number;
-  members: {
-    memberId: string;
-    memberType: ChannelMemberType;
-    mutedUntil: Date;
-    member: {
-      id: string;
-      nickname: string;
-      profileImageUrl: string | null;
-    };
-  }[];
+  channelMember: ChannelMemberDto;
+  channel: ChannelDto;
+  members: ChannelMemberDetailDto[];
+  messages: (ChannelMessageDto & { member: UserDto })[];
 };
 
 export type LeavingChannelInfo = {

@@ -5,10 +5,10 @@ import { useCallback, useContext, useEffect } from 'react';
 import { useQuery } from 'react-query';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { ModalLayout } from '../channel/modals/ModalLayout';
+import { Loading } from '../common/Loading';
 import { TextBox } from './TextBox';
 import { CardType, HistoryCard } from './history/HistoryCard';
 import { mockData } from './history/mockDataHistory';
-import { Loading } from '../common/Loading';
 
 interface ModalProfileProps {
   isOpen: boolean;
@@ -25,7 +25,7 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
 }) => {
   const { api } = useContext(ApiContext);
   const { isLoading, isError, data, refetch } = useQuery(
-    [targetId],
+    targetId,
     useCallback(
       async () =>
         (await api.usersControllerGetUserInfo({ targetUser: targetId })).data,

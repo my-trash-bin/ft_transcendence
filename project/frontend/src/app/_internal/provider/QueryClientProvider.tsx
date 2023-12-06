@@ -11,9 +11,11 @@ import {
 const queryClientConfig: QueryClientConfig = {
   defaultOptions: {
     queries: {
-      onError: (error) => {
-        console.error(`error from react-query: ${error}`);
-        if (error.message === 'Unauthorized') {
+      onError: (error: any) => {
+        if (
+          error?.error.statusCode === 401 ||
+          error?.error.statusCode === 403
+        ) {
           location.href = '/';
         }
         throw error;
