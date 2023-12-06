@@ -12,20 +12,22 @@ export default function withChannelAuth(Component: any) {
           localStorage.setItem('me', JSON.stringify(res.data.me));
 
           const participationRes: any =
-            await api.channelControllerIsParticipated(props.channelId);
+            await api.channelControllerIsParticipated(props.params.channelId);
           if (!participationRes.data.data) {
             throw { error: { type: 'participant' } };
           }
         } catch (e: any) {
-          if (e?.error?.type === 'participant')
+          if (e?.error?.type === 'participant') {
             window.location.href = '/channel';
+          }
 
           if (e?.error?.statusCode === 401) window.location.href = '/';
+          else if (e?.error?.statusCode === 403) console.log('error!! = ', e);
         }
       };
 
       validateAndCheckParticipation();
-    }, [api, props.channelId]);
+    }, [api, props.channelId, props.params.channelId]);
 
     return <Component {...props} />;
   };

@@ -1,11 +1,12 @@
 'use client';
+import withAuth from '@/components/auth/Auth';
+import { Title } from '@/components/common/Title';
 import { GameFinishModal } from '@/components/game/GameFinishModal';
+import { useState } from 'react';
 import GameButton from '../../components/game/GameButton';
 import { Ranking } from '../../components/game/Ranking';
-import React, { useState } from 'react';
-import { Title } from '@/components/common/Title';
 
-export default function GamePage() {
+function GamePage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleModalClose = () => {
@@ -35,3 +36,5 @@ export default function GamePage() {
     </div>
   );
 }
+
+export default withAuth(GamePage);
