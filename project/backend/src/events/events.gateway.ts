@@ -235,7 +235,7 @@ export class EventsGateway
       };
     } catch (error) {
       console.error('플레이어 정보를 가져오는 데 실패했습니다:', error);
-      return { nickname: '', avatarUrl: '' };
+      return { nickname: 'player', avatarUrl: '../frontend/public/avatar/avartar-black.svg' };
     }
   }
 
