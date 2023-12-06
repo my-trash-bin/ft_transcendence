@@ -1,7 +1,7 @@
 'use client';
 // ../../game/page.tsx
 import withAuth from '@/components/auth/Auth';
-import React, { useCallback } from 'react';
+import React from 'react';
 import { Title } from '@/components/common/Title';
 import { GameFinishModal } from '@/components/game/GameFinishModal';
 import ButtonComponent from '@/components/game/GameButton';

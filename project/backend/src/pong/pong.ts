@@ -239,6 +239,12 @@ export class Pong {
       !this.gameState.gameOver &&
       (this.gameState.score1 >= GAME_OVER || this.gameState.score2 >= GAME_OVER)
     ) {
+      if (this.gameState.score1 >= GAME_OVER) {
+        this.gameState.score1 = GAME_OVER;
+      }
+      if (this.gameState.score2 >= GAME_OVER) {
+        this.gameState.score2 = GAME_OVER;
+      }
       this.gameState.gameOver = true;
       this.gameState.pongItem = { x: 0, y: 0, type: 0 };
       this.onGameUpdate.emit('gameState', this.gameState);
