@@ -17,7 +17,7 @@ export function ChannleMessageBox({
   const localMe = localStorage.getItem('me');
   const me = localMe ? JSON.parse(localMe) : null;
 
-  const myAuthority = data?.data.members.filter((mem) => {
+  const myAuthority: any = data?.data.members.filter((mem: any) => {
     return mem.memberId === me.id;
   });
   if (isLoading) return <div>Loading...</div>;

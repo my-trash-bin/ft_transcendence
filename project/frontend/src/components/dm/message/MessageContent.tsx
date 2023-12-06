@@ -58,7 +58,7 @@ export function MessageContent({
 
   useEffect(() => {
     if (initialData) {
-      setMessages((prevMessages: any) => [...prevMessages, ...initialData]);
+      setMessages(initialData as MessageContentInterface[]);
     }
   }, [initialData]);
 
