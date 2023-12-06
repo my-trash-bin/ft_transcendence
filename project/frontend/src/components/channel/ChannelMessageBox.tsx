@@ -10,7 +10,7 @@ export function ChannleMessageBox({
   const channelApi = () =>
     new Api().api.channelControllerFindChannelInfo(channelId);
 
-  const { isLoading, isError, data } = useQuery('channelInfo', channelApi);
+  const { isLoading, data } = useQuery('channelInfo', channelApi);
 
   if (isLoading) return <div>Loading...</div>;
 
@@ -21,14 +21,13 @@ export function ChannleMessageBox({
     return mem.memberId === me.id;
   });
   if (isLoading) return <div>Loading...</div>;
-  if (myAuthority.length === 0) throw new Error('Error fetching data');
-
+  if (!myAuthority) return <></>;
   return (
     <>
       <ChannelInfo
         channelId={channelId}
         channelData={data?.data}
-        myAuthority={myAuthority[0].memberType}
+        myAuthority={myAuthority[0]?.memberType}
         myNickname={me.nickname}
       />
       <MessageContent

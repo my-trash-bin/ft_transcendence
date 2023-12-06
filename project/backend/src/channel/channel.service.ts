@@ -719,6 +719,24 @@ export class ChannelService {
     }
   }
 
+  async isParticipated(
+    userId: UserId,
+    channelId: ChannelId,
+  ): Promise<ServiceResponse<boolean>> {
+    try {
+      const result = await this.prisma.channelMember.findFirst({
+        where: {
+          channelId: channelId.value,
+          memberId: userId.value,
+        },
+      });
+      if (result) return newServiceOkResponse(true);
+      else return newServiceOkResponse(false);
+    } catch (error) {
+      return newServiceOkResponse(false);
+    }
+  }
+
   private async checkUserAlreadyInChannel(userId: string, channelId: string) {
     const result = await this.prisma.channelMember.findFirst({
       where: {

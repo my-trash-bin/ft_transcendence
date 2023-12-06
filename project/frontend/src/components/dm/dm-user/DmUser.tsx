@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-
+import { formatAMPM } from '../utils/FromatAmPm';
 export function DmUser({
   imageUri,
   nickname,
@@ -12,8 +12,7 @@ export function DmUser({
   messageShortcut: string;
   date: Date;
 }>) {
-  // const dateView = formatAMPM(date);
-  const dateView = '20-20-20';
+  const dateView = formatAMPM(date);
   return (
     <Link href={`/dm/${nickname}`}>
       <button className="w-[320px] h-[90px] bg-white border border-default rounded-md shrink-0 p-sm">

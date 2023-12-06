@@ -27,6 +27,15 @@ export const useSocket = (type: any, setMessages: any) => {
       socket.on('join', (res) => {
         setMessages((messages: any) => [...messages, res]);
       });
+
+      socket.on('kickBanPromote', (res) => {
+        if (res.data.actionType === 'KICK') {
+          if (res.data.targetUser.id === me.id) {
+            alert('채널에서 강퇴당했습니다.');
+            location.href = '/channel';
+          }
+        }
+      });
     }
 
     return () => {
@@ -36,6 +45,7 @@ export const useSocket = (type: any, setMessages: any) => {
         socket.off(`channelMessage`);
         socket.off('leave');
         socket.off('join');
+        socket.off('kickBanPromote');
       }
     };
   }, [type, setMessages]);
