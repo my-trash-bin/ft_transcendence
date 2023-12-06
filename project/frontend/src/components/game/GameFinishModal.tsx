@@ -38,7 +38,8 @@ export const GameFinishModal: React.FC<ModalProfileProps> = ({
               {isPlayer1 ? player2Info.nickname : player1Info.nickname}
             </div>
             <div className="text-center font-taebaek text-dark-purple">
-              패.. ㅠ
+             {(isPlayer1 && score2 > score1) || (!isPlayer1 && score1 > score2)
+              ? '승!!' : '패..ㅠ'}
             </div>
           </div>
           <div className="flex flex-col">
@@ -57,7 +58,8 @@ export const GameFinishModal: React.FC<ModalProfileProps> = ({
               {isPlayer1 ? player1Info.nickname : player2Info.nickname}
             </div>
             <div className="text-center font-taebaek text-dark-purple">
-              승!!
+              {(isPlayer1 && score1 > score2) || (!isPlayer1 && score2 > score1)
+              ? '승!!' : '패..ㅠ'}
             </div>
           </div>
         </div>
