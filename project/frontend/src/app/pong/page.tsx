@@ -1,8 +1,9 @@
 'use client';
+import withAuth from '@/components/auth/Auth';
 import Navbar from '../../components/common/Navbar';
 import Pong from '../../components/pong/Board';
 
-export default function FriendHome() {
+function FriendHome() {
   return (
     <div className="flex flex-row h-[100%] w-[100%]">
       <Navbar />
@@ -14,3 +15,5 @@ export default function FriendHome() {
     </div>
   );
 }
+
+export default withAuth(FriendHome);
