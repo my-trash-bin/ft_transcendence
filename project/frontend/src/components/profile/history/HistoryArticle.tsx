@@ -12,7 +12,7 @@ export function HistoryArticle() {
   const { api } = useContext(ApiContext);
   const router = useRouter();
   const { isLoading, isError, data } = useQuery(
-    ['achivement'],
+    'achivement',
     useCallback(
       async () => (await api.userFollowControllerFindFriends()).data,
       [api],

@@ -124,7 +124,7 @@ export class DmService {
       const targetUser = await this.prisma.user.findUniqueOrThrow({
         where: { nickname },
       });
-      const blockList = await this.getBlockUserList(userId);
+      const blockList = await this.getBlockUserList(userId.value);
       const isBlock = blockList.find((el) => el.followeeId === targetUser.id);
       if (isBlock) return newServiceOkResponse([]);
       const channelResult = await this.findOrCraeteDmChannel(
@@ -178,10 +178,10 @@ export class DmService {
           id: true,
         },
       });
-
+      if (dmChannelIds.length === 0) return newServiceOkResponse([]);
       const channelIdList = dmChannelIds.map(({ id }) => id);
 
-      const result: any = await this.getDmMessages(channelIdList);
+      let result: any = await this.getDmMessages(channelIdList);
       const otherUserId = result.map((el: any) => {
         if (el.member1Id === userId) {
           return el.member2Id;
@@ -195,11 +195,19 @@ export class DmService {
           },
         },
       });
+      const blockList = await this.getBlockUserList(userId);
+
       const userProfileMap = new Map();
       otherUsers.map((el) => {
         userProfileMap.set(el.id, el);
       });
 
+      //filter block user
+      result = result.filter((el: any) => {
+        const isBlock = blockList.find((block) => block.followeeId === el.id);
+        if (isBlock) return false;
+        else return true;
+      });
       return result.map((el: any) => {
         const otherUserId =
           el.member1Id === userId ? el.member2Id : el.member1Id;
@@ -231,10 +239,10 @@ export class DmService {
     ORDER BY "channelId", "sentAt" DESC`;
   }
 
-  async getBlockUserList(userId: UserId) {
+  async getBlockUserList(userId: string) {
     const res = await this.prisma.userFollow.findMany({
       where: {
-        followerId: userId.value,
+        followerId: userId,
       },
     });
     return res.filter((el) => el.isBlock);

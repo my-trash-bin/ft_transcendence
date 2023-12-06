@@ -4,11 +4,11 @@ import { useQuery } from 'react-query';
 import { MyChannelCard } from './MyChannelCard';
 
 function getRenderData(channelData: any, searchChannel: string) {
-  const filteredData = channelData.filter((channel: any) =>
+  const filteredData = channelData?.filter((channel: any) =>
     channel.title.includes(searchChannel),
   );
 
-  return filteredData.map((channel: any) => (
+  return filteredData?.map((channel: any) => (
     <MyChannelCard
       key={channel.id}
       id={channel.id}

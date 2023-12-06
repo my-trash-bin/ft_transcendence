@@ -34,7 +34,7 @@ export function OtherChat({
 
   return (
     <>
-      <Portal selector={'#backdrop-root'}>
+      <Portal selector={'#modal-channel'}>
         <ProfileModal
           isOpen={isModalOpen}
           onClose={handleModalClose}

@@ -12,7 +12,7 @@ const getRenderedData = (
   myNickname: string,
   channelId: string,
 ) => {
-  return data.map((p) => {
+  return data.map((p: any) => {
     return (
       <ParticipantCard
         key={p.member.id}

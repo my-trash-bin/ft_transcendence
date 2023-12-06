@@ -1,54 +1,57 @@
 import { getSocket } from '@/lib/Socket';
-
+import { ChannelButton } from './ChannelButton';
 export function SelectPenalty({
   channelId,
   memberId,
 }: Readonly<{ channelId: string; memberId: string }>) {
-  const handleKick = (e) => {
+  const kickBanPromote = (actionType: string) => {
     getSocket().emit('kickBanPromote', {
-      actionType: 'KICK',
+      actionType,
       channelId,
       memberId,
     });
-    alert('kicked');
-  };
-  const handleBen = (e) => {
-    getSocket().emit('kickBanPromote', {
-      actionType: 'BANNED',
-      channelId,
-      memberId,
-    });
-    alert('banned');
-  };
-  const handleMute = (e) => {
-    getSocket().emit('kickBanPromote', {
-      actionType: 'PROMOTE',
-      channelId,
-      memberId,
-    });
-    alert('promoted');
+    alert(actionType);
   };
 
+  const handleKick = (e: any) => kickBanPromote('KICK');
+  const handleBan = (e: any) => kickBanPromote('BANNED');
+  const handleMute = (e: any) => kickBanPromote('MUTE');
+  const handlePromote = (e: any) => kickBanPromote('PROMOTE');
+
   return (
-    <div className="h-[inherit] flex flex-col mr-[15px] pt-[3px] pb-[5px] justify-between">
-      <button
-        onClick={handleKick}
-        className="text-[11px] w-[40px] bg-purple-500 hover:bg-purple-300 text-white rounded-sm"
-      >
-        kick
-      </button>
-      <button
-        onClick={handleBen}
-        className="text-[11px] w-[40px] bg-purple-500 hover:bg-purple-300 text-white rounded-sm"
-      >
-        ben
-      </button>
-      <button
-        onClick={handleMute}
-        className="text-[11px] w-[40px] bg-purple-500 hover:bg-purple-300 text-white rounded-sm"
-      >
-        mute
-      </button>
+    <div className="h-[inherit] flex flex-col mr-[5px] pt-[3px] pb-[5px] justify-between">
+      <div>
+        <ChannelButton
+          onClick={handleKick}
+          text="kick"
+          width="40px"
+          height="25px"
+          classStyle="text-[11px] bg-pink-500"
+        ></ChannelButton>
+        <ChannelButton
+          onClick={handleBan}
+          text="ben"
+          width="40px"
+          height="25px"
+          classStyle="text-[11px] bg-pink-500"
+        ></ChannelButton>
+      </div>
+      <div>
+        <ChannelButton
+          onClick={handleMute}
+          text="mute"
+          width="40px"
+          height="25px"
+          classStyle="text-[11px] bg-pink-500"
+        ></ChannelButton>
+        <ChannelButton
+          onClick={handlePromote}
+          text="prom"
+          width="40px"
+          height="25px"
+          classStyle="text-[11px]"
+        ></ChannelButton>
+      </div>
     </div>
   );
 }

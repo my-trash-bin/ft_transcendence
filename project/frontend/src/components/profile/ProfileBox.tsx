@@ -13,7 +13,7 @@ export function ProfileBox() {
   const [profileEditModal, setProfileEditModal] = useState(false);
   const [avatarEditModal, setAvatarEditModal] = useState(false);
   const { isLoading, isError, data, refetch } = useQuery(
-    [],
+    'myProfile',
     useCallback(async () => (await api.usersControllerMyProfile()).data, [api]),
   );
 
@@ -42,7 +42,6 @@ export function ProfileBox() {
     if (isError) {
       return <p>Error loading profile data.</p>;
     }
-    // console.log('data', data);
     if (!data) {
       return <p>Fail to get data.</p>;
     }
