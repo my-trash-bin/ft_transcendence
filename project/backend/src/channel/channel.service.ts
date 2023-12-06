@@ -158,6 +158,73 @@ export class ChannelService {
     }
   }
 
+  async channelUpdate(
+    id: UserId,
+    channelId: ChannelId,
+    title: string | undefined,
+    isPublic: boolean | undefined,
+    maximumMemberCount: number | undefined,
+    password: string | undefined | null,
+  ): Promise<ServiceResponse<ChannelDto>> {
+    try {
+      const channel = await this.prisma.channel.findUnique({
+        where: { id: channelId.value },
+      });
+
+      if (channel === null) {
+        throw new ServiceError(
+          `유효하지 않은 채널 Id: ${channelId.value}`,
+          400,
+        );
+      }
+
+      const channelMember = await this.prisma.channelMember.findUnique({
+        where: {
+          channelId_memberId: {
+            channelId: channelId.value,
+            memberId: id.value,
+          },
+        },
+      });
+
+      if (
+        channelMember === null ||
+        channelMember.memberType === ChannelMemberType.BANNED
+      ) {
+        throw new ServiceError(
+          `채널에 참여중인 사용자만 채널의 정보를 업데이트 할 수 있습니다.`,
+          403,
+        );
+      }
+
+      if (channel.ownerId !== id.value) {
+        throw new ServiceError(
+          `채널 소유자만 채널의 정보를 업데이트 할 수 있습니다.`,
+          403,
+        );
+      }
+
+      const result = await this.prisma.channel.update({
+        where: { id: channelId.value },
+        data: {
+          title,
+          isPublic,
+          createdAt: new Date(),
+          maximumMemberCount,
+          password: password ? await this.mfaPasswordHash(password) : password,
+        },
+      });
+      return newServiceOkResponse(new ChannelDto(result));
+    } catch (error) {
+      if (error instanceof ServiceError) {
+        this.logger.debug(`채널 참여중 핸들링 되는 에러: ${error.message}`);
+        return { ok: false, error };
+      }
+      this.logger.debug(`채널 참여중 언핸들 에러: ${error}`);
+      return newServiceFailUnhandledResponse(400);
+    }
+  }
+
   // ChannelMember
   async joinChannel(
     id: UserId,

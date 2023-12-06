@@ -8,6 +8,7 @@ import {
   Logger,
   Param,
   Post,
+  Put,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -35,6 +36,8 @@ import { CreateChannelDto } from './dto/create-channel.dto';
 import { JoinedChannelInfoDto } from './dto/joined-channel-info.dto';
 import { kickBanPromoteMuteRequsetDto } from './dto/kick-ban-promote-mute-requset.dto';
 import { ParticipateChannelDto } from './dto/participate-channel.dto';
+import { UpdateChannelDto } from './dto/update-channel.dto';
+import { ChannelType } from './enums/channel-type.enum';
 
 @ApiTags('channel')
 @Controller('/api/v1/channel')
@@ -96,6 +99,36 @@ export class ChannelController {
       idOf(channelId),
       userId,
     );
+    return result.data!;
+  }
+
+  @Put()
+  @ApiOperation({ summary: '채널 정보 변경' })
+  @ApiOkResponse({
+    description: '업데이트 된 채널 정보 객체 반환',
+    type: () => ChannelDto,
+  })
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
+  async channelUpdate(
+    @Request() req: ExpressRequest,
+    @Body() dto: UpdateChannelDto,
+  ) {
+    const { id } = req.user as JwtPayloadPhaseComplete;
+    const { channelId, type, title, password, capacity } = dto;
+    const result = await this.channelService.channelUpdate(
+      id,
+      idOf(channelId),
+      title,
+      type !== ChannelType.Private,
+      capacity,
+      password,
+    );
+
+    if (!result.ok) {
+      throw new HttpException(result.error!.message, result.error!.statusCode);
+    }
+
     return result.data!;
   }
 
