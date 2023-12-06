@@ -215,8 +215,8 @@ model PongGameHistory {
   isPlayer1win Boolean  @default(true)
   createdAt    DateTime @default(now())
 
-  player1 User? @relation("PongGameHistory_player1", fields: [player1Id], references: [id])
-  player2 User? @relation("PongGameHistory_player2", fields: [player2Id], references: [id])
+  player1 User @relation("PongGameHistory_player1", fields: [player1Id], references: [id])
+  player2 User @relation("PongGameHistory_player2", fields: [player2Id], references: [id])
 
   @@index([createdAt])
   @@index([player1Id, player2Id])
