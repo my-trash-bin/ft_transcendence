@@ -33,11 +33,7 @@ import { UserFollowService } from '../user-follow/user-follow.service';
 import { NicknameCheckUserDto } from './dto/nickname-check-user.dto';
 import { TwoFactorPasswordDto } from './dto/two-factor-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import {
-  RecordDto,
-  RelationStatus,
-  UserProfileDto,
-} from './dto/user-profile.dto';
+import { RelationStatus, UserProfileDto } from './dto/user-profile.dto';
 import { UserRelationshipDto } from './dto/user-relationship.dto';
 import {
   FindOneParam,
@@ -142,22 +138,23 @@ export class UsersController {
     if (targetUser === null) {
       throw new NotFoundException('Invalid Id. (targetUser)');
     }
+
     const relation = await this.getRelation(userId.value, targetUserId);
-    const userLogs = await this.pongLogService.findOneByUserId(
+
+    const userGameHistories = await this.pongLogService.getUserGameHistories(
       idOf(targetUserId),
     );
 
-    const record = {
-      win: userLogs.wins,
-      lose: userLogs.losses,
-      ratio: userLogs.winRate,
-    };
+    const stats = this.pongLogService.makeStats2(
+      userId,
+      userGameHistories.data!,
+    );
 
     return new UserProfileDto({
       id: idOf(targetUserId),
       imageUrl: targetUser.profileImageUrl,
       nickname: targetUser.nickname,
-      record: new RecordDto(record),
+      stats,
       relation,
       statusMessage: targetUser.statusMessage,
     });

@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { UserId } from '../../common/Id';
+import { PongLogStatDto } from '../../pong-log/dto/pong-log-stat.dto';
 
 // export enum EnumRelation {
 //   'friend',
@@ -46,7 +47,7 @@ interface UserProfileDtoInput {
   id: UserId;
   imageUrl: string | null;
   nickname: string;
-  record: RecordDto;
+  stats: PongLogStatDto;
   relation: RelationStatus;
   statusMessage: string;
 }
@@ -65,8 +66,8 @@ export class UserProfileDto {
   })
   imageUrl: string | null;
 
-  @ApiProperty({ description: '전적', type: () => RecordDto })
-  record: RecordDto;
+  @ApiProperty({ description: '전적', type: () => PongLogStatDto })
+  stats: PongLogStatDto;
 
   @ApiProperty({ description: '상태메시지', type: String })
   statusMessage: string;
@@ -78,7 +79,7 @@ export class UserProfileDto {
     this.id = input.id.value;
     this.nickname = input.nickname;
     this.imageUrl = input.imageUrl;
-    this.record = input.record;
+    this.stats = input.stats;
     this.relation = input.relation;
     this.statusMessage = input.statusMessage;
   }
