@@ -1,6 +1,7 @@
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
+  ApiForbiddenResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -11,12 +12,29 @@ import { JwtGuard } from '../auth/jwt.guard';
 import { Phase, PhaseGuard } from '../auth/phase.guard';
 import { idOf } from '../common/Id';
 import { FindOneParam } from '../users/dto/user-request.dto';
+import { RankingRecordDto } from './dto/ranking-record.dto';
+import { UserHistoryDto } from './dto/user-history.dto';
 import { PongLogService } from './pong-log.service';
 
 @ApiTags('pong-log')
 @Controller('/api/v1/pong-log')
 export class PongLogController {
   constructor(private readonly pongLogService: PongLogService) {}
+
+  @Get('rank')
+  @ApiOperation({ summary: '랭킹 정보 반환' })
+  @ApiOkResponse({
+    description: '승률 상위 부터 제공',
+    type: () => RankingRecordDto,
+    isArray: true,
+  })
+  @ApiUnauthorizedResponse({ description: '인증되지 않은 사용자' })
+  @ApiForbiddenResponse({ description: '권한이 없는 사용자(by jwt.phase)' })
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
+  async getRanking() {
+    return await this.pongLogService.getRanking();
+  }
 
   @Get(':id')
   @ApiOperation({ summary: '게임 1개의 로그 조회' })
@@ -26,6 +44,7 @@ export class PongLogController {
   })
   @ApiBadRequestResponse({ description: '올바르지 않은 id' })
   @ApiUnauthorizedResponse({ description: '인증되지 않은 사용자' })
+  @ApiForbiddenResponse({ description: '권한이 없는 사용자(by jwt.phase)' })
   @UseGuards(JwtGuard, PhaseGuard)
   @Phase('complete')
   async findOne(@Param() param: FindOneParam) {
@@ -45,15 +64,14 @@ export class PongLogController {
   @ApiOperation({ summary: '유저 1명 기록 모두 조회' })
   @ApiOkResponse({
     description: '유저 1명의 로그 반환',
-    // type: () => PongSeasonLogDto,
+    type: () => UserHistoryDto,
   })
-  @ApiBadRequestResponse({ description: '올바르지 않은 id' })
   @ApiUnauthorizedResponse({ description: '인증되지 않은 사용자' })
+  @ApiForbiddenResponse({ description: '권한이 없는 사용자(by jwt.phase)' })
   @UseGuards(JwtGuard, PhaseGuard)
   @Phase('complete')
   async findOneByUserId(@Param() param: FindOneParam) {
     const { id } = param;
-    const userLogs = await this.pongLogService.findOneByUserId(idOf(id));
-    return userLogs;
+    return await this.pongLogService.findOneByUserId(idOf(id));
   }
 }

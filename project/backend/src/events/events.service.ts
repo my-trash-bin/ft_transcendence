@@ -1,13 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { WsException } from '@nestjs/websockets';
 import { ChangeActionType, ChannelService } from '../channel/channel.service';
-import { ChannelId, ClientId, UserId, idOf } from '../common/Id';
+import { ChannelId, ClientId, idOf, UserId } from '../common/Id';
 import { DmService } from '../dm/dm.service';
 import { UserFollowService } from '../user-follow/user-follow.service';
 import { UsersService } from '../users/users.service';
 // import { ChatRoomDto, ChatRoomStatusDto } from './chat.dto'
-import { ChannelMember } from '@prisma/client';
 import { Server, Socket } from 'socket.io';
+import { ChangeMemberStatusResultDto } from '../channel/dto/change-member-status-result.dto';
 import { GateWayEvents } from '../common/gateway-events.enum';
 import { MessageWithMemberDto } from '../dm/dto/message-with-member';
 import { UserDto } from '../users/dto/user.dto';
@@ -300,16 +300,19 @@ export class EventsService {
 
     const eventName = GateWayEvents.KickBanPromote;
 
-    const data: ChannelMember & { member: UserDto } = result.data!;
+    const data: ChangeMemberStatusResultDto = result.data!;
 
     this.broadcastToChannel(type, channelId, [], eventName, {
       type: eventName,
       data,
     }); // 채널에 통보
-    this.removeUserFromChannel(
-      this.channels[type][channelId.value],
-      idOf(userId),
-    ); // 실제 쫓아내기
+
+    if ([ChangeActionType.BANNED, ChangeActionType.KICK].includes(actionType)) {
+      this.removeUserFromChannel(
+        this.channels[type][channelId.value],
+        idOf(userId),
+      ); // BAN or KICK => 채널에서 나가짐 반영
+    }
   }
 
   handleUserJoinChannel(
