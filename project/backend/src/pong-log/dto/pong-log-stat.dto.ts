@@ -1,11 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsUUID } from 'class-validator';
 
-export class RankingRecordDto {
-  @ApiProperty({ description: '유저아이디' })
-  @IsUUID()
-  playerId!: string;
-
+export class PongLogStatDto {
   @ApiProperty({ description: '총 승리수' })
   wins!: number;
 
