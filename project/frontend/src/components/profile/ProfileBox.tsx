@@ -1,3 +1,4 @@
+import { avatarToUrl } from '@/app/_internal/util/avatarToUrl';
 import Image from 'next/image';
 import { useCallback, useContext, useState } from 'react';
 import { useQuery } from 'react-query';
@@ -51,7 +52,7 @@ export function ProfileBox() {
           <div className="w-[150px] h-[150px] inline-block overflow-x-hidden overflow-y-hidden">
             {data.me.profileImageUrl ? (
               <Image
-                src={data.me.profileImageUrl}
+                src={avatarToUrl(data.me.profileImageUrl)}
                 alt="avatar"
                 width={150}
                 height={150}

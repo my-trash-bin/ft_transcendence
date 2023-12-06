@@ -1,16 +1,14 @@
 import 'dotenv/config';
 
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import cors from 'cors';
+import * as express from 'express';
+import { join } from 'path';
 
 import { AppModule } from './app/app.module';
 import { env } from './util/env';
-
-import { ValidationPipe } from '@nestjs/common';
-
-import * as express from 'express';
-import { join } from 'path';
-// import serveIndex from 'serve-index';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { snapshot: true });
@@ -25,8 +23,11 @@ async function bootstrap() {
 
   // 폴더 자동생성 확인
   const staticDir = join(__dirname, '..', 'dist', 'uploads');
-  app.use('/uploads', express.static(staticDir));
-  // app.use('/uploads', serveIndex(staticDir, { icons: true }));
+  app.use(
+    '/uploads',
+    cors({ origin: process.env.FRONTEND_ORIGIN }),
+    express.static(staticDir),
+  );
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 

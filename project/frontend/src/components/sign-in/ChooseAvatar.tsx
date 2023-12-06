@@ -1,5 +1,6 @@
 'use client';
 
+import { avatarToUrl } from '@/app/_internal/util/avatarToUrl';
 import Image from 'next/image';
 import { useState } from 'react';
 import { Button } from '../common/Button';
@@ -53,7 +54,7 @@ export default function ChooseAvatar({
         },
       });
       if (response.ok) {
-        console.log('Upload image successfully');
+        console.log('Uploaded image successfully');
         const responseData = await response.json();
         setSelectedAvatar(responseData.filePath);
       } else {
@@ -70,7 +71,7 @@ export default function ChooseAvatar({
         {avatars.map((avatar) => (
           <SelectAvatar
             key={avatar}
-            imageUrl={avatar}
+            imageUrl={avatarToUrl(avatar)}
             isSelected={selectedAvatar === avatar}
             onClick={() => setSelectedAvatar(avatar)}
           />
