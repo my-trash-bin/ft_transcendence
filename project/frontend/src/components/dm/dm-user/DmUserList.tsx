@@ -13,11 +13,11 @@ interface DmUser {
 }
 
 function getRenderData(userData: any, searchUser: string) {
-  const filteredData = userData.filter((user: any) =>
+  const filteredData = userData?.filter((user: any) =>
     user.nickname.includes(searchUser),
   );
 
-  return filteredData.map((val: any) => (
+  return filteredData?.map((val: any) => (
     <DmUser
       key={val.nickname}
       imageUri={val.profileImage}
@@ -33,12 +33,11 @@ export function DmUserList({
 }: Readonly<{ searchUsername: string }>) {
   const { api } = useContext(ApiContext);
   const { isLoading, data }: { isLoading: boolean; data: any } = useQuery(
-    [],
+    'myDmList',
     useCallback(async () => await api.dmControllerGetMyDmList(), [api]),
   );
-
   if (isLoading) return <p>로딩중...</p>;
-  const renderData = getRenderData(data?.data, searchUsername);
+  const renderData = getRenderData(data?.data?.data, searchUsername);
 
   return (
     <div className="w-[350px] h-[600px] flex-grow-1 flex flex-col items-center gap-sm overflow-y-scroll">

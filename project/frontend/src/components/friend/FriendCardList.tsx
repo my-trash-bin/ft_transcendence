@@ -11,7 +11,7 @@ export function FriendCardList({
 }) {
   const { api } = useContext(ApiContext);
   const { isLoading, isError, data, refetch } = useQuery(
-    ['friendList'],
+    'friendList',
     useCallback(
       async () => (await api.userFollowControllerFindFriends()).data,
       [api],
