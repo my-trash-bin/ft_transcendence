@@ -1,8 +1,8 @@
-import Image from 'next/image';
-import { ModalLayout } from './ModalLayout';
-import { useCallback, useContext } from 'react';
 import { ApiContext } from '@/app/_internal/provider/ApiContext';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useCallback, useContext } from 'react';
+import { ModalLayout } from './ModalLayout';
 
 export function ParticipationModal({
   isModalOpen,
@@ -23,16 +23,18 @@ export function ParticipationModal({
 
   const participateChannel = useCallback(async () => {
     try {
+      console.log('Participate channel');
       await api.channelControllerParticipateChannel({
         type: targetChannelType === 'public' ? 'public' : 'protected',
         channelId: targetChannelId,
       });
       console.log('Participate channel successfully');
+      setIsModalOpen(false);
       router.push(`/channel/${targetChannelId}`);
     } catch (error) {
-      console.error('Error participate channel:', error);
+      // console.error('Error participate channel:', error);
     }
-  }, [api, targetChannelId, targetChannelType, router]);
+  }, [api, targetChannelId, targetChannelType, router, setIsModalOpen]);
 
   return (
     <ModalLayout

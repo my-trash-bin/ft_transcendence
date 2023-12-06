@@ -1,7 +1,6 @@
-import { ApiContext } from '@/app/_internal/provider/ApiContext';
+import { useInitMessage } from '@/hooks/useInitMessage';
 import { useSocket } from '@/hooks/useSocket';
-import { useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { useQuery } from 'react-query';
+import { useEffect, useRef, useState } from 'react';
 import { MyChat } from './MyChat';
 import { OtherChat } from './OtherChat';
 import { UserStateAnnounce } from './UserStateAnnounce';
@@ -10,7 +9,7 @@ export enum messageType {
   DM = 'DM',
   CHANNEL = 'CHANNEL',
 }
-interface MessageContentInterface {
+export interface MessageContentInterface {
   type: string;
   data: {
     id: string;
@@ -38,35 +37,12 @@ export function MessageContent({
   const [messages, setMessages] = useState<MessageContentInterface[]>([]);
   const messageEndRef = useRef<HTMLDivElement>(null);
 
-  const { api } = useContext(ApiContext);
-
-  const { data: initialData, refetch } = useQuery(
-    ['fetchChannelMsg'],
-    useCallback(async () => {
-      if (type === messageType.DM && targetName) {
-        return (await api.dmControllerGetDmChannelMessages(targetName)).data;
-      } else if (channelId) {
-        return (await api.channelControllerGetChannelMessages(channelId)).data;
-      }
-    }, [api, channelId, type, targetName]),
-    { enabled: false },
-  );
-
-  useEffect(() => {
-    refetch();
-  }, [channelId, refetch]);
-
-  useEffect(() => {
-    if (initialData) {
-      setMessages((prevMessages: any) => [...prevMessages, ...initialData]);
-    }
-  }, [initialData]);
+  useInitMessage(type, setMessages, channelId, targetName);
+  useSocket(type, setMessages);
 
   useEffect(() => {
     messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
-
-  useSocket(type, setMessages);
 
   return (
     <div className="w-[95%] h-[610px] pt-[20px] bg-chat-color2 rounded-[10px] flex flex-col overflow-y-scroll mt-sm">

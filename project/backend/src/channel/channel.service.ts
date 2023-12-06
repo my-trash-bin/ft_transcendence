@@ -15,22 +15,22 @@ import { PrismaService } from '../base/prisma.service';
 import { ChannelId, UserId } from '../common/Id';
 import { ServiceError } from '../common/ServiceError';
 import {
+  ServiceResponse,
   newServiceFailPrismaUnKnownResponse,
   newServiceFailResponse,
   newServiceFailUnhandledResponse,
   newServiceOkResponse,
-  ServiceResponse,
 } from '../common/ServiceResponse';
 import { DmService } from '../dm/dm.service';
 import { MessageWithMemberDto } from '../dm/dto/message-with-member';
 import { LeavingChannelInfo } from '../events/event-response.dto';
 import { userDtoSelect } from '../users/dto/user.dto';
 import {
-  createPrismaErrorMessage,
   IsForeignKeyConstraintFailError,
+  IsRecordToUpdateNotFoundError,
+  createPrismaErrorMessage,
   isPrismaUnknownError,
   isRecordNotFoundError,
-  IsRecordToUpdateNotFoundError,
   isUniqueConstraintError,
 } from '../util/prismaError';
 import { ChangeMemberStatusResultDto } from './dto/change-member-status-result.dto';
@@ -630,7 +630,7 @@ export class ChannelService {
     userId: UserId,
   ): Promise<ServiceResponse<any[]>> {
     try {
-      const blockList = await this.dmService.getBlockUserList(userId);
+      const blockList = await this.dmService.getBlockUserList(userId.value);
       let result = await this.prisma.channelMessage.findMany({
         where: {
           channelId: channelId,
@@ -716,6 +716,24 @@ export class ChannelService {
         throw new BadRequestException(createPrismaErrorMessage(error));
       }
       throw new InternalServerErrorException('Unknown Error');
+    }
+  }
+
+  async isParticipated(
+    userId: UserId,
+    channelId: ChannelId,
+  ): Promise<ServiceResponse<boolean>> {
+    try {
+      const result = await this.prisma.channelMember.findFirst({
+        where: {
+          channelId: channelId.value,
+          memberId: userId.value,
+        },
+      });
+      if (result) return newServiceOkResponse(true);
+      else return newServiceOkResponse(false);
+    } catch (error) {
+      return newServiceOkResponse(false);
     }
   }
 
