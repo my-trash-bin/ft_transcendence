@@ -7,7 +7,6 @@ import {
   newServiceOkResponse,
   ServiceResponse,
 } from '../common/ServiceResponse';
-import { EventsService } from '../events/events.service';
 import {
   isRecordNotFoundError,
   IsRecordToUpdateNotFoundError,
@@ -18,10 +17,8 @@ import { NotificationDto } from './dto/notification.dto';
 @Injectable()
 export class NotificationService {
   private logger = new Logger('NotificaitonController');
-  constructor(
-    private prisma: PrismaService,
-    private eventsService: EventsService,
-  ) {}
+
+  constructor(private prisma: PrismaService) {}
 
   async create(
     id: UserId,
@@ -34,7 +31,6 @@ export class NotificationService {
           contentJson,
         },
       });
-      this.eventsService.handleNotificationToUser(id, contentJson);
       return newServiceOkResponse(noti);
     } catch (error) {
       if (isUniqueConstraintError(error)) {

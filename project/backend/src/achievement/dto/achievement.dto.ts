@@ -22,3 +22,10 @@ export class AchievementDto {
   })
   description!: string;
 }
+
+export const achievementSelect = {
+  id: true,
+  title: true,
+  imageUrl: true,
+  description: true,
+};

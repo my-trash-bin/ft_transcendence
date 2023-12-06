@@ -1,5 +1,5 @@
 import { Api } from '@/api/api';
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { useQuery } from 'react-query';
 import { MyChannelCard } from './MyChannelCard';
 
@@ -19,8 +19,11 @@ function getRenderData(channelData: any, searchChannel: string) {
   ));
 }
 
-export function MyChannelList({ searchChannel }: { searchChannel: string }) {
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+export function MyChannelList({
+  searchChannel,
+}: {
+  readonly searchChannel: string;
+}) {
   const apiCall = useCallback(
     () => new Api().api.channelControllerFindMyChannels(),
     [],

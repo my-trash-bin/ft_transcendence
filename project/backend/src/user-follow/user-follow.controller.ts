@@ -124,9 +124,7 @@ export class UserFollowController {
   @UseGuards(JwtGuard, PhaseGuard)
   @Phase('complete')
   async findFriends(@Request() req: ExpressRequest): Promise<UserFollowDto[]> {
-    console.log('findFriends', req.user);
     const userId = (req.user as JwtPayloadPhaseComplete).id;
-    console.log('findFriends2', userId);
     const isBlock = false;
     const result = await this.userFollowService.findByUsers(userId, isBlock);
     return result.map((el) => new UserFollowDto(el));
