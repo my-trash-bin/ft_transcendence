@@ -16,8 +16,8 @@ import { Server, Socket } from 'socket.io';
 import { v4 as uuidv4 } from 'uuid';
 import { PrismaService } from '../base/prisma.service';
 import { ChangeActionType } from '../channel/channel.service';
-import { GateWayEvents } from '../common/gateway-events.enum';
 import { idOf } from '../common/Id';
+import { GateWayEvents } from '../common/gateway-events.enum';
 import { GameState, Pong } from '../pong/pong';
 import {
   ChannelIdentityDto,
@@ -219,7 +219,39 @@ export class EventsGateway
     }
   }
 
-  private createGameRoom(player1: Socket, player2: Socket, mode: boolean): void {
+  private async fetchPlayerInfo(
+    playerId: string,
+  ): Promise<{ nickname: string; avatarUrl: string }> {
+    try {
+      const prismaUser = await this.prisma.user.findUniqueOrThrow({
+        where: {
+          id: playerId,
+        },
+      });
+      console.log(prismaUser);
+      return {
+        nickname: prismaUser.nickname,
+        avatarUrl: prismaUser.profileImageUrl ?? '',
+      };
+    } catch (error) {
+      console.error('플레이어 정보를 가져오는 데 실패했습니다:', error);
+      return { nickname: '', avatarUrl: '' };
+    }
+  }
+
+  private async emitPlayerInfo(player1Id: string, player2Id: string, roomName: string) {
+    const player1Info = await this.fetchPlayerInfo(player1Id);
+    this.server.to(roomName).emit('player1Info', player1Info);
+
+    const player2Info = await this.fetchPlayerInfo(player2Id);
+    this.server.to(roomName).emit('player2Info', player2Info);
+  }
+
+  private createGameRoom(
+    player1: Socket,
+    player2: Socket,
+    mode: boolean,
+  ): void {
     // 룸 생성 및 클라이언트 추가
     const roomName = generateUniqueRoomName();
     player1.join(roomName);
@@ -237,6 +269,7 @@ export class EventsGateway
         this.pongMap.delete(player1Id);
         this.pongMap.delete(player2Id);
       });
+      this.emitPlayerInfo(player1Id, player2Id, roomName);
       pong.onGameUpdate.on('gameState', (gameState: GameState) => {
         player1.emit('gameUpdate', gameState);
         player2.emit('gameUpdate', gameState);
@@ -255,7 +288,10 @@ export class EventsGateway
     if (client.data.userId === undefined) return;
     if (!this.pongMap.has(client.data.userId)) return;
     if (this.pongMap.get(client.data.userId) === undefined) return;
-    if (this.pongMap.get(client.data.userId)?.getGameState().gameStart === false) return;
+    if (
+      this.pongMap.get(client.data.userId)?.getGameState().gameStart === false
+    )
+      return;
     const playerId = client.data.userId;
     const pong = this.pongMap.get(playerId);
     if (!pong) return;
@@ -292,7 +328,6 @@ export class EventsGateway
     return jwtKeyValue !== undefined ? jwtKeyValue[1] : null;
   };
   private isValidJwtAndPhase = (client: UserSocket) => {
-    // console.log(client.handshake.headers.cookie);
     if (client.handshake.headers.cookie === undefined) {
       throw new WsException(
         '헤더에 쿠키가 존재하지 않습니다. 인증을 위해 쿠키 필수입니다.',

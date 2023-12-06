@@ -3,6 +3,7 @@
 .bg-dark-purple { @apply bg-[#5B3F9A] dark:bg-[#5B3F9A]; }
 .text-dark-purple { @apply text-[#5B3F9A] dark:text-[#5B3F9A]; }
 .caret-dark-purple { @apply caret-[#5B3F9A] dark:caret-[#5B3F9A]; }
+.bg-game-board { @apply bg-[#faf5ff]}
 .bg-ball-pink { @apply bg-[#f472b6]}
 .bg-ball-pink-hover { @apply bg-[#EC4899]}
 .bg-ball-gold { @apply bg-[#FACC15]}

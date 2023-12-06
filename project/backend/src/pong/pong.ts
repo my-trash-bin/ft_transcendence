@@ -44,6 +44,7 @@ export class Pong {
   ) {
     this.player1Id = player1Id;
     this.player2Id = player2Id;
+
     this.gameState = {
       ball: {
         x: BOARD_WIDTH / 2 - BALL_SIZE / 2,
