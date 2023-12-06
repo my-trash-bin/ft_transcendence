@@ -328,7 +328,6 @@ export class EventsGateway
     return jwtKeyValue !== undefined ? jwtKeyValue[1] : null;
   };
   private isValidJwtAndPhase = (client: UserSocket) => {
-    // console.log(client.handshake.headers.cookie);
     if (client.handshake.headers.cookie === undefined) {
       throw new WsException(
         '헤더에 쿠키가 존재하지 않습니다. 인증을 위해 쿠키 필수입니다.',

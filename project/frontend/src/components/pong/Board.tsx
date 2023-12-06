@@ -15,17 +15,35 @@ const usePaddleHeight = (type: number) => {
   }, [type]);
 };
 
+const preloadImages = (imagePaths: string[], callback: () => void) => {
+  let loadedImages = 0;
+
+  imagePaths.forEach((path) => {
+    const img = new window.Image();
+    img.onload = () => {
+      loadedImages++;
+      if (loadedImages === imagePaths.length) {
+        callback();
+      }
+    };
+    img.src = path;
+  });
+};
+
 // npm run build && npx nest start --watch
 const Board: React.FC = () => {
   const {
     ball, paddle1, paddle2, score1, score2,
     isPlayer1, setGameState, pongItem, isItemMode,
   } = useStore();
-  const [isItemImageLoaded, setItemImageLoaded] = useState(false);
   const [player1Info, setPlayer1Info] = useState<PlayerInfo>({ nickname: '', avatarUrl: '' });
   const [player2Info, setPlayer2Info] = useState<PlayerInfo>({ nickname: '', avatarUrl: '' });
   const socket = getGameSocket();
   const router = useRouter();
+  const [imagesLoaded, setImagesLoaded] = useState(false);
+  const handleImagesLoaded = () => {
+    setImagesLoaded(true);
+  };
 
   usePaddleMovement();
 
@@ -39,15 +57,6 @@ const Board: React.FC = () => {
       router.push('/pong/gameOver');
     }
   }, [setGameState, router]);
-
-  const handleImageLoad = () => {
-    console.log('Image Loaded');
-    setItemImageLoaded(true);
-  };
-
-  useEffect(() => {
-    setItemImageLoaded(false);
-  }, [pongItem.type]);
 
   useEffect(() => {
     socket.on('gameUpdate', handleGameUpdate);
@@ -76,6 +85,15 @@ const Board: React.FC = () => {
       socket.off('player2Info', handlePlayer2Info);
     };
   }, [socket, handlePlayerInfo]);
+
+  useEffect(() => {
+    if (isItemMode) {
+      preloadImages(
+        ['/item/1.png', '/item/2.png', '/item/3.png'],
+        handleImagesLoaded
+      );
+    }
+  }, [isItemMode]);
 
   const ballColor = useMemo(() => getBallColor(ball.type), [ball.type]);
   const paddleHeight1 = usePaddleHeight(paddle1.type);
@@ -108,7 +126,7 @@ const Board: React.FC = () => {
         className="border-2 border-dark-purple-interactive relative rounded-md bg-game-board mt-[10px]"
         style={{ width: BOARD_WIDTH, height: BOARD_HEIGHT }}
       >
-        {isItemMode && pongItem.type != 0 && (
+        {isItemMode && imagesLoaded && pongItem.type != 0 && (
           <div
             className={`absolute rounded-md border-3 ${getBallColor(pongItem.type)}`}
             style={{
@@ -130,9 +148,10 @@ const Board: React.FC = () => {
               <Image
                 src={`/item/${pongItem.type}.png`}
                 alt={`Item type ${pongItem.type}`}
-                layout="fill"
-                objectFit="cover"
-                onLoadingComplete={handleImageLoad}
+                layout="responsive"
+                width={ITEM_SIZE - 12}
+                height={ITEM_SIZE - 12}
+                objectPosition="center center"
               />
             </div>
           </div>
