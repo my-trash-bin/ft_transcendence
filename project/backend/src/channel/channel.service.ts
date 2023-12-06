@@ -30,6 +30,7 @@ import {
   IsRecordToUpdateNotFoundError,
   isUniqueConstraintError,
 } from '../util/prismaError';
+import { ChangeMemberStatusResultDto } from './dto/change-member-status-result.dto';
 import { ChannelMemberDetailDto } from './dto/channel-member-detail.dto';
 import {
   ChannelMemberDto,
@@ -309,7 +310,7 @@ export class ChannelService {
     channelId: ChannelId,
     targetId: UserId,
     actionType: ChangeActionType,
-  ): Promise<ServiceResponse<ChannelMemberDetailDto>> {
+  ): Promise<ServiceResponse<ChangeMemberStatusResultDto>> {
     try {
       const result = await this.prisma.$transaction(async (prisma) => {
         // 유저가 그 방의 ADMINISTRATOR 여야 하고, 상대가 방에 있는 OWNER가 아닌 유저
@@ -322,7 +323,7 @@ export class ChannelService {
           throw new ServiceError('Invalid channelId', 400);
         }
 
-        const user = await prisma.channelMember.findUnique({
+        const triggerUser = await prisma.channelMember.findUnique({
           where: {
             channelId_memberId: {
               channelId: channelId.value,
@@ -332,10 +333,13 @@ export class ChannelService {
               not: ChannelMemberType.BANNED,
             },
           },
+          include: {
+            member: true,
+          },
         });
 
         // 2. 방에 속한 유저만이 행동을 트리거 할 수 있다.
-        if (user === null) {
+        if (triggerUser === null) {
           throw new ServiceError(
             '방에 존재하지 않는 유저는 kick/ban/promote 할 수 없습니다.',
             400,
@@ -351,6 +355,9 @@ export class ChannelService {
             memberType: {
               not: ChannelMemberType.BANNED,
             },
+          },
+          include: {
+            member: true,
           },
         });
 
@@ -375,7 +382,9 @@ export class ChannelService {
         const isOwner = id.value === ownerId;
 
         // 6. 권한 체크
-        if (!this.checkPermissions(user.memberType, actionType, isOwner)) {
+        if (
+          !this.checkPermissions(triggerUser.memberType, actionType, isOwner)
+        ) {
           throw new ServiceError(
             `${actionType} 할 수 있는 권한이 존재하지 않습니다.`,
             400,
@@ -384,7 +393,7 @@ export class ChannelService {
 
         // 7. 수행
         if (actionType === ChangeActionType.KICK) {
-          return await this.kickUser(channelId, targetId);
+          await this.kickUser(channelId, targetId);
         } else {
           const memberType =
             actionType === ChangeActionType.BANNED
@@ -396,15 +405,21 @@ export class ChannelService {
             actionType === ChangeActionType.MUTE
               ? this.getMutedDateTime()
               : undefined;
-          return await this.banOrPromoteOrMuteUser(
+          await this.banOrPromoteOrMuteUser(
             channelId,
             targetId,
             memberType,
             mutedUntil,
           );
         }
+        return {
+          triggerUser: triggerUser.member,
+          targetUser: targetUser.member,
+          channelId: prismaChannel.id,
+          actionType,
+        };
       });
-      return result;
+      return newServiceOkResponse(result);
     } catch (error) {
       if (error instanceof ServiceError) {
         return { ok: false, error };
