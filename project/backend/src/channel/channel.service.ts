@@ -3,30 +3,34 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
-import { ChannelMember, ChannelMemberType } from '@prisma/client';
+import { ChannelMemberType } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../base/prisma.service';
 import { ChannelId, UserId } from '../common/Id';
 import { ServiceError } from '../common/ServiceError';
 import {
-  ServiceResponse,
   newServiceFailPrismaUnKnownResponse,
   newServiceFailResponse,
   newServiceFailUnhandledResponse,
   newServiceOkResponse,
+  ServiceResponse,
 } from '../common/ServiceResponse';
 import { DmService } from '../dm/dm.service';
 import { MessageWithMemberDto } from '../dm/dto/message-with-member';
 import { LeavingChannelInfo } from '../events/event-response.dto';
-import { UserDto, userDtoSelect } from '../users/dto/user.dto';
+import { userDtoSelect } from '../users/dto/user.dto';
 import {
-  IsRecordToUpdateNotFoundError,
   createPrismaErrorMessage,
+  IsForeignKeyConstraintFailError,
   isPrismaUnknownError,
   isRecordNotFoundError,
+  IsRecordToUpdateNotFoundError,
   isUniqueConstraintError,
 } from '../util/prismaError';
+import { ChannelMemberDetailDto } from './dto/channel-member-detail.dto';
 import {
   ChannelMemberDto,
   channelMemberDtoSelect,
@@ -37,6 +41,7 @@ import { ChannelWithAllInfoDto } from './dto/channel-with-all-info.dto';
 import { ChannelWithMembersDto } from './dto/channel-with-members.dto';
 import { ChannelDto, channelDtoSelect } from './dto/channel.dto';
 import { CreateChannelDto } from './dto/create-channel.dto';
+import { JoinedChannelInfoDto } from './dto/joined-channel-info.dto';
 import { ParticipateChannelDto } from './dto/participate-channel.dto';
 import { ChannelType } from './enums/channel-type.enum';
 
@@ -44,6 +49,7 @@ export enum ChangeActionType {
   KICK = 'KICK',
   BANNED = 'BANNED',
   PROMOTE = 'PROMOTE',
+  MUTE = 'MUTE',
 }
 
 export type JoinChannelInfoType = {
@@ -69,6 +75,7 @@ export type JoinChannelInfoType = {
 
 @Injectable()
 export class ChannelService {
+  private logger = new Logger('ChannelService');
   constructor(
     private prisma: PrismaService,
     private readonly dmService: DmService,
@@ -302,14 +309,14 @@ export class ChannelService {
     channelId: ChannelId,
     targetId: UserId,
     actionType: ChangeActionType,
-    // { type, title, password, capacity }: CreateChannelDto,
-  ): Promise<ServiceResponse<ChannelMember & { member: UserDto }>> {
+  ): Promise<ServiceResponse<ChannelMemberDetailDto>> {
     try {
       const result = await this.prisma.$transaction(async (prisma) => {
         // 유저가 그 방의 ADMINISTRATOR 여야 하고, 상대가 방에 있는 OWNER가 아닌 유저
         const prismaChannel = await prisma.channel.findUnique({
           where: { id: channelId.value },
         });
+
         // 1. 올바른 채널 ID
         if (prismaChannel === null) {
           throw new ServiceError('Invalid channelId', 400);
@@ -354,6 +361,7 @@ export class ChannelService {
             400,
           );
         }
+
         // 4. Owner는 명령의 대상이 될 수 없음
         const { ownerId } = prismaChannel;
         if (ownerId === targetId.value) {
@@ -363,28 +371,40 @@ export class ChannelService {
           );
         }
 
-        // 4. 오너 여부 체크
-        const isOwner = user.memberId === ownerId;
+        // 5. 오너 여부 체크
+        const isOwner = id.value === ownerId;
 
-        // 5. 권한 체크
-        if (this.checkPermissions(user.memberType, actionType, isOwner)) {
+        // 6. 권한 체크
+        if (!this.checkPermissions(user.memberType, actionType, isOwner)) {
           throw new ServiceError(
             `${actionType} 할 수 있는 권한이 존재하지 않습니다.`,
             400,
           );
         }
-        // 6. 수행
+
+        // 7. 수행
         if (actionType === ChangeActionType.KICK) {
           return await this.kickUser(channelId, targetId);
         } else {
-          const changedType =
+          const memberType =
             actionType === ChangeActionType.BANNED
               ? ChannelMemberType.BANNED
-              : ChannelMemberType.ADMINISTRATOR;
-          return await this.banOrPromoteUser(channelId, targetId, changedType);
+              : actionType === ChangeActionType.PROMOTE
+              ? ChannelMemberType.ADMINISTRATOR
+              : undefined;
+          const mutedUntil =
+            actionType === ChangeActionType.MUTE
+              ? this.getMutedDateTime()
+              : undefined;
+          return await this.banOrPromoteOrMuteUser(
+            channelId,
+            targetId,
+            memberType,
+            mutedUntil,
+          );
         }
       });
-      return newServiceOkResponse(result);
+      return result;
     } catch (error) {
       if (error instanceof ServiceError) {
         return { ok: false, error };
@@ -624,13 +644,14 @@ export class ChannelService {
   }
   async participate(userId: string, dto: ParticipateChannelDto) {
     try {
-      const res = await this.checkUserAlreadyInChannel(userId, dto.channelId);
-      if (res) return;
-      if (dto.type == ChannelType.Public)
+      const alreadyIn = await this.checkUserAlreadyInChannel(
+        userId,
+        dto.channelId,
+      );
+      if (alreadyIn || dto.type == ChannelType.Public)
         return await this.participateUserToChannel(userId, dto);
 
-      if (!dto.password)
-        throw new BadRequestException('비밀번호가 필요합니다.');
+      if (!dto.password) throw new ServiceError('비밀번호가 필요합니다.', 400);
       const channel = await this.prisma.channel.findUnique({
         where: {
           id: dto.channelId,
@@ -639,14 +660,29 @@ export class ChannelService {
       if (!channel?.password)
         throw new InternalServerErrorException('비밀번호가 없습니다.');
       const match = await bcrypt.compare(dto.password, channel.password);
-      if (match) await this.participateUserToChannel(userId, dto);
-      else throw new BadRequestException('비밀번호가 틀렸습니다.');
-    } catch (error) {
-      if (isPrismaUnknownError(error)) {
-        throw new InternalServerErrorException(createPrismaErrorMessage(error));
+      if (!match) {
+        throw new ServiceError('비밀번호가 틀렸습니다.', 400);
       }
-      if (error instanceof BadRequestException) throw error;
-      return newServiceFailPrismaUnKnownResponse(500);
+      return await this.participateUserToChannel(userId, dto);
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        this.logger.debug(error.code);
+      }
+      if (
+        isUniqueConstraintError(error) ||
+        isRecordNotFoundError(error) ||
+        IsRecordToUpdateNotFoundError(error) ||
+        IsForeignKeyConstraintFailError(error)
+      ) {
+        this.logger.debug(
+          `잘못된 입력으로 인한 프리즈마 에러${
+            error.code
+          } 발생: ${createPrismaErrorMessage(error)}`,
+        );
+        throw new BadRequestException(createPrismaErrorMessage(error));
+      }
+      if (error instanceof ServiceError) throw error;
+      throw new InternalServerErrorException('Unknown Error');
     }
   }
 
@@ -664,73 +700,141 @@ export class ChannelService {
   private async participateUserToChannel(
     userId: string,
     dto: ParticipateChannelDto,
-  ) {
-    const result = await this.prisma.channelMember.create({
-      data: {
+  ): Promise<JoinedChannelInfoDto> {
+    const channelMember = await this.prisma.channelMember.upsert({
+      where: {
+        channelId_memberId: {
+          channelId: dto.channelId,
+          memberId: userId,
+        },
+      },
+      create: {
         channelId: dto.channelId,
         memberId: userId,
         memberType: ChannelMemberType.MEMBER,
       },
+      update: {},
     });
-    return newServiceOkResponse(result);
+    const result = await this.prisma.channel.findUniqueOrThrow({
+      where: { id: dto.channelId },
+      include: {
+        members: {
+          include: {
+            member: {
+              select: userDtoSelect,
+            },
+          },
+        },
+        messages: {
+          include: {
+            member: {
+              select: userDtoSelect,
+            },
+          },
+        },
+      },
+    });
+    const channel = {
+      id: result.id,
+      title: result.title,
+      isPublic: result.isPublic,
+      needPassword: result.password !== null,
+      createdAt: result.createdAt,
+      lastActiveAt: result.lastActiveAt,
+      ownerId: result.ownerId,
+      memberCount: result.memberCount,
+      maximumMemberCount: result.maximumMemberCount,
+    };
+    return {
+      channelMember,
+      channel,
+      members: result.members,
+      messages: result.messages,
+    };
   }
 
   private async kickUser(
     channelId: ChannelId,
     targetId: UserId,
-  ): Promise<ChannelMember & { member: UserDto }> {
-    const result = await this.prisma.channelMember.delete({
-      where: {
-        channelId_memberId: {
-          channelId: channelId.value,
-          memberId: targetId.value,
-        },
-      },
-      include: {
-        member: {
-          select: {
-            id: true,
-            joinedAt: true,
-            isLeaved: true,
-            leavedAt: true,
-            nickname: true,
-            profileImageUrl: true,
-            statusMessage: true,
+  ): Promise<ServiceResponse<ChannelMemberDetailDto>> {
+    try {
+      const result = await this.prisma.channelMember.delete({
+        where: {
+          channelId_memberId: {
+            channelId: channelId.value,
+            memberId: targetId.value,
           },
         },
-      },
-    });
-    return result;
+        include: {
+          member: {
+            select: userDtoSelect,
+          },
+        },
+      });
+      return newServiceOkResponse(result);
+    } catch (error) {
+      if (
+        isRecordNotFoundError(error) ||
+        IsRecordToUpdateNotFoundError(error)
+      ) {
+        this.logger.log(
+          `kickUser 시도가 레코드 없음으로 실패: ${error.message}`,
+        );
+        return newServiceFailResponse(error.message, 400);
+      }
+      this.logger.debug(
+        `예상치 못 한 banOrPromoteOrMuteUser 시도의 실패: ${error}`,
+      );
+      return newServiceFailUnhandledResponse(500);
+    }
   }
 
-  private async banOrPromoteUser(
+  private async banOrPromoteOrMuteUser(
     channelId: ChannelId,
     targetId: UserId,
-    memberType: ChannelMemberType,
-  ): Promise<ChannelMember & { member: UserDto }> {
-    const result = await this.prisma.channelMember.update({
-      where: {
-        channelId_memberId: {
-          channelId: channelId.value,
-          memberId: targetId.value,
-        },
-      },
-      include: {
-        member: {
-          select: {
-            id: true,
-            joinedAt: true,
-            isLeaved: true,
-            leavedAt: true,
-            nickname: true,
-            profileImageUrl: true,
-            statusMessage: true,
+    memberType: ChannelMemberType | undefined,
+    mutedUntil: Date | undefined,
+  ): Promise<ServiceResponse<ChannelMemberDetailDto>> {
+    try {
+      const result = await this.prisma.channelMember.update({
+        where: {
+          channelId_memberId: {
+            channelId: channelId.value,
+            memberId: targetId.value,
           },
         },
-      },
-      data: { memberType },
-    });
-    return result;
+        include: {
+          member: {
+            select: userDtoSelect,
+          },
+        },
+        data: { memberType, mutedUntil },
+      });
+      return newServiceOkResponse(result);
+    } catch (error) {
+      if (
+        isRecordNotFoundError(error) ||
+        IsRecordToUpdateNotFoundError(error)
+      ) {
+        this.logger.log(
+          `banOrPromoteOrMuteUser 시도가 레코드 없음으로 실패: ${error.message}`,
+        );
+        return newServiceFailResponse(error.message, 400);
+      }
+      this.logger.debug(
+        `예상치 못 한 banOrPromoteOrMuteUser 시도의 실패: ${error}`,
+      );
+      return newServiceFailUnhandledResponse(500);
+    }
+  }
+
+  private getMutedDateTime() {
+    const THREE_MINUTE = 3;
+    const SECONDS_IN_MINUTES = 60;
+    const MILLI_SECONDS_IN_SECONDS = 1000;
+    return new Date(
+      Date.now() + THREE_MINUTE * SECONDS_IN_MINUTES * MILLI_SECONDS_IN_SECONDS,
+    );
   }
 
   private checkPermissions(
@@ -740,9 +844,9 @@ export class ChannelService {
   ) {
     return actionType === ChangeActionType.PROMOTE
       ? this.checkPromotePermission(isOwner)
-      : this.checkKickBanPermissions(type);
+      : this.checkKickBanMutePermissions(type);
   }
-  private checkKickBanPermissions(type: ChannelMemberType) {
+  private checkKickBanMutePermissions(type: ChannelMemberType) {
     return type === ChannelMemberType.ADMINISTRATOR;
   }
   private checkPromotePermission(isOwner: boolean) {
