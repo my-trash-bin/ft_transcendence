@@ -54,7 +54,8 @@ const Board: React.FC = () => {
       setGameState(gameState);
     } else {
       console.log('gameOver');
-      router.push('/pong/gameOver');
+      useStore.setState({ gameOver: true });
+      router.push('/game');
     }
   }, [setGameState, router]);
 

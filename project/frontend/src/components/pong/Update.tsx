@@ -12,6 +12,7 @@ interface ExtendedGameState extends GameState {
   isPlayer1: boolean;
   setIsPlayer1: (isPlayer1: boolean) => void;
   setGameState: (newState: GameState) => void;
+  setGameOver: (gameOver: boolean) => void;
 }
 
 const useStore = create<ExtendedGameState>((set) => ({
@@ -33,6 +34,7 @@ const useStore = create<ExtendedGameState>((set) => ({
 
   setIsPlayer1: (isPlayer1) => set({ isPlayer1 }),
   setGameState: (newState) => set({ ...newState }),
+  setGameOver: (gameOver) => set({ gameOver }),
 }));
 
 export default useStore;

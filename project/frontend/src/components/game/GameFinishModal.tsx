@@ -12,6 +12,9 @@ export const GameFinishModal: React.FC<ModalProfileProps> = ({
   isOpen,
   onClose,
 }) => {
+  const handleClose = () => {
+    onClose();
+  };
   const userLayout = 'flex flex-col justify-center items-center';
   return (
     <ModalLayout
@@ -51,10 +54,7 @@ export const GameFinishModal: React.FC<ModalProfileProps> = ({
           </div>
         </div>
         <div className="flex flex-row justify-center gap-3xl">
-          <Button onClick={() => alert('again game!')} size={'medium'}>
-            다시하기
-          </Button>
-          <Button onClick={() => alert('go to game page!')} size={'medium'}>
+          <Button onClick={handleClose} size={'medium'}>
             그만하기
           </Button>
         </div>
