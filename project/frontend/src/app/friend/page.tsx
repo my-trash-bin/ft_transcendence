@@ -1,10 +1,11 @@
 'use client';
+import withAuth from '@/components/auth/Auth';
 import { useState } from 'react';
 import { BlockCardList } from '../../components/friend/BlockCardList';
 import { FriendCardList } from '../../components/friend/FriendCardList';
 import { SearchCardList } from '../../components/friend/SearchCardList';
 
-export default function FriendPage() {
+function FriendPage() {
   const [activeScreen, setActiveScreen] = useState('friend');
 
   const changeScreen = (screenName: string) => {
@@ -64,3 +65,5 @@ export default function FriendPage() {
     </div>
   );
 }
+
+export default withAuth(FriendPage);

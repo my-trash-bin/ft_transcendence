@@ -207,6 +207,28 @@ export class ChannelController {
     return result.data!;
   }
 
+  @Get('participated/:channelId')
+  @ApiOperation({ summary: '내가 이 채널에 참여해있나' })
+  @ApiCreatedResponse({
+    type: () => Boolean,
+  })
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
+  async isParticipated(
+    @Param('channelId') channelId: string,
+    @Request() req: ExpressRequest,
+  ) {
+    const userId = (req.user as JwtPayloadPhaseComplete).id;
+    const result = await this.channelService.isParticipated(
+      userId,
+      idOf(channelId),
+    );
+    if (!result.ok) {
+      throw new HttpException(result.error!.message, result.error!.statusCode);
+    }
+    return result;
+  }
+
   // @Get('participand/:cheenlId')
   // @ApiOperation({ summary: '채널 참여자 목록' })
   // @ApiOkResponse({

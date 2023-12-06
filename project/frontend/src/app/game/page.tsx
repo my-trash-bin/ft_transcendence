@@ -1,5 +1,6 @@
 'use client';
 // ../../game/page.tsx
+import withAuth from '@/components/auth/Auth';
 import React, { useCallback } from 'react';
 import { Title } from '@/components/common/Title';
 import { GameFinishModal } from '@/components/game/GameFinishModal';
@@ -7,7 +8,7 @@ import ButtonComponent from '@/components/game/GameButton';
 import { Ranking } from '../../components/game/Ranking';
 import useStore from '../../components/pong/Update';
 
-export default function GamePage() {
+function GamePage() {
   const { gameOver } = useStore((state) => ({
     gameOver: state.gameOver,
   }));
@@ -39,3 +40,5 @@ export default function GamePage() {
     </div>
   );
 }
+
+export default withAuth(GamePage);
