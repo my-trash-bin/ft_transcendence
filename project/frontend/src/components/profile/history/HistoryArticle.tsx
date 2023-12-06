@@ -1,20 +1,19 @@
 import { ApiContext } from '@/app/_internal/provider/ApiContext';
+import { Button } from '@/components/common/Button';
 import { Loading } from '@/components/common/Loading';
 import { Title } from '@/components/common/Title';
+import { useRouter } from 'next/navigation';
 import { useCallback, useContext } from 'react';
 import { useQuery } from 'react-query';
 import { HistoryCard } from './HistoryCard';
-import { mockData } from './mockDataHistory';
-import { Button } from '@/components/common/Button';
-import { useRouter } from 'next/navigation';
 
 export function HistoryArticle() {
   const { api } = useContext(ApiContext);
   const router = useRouter();
   const { isLoading, isError, data } = useQuery(
-    ['achivement'],
+    ['fetchHistory2'],
     useCallback(
-      async () => (await api.userFollowControllerFindFriends()).data,
+      async () => (await api.pongLogControllerFindOneByUserId('5bbed335-f2f6-49c5-a651-5fd34dc647c9')).data,
       [api],
     ),
   );
@@ -44,21 +43,21 @@ export function HistoryArticle() {
       );
     }
 
-    if (data.length === 0) {
+    if (data.userLogs.length === 0) {
       return <p className="font-semibold text-h2 text-center">No elements</p>;
     }
 
     return (
       <div className="flex flex-col items-center w-[80%] h-[500px] overflow-y-scroll">
-        {mockData.map((data) => (
+        {data.userLogs.map((data) => (
           <HistoryCard
-            key={data.key}
-            user1Name={data.user1Name}
-            user2Name={data.user2Name}
-            user1Avatar={data.user1Avatar}
-            user2Avatar={data.user2Avatar}
-            user1Score={data.user1Score}
-            user2Score={data.user2Score}
+          key={data.id}
+          user1Name={data.player1Id}
+          user2Name={data.player2Id}
+          user1Avatar={data.user1Avatar}
+          user2Avatar={data.user2Avatar}
+          user1Score={data.player1Score}
+          user2Score={data.player2Score}
           />
         ))}
       </div>
