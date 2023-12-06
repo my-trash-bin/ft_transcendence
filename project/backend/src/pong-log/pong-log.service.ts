@@ -182,7 +182,7 @@ export class PongLogService {
     return ranking;
   }
 
-  private makeStats(
+  makeStats(
     pongGameHistory1: { isPlayer1win: boolean }[],
     pongGameHistory2: { isPlayer1win: boolean }[],
   ): PongLogStatDto {
@@ -197,6 +197,29 @@ export class PongLogService {
     });
     pongGameHistory2.forEach((h) => {
       h.isPlayer1win ? (stats.losses += 1) : (stats.wins += 1);
+    });
+    stats.totalGames = stats.wins + stats.losses;
+    stats.winRate = stats.totalGames
+      ? (stats.wins / stats.totalGames) * 100
+      : 0;
+    return stats;
+  }
+
+  makeStats2(
+    id: UserId,
+    pongGameHistory: { player1Id: string; isPlayer1win: boolean }[],
+  ): PongLogStatDto {
+    const userId = id.value;
+    const stats = {
+      wins: 0,
+      losses: 0,
+      totalGames: 0,
+      winRate: 0,
+    };
+    pongGameHistory.forEach((h) => {
+      (h.player1Id === userId ? h.isPlayer1win : !h.isPlayer1win)
+        ? (stats.wins += 1)
+        : (stats.losses += 1);
     });
     stats.totalGames = stats.wins + stats.losses;
     stats.winRate = stats.totalGames
