@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect, useCallback } from 'react';
 import usePaddleMovement from './KeyHandle';
 import useStore from './Update';
 import {
@@ -20,8 +20,8 @@ const Board: React.FC = () => {
   const router = useRouter();
 
   usePaddleMovement();
-
-  const handleGameUpdate = (gameState: GameState) => {
+  
+  const handleGameUpdate = useCallback((gameState: GameState) => {
     if (!gameState.gameStart) {
       console.log('game not started');
     } else if (!gameState.gameOver) {
@@ -30,7 +30,7 @@ const Board: React.FC = () => {
       console.log('gameOver');
       router.push('/pong/gameOver');
     }
-  };
+  }, [setGameState, router]);
 
   useEffect(() => {
     socket.on('gameUpdate', handleGameUpdate);
