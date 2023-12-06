@@ -1,31 +1,33 @@
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React, { useMemo, useEffect, useCallback } from 'react';
+import React, { useMemo, useEffect, useCallback, useState } from 'react';
 import usePaddleMovement from './KeyHandle';
 import useStore from './Update';
 import {
   BALL_SIZE, BOARD_HEIGHT, BOARD_WIDTH, GameState, ITEM_SIZE,
-  PADDLE_HEIGHT, PADDLE_WIDTH, SMALL_PADDLE_HEIGHT,
+  PADDLE_HEIGHT, PADDLE_WIDTH, SMALL_PADDLE_HEIGHT, PlayerInfo,
 } from './gameConstants';
 import { getGameSocket } from './gameSocket';
 
 // npm run build && npx nest start --watch
-
 const Board: React.FC = () => {
   const {
     ball, paddle1, paddle2, score1, score2,
     isPlayer1, setGameState, pongItem, isItemMode,
   } = useStore();
+  const [player1Info, setPlayer1Info] = useState<PlayerInfo>({ nickname: '', avatarUrl: '' });
+  const [player2Info, setPlayer2Info] = useState<PlayerInfo>({ nickname: '', avatarUrl: '' });
   const socket = getGameSocket();
   const router = useRouter();
 
   usePaddleMovement();
-  
+
   const handleGameUpdate = useCallback((gameState: GameState) => {
     if (!gameState.gameStart) {
       console.log('game not started');
     } else if (!gameState.gameOver) {
       setGameState(gameState);
+      // console.log('hi', gameState.player1Id, gameState.player2Id);
     } else {
       console.log('gameOver');
       router.push('/pong/gameOver');
@@ -38,6 +40,27 @@ const Board: React.FC = () => {
       socket.off('gameUpdate', handleGameUpdate);
     };
   }, [socket, handleGameUpdate]);
+  
+  const handlePlayerInfo = useCallback((info: PlayerInfo, playerNumber: number) => {
+    if (playerNumber === 1 && (player1Info.nickname !== info.nickname || player1Info.avatarUrl !== info.avatarUrl)) {
+      setPlayer1Info(info);
+    } else if (playerNumber === 2 && (player2Info.nickname !== info.nickname || player2Info.avatarUrl !== info.avatarUrl)) {
+      setPlayer2Info(info);
+    }
+  }, [player1Info, player2Info]);
+
+  useEffect(() => {
+    const handlePlayer1Info = (info: PlayerInfo) => handlePlayerInfo(info, 1);
+    const handlePlayer2Info = (info: PlayerInfo) => handlePlayerInfo(info, 2);
+
+    socket.on('player1Info', handlePlayer1Info);
+    socket.on('player2Info', handlePlayer2Info);
+
+    return () => {
+      socket.off('player1Info', handlePlayer1Info);
+      socket.off('player2Info', handlePlayer2Info);
+    };
+  }, [socket, handlePlayerInfo]);
 
   const ballColor = useMemo(() => getBallColor(ball.type), [ball.type]);
 
@@ -53,8 +76,8 @@ const Board: React.FC = () => {
       <div className="flex items-center justify-between w-[800px]">
         {/* 상대방 플레이어 아바타 (왼쪽에 항상 표시) */}
         <PlayerAvatar
-          avatarUrl="/avatar/avatar-black.svg"
-          playerName={isPlayer1 ? 'Player2' : 'Player1'}
+          avatarUrl={isPlayer1 ? player2Info.avatarUrl : player1Info.avatarUrl}
+          playerName={isPlayer1 ? player2Info.nickname : player1Info.nickname}
         />
 
         {/* 점수판 (중앙) */}
@@ -64,8 +87,8 @@ const Board: React.FC = () => {
 
         {/* 현재 플레이어 아바타 (오른쪽에 항상 표시) */}
         <PlayerAvatar
-          avatarUrl="/avatar/avatar-black.svg"
-          playerName={isPlayer1 ? 'Player1' : 'Player2'}
+          avatarUrl={isPlayer1 ? player1Info.avatarUrl : player2Info.avatarUrl}
+          playerName={isPlayer1 ? player1Info.nickname : player2Info.nickname}
         />
       </div>
 
