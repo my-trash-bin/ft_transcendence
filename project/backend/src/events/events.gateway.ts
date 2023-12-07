@@ -111,13 +111,6 @@ export class EventsGateway
     }
   }
 
-  @SubscribeMessage('receivedDisconnectMessage')
-  async deletePongInstances(@ConnectedSocket() client: Socket) {
-    console.log('receivedDisconnectMessage');
-    console.log(client.data.userId);
-    this.pongMap.delete(client.data.userId);
-  }
-
   private async finalizeGame(client: Socket) {
     if (!this.pongMap.has(client.data.userId)) {
       return;

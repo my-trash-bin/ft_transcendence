@@ -65,25 +65,6 @@ const Board: React.FC = () => {
     };
   }, [socket, handleGameUpdate]);
 
-//  @SubscribeMessage('receivedDisconnectMessage')
-
-  //   private deletePongInstances(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
-
-  // const handleOpponentDisconnected = () => {
-  //   console.log('opponentDisconnected');
-  //   useStore.setState({ gameOver: true });
-  //   router.push('/game');
-  //   console.log('opponentDisconnected');
-  //   socket.emit('receivedDisconnectMessage');
-  // };
-
-  // useEffect(() => {
-  //   socket.on('opponentDisconnected', handleOpponentDisconnected);
-  //   return () => {
-  //     socket.off('opponentDisconnected', handleOpponentDisconnected);
-  //   };
-  // });
-
   useEffect(() => {
     return () => {
       socket.emit('leaveGameBoard');
