@@ -37,7 +37,7 @@ export function DmUserList({
     useCallback(async () => await api.dmControllerGetMyDmList(), [api]),
   );
   if (isLoading) return <p>로딩중...</p>;
-  const renderData = getRenderData(data?.data?.data, searchUsername);
+  const renderData = getRenderData(data?.data, searchUsername);
 
   return (
     <div className="w-[350px] h-[600px] flex-grow-1 flex flex-col items-center gap-sm overflow-y-scroll">

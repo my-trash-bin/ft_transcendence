@@ -85,8 +85,15 @@ export class ChannelController {
   @Phase('complete')
   async create(@Body() dto: CreateChannelDto, @Request() req: ExpressRequest) {
     const userId = (req.user as JwtPayloadPhaseComplete).id;
-
-    const result = await this.channelService.create(userId, dto);
+    const { type, title, password, capacity } = dto;
+    const isPublic = type !== ChannelType.Private;
+    const result = await this.channelService.create(
+      userId,
+      isPublic,
+      title,
+      password,
+      capacity,
+    );
     if (!result.ok) {
       if (result.error!.statusCode === 500) {
         throw new InternalServerErrorException(result.error!.message);
