@@ -35,6 +35,8 @@ import { ChannelDto } from './dto/channel.dto';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { JoinedChannelInfoDto } from './dto/joined-channel-info.dto';
 import { kickBanPromoteMuteRequsetDto } from './dto/kick-ban-promote-mute-requset.dto';
+import { LeavingChannelResponseDto } from './dto/leave-channel-response.dto';
+import { LeaveChannelDto } from './dto/leave-channel.dto';
 import { ParticipateChannelDto } from './dto/participate-channel.dto';
 import { UpdateChannelDto } from './dto/update-channel.dto';
 import { ChannelType } from './enums/channel-type.enum';
@@ -219,6 +221,22 @@ export class ChannelController {
       idOf(channelId),
       password,
     );
+  }
+
+  @Post('/leave')
+  @ApiOperation({ summary: '채널 나가기' })
+  @ApiCreatedResponse({
+    type: () => LeavingChannelResponseDto,
+  })
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
+  async leaveChannel(
+    @Body() dto: LeaveChannelDto,
+    @Request() req: ExpressRequest,
+  ) {
+    const userId = (req.user as JwtPayloadPhaseComplete).id;
+    const { channelId } = dto;
+    return await this.channelService.leaveChannel(userId, idOf(channelId));
   }
 
   @Post('/kickBanPromoteMute')

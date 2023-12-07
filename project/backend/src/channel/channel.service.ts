@@ -22,7 +22,6 @@ import {
 } from '../common/ServiceResponse';
 import { DmService } from '../dm/dm.service';
 import { MessageWithMemberDto } from '../dm/dto/message-with-member';
-import { LeavingChannelInfo } from '../events/event-response.dto';
 import { UserDto, userDtoSelect } from '../users/dto/user.dto';
 import {
   createPrismaErrorMessage,
@@ -44,6 +43,7 @@ import { ChannelWithAllInfoDto } from './dto/channel-with-all-info.dto';
 import { ChannelWithMembersDto } from './dto/channel-with-members.dto';
 import { ChannelDto, channelDtoSelect } from './dto/channel.dto';
 import { JoinedChannelInfoDto } from './dto/joined-channel-info.dto';
+import { LeavingChannelResponseDto } from './dto/leave-channel-response.dto';
 
 export enum ChangeActionType {
   KICK = 'KICK',
@@ -319,7 +319,7 @@ export class ChannelService {
   async leaveChannel(
     id: UserId,
     channelId: ChannelId,
-  ): Promise<ServiceResponse<LeavingChannelInfo>> {
+  ): Promise<ServiceResponse<LeavingChannelResponseDto>> {
     try {
       const result = await this.prismaService.$transaction(async (prisma) => {
         const channelMember = await prisma.channelMember.findUnique({
