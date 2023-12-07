@@ -10,12 +10,14 @@ export function AllChannelCard({
   participateModalOpen,
   setSelectedChannelId,
   setSelectedChannelType,
+  needPassword,
 }: Readonly<{
   id: string;
   channelName: string;
   now: number;
   max: number;
   isPublic: boolean;
+  needPassword: boolean;
   passwordModalOpen: (isModalOpen: boolean) => void;
   participateModalOpen: (isModalOpen: boolean) => void;
   setSelectedChannelId: (channelId: string) => void;
@@ -25,14 +27,12 @@ export function AllChannelCard({
 
   const addUserToChannel = () => {
     setSelectedChannelId(id);
-    if (isPublic) {
-      setSelectedChannelType('public');
-      participateModalOpen(true);
-    } else {
+    if (isPublic && needPassword) {
       setSelectedChannelType('private');
       passwordModalOpen(true);
-      // if(password)
-      //   getSocket().emit('join', { channelId: id, password: password });
+    } else {
+      setSelectedChannelType('public');
+      participateModalOpen(true);
     }
   };
 
@@ -45,7 +45,7 @@ export function AllChannelCard({
       >
         <p className="self-center text-h3">{channelName}</p>
         <div className="flex items-center">
-          {!isPublic ? (
+          {isPublic && needPassword ? (
             <Image
               src="/icon/lock.svg"
               width={25}

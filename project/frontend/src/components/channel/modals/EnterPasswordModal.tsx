@@ -1,8 +1,8 @@
-import Image from 'next/image';
-import { ModalLayout } from './ModalLayout';
-import { useCallback, useContext, useState } from 'react';
 import { ApiContext } from '@/app/_internal/provider/ApiContext';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useCallback, useContext, useState } from 'react';
+import { ModalLayout } from './ModalLayout';
 
 export function EnterPasswordModal({
   isModalOpen,
@@ -33,8 +33,12 @@ export function EnterPasswordModal({
       });
       console.log('Participate channel successfully');
       router.push(`/channel/${targetChannelId}`);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error participate channel:', error);
+      if (error?.error.message === '밴된 유저는 채널에 들어갈 수 없습니다.')
+        alert('해당 채널에서 BEN된 유저입니다.');
+      else if (error?.error.message === '올바른 비밀번호 입력이 필요합니다.')
+        alert('비밀번호를 다시 입력해주세요.');
     }
   }, [api, targetChannelId, password, router]);
 
