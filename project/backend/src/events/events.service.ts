@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { WsException } from '@nestjs/websockets';
 import { ChangeActionType, ChannelService } from '../channel/channel.service';
-import { ChannelId, ClientId, idOf, UserId } from '../common/Id';
+import { ChannelId, ClientId, UserId, idOf } from '../common/Id';
 import { DmService } from '../dm/dm.service';
 import { UserFollowService } from '../user-follow/user-follow.service';
 import { UsersService } from '../users/users.service';
@@ -380,6 +380,7 @@ export class EventsService {
       );
   }
   private broadcastToUserClients(userId: UserId, eventName: string, data: any) {
+    this.logger.log(userId);
     this.socketMap
       .get(userId.value)
       ?.forEach((client) => client.emit(eventName, data));

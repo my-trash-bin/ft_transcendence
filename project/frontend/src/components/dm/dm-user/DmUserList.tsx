@@ -37,6 +37,7 @@ export function DmUserList({
     useCallback(async () => await api.dmControllerGetMyDmList(), [api]),
   );
   if (isLoading) return <p>로딩중...</p>;
+  console.log(data);
   const renderData = getRenderData(data?.data, searchUsername);
 
   return (
