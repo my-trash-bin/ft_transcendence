@@ -2,7 +2,7 @@
 
 import { getSocket } from '@/lib/Socket';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { messageType } from './MessageContent';
 
 export function MessageSendBox({
@@ -15,6 +15,17 @@ export function MessageSendBox({
   targetUserId?: string;
 }) {
   const [message, setMessage] = useState<string>('');
+  useEffect(() => {
+    const socket = getSocket();
+    socket.on('exception', (data: any) => {
+      if (data.message === '뮤트 상태의 유저입니다.') {
+        alert('뮤트 상태의 유저입니다.');
+      }
+    });
+    return () => {
+      socket.off('exception');
+    };
+  });
   const sendMessage = () => {
     if (message === '') return;
     const socket = getSocket();
