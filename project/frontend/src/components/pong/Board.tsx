@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React, { useMemo, useEffect, useCallback, useState } from 'react';
+import React, { useMemo, useEffect, useCallback, useState, use } from 'react';
 import usePaddleMovement from './KeyHandle';
 import useStore from './Update';
 import {
@@ -53,8 +53,8 @@ const Board: React.FC = () => {
     } else {
       console.log('gameOver');
       setGameState(gameState);
-      useStore.setState({ gameOver: true });
       router.push('/game');
+      useStore.setState({ gameOver: true });
     }
   }, [setGameState, router]);
 
@@ -64,6 +64,30 @@ const Board: React.FC = () => {
       socket.off('gameUpdate', handleGameUpdate);
     };
   }, [socket, handleGameUpdate]);
+
+//  @SubscribeMessage('receivedDisconnectMessage')
+
+  //   private deletePongInstances(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+
+  const handleOpponentDisconnected = (data: { userId: string; opponentId: string, gameState: GameState }) => {
+    useStore.setState({ gameOver: true });
+    router.push('/game');
+    console.log('opponentDisconnected', data);
+    socket.emit('receivedDisconnectMessage', { opponentId: data.opponentId })
+  };
+
+  useEffect(() => {
+    socket.on('opponentDisconnected', handleOpponentDisconnected);
+    return () => {
+      socket.off('opponentDisconnected', handleOpponentDisconnected);
+    };
+  });
+
+  useEffect(() => {
+    return () => {
+      socket.emit('leaveGameBoard');
+    };
+  }, [socket]);
 
   const handlePlayerInfo = useCallback((info: PlayerInfo, playerNumber: number) => {
     if (playerNumber === 1 && (player1Info.nickname !== info.nickname || player1Info.avatarUrl !== info.avatarUrl)) {

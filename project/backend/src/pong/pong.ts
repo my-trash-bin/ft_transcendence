@@ -15,7 +15,7 @@ const SMASH_SPEED = 8;
 const PADDLE_STRIKE = 4;
 const PADDLE_MOVE_STEP = 20;
 const ITEM_SIZE = 100;
-const GAME_OVER = 1;
+const GAME_OVER = 10;
 
 export interface GameState {
   ball: { x: number; y: number; type: number };
@@ -94,7 +94,7 @@ export class Pong {
 
     this.setIsItemMode(this.IsItemMode);
 
-    
+
     const interval = setInterval(async () => {
       if (this.updateGameLogic()) {
         clearInterval(interval);
