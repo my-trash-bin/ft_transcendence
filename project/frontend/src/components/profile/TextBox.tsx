@@ -17,7 +17,7 @@ export const TextBox: React.FC<TextBoxProps> = ({
 }) => {
   const textSize = isModal ? 'text-xl' : 'text-h3 leading-[2]';
   const gapSize = isModal ? 'gap-sm' : 'gap.md';
-  const roundedRatio = ratio.toFixed(1);
+  const roundedRatio = ratio?.toFixed(1);
   return (
     <div className={`${gapSize} flex flex-col font-mayo leading-loose`}>
       <p className={`${textSize} text-dark-purple`}>
