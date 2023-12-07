@@ -13,8 +13,8 @@ const queryClientConfig: QueryClientConfig = {
     queries: {
       onError: (error: any) => {
         if (
-          error?.error.statusCode === 401 ||
-          error?.error.statusCode === 403
+          error?.error?.statusCode === 401 ||
+          error?.error?.statusCode === 403
         ) {
           location.href = '/';
         }
