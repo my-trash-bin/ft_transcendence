@@ -35,7 +35,7 @@ export function HistoryBox() {
   );
 
   function render() {
-    if (isLoading) return <Loading width={500} />;
+    if (isLoading) return <Loading width={300} />;
 
     if (isError || !data) {
       return <p className="text-center">Something went wrong</p>;
@@ -46,7 +46,7 @@ export function HistoryBox() {
     }
 
     return (
-      <div className="flex flex-col items-center w-[100%] h-[400px] overflow-y-scroll">
+      <div className="flex flex-col items-center w-[100%] h-[300px] overflow-y-scroll">
         {data.records.map((history: any) => (
           <HistoryCard
             key={history.id}

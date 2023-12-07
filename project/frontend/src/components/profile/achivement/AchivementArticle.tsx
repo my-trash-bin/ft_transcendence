@@ -22,7 +22,7 @@ export function AchivementArticle() {
     <div className="relative">
       <div className="h-[inherit] pt-3xl flex flex-col items-center">
         <Title location="top-center" font="big">
-          업적
+          전체 업적
         </Title>
         <Button onClick={() => router.push('/profile')} size={'big'}>
           돌아가기

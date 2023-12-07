@@ -44,7 +44,7 @@ export function SearchCardList({
           placeholder="Search Friends"
           eventFunction={userSearchCallback}
         />
-        <div className="w-[700px] h-[580px] grid gap-lg justify-center items-start overflow-y-scroll pt-xl place-content-start">
+        <div className="w-[700px] h-[580px] grid gap-lg justify-center items-start overflow-y-scroll mt-xl place-content-start">
           {render()}
         </div>
       </div>
