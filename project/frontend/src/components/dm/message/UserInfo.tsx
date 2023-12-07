@@ -9,7 +9,7 @@ export function UserInfo({
   username: any;
   onActive: boolean;
 }>) {
-  const active = onActive ? 'Active' : 'Inavtice';
+  const active = onActive ? 'Active' : 'Inactive';
   const activeStyle = onActive
     ? '.border-live-interactive'
     : 'bg-gray-interactive';
