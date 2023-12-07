@@ -111,12 +111,12 @@ export class EventsGateway
     }
   }
 
-  // @SubscribeMessage('receivedDisconnectMessage')
-  // async deletePongInstances(@ConnectedSocket() client: Socket, @MessageBody() data: { opponentId: string}) {
-  //   console.log('receivedDisconnectMessage', data.opponentId);
-  //   this.pongMap.delete(client.data.userId);
-  //   this.pongMap.delete(data.opponentId);
-  // }
+  @SubscribeMessage('receivedDisconnectMessage')
+  async deletePongInstances(@ConnectedSocket() client: Socket) {
+    console.log('receivedDisconnectMessage');
+    console.log(client.data.userId);
+    this.pongMap.delete(client.data.userId);
+  }
 
   private async finalizeGame(client: Socket) {
     if (!this.pongMap.has(client.data.userId)) {
@@ -124,14 +124,17 @@ export class EventsGateway
     }
 
     const pong = this.pongMap.get(client.data.userId);
+    pong?.setGameOver();
     if (!pong || !pong.getGameState().gameStart) {
       return;
     }
     await this.storeGameStateToDB(pong.getGameState(), pong);
-
     // 상대방에게 연결 종료 알림
-    const opponentId = client.data.userId === pong.player1Id ? pong.player2Id : pong.player1Id;
-    this.server.to(opponentId).emit('opponentDisconnected', { userId: client.data.userId, opponentId });
+    const opponentSocketId = client.id === pong.player1SocketId ? pong.player2SocketId : pong.player1SocketId;
+    this.server.to(opponentSocketId).emit('opponentDisconnected', { userId: client.data.userId, opponentId: opponentSocketId });
+
+    this.pongMap.delete(pong.player1Id);
+    this.pongMap.delete(pong.player2Id);
   }
 
   @SubscribeMessage('leaveGameBoard')
@@ -430,7 +433,8 @@ export class EventsGateway
     setTimeout(() => {
       const player1Id = player1.data.userId;
       const player2Id = player2.data.userId;
-      const pong = new Pong(this.prisma, player1Id, player2Id, mode, () => {
+      const pong = new Pong(this.prisma, player1Id, player2Id, player1.id, player2.id,
+        mode, () => {
         this.pongMap.delete(player1Id);
         this.pongMap.delete(player2Id);
       });

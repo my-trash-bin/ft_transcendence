@@ -35,16 +35,19 @@ export class Pong {
 
   private gameState: GameState;
   private player1Won: boolean;
-
   constructor(
     private readonly prisma: PrismaService,
     public readonly player1Id: string,
     public readonly player2Id: string,
+    public readonly player1SocketId: string,
+    public readonly player2SocketId: string,
     private IsItemMode: boolean,
     private readonly onEnd: () => void,
   ) {
     this.player1Id = player1Id;
     this.player2Id = player2Id;
+    this.player1SocketId = player1SocketId;
+    this.player2SocketId = player2SocketId;
     this.player1Won = false;
 
     this.gameState = {
@@ -68,6 +71,9 @@ export class Pong {
     this.startGameLoop();
   }
 
+  setGameOver() {
+    this.gameState.gameOver = true;
+  }
   private makeItemRandomPosition(): boolean {
     // item position = 200 ~ 600, 150 ~ 400
     const x = Math.floor(Math.random() * (600 - 150 + 1)) + 150;
