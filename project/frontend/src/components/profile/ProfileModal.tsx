@@ -158,7 +158,7 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
         onMouseLeave={() => setIsHovered(false)}
         className="relative w-[75px] h-[30px]"
       >
-        {isHovered ? (
+        {isHovered && !disabled ? (
           <div className="absolute bottom-[-15px]">
             <Button isModal={true} onClick={() => startNormal()}>
               {'일반모드'}
