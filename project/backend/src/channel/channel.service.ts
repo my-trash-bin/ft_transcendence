@@ -906,7 +906,9 @@ export class ChannelService {
     prisma?: TransactionPrismaType,
   ): Promise<ServiceResponse<ChannelMemberDetailDto>> {
     try {
-      const result = await (prisma ?? this.prismaService).channelMember.delete({
+      const user = await (
+        prisma ?? this.prismaService
+      ).channelMember.findUniqueOrThrow({
         where: {
           channelId_memberId: {
             channelId: channelId.value,
@@ -919,7 +921,27 @@ export class ChannelService {
           },
         },
       });
-      return newServiceOkResponse(result);
+
+      await (prisma ?? this.prismaService).channel.update({
+        where: {
+          id: channelId.value,
+        },
+        data: {
+          members: {
+            delete: {
+              channelId_memberId: {
+                channelId: channelId.value,
+                memberId: targetId.value,
+              },
+            },
+          },
+          memberCount: {
+            decrement: 1,
+          },
+        },
+      });
+
+      return newServiceOkResponse(user);
     } catch (error) {
       if (
         isRecordNotFoundError(error) ||
@@ -959,6 +981,16 @@ export class ChannelService {
         },
         data: { memberType, mutedUntil },
       });
+      if (memberType === ChannelMemberType.BANNED) {
+        await (prisma ?? this.prismaService).channel.update({
+          where: { id: channelId.value },
+          data: {
+            memberCount: {
+              decrement: 1,
+            },
+          },
+        });
+      }
       return newServiceOkResponse(result);
     } catch (error) {
       if (

@@ -20,7 +20,9 @@ export function CommonCard({
 }: CommonCardProps) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isInviteOpen, setIsInviteOpen] = useState(false);
-
+  const [gameMode, setGameMode] = useState<'normal' | 'item'>('normal');
+  // const active = onActive ? 'Active' : 'Inactive';
+  const active = 'Active';
   const handleProfileClose = () => {
     setIsProfileOpen(false);
   };
@@ -40,8 +42,14 @@ export function CommonCard({
   return (
     <div className={`${sizeCSS} ${colorCSS} ${alignCSS}`}>
       <FriendAvatar imageUrl={imageUrl} size={60} onClick={handleProfileOpen} />
-      <div className="text-left text-black text-h3 absolute left-[100px] font-light font-agro">
-        {nickname}
+      <div className="flex flex-col absolute left-[100px]">
+        <div className="text-left text-black text-h3  font-light font-agro">
+          {nickname}
+        </div>
+        <div className="flex flex-row items-center gap-sm">
+          <div className="w-[10px] h-[10px] rounded-[10px] bg-dark-purple" />
+          <p className="text-sm">{active}</p>
+        </div>
       </div>
       <div className="absolute right-xl flex items-center">{children}</div>
       <ProfileModal
@@ -50,11 +58,12 @@ export function CommonCard({
         targetId={id}
         refetchPage={refetch}
         openInvite={handleInviteOpen}
+        setGameMode={setGameMode}
       />
       <FriendInvite
         isOpen={isInviteOpen}
         onClose={handleInviteClose}
-        mode="item"
+        mode={gameMode}
         friendId={id}
       />
     </div>
