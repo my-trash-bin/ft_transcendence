@@ -7,7 +7,7 @@ export default function ChannelLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-row w-[inherit] h-[100%]">
+    <div className="flex flex-row w-[inherit]">
       <Navbar />
       <MainLayout>{children}</MainLayout>
     </div>

@@ -19,7 +19,7 @@ export default function Layout({ children }: Readonly<PropsWithChildren>) {
         {/* eslint-disable-next-line @next/next/no-sync-scripts */}
         <script src="/script/mode.js" />
       </head>
-      <body className="bg-background text-text">
+      <body className="bg-background text-text overflow-auto">
         <QueryClientProvider>
           <ApiContextProvider>
             <ModeContextProvider variableName="npm:@-ft/mode-codegen">
