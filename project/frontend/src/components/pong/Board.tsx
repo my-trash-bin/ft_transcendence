@@ -30,14 +30,12 @@ const preloadImages = (imagePaths: string[], callback: () => void) => {
   });
 };
 
-// npm run build && npx nest start --watch
 const Board: React.FC = () => {
   const {
     ball, paddle1, paddle2, score1, score2,
     isPlayer1, setGameState, pongItem, isItemMode,
+    player1Info, player2Info, setplayer1Info, setplayer2Info,
   } = useStore();
-  const [player1Info, setPlayer1Info] = useState<PlayerInfo>({ nickname: '', avatarUrl: '' });
-  const [player2Info, setPlayer2Info] = useState<PlayerInfo>({ nickname: '', avatarUrl: '' });
   const socket = getGameSocket();
   const router = useRouter();
   const [imagesLoaded, setImagesLoaded] = useState(false);
@@ -54,7 +52,9 @@ const Board: React.FC = () => {
       setGameState(gameState);
     } else {
       console.log('gameOver');
-      router.push('/pong/gameOver');
+      setGameState(gameState);
+      useStore.setState({ gameOver: true });
+      router.push('/game');
     }
   }, [setGameState, router]);
 
@@ -67,9 +67,9 @@ const Board: React.FC = () => {
 
   const handlePlayerInfo = useCallback((info: PlayerInfo, playerNumber: number) => {
     if (playerNumber === 1 && (player1Info.nickname !== info.nickname || player1Info.avatarUrl !== info.avatarUrl)) {
-      setPlayer1Info(info);
+      setplayer1Info(info);
     } else if (playerNumber === 2 && (player2Info.nickname !== info.nickname || player2Info.avatarUrl !== info.avatarUrl)) {
-      setPlayer2Info(info);
+      setplayer2Info(info);
     }
   }, [player1Info, player2Info]);
 
@@ -236,3 +236,4 @@ const PlayerAvatar: React.FC<PlayerAvatarProps> = React.memo(({ avatarUrl, playe
 });
 
 export default Board;
+

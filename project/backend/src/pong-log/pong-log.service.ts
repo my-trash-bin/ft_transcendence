@@ -1,5 +1,4 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
-import { PongGameHistory } from '@prisma/client';
 import { PrismaService } from '../base/prisma.service';
 import { GameHistoryId, UserId } from '../common/Id';
 import {
@@ -8,6 +7,7 @@ import {
   newServiceOkResponse,
   ServiceResponse,
 } from '../common/ServiceResponse';
+import { UserDto } from '../users/dto/user.dto';
 import {
   createPrismaErrorMessage,
   isRecordNotFoundError,
@@ -15,53 +15,44 @@ import {
   isUniqueConstraintError,
 } from '../util/prismaError';
 import { HistoryStaticDto } from './dto/history-static.dto';
+import { PongLogStatDto } from './dto/pong-log-stat.dto';
+import {
+  PongGameHistoryWithPlayerType,
+  PongLogDtoWithPlayerDto,
+} from './dto/pong-log-with-player.dto';
 import { PongLogDto } from './dto/pong-log.dto';
-import { RankingRecordDto } from './dto/ranking-record.dto';
+import { PongLogRankingRecordDto } from './dto/pong-long-ranking-record.dto';
 
 @Injectable()
 export class PongLogService {
   private logger = new Logger('PongLogService');
   constructor(private readonly prisma: PrismaService) {}
 
-  async findOneByUserId(
+  async getUserGameHistories(
     id: UserId,
-  ): Promise<HistoryStaticDto & { userLogs: PongLogDto[] }> {
-    const userLogs = await this.prisma.pongGameHistory.findMany({
-      where: {
-        OR: [{ player1Id: id.value }, { player2Id: id.value }],
-      },
-      include: {
-        player1: true,
-        player2: true,
-      },
-    });
-    const filtered = userLogs
-      .filter(({ isPlayer1win }) => isPlayer1win !== null)
-      .map(
-        ({
-          player1Id,
-          player2Id,
-          isPlayer1win,
-          player1Score,
-          player2Score,
-          createdAt,
-        }) => ({
-          player1Id,
-          player2Id,
-          isPlayer1win,
-          player1Score,
-          player2Score,
-          createdAt,
-        }),
-      );
-    const cal = this.calculateStatistics(filtered, id);
-    return {
-      userLogs,
-      ...cal,
-    };
+  ): Promise<ServiceResponse<PongLogDtoWithPlayerDto[]>> {
+    try {
+      const gameHistories: PongGameHistoryWithPlayerType[] =
+        await this.prisma.pongGameHistory.findMany({
+          where: { OR: [{ player1Id: id.value }, { player2Id: id.value }] },
+          include: {
+            player1: true,
+            player2: true,
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+        });
+
+      const result = gameHistories.map((el) => new PongLogDtoWithPlayerDto(el));
+      return newServiceOkResponse(result);
+    } catch (error) {
+      this.logger.debug(`히스토리 조회과정에서 에러 발생: ${error}`);
+      return newServiceFailUnhandledResponse(400);
+    }
   }
 
-  async findOne(id: GameHistoryId): Promise<ServiceResponse<PongGameHistory>> {
+  async findOne(id: GameHistoryId): Promise<ServiceResponse<PongLogDto>> {
     try {
       const gameHistory = await this.prisma.pongGameHistory.findUniqueOrThrow({
         where: { id: id.value },
@@ -165,32 +156,76 @@ export class PongLogService {
     }
   }
 
-  async getRanking(): Promise<RankingRecordDto[]> {
-    const gameHistories = await this.prisma.pongGameHistory.findMany();
-
-    const playerStats = new Map<
-      string,
-      { wins: number; losses: number; winRate: number; totalGames: number }
-    >();
-
-    gameHistories.forEach((game) => {
-      this.updateStats(playerStats, game.player1Id, game.isPlayer1win);
-      this.updateStats(playerStats, game.player2Id, !game.isPlayer1win);
+  async getRanking(): Promise<PongLogRankingRecordDto[]> {
+    const users = await this.prisma.user.findMany({
+      include: {
+        pongGameHistory1: {
+          select: {
+            isPlayer1win: true,
+          },
+        },
+        pongGameHistory2: {
+          select: {
+            isPlayer1win: true,
+          },
+        },
+      },
     });
 
-    // 통계를 배열로 변환하고 랭킹 정렬
-    const ranking = Array.from(playerStats.entries()).map(
-      ([playerId, stats]) => ({
-        playerId,
-        ...stats,
-        winRate:
-          stats.totalGames === 0 ? 0 : (stats.wins / stats.totalGames) * 100,
-      }),
-    );
+    const ranking = users.map((user) => ({
+      user: new UserDto(user),
+      ...this.makeStats(user.pongGameHistory1, user.pongGameHistory2),
+    }));
 
     ranking.sort((a, b) => b.winRate - a.winRate || b.wins - a.wins);
 
     return ranking;
+  }
+
+  makeStats(
+    pongGameHistory1: { isPlayer1win: boolean }[],
+    pongGameHistory2: { isPlayer1win: boolean }[],
+  ): PongLogStatDto {
+    const stats = {
+      wins: 0,
+      losses: 0,
+      totalGames: 0,
+      winRate: 0,
+    };
+    pongGameHistory1.forEach((h) => {
+      h.isPlayer1win ? (stats.wins += 1) : (stats.losses += 1);
+    });
+    pongGameHistory2.forEach((h) => {
+      h.isPlayer1win ? (stats.losses += 1) : (stats.wins += 1);
+    });
+    stats.totalGames = stats.wins + stats.losses;
+    stats.winRate = stats.totalGames
+      ? (stats.wins / stats.totalGames) * 100
+      : 0;
+    return stats;
+  }
+
+  makeStats2(
+    id: UserId,
+    pongGameHistory: { player1Id: string; isPlayer1win: boolean }[],
+  ): PongLogStatDto {
+    const userId = id.value;
+    const stats = {
+      wins: 0,
+      losses: 0,
+      totalGames: 0,
+      winRate: 0,
+    };
+    pongGameHistory.forEach((h) => {
+      (h.player1Id === userId ? h.isPlayer1win : !h.isPlayer1win)
+        ? (stats.wins += 1)
+        : (stats.losses += 1);
+    });
+    stats.totalGames = stats.wins + stats.losses;
+    stats.winRate = stats.totalGames
+      ? (stats.wins / stats.totalGames) * 100
+      : 0;
+    return stats;
   }
 
   private updateStats(
@@ -205,15 +240,8 @@ export class PongLogService {
   }
 
   private calculateStatistics(
-    userLogs: {
-      player1Id: string;
-      player2Id: string;
-      player1Score: number;
-      player2Score: number;
-      isPlayer1win: boolean;
-      createdAt: Date;
-    }[],
     id: UserId,
+    userLogs: PongLogDto[],
   ): HistoryStaticDto {
     const userId = id.value;
 
