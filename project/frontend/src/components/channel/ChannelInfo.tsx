@@ -26,7 +26,7 @@ export function ChannelInfo({
 
   return (
     <>
-      <Portal selector={'#modal-channel'}>
+      <Portal selector={'#backdrop-root'}>
         <ChannelSettingModal
           isOpen={isOpen}
           closeModal={modalClose}

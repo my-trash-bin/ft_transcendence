@@ -13,7 +13,7 @@ export function AddChannelButton() {
   };
   return (
     <>
-      <Portal selector={'#modal-channel'}>
+      <Portal selector={'#backdrop-root'}>
         <CreateChannelModal isOpen={isOpen} closeModal={closeModal} />
       </Portal>
       <button onClick={openModal}>

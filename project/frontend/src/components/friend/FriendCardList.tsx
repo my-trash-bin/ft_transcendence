@@ -25,7 +25,7 @@ export function FriendCardList({
   }, [activeScreen, refetch]);
 
   return (
-    <div className="w-[700px] h-[600px] pt-xl grid gap-lg justify-center items-center overflow-y-scroll place-content-start">
+    <div className="w-[700px] h-[600px] mt-xl grid gap-lg justify-center items-center overflow-y-scroll place-content-start">
       {render()}
     </div>
   );

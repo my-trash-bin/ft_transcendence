@@ -20,6 +20,7 @@ export function CommonCard({
 }: CommonCardProps) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isInviteOpen, setIsInviteOpen] = useState(false);
+  const [gameMode, setGameMode] = useState<'normal' | 'item'>('normal');
 
   const handleProfileClose = () => {
     setIsProfileOpen(false);
@@ -50,11 +51,12 @@ export function CommonCard({
         targetId={id}
         refetchPage={refetch}
         openInvite={handleInviteOpen}
+        setGameMode={setGameMode}
       />
       <FriendInvite
         isOpen={isInviteOpen}
         onClose={handleInviteClose}
-        mode="item"
+        mode={gameMode}
         friendId={id}
       />
     </div>

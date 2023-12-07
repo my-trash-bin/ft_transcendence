@@ -29,10 +29,21 @@ export const useSocket = (type: any, setMessages: any) => {
       });
 
       socket.on('kickBanPromote', (res) => {
-        if (res.data.actionType === 'KICK') {
+        if (
+          res.data.actionType === 'KICK' ||
+          res.data.actionType === 'BANNED'
+        ) {
           if (res.data.targetUser.id === me.id) {
             alert('채널에서 강퇴당했습니다.');
             location.href = '/channel';
+          }
+        } else if (res.data.actionType === 'PROMOTE') {
+          if (res.data.targetUser.id === me.id) {
+            alert('채널에서 관리자가 되었습니다.');
+          }
+        } else {
+          if (res.data.targetUser.id === me.id) {
+            alert('채널에서 뮤트 되었습니다.');
           }
         }
       });

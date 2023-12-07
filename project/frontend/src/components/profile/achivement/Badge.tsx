@@ -4,7 +4,6 @@ import Image from 'next/image';
 export const badge = cva(
   [
     'flex flex-col items-center justify-center',
-    'w-full h-full',
     'bg-white-interactive rounded-md border-2 border-gray',
     'py-sm',
     'transition-all',
@@ -17,8 +16,8 @@ export const badge = cva(
   {
     variants: {
       size: {
-        default: ['text-xl'],
-        small: ['text-lg'],
+        default: ['text-xl', 'w-[180px] h-[180px]'],
+        small: ['text-lg', 'w-[110px] h-[110px]'],
       },
     },
     defaultVariants: {
@@ -41,7 +40,7 @@ export const Badge: React.FC<BadgeProps> = ({
   isMine = true,
 }) => {
   const imageSizeStyles: { width: number; height: number } =
-    size === 'small' ? { width: 75, height: 75 } : { width: 100, height: 100 };
+    size === 'small' ? { width: 60, height: 60 } : { width: 100, height: 100 };
 
   return (
     <div className={badge({ size })}>

@@ -21,7 +21,7 @@ export function AchivementBox() {
   return (
     <div className="w-[435px] h-[420px] bg-light-background rounded-lg relative">
       <div className="h-[inherit] pt-3xl pb-xl flex flex-col items-center">
-        <Title location="top-left">업적</Title>
+        <Title location="top-left">나의 업적</Title>
         <Button onClick={() => router.push('/profile/achivement')} size={'big'}>
           더보기
         </Button>
@@ -40,7 +40,7 @@ export function AchivementBox() {
         <p className="self-center text-center">아직 획득한 업적이 없습니다. </p>
       );
     return (
-      <div className="grid grid-cols-3 h-[90%] w-[90%] gap-md px-sm overflow-y-scroll">
+      <div className="grid grid-cols-3 h-[300px] w-[90%] gap-md px-sm overflow-y-scroll">
         {filteredData.map((badge) => (
           <Badge
             key={badge.id}
