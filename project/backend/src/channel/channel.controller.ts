@@ -1,10 +1,8 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Get,
   HttpException,
-  InternalServerErrorException,
   Logger,
   Param,
   Post,
@@ -97,10 +95,7 @@ export class ChannelController {
       capacity,
     );
     if (!result.ok) {
-      if (result.error!.statusCode === 500) {
-        throw new InternalServerErrorException(result.error!.message);
-      }
-      throw new BadRequestException(result.error!.message);
+      throw new HttpException(result.error!.message, result.error!.statusCode);
     }
     const channelId = result.data!.id;
     this.eventsService.handleUserJoinChannel(
@@ -216,11 +211,21 @@ export class ChannelController {
   ) {
     const userId = (req.user as JwtPayloadPhaseComplete).id;
     const { type, channelId, password } = dto;
-    return await this.channelService.joinChannel(
+    const result = await this.channelService.joinChannel(
       userId,
       idOf(channelId),
       password,
     );
+    if (!result.ok) {
+      throw new HttpException(result.error!.message, result.error!.statusCode);
+    }
+    this.eventsService.onJoinByApi(
+      ChannelRoomType.NORMAL,
+      idOf(channelId),
+      userId,
+      result.data!,
+    );
+    return result.data!;
   }
 
   @Post('/leave')
@@ -236,7 +241,23 @@ export class ChannelController {
   ) {
     const userId = (req.user as JwtPayloadPhaseComplete).id;
     const { channelId } = dto;
-    return await this.channelService.leaveChannel(userId, idOf(channelId));
+    const result = await this.channelService.leaveChannel(
+      userId,
+      idOf(channelId),
+    );
+
+    if (!result.ok) {
+      throw new HttpException(result.error!.message, result.error!.statusCode);
+    }
+
+    this.eventsService.onLeaveByApi(
+      ChannelRoomType.NORMAL,
+      idOf(channelId),
+      userId,
+      result.data!,
+    );
+
+    return result.data!;
   }
 
   @Post('/kickBanPromoteMute')
@@ -260,12 +281,15 @@ export class ChannelController {
       actionType,
     );
     if (!result.ok) {
-      if (result.error!.statusCode === 500) {
-        throw new InternalServerErrorException(result.error!.message);
-      }
-      throw new BadRequestException(result.error!.message);
+      throw new HttpException(result.error!.message, result.error!.statusCode);
     }
-
+    this.eventsService.onKickBanPromoteByApi(
+      ChannelRoomType.NORMAL,
+      idOf(channelId),
+      userId,
+      actionType,
+      result.data!,
+    );
     return result.data!;
   }
 
