@@ -1,5 +1,4 @@
 import Image from 'next/image';
-import { useState } from 'react';
 import { LongCard } from '../common/LongCard';
 
 interface RankingCardProps {
@@ -15,15 +14,10 @@ export default function RankingCard({
   avatar,
   isUser,
 }: RankingCardProps) {
-  const [, setIsModalOpen] = useState(false);
-
-  const handleButtonClick = () => {
-    setIsModalOpen(true);
-  };
   const alignCSS = 'flex items-center justify-between w-[600px]';
   return (
     <div>
-      <button onClick={handleButtonClick} className="mb-xl">
+      <button className="">
         <LongCard
           size={isUser ? 'big' : 'medium'}
           color={isUser ? 'color' : 'default'}

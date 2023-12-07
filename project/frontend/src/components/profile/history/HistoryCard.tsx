@@ -29,7 +29,7 @@ export function HistoryCard({
   const player1Img = user1Avatar ?? '/avatar/avatar-black.svg';
   const player2Img = user2Avatar ?? '/avatar/avatar-black.svg';
   return (
-    <div className={type === CardType.Default ? 'mb-xl' : 'mb-md'}>
+    <div>
       <LongCard size={cardSize} color="default">
         <Image
           src={player1Img}

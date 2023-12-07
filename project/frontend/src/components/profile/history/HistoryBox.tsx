@@ -41,13 +41,13 @@ export function HistoryBox() {
       return <p className="text-center">Something went wrong</p>;
     }
 
-    if (data.data.records.length === 0) {
+    if (data.records.length === 0) {
       return <p className="text-center">아직 게임 히스토리가 없습니다.</p>;
     }
 
     return (
       <div className="flex flex-col items-center w-[100%] h-[400px] overflow-y-scroll">
-        {data.data.records.map((history: any) => (
+        {data.records.map((history: any) => (
           <HistoryCard
             key={history.id}
             user1Name={history.player1.nickname}

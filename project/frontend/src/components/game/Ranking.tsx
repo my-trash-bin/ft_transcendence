@@ -14,7 +14,7 @@ export function Ranking() {
       [api],
     ),
   );
-// TODO: check data type, test 
+
   return (
     <div>
       <RankingCard
@@ -24,15 +24,18 @@ export function Ranking() {
         isUser={true}
       />
       <div className={'max-w-[620px] mx-auto'}>
-        {data.map((item) => (
-          <RankingCard
-            key={item.id}
-            rank={item.rank}
-            name={item.name}
-            avatar={item.avatar}
-            isUser={false}
-          />
-        ))}
+        {data &&
+          data
+            .slice(0, 5)
+            .map((item) => (
+              <RankingCard
+                key={item.id}
+                rank={item.rank}
+                name={item.user.nickname}
+                avatar={item.user.profileImageUrl}
+                isUser={false}
+              />
+            ))}
       </div>
     </div>
   );

@@ -1,13 +1,14 @@
 'use client';
 import { Button } from '@/components/common/Button';
 import FriendAvatar from '@/components/friend/utils/FriendAvatar';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect } from 'react';
 import { useQuery } from 'react-query';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { ModalLayout } from '../channel/modals/ModalLayout';
 import { Loading } from '../common/Loading';
 import { TextBox } from './TextBox';
 import { CardType, HistoryCard } from './history/HistoryCard';
+import { LongCard } from '../common/LongCard';
 
 interface ModalProfileProps {
   isOpen: boolean;
@@ -29,33 +30,31 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
     data: userInfoData,
     refetch: refetchUserInfo,
   } = useQuery(
-    targetId,
+    [targetId, 'profile'],
     useCallback(
       async () =>
         (await api.usersControllerGetUserInfo({ targetUser: targetId })).data,
       [api, targetId],
     ),
+    {
+      enabled: isOpen,
+    },
   );
   const {
     // isLoading: historyLoading,
     // isError: historyError,
     data: historyData,
   } = useQuery(
-    ['History'],
+    [targetId, 'history'],
     useCallback(
       async () =>
         (await api.pongLogControllerGetUserGameHistories(targetId)).data,
       [api, targetId],
     ),
+    {
+      enabled: isOpen,
+    },
   );
-
-  const [record, setRecord] = useState(historyData?.data.stats || {});
-
-  useEffect(() => {
-    if (historyData?.data.stats) {
-      setRecord(historyData.data.stats);
-    }
-  }, [historyData]);
 
   useEffect(() => {
     if (isOpen) {
@@ -202,6 +201,40 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
     }
   }, [api, targetId, refetchUserInfo, refetchPage]);
 
+  function renderHistory() {
+    if (historyData && historyData.records) {
+      const historyCards = historyData.records
+        .slice(0, 3)
+        .map((history: any) => (
+          <HistoryCard
+            key={history.id}
+            user1Name={history.player1.nickname}
+            user2Name={history.player2.nickname}
+            user1Avatar={history.player1.profileImageUrl}
+            user2Avatar={history.player2.profileImageUrl}
+            user1Score={history.player1Score}
+            user2Score={history.player2Score}
+            type={CardType.Small}
+          />
+        ));
+
+      const emptyCards = Array.from(
+        { length: 3 - (historyData.records?.length || 0) },
+        (_, index) => (
+          <LongCard key={`empty-${index}`} size={'small'} color="default">
+            no history
+          </LongCard>
+        ),
+      );
+
+      return (
+        <div className="flex flex-col">{historyCards.concat(emptyCards)}</div>
+      );
+    } else {
+      return <p>No history data available.</p>;
+    }
+  }
+
   return (
     <ModalLayout
       isOpen={isOpen}
@@ -229,27 +262,14 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
           <FriendAvatar imageUrl={userInfoData.imageUrl} size={80} />
           <TextBox
             nickname={userInfoData.nickname}
-            win={record.wins}
-            lose={record.losses}
-            ratio={record.winRate}
+            win={historyData?.stats.wins}
+            lose={historyData?.stats.losses}
+            ratio={historyData?.stats.winRate}
             statusMessage={userInfoData.statusMessage}
             isModal={true}
           />
         </div>
-        <div className="flex flex-col">
-          {historyData.data.records.slice(0, 3).map((history: any) => (
-            <HistoryCard
-              key={history.id}
-              user1Name={history.player1.nickname}
-              user2Name={history.player2.nickname}
-              user1Avatar={history.player1.profileImageUrl}
-              user2Avatar={history.player2.profileImageUrl}
-              user1Score={history.player1Score}
-              user2Score={history.player2Score}
-              type={CardType.Small}
-            />
-          ))}
-        </div>
+        {renderHistory()}
         <div className="flex flex-col gap-md">
           <div className="flex flex-row gap-3xl justify-center">
             {handleFriendButton()}

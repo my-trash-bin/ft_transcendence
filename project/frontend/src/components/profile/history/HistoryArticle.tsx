@@ -44,7 +44,7 @@ export function HistoryArticle() {
       return <p className="text-h2 text-center">Something went wrong</p>;
     }
 
-    if (data.data.length === 0) {
+    if (data.records.length === 0) {
       return (
         <p className="text-h2 text-center">아직 게임 히스토리가 없습니다.</p>
       );
@@ -52,13 +52,13 @@ export function HistoryArticle() {
 
     return (
       <div className="flex flex-col items-center w-[80%] h-[500px] overflow-y-scroll">
-        {data.data.map((history) => (
+        {data.records.map((history: any) => (
           <HistoryCard
             key={history.id}
-            user1Name={history.player1Id}
-            user2Name={history.player2Id}
-            user1Avatar={history.user1Avatar}
-            user2Avatar={history.user2Avatar}
+            user1Name={history.player1.nickname}
+            user2Name={history.player2.nickname}
+            user1Avatar={history.player1.profileImageUrl}
+            user2Avatar={history.player2.profileImageUrl}
             user1Score={history.player1Score}
             user2Score={history.player2Score}
           />
