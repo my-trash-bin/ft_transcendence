@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { LongCard } from '../common/LongCard';
+import { avatarToUrl } from '@/app/_internal/util/avatarToUrl';
 
 interface RankingCardProps {
   readonly rank: number;
@@ -28,7 +29,7 @@ export default function RankingCard({
               {rank}. {name}
             </span>
             <Image
-              src={imageUrl}
+              src={avatarToUrl(imageUrl)}
               alt={`${name}'s avatar`}
               width={50}
               height={50}

@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { formatAMPM } from '../utils/FromatAmPm';
+import { avatarToUrl } from '@/app/_internal/util/avatarToUrl';
 export function DmUser({
   imageUri,
   nickname,
@@ -19,7 +20,7 @@ export function DmUser({
         <div className="flex flex-row gap-md h-[100%]">
           <Image
             alt="user image short cut dm"
-            src={imageUri}
+            src={avatarToUrl(imageUri)}
             width="40"
             height="40"
           />

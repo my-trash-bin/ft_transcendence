@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { LongCard } from '../../common/LongCard';
+import { avatarToUrl } from '@/app/_internal/util/avatarToUrl';
 
 export enum CardType {
   Default = 'default',
@@ -32,14 +33,14 @@ export function HistoryCard({
     <div>
       <LongCard size={cardSize} color="default">
         <Image
-          src={player1Img}
+          src={avatarToUrl(player1Img)}
           alt="avatar"
           width={type === CardType.Default ? 50 : 30}
           height={type === CardType.Default ? 50 : 30}
           className="absolute left-sm"
         />
         <Image
-          src={player2Img}
+          src={avatarToUrl(player2Img)}
           alt="avatar"
           width={type === CardType.Default ? 50 : 30}
           height={type === CardType.Default ? 50 : 30}

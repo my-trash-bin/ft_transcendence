@@ -1,3 +1,4 @@
+import { avatarToUrl } from '@/app/_internal/util/avatarToUrl';
 import Image from 'next/image';
 
 export function UserInfo({
@@ -19,7 +20,7 @@ export function UserInfo({
       <div className="w-[45px] h-[50px] absolute left-[30px] top-[20px]">
         <Image
           alt="userImage"
-          src={imageUri}
+          src={avatarToUrl(imageUri)}
           width={35}
           height={40}
           layout="relative"
