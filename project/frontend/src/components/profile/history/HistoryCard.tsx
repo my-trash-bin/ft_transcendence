@@ -7,13 +7,13 @@ export enum CardType {
 }
 
 interface HistoryCardProps {
-  user1Name: string;
-  user2Name: string;
-  user1Avatar: string;
-  user2Avatar: string;
-  user1Score: number;
-  user2Score: number;
-  type?: CardType;
+  readonly user1Name: string;
+  readonly user2Name: string;
+  readonly user1Avatar?: string;
+  readonly user2Avatar?: string;
+  readonly user1Score: number;
+  readonly user2Score: number;
+  readonly type?: CardType;
 }
 
 export function HistoryCard({
@@ -26,19 +26,20 @@ export function HistoryCard({
   type = CardType.Default,
 }: HistoryCardProps) {
   const cardSize = type === CardType.Default ? 'medium' : 'small';
-
+  const player1Img = user1Avatar ?? '/avatar/avatar-black.svg';
+  const player2Img = user2Avatar ?? '/avatar/avatar-black.svg';
   return (
     <div className={type === CardType.Default ? 'mb-xl' : 'mb-md'}>
       <LongCard size={cardSize} color="default">
         <Image
-          src={user1Avatar}
+          src={player1Img}
           alt="avatar"
           width={type === CardType.Default ? 50 : 30}
           height={type === CardType.Default ? 50 : 30}
           className="absolute left-sm"
         />
         <Image
-          src={user2Avatar}
+          src={player2Img}
           alt="avatar"
           width={type === CardType.Default ? 50 : 30}
           height={type === CardType.Default ? 50 : 30}
