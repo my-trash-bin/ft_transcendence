@@ -1,7 +1,9 @@
 import { ProfileModal } from '@/components/profile/ProfileModal';
-import { ReactNode, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import FriendAvatar from './FriendAvatar';
 import FriendInvite from '@/components/game/FriendInvite';
+import { getSocket } from '@/lib/Socket';
+import { LiveStatus } from '@/components/common/LiveStatus';
 
 interface CommonCardProps {
   readonly children: ReactNode;
@@ -41,8 +43,11 @@ export function CommonCard({
   return (
     <div className={`${sizeCSS} ${colorCSS} ${alignCSS}`}>
       <FriendAvatar imageUrl={imageUrl} size={60} onClick={handleProfileOpen} />
-      <div className="text-left text-black text-h3 absolute left-[100px] font-light font-agro">
-        {nickname}
+      <div className="flex flex-col absolute left-[100px]">
+        <div className="text-left text-black text-h3  font-light font-agro">
+          {nickname}
+        </div>
+        <LiveStatus targetId={id} />
       </div>
       <div className="absolute right-xl flex items-center">{children}</div>
       <ProfileModal

@@ -1,3 +1,4 @@
+import { avatarToUrl } from '@/app/_internal/util/avatarToUrl';
 import Image from 'next/image';
 
 type FriendAvatarProps = {
@@ -19,7 +20,7 @@ export default function FriendAvatar(props: FriendAvatarProps) {
     >
       {props.imageUrl ? (
         <Image
-          src={props.imageUrl}
+          src={avatarToUrl(props.imageUrl)}
           priority={true}
           alt="avatar"
           width={props.size}

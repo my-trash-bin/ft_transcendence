@@ -4,10 +4,18 @@ import React, { useMemo, useEffect, useCallback, useState, use } from 'react';
 import usePaddleMovement from './KeyHandle';
 import useStore from './Update';
 import {
-  BALL_SIZE, BOARD_HEIGHT, BOARD_WIDTH, GameState, ITEM_SIZE,
-  PADDLE_HEIGHT, PADDLE_WIDTH, SMALL_PADDLE_HEIGHT, PlayerInfo,
+  BALL_SIZE,
+  BOARD_HEIGHT,
+  BOARD_WIDTH,
+  GameState,
+  ITEM_SIZE,
+  PADDLE_HEIGHT,
+  PADDLE_WIDTH,
+  SMALL_PADDLE_HEIGHT,
+  PlayerInfo,
 } from './gameConstants';
 import { getGameSocket } from './gameSocket';
+import { avatarToUrl } from '@/app/_internal/util/avatarToUrl';
 
 const usePaddleHeight = (type: number) => {
   return useMemo(() => {
@@ -32,9 +40,19 @@ const preloadImages = (imagePaths: string[], callback: () => void) => {
 
 const Board: React.FC = () => {
   const {
-    ball, paddle1, paddle2, score1, score2,
-    isPlayer1, setGameState, pongItem, isItemMode,
-    player1Info, player2Info, setplayer1Info, setplayer2Info,
+    ball,
+    paddle1,
+    paddle2,
+    score1,
+    score2,
+    isPlayer1,
+    setGameState,
+    pongItem,
+    isItemMode,
+    player1Info,
+    player2Info,
+    setplayer1Info,
+    setplayer2Info,
   } = useStore();
   const socket = getGameSocket();
   const router = useRouter();
@@ -71,13 +89,24 @@ const Board: React.FC = () => {
     };
   }, [socket]);
 
-  const handlePlayerInfo = useCallback((info: PlayerInfo, playerNumber: number) => {
-    if (playerNumber === 1 && (player1Info.nickname !== info.nickname || player1Info.avatarUrl !== info.avatarUrl)) {
-      setplayer1Info(info);
-    } else if (playerNumber === 2 && (player2Info.nickname !== info.nickname || player2Info.avatarUrl !== info.avatarUrl)) {
-      setplayer2Info(info);
-    }
-  }, [player1Info, player2Info]);
+  const handlePlayerInfo = useCallback(
+    (info: PlayerInfo, playerNumber: number) => {
+      if (
+        playerNumber === 1 &&
+        (player1Info.nickname !== info.nickname ||
+          player1Info.avatarUrl !== info.avatarUrl)
+      ) {
+        setplayer1Info(info);
+      } else if (
+        playerNumber === 2 &&
+        (player2Info.nickname !== info.nickname ||
+          player2Info.avatarUrl !== info.avatarUrl)
+      ) {
+        setplayer2Info(info);
+      }
+    },
+    [player1Info, player2Info],
+  );
 
   useEffect(() => {
     const handlePlayer1Info = (info: PlayerInfo) => handlePlayerInfo(info, 1);
@@ -96,7 +125,7 @@ const Board: React.FC = () => {
     if (isItemMode) {
       preloadImages(
         ['/item/1.png', '/item/2.png', '/item/3.png'],
-        handleImagesLoaded
+        handleImagesLoaded,
       );
     }
   }, [isItemMode]);
@@ -134,11 +163,17 @@ const Board: React.FC = () => {
       >
         {isItemMode && imagesLoaded && pongItem.type != 0 && (
           <div
-            className={`absolute rounded-md border-3 ${getBallColor(pongItem.type)}`}
+            className={`absolute rounded-md border-3 ${getBallColor(
+              pongItem.type,
+            )}`}
             style={{
               width: `${ITEM_SIZE}px`,
               height: `${ITEM_SIZE}px`,
-              left: isPlayer1 ? `${BOARD_WIDTH - PADDLE_WIDTH - 10 - ITEM_SIZE - pongItem.x}px` : `${pongItem.x}px`,
+              left: isPlayer1
+                ? `${
+                    BOARD_WIDTH - PADDLE_WIDTH - 10 - ITEM_SIZE - pongItem.x
+                  }px`
+                : `${pongItem.x}px`,
               top: `${pongItem.y}px`,
             }}
           >
@@ -162,18 +197,18 @@ const Board: React.FC = () => {
             </div>
           </div>
         )}
-          {/* 공 */}
-          <div
-            className={`absolute rounded-full ${ballColor}`}
-            style={{
-              width: BALL_SIZE,
-              height: BALL_SIZE,
-              left: isPlayer1
-                ? `${BOARD_WIDTH - PADDLE_WIDTH - 10 - ball.x}px`
-                : `${ball.x}px`,
-              top: `${ball.y}px`,
-            }}
-          />
+        {/* 공 */}
+        <div
+          className={`absolute rounded-full ${ballColor}`}
+          style={{
+            width: BALL_SIZE,
+            height: BALL_SIZE,
+            left: isPlayer1
+              ? `${BOARD_WIDTH - PADDLE_WIDTH - 10 - ball.x}px`
+              : `${ball.x}px`,
+            top: `${ball.y}px`,
+          }}
+        />
 
         {/*
           paddle type = 3 -> paddle height = SMALL_PADDLE_HEIGHT
@@ -225,21 +260,22 @@ interface PlayerAvatarProps {
   playerName: string;
 }
 
-const PlayerAvatar: React.FC<PlayerAvatarProps> = React.memo(({ avatarUrl, playerName }) => {
-  return (
-    <div className="flex items-center">
-      <div className="relative w-[30px] h-[30px] rounded-full overflow-hidden mr-[10px]">
-        <Image
-          src={avatarUrl}
-          alt={`${playerName} Avatar`}
-          layout="fill"
-          objectFit="cover"
-        />
+const PlayerAvatar: React.FC<PlayerAvatarProps> = React.memo(
+  ({ avatarUrl, playerName }) => {
+    return (
+      <div className="flex items-center">
+        <div className="relative w-[30px] h-[30px] rounded-full overflow-hidden mr-[10px]">
+          <Image
+            src={avatarToUrl(avatarUrl)}
+            alt={`${playerName} Avatar`}
+            layout="fill"
+            objectFit="cover"
+          />
+        </div>
+        <span className="text-lg font-medium">{playerName}</span>
       </div>
-      <span className="text-lg font-medium">{playerName}</span>
-    </div>
-  );
-});
+    );
+  },
+);
 
 export default Board;
-

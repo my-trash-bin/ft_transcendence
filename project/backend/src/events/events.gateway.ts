@@ -16,8 +16,8 @@ import { Server, Socket } from 'socket.io';
 import { v4 as uuidv4 } from 'uuid';
 import { PrismaService } from '../base/prisma.service';
 import { ChangeActionType } from '../channel/channel.service';
-import { idOf } from '../common/Id';
 import { GateWayEvents } from '../common/gateway-events.enum';
+import { idOf } from '../common/Id';
 import { GameState, Pong } from '../pong/pong';
 import {
   ChannelIdentityDto,
@@ -143,7 +143,7 @@ export class EventsGateway
     this.eventsService.handleDisconnect(client);
   }
 
-  // only DM채널
+  // only 일반채널
   @SubscribeMessage(GateWayEvents.ChannelMessage)
   async handleMessage(
     @ConnectedSocket() client: UserSocket,

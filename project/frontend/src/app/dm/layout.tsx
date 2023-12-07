@@ -1,13 +1,8 @@
-import { MainLayout } from '@/components/common/MainLayout';
+import { NavbarLayout } from '@/components/common/NavbarLayout';
 import Navbar from '../../components/common/Navbar';
 
 export default function DmLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  return (
-    <div className="flex flex-row w-[inherit] h-[100%]">
-      <Navbar />
-      <MainLayout>{children}</MainLayout>
-    </div>
-  );
+  return <NavbarLayout>{children}</NavbarLayout>;
 }

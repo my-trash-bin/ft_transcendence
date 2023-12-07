@@ -5,6 +5,7 @@ import { ProfileModal } from '@/components/profile/ProfileModal';
 import Image from 'next/image';
 import { ReactNode, useState } from 'react';
 import { formatAMPM } from '../utils/FromatAmPm';
+import { avatarToUrl } from '@/app/_internal/util/avatarToUrl';
 
 export function OtherChat({
   message,
@@ -49,7 +50,7 @@ export function OtherChat({
           >
             <Image
               alt="profile"
-              src={profileImage}
+              src={avatarToUrl(profileImage)}
               width={40}
               height={40}
               layout="responsive"
