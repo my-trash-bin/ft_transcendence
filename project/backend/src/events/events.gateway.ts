@@ -94,8 +94,42 @@ export class EventsGateway
     }
   }
 
+  private async storeGameStateToDB(gameState: GameState, pong: Pong): Promise<void> {
+    try {
+      await this.prisma.pongGameHistory.create({
+        data: {
+          player1Id: pong.player1Id,
+          player2Id: pong.player2Id,
+          player1Score: gameState.score1,
+          player2Score: gameState.score2,
+          isPlayer1win: gameState.score1 > gameState.score2,
+        },
+      });
+      console.log('Game state saved to DB');
+    } catch (error) {
+      console.error('Failed to save game state to DB:', error);
+    }
+  }
+
+  // 연결 끊김: 게임중이었으면 상대방에게 연결 종료 알림, DB에 게임 기록 저장
   async handleDisconnect(client: Socket) {
     this.logger.log(`Client disconnected: ${client.id}`);
+
+    if (this.pongMap.has(client.data.userId)) {
+      const pong = this.pongMap.get(client.data.userId);
+
+      if (pong && pong.getGameState().gameStart) {
+        await this.storeGameStateToDB(pong.getGameState(), pong);
+
+        const opponentId = client.data.userId === pong.player1Id ? pong.player2Id : pong.player1Id;
+        const opponentPong = this.pongMap.get(opponentId);
+        if (opponentPong) {
+          this.server.to(opponentId).emit('opponentDisconnected');
+        }
+        this.pongMap.delete(client.data.userId);
+        this.pongMap.delete(opponentId);
+      }
+    }
     this.eventsService.handleDisconnect(client);
   }
 
