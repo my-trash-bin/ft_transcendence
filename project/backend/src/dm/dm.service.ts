@@ -178,7 +178,7 @@ export class DmService {
           id: true,
         },
       });
-      if (dmChannelIds.length === 0) return newServiceOkResponse([]);
+      if (dmChannelIds.length === 0) return [];
       const channelIdList = dmChannelIds.map(({ id }) => id);
 
       let result: any = await this.getDmMessages(channelIdList);

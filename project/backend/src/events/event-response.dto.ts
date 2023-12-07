@@ -19,18 +19,6 @@ export type DmChannelInfoType = {
   member2Id: string;
 };
 
-type ChannelInfo = {
-  id: string;
-  title: string;
-  isPublic: boolean;
-  password: string | null;
-  createdAt: Date;
-  lastActiveAt: Date;
-  ownerId: string | null;
-  memberCount: number;
-  maximumMemberCount: number;
-};
-
 export type ChannelMemberInfo = {
   channelId: string;
   memberId: string;
@@ -43,9 +31,4 @@ export type JoiningChannelInfo = {
   channel: ChannelDto;
   members: ChannelMemberDetailDto[];
   messages: (ChannelMessageDto & { member: UserDto })[];
-};
-
-export type LeavingChannelInfo = {
-  channel: ChannelDto;
-  member: UserDto;
 };

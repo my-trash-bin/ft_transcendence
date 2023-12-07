@@ -107,6 +107,8 @@ export class Pong {
                 isPlayer1win: this.gameState.score1 === GAME_OVER,
               },
             });
+          } catch (error) {
+            console.error(error);
           } finally {
             this.onEnd();
           }

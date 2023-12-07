@@ -17,12 +17,13 @@ export const TextBox: React.FC<TextBoxProps> = ({
 }) => {
   const textSize = isModal ? 'text-xl' : 'text-h3 leading-[2]';
   const gapSize = isModal ? 'gap-sm' : 'gap.md';
+  const roundedRatio = ratio.toFixed(1);
   return (
     <div className={`${gapSize} flex flex-col font-mayo leading-loose`}>
       <p className={`${textSize} text-dark-purple`}>
         닉네임: {nickname}
         <br />
-        전적 : {win}승 {lose}패 {ratio}%
+        전적 : {win}승 {lose}패 {roundedRatio}%
       </p>
       <p className={`${textSize} text-dark-gray`}>
         상태메세지 <br />

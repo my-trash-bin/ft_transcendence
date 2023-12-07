@@ -8,10 +8,12 @@ import { UsersService } from '../users/users.service';
 // import { ChatRoomDto, ChatRoomStatusDto } from './chat.dto'
 import { Server, Socket } from 'socket.io';
 import { ChangeMemberStatusResultDto } from '../channel/dto/change-member-status-result.dto';
+import { JoinedChannelInfoDto } from '../channel/dto/joined-channel-info.dto';
+import { LeavingChannelResponseDto } from '../channel/dto/leave-channel-response.dto';
 import { GateWayEvents } from '../common/gateway-events.enum';
 import { MessageWithMemberDto } from '../dm/dto/message-with-member';
 import { UserDto } from '../users/dto/user.dto';
-import { DmChannelInfoType, LeavingChannelInfo } from './event-response.dto';
+import { DmChannelInfoType } from './event-response.dto';
 import { UserSocket } from './events.gateway';
 
 export enum ChannelRoomType {
@@ -248,7 +250,7 @@ export class EventsService {
     this.handleUserLeaveChannel(type, channelId, idOf(userId));
 
     const eventName = GateWayEvents.Leave;
-    const data: LeavingChannelInfo = result.data!;
+    const data: LeavingChannelResponseDto = result.data!;
     this.broadcastToChannel(type, channelId, [], eventName, {
       type: eventName,
       data,
@@ -319,7 +321,9 @@ export class EventsService {
     if (!(channelId.value in this.channels[type])) {
       this.channels[type][channelId.value] = new Set();
     }
+    const isNewUser = !(userId.value in this.channels[type][channelId.value]);
     this.channels[type][channelId.value].add(userId.value);
+    return isNewUser;
   }
 
   handleUserLeaveChannel(
@@ -335,6 +339,58 @@ export class EventsService {
   handleNotificationToUser(userId: UserId, data: any) {
     const eventName = GateWayEvents.Notification;
     this.broadcastToUserClients(userId, eventName, data);
+  }
+
+  onJoinByApi(
+    type: ChannelRoomType,
+    channelId: ChannelId,
+    userId: UserId,
+    data: JoinedChannelInfoDto,
+  ) {
+    const isNewUser = this.handleUserJoinChannel(type, channelId, userId);
+
+    if (isNewUser) {
+      const eventName = GateWayEvents.Join;
+      this.broadcastToChannel(type, channelId, [], eventName, {
+        type: eventName,
+        data,
+      });
+    }
+  }
+
+  onLeaveByApi(
+    type: ChannelRoomType,
+    channelId: ChannelId,
+    userId: UserId,
+    data: LeavingChannelResponseDto,
+  ) {
+    this.handleUserLeaveChannel(type, channelId, userId);
+
+    const eventName = GateWayEvents.Leave;
+    this.broadcastToChannel(type, channelId, [], eventName, {
+      type: eventName,
+      data,
+    });
+  }
+
+  onKickBanPromoteByApi(
+    type: ChannelRoomType,
+    channelId: ChannelId,
+    userId: UserId,
+    actionType: ChangeActionType,
+    data: ChangeMemberStatusResultDto,
+  ) {
+    if ([ChangeActionType.BANNED, ChangeActionType.KICK].includes(actionType)) {
+      this.handleUserLeaveChannel(type, channelId, userId);
+    }
+    const eventName = GateWayEvents.KickBanPromote;
+    this.broadcastToChannel(type, channelId, [], eventName, {
+      type: eventName,
+      data: {
+        ...data,
+        actionType,
+      },
+    });
   }
 
   private getAllOnlineUsers = () => {
@@ -379,6 +435,7 @@ export class EventsService {
       );
   }
   private broadcastToUserClients(userId: UserId, eventName: string, data: any) {
+    this.logger.log(userId);
     this.socketMap
       .get(userId.value)
       ?.forEach((client) => client.emit(eventName, data));

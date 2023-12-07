@@ -1,4 +1,11 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpException,
+  Logger,
+  Param,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiForbiddenResponse,
@@ -12,14 +19,15 @@ import { JwtGuard } from '../auth/jwt.guard';
 import { Phase, PhaseGuard } from '../auth/phase.guard';
 import { idOf } from '../common/Id';
 import { FindOneParam } from '../users/dto/user-request.dto';
-import { PongLogDtoWithPlayerDto } from './dto/pong-log-with-player.dto';
+import { PongLogHistoryResponse } from './dto/pong-log-history-response.dto';
+import { PongLogRankingRecordDto } from './dto/pong-log-ranking-record.dto';
 import { PongLogDto } from './dto/pong-log.dto';
-import { PongLogRankingRecordDto } from './dto/pong-long-ranking-record.dto';
 import { PongLogService } from './pong-log.service';
 
 @ApiTags('pong-log')
 @Controller('/api/v1/pong-log')
 export class PongLogController {
+  private logger = new Logger('PongLogController');
   constructor(private readonly pongLogService: PongLogService) {}
 
   @Get('rank')
@@ -65,8 +73,7 @@ export class PongLogController {
   @ApiOperation({ summary: '유저 1명 기록 모두 조회' })
   @ApiOkResponse({
     description: '유저 1명의 로그 반환',
-    type: () => PongLogDtoWithPlayerDto,
-    isArray: true,
+    type: () => PongLogHistoryResponse,
   })
   @ApiUnauthorizedResponse({ description: '인증되지 않은 사용자' })
   @ApiForbiddenResponse({ description: '권한이 없는 사용자(by jwt.phase)' })
@@ -74,6 +81,10 @@ export class PongLogController {
   @Phase('complete')
   async getUserGameHistories(@Param() param: FindOneParam) {
     const { id } = param;
-    return await this.pongLogService.getUserGameHistories(idOf(id));
+    const result = await this.pongLogService.getUserGameHistories(idOf(id));
+    if (!result.ok) {
+      throw new HttpException(result.error!.message, result.error!.statusCode);
+    }
+    return result.data!;
   }
 }
