@@ -1,8 +1,8 @@
 import { useRouter } from 'next/navigation';
 import React, { useEffect } from 'react';
-import Modal from 'react-modal';
 import useStore from '../pong/Update';
 import { getGameSocket } from '../pong/gameSocket';
+import { ModalLayout } from '../channel/modals/ModalLayout';
 
 interface FriendInviteProps {
   isOpen: boolean;
@@ -52,12 +52,10 @@ const FriendInvite: React.FC<FriendInviteProps> = ({
     };
   }, []);
 
-  const bgCSS = 'bg-default rounded-md';
   const size = 'py-sm px-lg w-[498px] h-[308px]';
-  const borderCSS = 'border-dark-purple border-4';
   const textCSS = 'text-dark-purple text-h2';
   const alignCSS = 'items-center justify-center';
-  const positionCSS = 'mx-auto mt-[200px]';
+  const positionCSS = 'mx-auto';
 
   const hoverCSS = 'cursor-pointer';
   const txtPos = 'text-center mt-[80px]';
@@ -69,15 +67,13 @@ const FriendInvite: React.FC<FriendInviteProps> = ({
   let content = mode === 'normal' ? '일반' : '아이템';
 
   return (
-    <Modal
+    <ModalLayout
       isOpen={isOpen}
-      onRequestClose={onClose}
-      shouldCloseOnOverlayClick={false}
-      className="bg-transparent"
+      closeModal={onClose}
+      width="500px"
+      height="300px"
     >
-      <div
-        className={`${textCSS} ${alignCSS} ${positionCSS} ${borderCSS} ${size} ${bgCSS}`}
-      >
+      <div className={`${textCSS} ${alignCSS} ${positionCSS} ${size} `}>
         <div className={`${txtPos}`}>
           <p>{content} 게임으로 친구를 초대하였습니다.</p>
         </div>
@@ -85,7 +81,7 @@ const FriendInvite: React.FC<FriendInviteProps> = ({
           닫기
         </button>
       </div>
-    </Modal>
+    </ModalLayout>
   );
 };
 
