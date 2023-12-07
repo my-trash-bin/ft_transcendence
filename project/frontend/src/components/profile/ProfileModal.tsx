@@ -58,7 +58,7 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
     // isError: historyError,
     data: historyData,
   } = useQuery(
-    [targetId, 'history'],
+    [targetId, 'historyFromProfileModal'],
     useCallback(
       async () =>
         (await api.pongLogControllerGetUserGameHistories(targetId)).data,
@@ -141,7 +141,13 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
     }
     return <DualFunctionButton content={content} disabled={disabled} />;
   }
-  function DualFunctionButton({ content, disabled }) {
+  function DualFunctionButton({
+    content,
+    disabled,
+  }: {
+    content: string;
+    disabled: boolean;
+  }) {
     const [isHovered, setIsHovered] = useState(false);
 
     function startNormal() {

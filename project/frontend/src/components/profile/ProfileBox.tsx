@@ -17,7 +17,19 @@ export function ProfileBox() {
     'myProfile',
     useCallback(async () => (await api.usersControllerMyProfile()).data, [api]),
   );
-
+  const localMe = localStorage.getItem('me');
+  const me = localMe ? JSON.parse(localMe) : null;
+  const {
+    isLoading: historyLoading,
+    isError: historyError,
+    data: historyData,
+  } = useQuery(
+    [me, 'historyFromProfilePage'],
+    useCallback(
+      async () => (await api.pongLogControllerGetUserGameHistories(me.id)).data,
+      [api, me],
+    ),
+  );
   const handleOpenProfile = () => {
     setProfileEditModal(true);
   };
@@ -49,7 +61,7 @@ export function ProfileBox() {
     return (
       <div className="flex flex-row justify-center items-center gap-lg w-[100%] h-[100%]">
         <div className="flex flex-col justify-center items-center gap-md px-2xl">
-          <div className="w-[150px] h-[150px] inline-block overflow-x-hidden overflow-y-hidden">
+          <div className="w-[150px] h-[150px] rounded-md inline-block overflow-x-hidden overflow-y-hidden">
             {data.me.profileImageUrl ? (
               <Image
                 src={avatarToUrl(data.me.profileImageUrl)}
@@ -71,12 +83,9 @@ export function ProfileBox() {
         <div className="flex flex-col justify-between rounded-sm bg-default p-xl w-[50%] h-[100%]">
           <TextBox
             nickname={data.me.nickname}
-            // win={data.record.win}
-            // lose={data.record.win}
-            // ratio={data.record.win}
-            win={3}
-            lose={3}
-            ratio={3}
+            win={historyData?.stats.wins}
+            lose={historyData?.stats.losses}
+            ratio={historyData?.stats.winRate}
             statusMessage={data.me.statusMessage}
           />
           <div className="self-end">
