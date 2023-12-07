@@ -3,14 +3,19 @@ import { DMChannelAssociation, DMMessage, Prisma } from '@prisma/client';
 
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { PrismaService } from '../base/prisma.service';
-import { UserId, idOf } from '../common/Id';
+import { idOf, UserId } from '../common/Id';
 import {
-  ServiceResponse,
   newServiceFailPrismaKnownResponse,
   newServiceFailResponse,
+  newServiceFailUnhandledResponse,
   newServiceOkResponse,
+  ServiceResponse,
 } from '../common/ServiceResponse';
 import { userDtoSelect } from '../users/dto/user.dto';
+import {
+  createPrismaErrorMessage,
+  isUniqueConstraintError,
+} from '../util/prismaError';
 import { MessageWithMemberDto } from './dto/message-with-member';
 
 @Injectable()
@@ -84,12 +89,17 @@ export class DmService {
           },
         },
       });
+      this.logger.log(`createDm 성공: ${userId} to ${targetId}`);
       return newServiceOkResponse(prismaDmMessage);
     } catch (error) {
-      if (error instanceof PrismaClientKnownRequestError) {
-        return newServiceFailPrismaKnownResponse(error.code, 400);
+      if (isUniqueConstraintError(error)) {
+        const msg = `createDm 실패: ${createPrismaErrorMessage(error)}`;
+        this.logger.error(msg);
+        return newServiceFailResponse(msg, 500); // 모종의 이유로 prisma.dMMessage.create 실패, 내부 에러로서 500에러
       }
-      return newServiceFailResponse('Unknown Error', 500);
+      this.logger.debug(`createDm 실패: Unhandled Error`);
+      this.logger.error(error);
+      return newServiceFailUnhandledResponse(500);
     }
   }
 

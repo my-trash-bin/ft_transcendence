@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React, { useMemo, useEffect, useCallback, useState } from 'react';
+import React, { useMemo, useEffect, useCallback, useState, use } from 'react';
 import usePaddleMovement from './KeyHandle';
 import useStore from './Update';
 import {
@@ -63,21 +63,18 @@ const Board: React.FC = () => {
 
   usePaddleMovement();
 
-  const handleGameUpdate = useCallback(
-    (gameState: GameState) => {
-      if (!gameState.gameStart) {
-        console.log('game not started');
-      } else if (!gameState.gameOver) {
-        setGameState(gameState);
-      } else {
-        console.log('gameOver');
-        setGameState(gameState);
-        useStore.setState({ gameOver: true });
-        router.push('/game');
-      }
-    },
-    [setGameState, router],
-  );
+  const handleGameUpdate = useCallback((gameState: GameState) => {
+    if (!gameState.gameStart) {
+      console.log('game not started');
+    } else if (!gameState.gameOver) {
+      setGameState(gameState);
+    } else {
+      console.log('gameOver');
+      setGameState(gameState);
+      router.push('/game');
+      useStore.setState({ gameOver: true });
+    }
+  }, [setGameState, router]);
 
   useEffect(() => {
     socket.on('gameUpdate', handleGameUpdate);
@@ -85,6 +82,12 @@ const Board: React.FC = () => {
       socket.off('gameUpdate', handleGameUpdate);
     };
   }, [socket, handleGameUpdate]);
+
+  useEffect(() => {
+    return () => {
+      socket.emit('leaveGameBoard');
+    };
+  }, [socket]);
 
   const handlePlayerInfo = useCallback(
     (info: PlayerInfo, playerNumber: number) => {

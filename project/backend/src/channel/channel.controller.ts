@@ -312,14 +312,6 @@ export class ChannelController {
     if (!result.ok) {
       throw new HttpException(result.error!.message, result.error!.statusCode);
     }
-    return result;
+    return result.data!;
   }
-
-  // @Get('participand/:cheenlId')
-  // @ApiOperation({ summary: '채널 참여자 목록' })
-  // @ApiOkResponse({
-  //   description: '생성된 채널 정보 객체 반환',
-  //   type: () => {},
-  // })
-  // findChannelMembers() {}
 }
