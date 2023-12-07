@@ -79,6 +79,8 @@ export class EventsService {
     // TODO: Game 상태까지 고려하기
     const allOnlineUsers = this.getAllOnlineUsers();
 
+    this.logger.verbose(`allOnlineUsers: ${allOnlineUsers}`);
+
     client.emit(GateWayEvents.Events, {
       userId: client.data.userId as string,
       dmChannels,
@@ -93,15 +95,6 @@ export class EventsService {
       this.removeClientAtSocketMap(idOf(client.id), idOf(userId)); // 소켓의 접속 해제를 반영
     }
   }
-
-  // 애매하다. 이걸로도 부족할듯 하고.
-  // handleOnChat(client: UserSocket) {
-  //   this.addClientAtSocketMap(client);
-  // }
-
-  // handleOffChat(clientId: ClientId, userId: UserId) {
-  //   this.removeClientAtSocketMap(clientId, userId);
-  // }
 
   // only 일반채널
   async sendMessage(client: UserSocket, channelId: ChannelId, msg: string) {
@@ -179,6 +172,8 @@ export class EventsService {
   }
 
   async handleSendDm(client: UserSocket, toId: UserId, msg: string) {
+    this.logger.debug(`handleSendDm: ${toId.value}`);
+
     const userId = client.data.userId as string;
     const type = ChannelRoomType.DM;
 
@@ -412,6 +407,9 @@ export class EventsService {
       this.notiUserOn(userId);
     }
     this.socketMap.set(userId, [...sockets, client]);
+    this.logger.debug(
+      `addClientAtSocketMap(${userId}): ${this.socketMap.get(userId)?.length}`,
+    );
   }
   private removeClientAtSocketMap(clientId: ClientId, userId: UserId) {
     const sockets = this.socketMap.get(userId.value);
@@ -432,7 +430,8 @@ export class EventsService {
     eventName: string,
     data: any,
   ) {
-    new Logger().log(data);
+    this.logger.log(`blockedIdList: ${blockedIdList}`);
+    this.logger.log(this.getChannelArray(type, channelId));
     this.getChannelArray(type, channelId)
       ?.filter((userId) =>
         blockedIdList.every((blockedId) => blockedId !== userId),
@@ -442,7 +441,8 @@ export class EventsService {
       );
   }
   private broadcastToUserClients(userId: UserId, eventName: string, data: any) {
-    this.logger.log(userId);
+    this.logger.debug(`broadcastToUserClients: ${userId.value}, ${eventName}`);
+    this.logger.debug(`socketMap: ${this.socketMap.get(userId.value)}`);
     this.socketMap
       .get(userId.value)
       ?.forEach((client) => client.emit(eventName, data));
