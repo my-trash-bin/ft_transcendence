@@ -6,7 +6,8 @@ import {
   Logger,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ChannelMemberType } from '@prisma/client';
+import { ChannelMemberType, Prisma, PrismaClient } from '@prisma/client';
+import { DefaultArgs } from '@prisma/client/runtime/library';
 import * as bcrypt from 'bcrypt';
 import { scrypt } from 'crypto';
 import { PrismaService } from '../base/prisma.service';
@@ -71,6 +72,11 @@ export type JoinChannelInfoType = {
     };
   }[];
 };
+
+export type TransactionPrismaType = Omit<
+  PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
+  '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'
+>;
 
 @Injectable()
 export class ChannelService {
@@ -226,7 +232,7 @@ export class ChannelService {
     inputPassword?: string | null,
   ): Promise<ServiceResponse<JoinedChannelInfoDto>> {
     try {
-      const info = await this.prismaService.$transaction(async (prisma) => {
+      await this.prismaService.$transaction(async (prisma) => {
         const channel = await this.prismaService.channel.findUnique({
           where: { id: channelId.value },
         });
@@ -248,7 +254,7 @@ export class ChannelService {
         });
 
         if (this.isUserInChannel(channelMember)) {
-          return await this.getJoinedChannelInfo(id, channelId); // 이미 들어가 있는 사용자 => 채널 정보만 리턴.
+          return; // 이미 들어가 있으면 패스 => 데이터만 전달
         }
 
         if (channelMember?.memberType === ChannelMemberType.BANNED) {
@@ -285,10 +291,13 @@ export class ChannelService {
             },
           },
         });
-        return await this.getJoinedChannelInfo(id, channelId); // 참가한 채널의 정보 리턴
       });
 
-      return newServiceOkResponse(info);
+      const data = await this.getJoinedChannelInfo(id, channelId); // 참가한 채널의 정보 리턴
+      this.logger.log(
+        `joinChannel 성공: 유저 ${id.value}, 채널: ${channelId.value}`,
+      );
+      return newServiceOkResponse(data);
     } catch (error) {
       if (error instanceof ServiceError) {
         this.logger.debug(
@@ -368,6 +377,9 @@ export class ChannelService {
           member: new UserDto(channelMember!.member),
         };
       });
+      this.logger.log(
+        `leaveChannel 성공: 유저 ${id.value}, 채널: ${channelId.value}`,
+      );
       return newServiceOkResponse(result);
     } catch (error) {
       if (
@@ -471,7 +483,7 @@ export class ChannelService {
 
         // 7. 수행
         if (actionType === ChangeActionType.KICK) {
-          await this.kickUser(channelId, targetId);
+          await this.kickUser(channelId, targetId, prisma);
         } else {
           const memberType =
             actionType === ChangeActionType.BANNED
@@ -488,6 +500,7 @@ export class ChannelService {
             targetId,
             memberType,
             mutedUntil,
+            prisma,
           );
         }
         return {
@@ -497,6 +510,9 @@ export class ChannelService {
           actionType,
         };
       });
+      this.logger.log(
+        `changeMemberStatus 성공: 유저 ${id.value}, 채널: ${channelId.value}, 타겟: ${targetId.value}, 액션: ${actionType}`,
+      );
       return newServiceOkResponse(result);
     } catch (error) {
       if (error instanceof ServiceError) {
@@ -878,9 +894,10 @@ export class ChannelService {
   private async kickUser(
     channelId: ChannelId,
     targetId: UserId,
+    prisma?: TransactionPrismaType,
   ): Promise<ServiceResponse<ChannelMemberDetailDto>> {
     try {
-      const result = await this.prismaService.channelMember.delete({
+      const result = await (prisma ?? this.prismaService).channelMember.delete({
         where: {
           channelId_memberId: {
             channelId: channelId.value,
@@ -916,9 +933,10 @@ export class ChannelService {
     targetId: UserId,
     memberType: ChannelMemberType | undefined,
     mutedUntil: Date | undefined,
+    prisma?: TransactionPrismaType,
   ): Promise<ServiceResponse<ChannelMemberDetailDto>> {
     try {
-      const result = await this.prismaService.channelMember.update({
+      const result = await (prisma ?? this.prismaService).channelMember.update({
         where: {
           channelId_memberId: {
             channelId: channelId.value,
