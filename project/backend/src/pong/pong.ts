@@ -93,7 +93,9 @@ export class Pong {
     }
 
     this.setIsItemMode(this.IsItemMode);
-    const interval = setInterval(() => {
+
+    
+    const interval = setInterval(async () => {
       if (this.updateGameLogic()) {
         clearInterval(interval);
         (async () => {
@@ -104,7 +106,7 @@ export class Pong {
                 player2Id: this.player2Id,
                 player1Score: this.gameState.score1,
                 player2Score: this.gameState.score2,
-                isPlayer1win: this.gameState.score1 === GAME_OVER,
+                isPlayer1win: this.gameState.score1 > this.gameState.score2,
               },
             });
           } catch (error) {
