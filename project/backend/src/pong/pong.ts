@@ -98,7 +98,7 @@ export class Pong {
         clearInterval(interval);
         (async () => {
           try {
-            this.prisma.pongGameHistory.create({
+            await this.prisma.pongGameHistory.create({
               data: {
                 player1Id: this.player1Id,
                 player2Id: this.player2Id,
@@ -107,6 +107,8 @@ export class Pong {
                 isPlayer1win: this.gameState.score1 === GAME_OVER,
               },
             });
+          } catch (error) {
+            console.error(error);
           } finally {
             this.onEnd();
           }

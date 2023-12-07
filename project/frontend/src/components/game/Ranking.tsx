@@ -1,8 +1,20 @@
+import { ApiContext } from '@/app/_internal/provider/ApiContext';
+import { useCallback, useContext } from 'react';
+import { useQuery } from 'react-query';
 import RankingCard from './RankingCard';
-import { mockRankings } from './mockRankings';
 import { mockUser } from './mockUser';
 
 export function Ranking() {
+  const { api } = useContext(ApiContext);
+
+  const { isLoading, isError, data } = useQuery(
+    [''],
+    useCallback(
+      async () => (await api.pongLogControllerGetRanking()).data,
+      [api],
+    ),
+  );
+
   return (
     <div>
       <RankingCard
@@ -12,15 +24,18 @@ export function Ranking() {
         isUser={true}
       />
       <div className={'max-w-[620px] mx-auto'}>
-        {mockRankings.map((item) => (
-          <RankingCard
-            key={item.id}
-            rank={item.rank}
-            name={item.name}
-            avatar={item.avatar}
-            isUser={false}
-          />
-        ))}
+        {data &&
+          data
+            .slice(0, 5)
+            .map((item) => (
+              <RankingCard
+                key={item.id}
+                rank={item.rank}
+                name={item.user.nickname}
+                avatar={item.user.profileImageUrl}
+                isUser={false}
+              />
+            ))}
       </div>
     </div>
   );

@@ -1,4 +1,11 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpException,
+  Logger,
+  Param,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiForbiddenResponse,
@@ -20,6 +27,7 @@ import { PongLogService } from './pong-log.service';
 @ApiTags('pong-log')
 @Controller('/api/v1/pong-log')
 export class PongLogController {
+  private logger = new Logger('PongLogController');
   constructor(private readonly pongLogService: PongLogService) {}
 
   @Get('rank')
@@ -73,6 +81,10 @@ export class PongLogController {
   @Phase('complete')
   async getUserGameHistories(@Param() param: FindOneParam) {
     const { id } = param;
-    return await this.pongLogService.getUserGameHistories(idOf(id));
+    const result = await this.pongLogService.getUserGameHistories(idOf(id));
+    if (!result.ok) {
+      throw new HttpException(result.error!.message, result.error!.statusCode);
+    }
+    return result.data!;
   }
 }

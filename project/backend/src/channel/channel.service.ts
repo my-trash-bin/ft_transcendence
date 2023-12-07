@@ -14,21 +14,21 @@ import { PrismaService } from '../base/prisma.service';
 import { ChannelId, UserId } from '../common/Id';
 import { ServiceError } from '../common/ServiceError';
 import {
-  ServiceResponse,
   newServiceFailPrismaUnKnownResponse,
   newServiceFailResponse,
   newServiceFailUnhandledResponse,
   newServiceOkResponse,
+  ServiceResponse,
 } from '../common/ServiceResponse';
 import { DmService } from '../dm/dm.service';
 import { MessageWithMemberDto } from '../dm/dto/message-with-member';
 import { UserDto, userDtoSelect } from '../users/dto/user.dto';
 import {
-  IsForeignKeyConstraintFailError,
-  IsRecordToUpdateNotFoundError,
   createPrismaErrorMessage,
+  IsForeignKeyConstraintFailError,
   isPrismaUnknownError,
   isRecordNotFoundError,
+  IsRecordToUpdateNotFoundError,
   isUniqueConstraintError,
 } from '../util/prismaError';
 import { ChangeMemberStatusResultDto } from './dto/change-member-status-result.dto';
@@ -382,6 +382,9 @@ export class ChannelService {
       );
       return newServiceOkResponse(result);
     } catch (error) {
+      if (error instanceof ServiceError) {
+        return { ok: false, error };
+      }
       if (
         IsRecordToUpdateNotFoundError(error) ||
         isRecordNotFoundError(error)

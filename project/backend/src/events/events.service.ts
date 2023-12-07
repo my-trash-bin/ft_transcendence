@@ -1,13 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { WsException } from '@nestjs/websockets';
 import { ChangeActionType, ChannelService } from '../channel/channel.service';
-import { ChannelId, ClientId, UserId, idOf } from '../common/Id';
+import { ChannelId, ClientId, idOf, UserId } from '../common/Id';
 import { DmService } from '../dm/dm.service';
 import { UserFollowService } from '../user-follow/user-follow.service';
 import { UsersService } from '../users/users.service';
 // import { ChatRoomDto, ChatRoomStatusDto } from './chat.dto'
 import { Server, Socket } from 'socket.io';
 import { ChangeMemberStatusResultDto } from '../channel/dto/change-member-status-result.dto';
+import { JoinedChannelInfoDto } from '../channel/dto/joined-channel-info.dto';
 import { LeavingChannelResponseDto } from '../channel/dto/leave-channel-response.dto';
 import { GateWayEvents } from '../common/gateway-events.enum';
 import { MessageWithMemberDto } from '../dm/dto/message-with-member';
@@ -320,7 +321,9 @@ export class EventsService {
     if (!(channelId.value in this.channels[type])) {
       this.channels[type][channelId.value] = new Set();
     }
+    const isNewUser = !(userId.value in this.channels[type][channelId.value]);
     this.channels[type][channelId.value].add(userId.value);
+    return isNewUser;
   }
 
   handleUserLeaveChannel(
@@ -336,6 +339,58 @@ export class EventsService {
   handleNotificationToUser(userId: UserId, data: any) {
     const eventName = GateWayEvents.Notification;
     this.broadcastToUserClients(userId, eventName, data);
+  }
+
+  onJoinByApi(
+    type: ChannelRoomType,
+    channelId: ChannelId,
+    userId: UserId,
+    data: JoinedChannelInfoDto,
+  ) {
+    const isNewUser = this.handleUserJoinChannel(type, channelId, userId);
+
+    if (isNewUser) {
+      const eventName = GateWayEvents.Join;
+      this.broadcastToChannel(type, channelId, [], eventName, {
+        type: eventName,
+        data,
+      });
+    }
+  }
+
+  onLeaveByApi(
+    type: ChannelRoomType,
+    channelId: ChannelId,
+    userId: UserId,
+    data: LeavingChannelResponseDto,
+  ) {
+    this.handleUserLeaveChannel(type, channelId, userId);
+
+    const eventName = GateWayEvents.Leave;
+    this.broadcastToChannel(type, channelId, [], eventName, {
+      type: eventName,
+      data,
+    });
+  }
+
+  onKickBanPromoteByApi(
+    type: ChannelRoomType,
+    channelId: ChannelId,
+    userId: UserId,
+    actionType: ChangeActionType,
+    data: ChangeMemberStatusResultDto,
+  ) {
+    if ([ChangeActionType.BANNED, ChangeActionType.KICK].includes(actionType)) {
+      this.handleUserLeaveChannel(type, channelId, userId);
+    }
+    const eventName = GateWayEvents.KickBanPromote;
+    this.broadcastToChannel(type, channelId, [], eventName, {
+      type: eventName,
+      data: {
+        ...data,
+        actionType,
+      },
+    });
   }
 
   private getAllOnlineUsers = () => {
