@@ -165,7 +165,7 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
         className="relative w-[75px] h-[30px]"
       >
         {isHovered && !disabled ? (
-          <div className="absolute bottom-[-15px]">
+          <div className="flex absolute left-[-30px]">
             <Button isModal={true} onClick={() => startNormal()}>
               {'일반모드'}
             </Button>
