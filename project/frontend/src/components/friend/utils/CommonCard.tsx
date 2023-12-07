@@ -3,6 +3,7 @@ import { ReactNode, useEffect, useState } from 'react';
 import FriendAvatar from './FriendAvatar';
 import FriendInvite from '@/components/game/FriendInvite';
 import { getSocket } from '@/lib/Socket';
+import { LiveStatus } from '@/components/common/LiveStatus';
 
 interface CommonCardProps {
   readonly children: ReactNode;
@@ -22,32 +23,6 @@ export function CommonCard({
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [gameMode, setGameMode] = useState<'normal' | 'item'>('normal');
-  const [active, setActive] = useState<'online' | 'offline' | 'on game'>(
-    'offline',
-  );
-  const socket = getSocket();
-  const activeColor =
-    active === 'online'
-      ? 'bg-default border-1 border-dark-purple'
-      : active === 'offline'
-      ? 'bg-gray'
-      : 'bg-dark-purple';
-  const handleStatus = (data: { status: string; userId: string }) => {
-    console.log('status', data.status, 'userId', data.userId);
-    if (id === data.userId && data.status === 'online') {
-      setActive('online');
-    }
-    if (id === data.userId && data.status === 'offline') {
-      setActive('offline');
-    }
-  };
-
-  useEffect(() => {
-    socket.on('userStatus', handleStatus);
-    return () => {
-      socket.off('userStatus', handleStatus);
-    };
-  }, []);
 
   const handleProfileClose = () => {
     setIsProfileOpen(false);
@@ -72,10 +47,7 @@ export function CommonCard({
         <div className="text-left text-black text-h3  font-light font-agro">
           {nickname}
         </div>
-        <div className="flex flex-row items-center gap-sm">
-          <div className={`w-[10px] h-[10px] rounded-[10px] ${activeColor}`} />
-          <p className="text-sm">{active}</p>
-        </div>
+        <LiveStatus targetId={id} />
       </div>
       <div className="absolute right-xl flex items-center">{children}</div>
       <ProfileModal
