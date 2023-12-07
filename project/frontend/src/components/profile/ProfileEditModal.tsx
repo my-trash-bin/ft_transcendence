@@ -53,7 +53,7 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
         password: password,
       });
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       if (error.status === 400) {
         alert(
           '비밀번호는 6-12자의 영문, 숫자, 하이픈(-), 언더스코어(_)만 사용 가능합니다',
