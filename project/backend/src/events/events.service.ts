@@ -201,6 +201,13 @@ export class EventsService {
 
     const data: MessageWithMemberDto = result.data!;
 
+    this.handleUserJoinChannel(
+      ChannelRoomType.DM,
+      idOf(channelId),
+      idOf(userId),
+    );
+    this.handleUserJoinChannel(ChannelRoomType.DM, idOf(channelId), toId);
+
     this.broadcastToChannel(type, idOf(channelId), blockedIdList, eventName, {
       type: eventName,
       data,
