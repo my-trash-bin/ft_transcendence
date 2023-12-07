@@ -147,7 +147,7 @@ export class UsersController {
 
     const stats = this.pongLogService.makeStats2(
       userId,
-      userGameHistories.data!,
+      userGameHistories.data!.records,
     );
 
     return new UserProfileDto({
