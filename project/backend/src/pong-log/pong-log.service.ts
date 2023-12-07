@@ -15,13 +15,14 @@ import {
   isUniqueConstraintError,
 } from '../util/prismaError';
 import { HistoryStaticDto } from './dto/history-static.dto';
+import { PongLogHistoryResponse } from './dto/pong-log-history-response.dto';
+import { PongLogRankingRecordDto } from './dto/pong-log-ranking-record.dto';
 import { PongLogStatDto } from './dto/pong-log-stat.dto';
 import {
   PongGameHistoryWithPlayerType,
   PongLogDtoWithPlayerDto,
 } from './dto/pong-log-with-player.dto';
 import { PongLogDto } from './dto/pong-log.dto';
-import { PongLogRankingRecordDto } from './dto/pong-long-ranking-record.dto';
 
 @Injectable()
 export class PongLogService {
@@ -30,7 +31,7 @@ export class PongLogService {
 
   async getUserGameHistories(
     id: UserId,
-  ): Promise<ServiceResponse<PongLogDtoWithPlayerDto[]>> {
+  ): Promise<ServiceResponse<PongLogHistoryResponse>> {
     try {
       const gameHistories: PongGameHistoryWithPlayerType[] =
         await this.prisma.pongGameHistory.findMany({
@@ -43,9 +44,11 @@ export class PongLogService {
             createdAt: 'desc',
           },
         });
-
-      const result = gameHistories.map((el) => new PongLogDtoWithPlayerDto(el));
-      return newServiceOkResponse(result);
+      const records = gameHistories.map(
+        (el) => new PongLogDtoWithPlayerDto(el),
+      );
+      const stats = this.makeStats2(id, gameHistories);
+      return newServiceOkResponse({ records, stats });
     } catch (error) {
       this.logger.debug(`히스토리 조회과정에서 에러 발생: ${error}`);
       return newServiceFailUnhandledResponse(400);
@@ -175,9 +178,12 @@ export class PongLogService {
     const ranking = users.map((user) => ({
       user: new UserDto(user),
       ...this.makeStats(user.pongGameHistory1, user.pongGameHistory2),
+      rank: 0,
     }));
 
-    ranking.sort((a, b) => b.winRate - a.winRate || b.wins - a.wins);
+    ranking.sort((a, b) => b.wins - a.wins || b.winRate - a.winRate);
+
+    ranking.forEach((r, i) => (r.rank = i + 1));
 
     return ranking;
   }

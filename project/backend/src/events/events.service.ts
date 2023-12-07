@@ -8,10 +8,11 @@ import { UsersService } from '../users/users.service';
 // import { ChatRoomDto, ChatRoomStatusDto } from './chat.dto'
 import { Server, Socket } from 'socket.io';
 import { ChangeMemberStatusResultDto } from '../channel/dto/change-member-status-result.dto';
+import { LeavingChannelResponseDto } from '../channel/dto/leave-channel-response.dto';
 import { GateWayEvents } from '../common/gateway-events.enum';
 import { MessageWithMemberDto } from '../dm/dto/message-with-member';
 import { UserDto } from '../users/dto/user.dto';
-import { DmChannelInfoType, LeavingChannelInfo } from './event-response.dto';
+import { DmChannelInfoType } from './event-response.dto';
 import { UserSocket } from './events.gateway';
 
 export enum ChannelRoomType {
@@ -248,7 +249,7 @@ export class EventsService {
     this.handleUserLeaveChannel(type, channelId, idOf(userId));
 
     const eventName = GateWayEvents.Leave;
-    const data: LeavingChannelInfo = result.data!;
+    const data: LeavingChannelResponseDto = result.data!;
     this.broadcastToChannel(type, channelId, [], eventName, {
       type: eventName,
       data,

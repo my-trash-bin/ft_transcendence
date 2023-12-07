@@ -6,7 +6,8 @@ import {
   Logger,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ChannelMemberType } from '@prisma/client';
+import { ChannelMemberType, Prisma, PrismaClient } from '@prisma/client';
+import { DefaultArgs } from '@prisma/client/runtime/library';
 import * as bcrypt from 'bcrypt';
 import { scrypt } from 'crypto';
 import { PrismaService } from '../base/prisma.service';
@@ -21,7 +22,6 @@ import {
 } from '../common/ServiceResponse';
 import { DmService } from '../dm/dm.service';
 import { MessageWithMemberDto } from '../dm/dto/message-with-member';
-import { LeavingChannelInfo } from '../events/event-response.dto';
 import { UserDto, userDtoSelect } from '../users/dto/user.dto';
 import {
   IsForeignKeyConstraintFailError,
@@ -43,6 +43,7 @@ import { ChannelWithAllInfoDto } from './dto/channel-with-all-info.dto';
 import { ChannelWithMembersDto } from './dto/channel-with-members.dto';
 import { ChannelDto, channelDtoSelect } from './dto/channel.dto';
 import { JoinedChannelInfoDto } from './dto/joined-channel-info.dto';
+import { LeavingChannelResponseDto } from './dto/leave-channel-response.dto';
 
 export enum ChangeActionType {
   KICK = 'KICK',
@@ -71,6 +72,11 @@ export type JoinChannelInfoType = {
     };
   }[];
 };
+
+export type TransactionPrismaType = Omit<
+  PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
+  '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'
+>;
 
 @Injectable()
 export class ChannelService {
@@ -226,7 +232,7 @@ export class ChannelService {
     inputPassword?: string | null,
   ): Promise<ServiceResponse<JoinedChannelInfoDto>> {
     try {
-      const info = await this.prismaService.$transaction(async (prisma) => {
+      await this.prismaService.$transaction(async (prisma) => {
         const channel = await this.prismaService.channel.findUnique({
           where: { id: channelId.value },
         });
@@ -248,7 +254,7 @@ export class ChannelService {
         });
 
         if (this.isUserInChannel(channelMember)) {
-          return; // 이미 들어가 있는 사용자 => 채널 정보만 리턴.
+          return; // 이미 들어가 있으면 패스 => 데이터만 전달
         }
 
         if (channelMember?.memberType === ChannelMemberType.BANNED) {
@@ -287,9 +293,11 @@ export class ChannelService {
         });
       });
 
-      return newServiceOkResponse(
-        await this.getJoinedChannelInfo(id, channelId),
+      const data = await this.getJoinedChannelInfo(id, channelId); // 참가한 채널의 정보 리턴
+      this.logger.log(
+        `joinChannel 성공: 유저 ${id.value}, 채널: ${channelId.value}`,
       );
+      return newServiceOkResponse(data);
     } catch (error) {
       if (error instanceof ServiceError) {
         this.logger.debug(
@@ -311,7 +319,7 @@ export class ChannelService {
   async leaveChannel(
     id: UserId,
     channelId: ChannelId,
-  ): Promise<ServiceResponse<LeavingChannelInfo>> {
+  ): Promise<ServiceResponse<LeavingChannelResponseDto>> {
     try {
       const result = await this.prismaService.$transaction(async (prisma) => {
         const channelMember = await prisma.channelMember.findUnique({
@@ -369,6 +377,9 @@ export class ChannelService {
           member: new UserDto(channelMember!.member),
         };
       });
+      this.logger.log(
+        `leaveChannel 성공: 유저 ${id.value}, 채널: ${channelId.value}`,
+      );
       return newServiceOkResponse(result);
     } catch (error) {
       if (
@@ -377,6 +388,7 @@ export class ChannelService {
       ) {
         return newServiceFailResponse(createPrismaErrorMessage(error), 500); // prisma.channel.update 과정에서 병렬실행으로 인해 에러가 날 수도, 어쨋든 내부에러니 500
       }
+      this.logger.error(error);
       return newServiceFailUnhandledResponse(500);
     }
   }
@@ -472,7 +484,7 @@ export class ChannelService {
 
         // 7. 수행
         if (actionType === ChangeActionType.KICK) {
-          await this.kickUser(channelId, targetId);
+          await this.kickUser(channelId, targetId, prisma);
         } else {
           const memberType =
             actionType === ChangeActionType.BANNED
@@ -489,6 +501,7 @@ export class ChannelService {
             targetId,
             memberType,
             mutedUntil,
+            prisma,
           );
         }
         return {
@@ -498,6 +511,9 @@ export class ChannelService {
           actionType,
         };
       });
+      this.logger.log(
+        `changeMemberStatus 성공: 유저 ${id.value}, 채널: ${channelId.value}, 타겟: ${targetId.value}, 액션: ${actionType}`,
+      );
       return newServiceOkResponse(result);
     } catch (error) {
       if (error instanceof ServiceError) {
@@ -509,6 +525,7 @@ export class ChannelService {
       ) {
         throw new BadRequestException(createPrismaErrorMessage(error));
       }
+      this.logger.error(error);
       return newServiceFailUnhandledResponse(500);
     }
   }
@@ -520,37 +537,36 @@ export class ChannelService {
   ): Promise<ServiceResponse<MessageWithMemberDto>> {
     try {
       const result = await this.prismaService.$transaction(async (prisma) => {
-        const prismaChannel = await prisma.channel.findUnique({
+        const channel = await prisma.channel.findUnique({
           where: { id: channelId.value },
-          select: {
-            id: true,
-            members: {
-              where: {
-                channelId: channelId.value,
-                memberId: userId.value,
-              },
-              select: {
-                channelId: true,
-                memberId: true,
-                memberType: true,
-                mutedUntil: true,
-              },
-              take: 1,
-            },
-          },
         });
         // 1. 올바른 채널 ID
-        if (prismaChannel === null) {
+        if (channel === null) {
           throw new ServiceError('유효하지 않은 channelId', 400);
         }
         // 2. 방에 속한 유저만이 행동 할 수 있다.
-        const user = prismaChannel.members ? prismaChannel.members[0] : null;
-        if (!user || user.memberType === ChannelMemberType.BANNED) {
-          throw new ServiceError('채널에 속하지 않은 유저입니다.', 400);
+        const channelMember = await prisma.channelMember.findUnique({
+          where: {
+            channelId_memberId: {
+              channelId: channelId.value,
+              memberId: userId.value,
+            },
+          },
+          include: {
+            member: true,
+          },
+        });
+
+        if (!this.isUserInChannel(channelMember)) {
+          throw new ServiceError(
+            '채널에 속하지 않은 유저는 메시지를 보낼 수 없습니다.',
+            400,
+          );
         }
-        if (new Date(user.mutedUntil) > new Date()) {
+        if (new Date(channelMember!.mutedUntil) > new Date()) {
           throw new ServiceError('뮤트 상태의 유저입니다.', 400);
         }
+
         return await prisma.channelMessage.create({
           data: {
             channelId: channelId.value,
@@ -879,9 +895,10 @@ export class ChannelService {
   private async kickUser(
     channelId: ChannelId,
     targetId: UserId,
+    prisma?: TransactionPrismaType,
   ): Promise<ServiceResponse<ChannelMemberDetailDto>> {
     try {
-      const result = await this.prismaService.channelMember.delete({
+      const result = await (prisma ?? this.prismaService).channelMember.delete({
         where: {
           channelId_memberId: {
             channelId: channelId.value,
@@ -917,9 +934,10 @@ export class ChannelService {
     targetId: UserId,
     memberType: ChannelMemberType | undefined,
     mutedUntil: Date | undefined,
+    prisma?: TransactionPrismaType,
   ): Promise<ServiceResponse<ChannelMemberDetailDto>> {
     try {
-      const result = await this.prismaService.channelMember.update({
+      const result = await (prisma ?? this.prismaService).channelMember.update({
         where: {
           channelId_memberId: {
             channelId: channelId.value,
