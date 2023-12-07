@@ -24,14 +24,17 @@ export class NotificationController {
 
   @Post()
   @ApiOperation({ summary: '유저에게 알림 하나 생성' })
-  @ApiOkResponse({ description: '알림 생성 성공', type: NotificationDto })
+  @ApiOkResponse({ description: '알림 생성 성공', type: () => NotificationDto })
   @UseGuards(JwtGuard, PhaseGuard)
   @Phase('complete')
   async create(@Req() req: ExpressRequest, @Body() dto: CreateNotificationDto) {
     const { id } = req.user as JwtPayloadPhaseComplete;
     const { contentJson } = dto;
     const result = await this.notificationService.create(id, contentJson);
-    return result;
+    if (!result.ok) {
+      throw new HttpException(result.error!.message, result.error!.statusCode);
+    }
+    return result.data!;
   }
 
   @Get()
