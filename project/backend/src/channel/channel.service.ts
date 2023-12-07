@@ -13,22 +13,22 @@ import { PrismaService } from '../base/prisma.service';
 import { ChannelId, UserId } from '../common/Id';
 import { ServiceError } from '../common/ServiceError';
 import {
+  ServiceResponse,
   newServiceFailPrismaUnKnownResponse,
   newServiceFailResponse,
   newServiceFailUnhandledResponse,
   newServiceOkResponse,
-  ServiceResponse,
 } from '../common/ServiceResponse';
 import { DmService } from '../dm/dm.service';
 import { MessageWithMemberDto } from '../dm/dto/message-with-member';
 import { LeavingChannelInfo } from '../events/event-response.dto';
 import { UserDto, userDtoSelect } from '../users/dto/user.dto';
 import {
-  createPrismaErrorMessage,
   IsForeignKeyConstraintFailError,
+  IsRecordToUpdateNotFoundError,
+  createPrismaErrorMessage,
   isPrismaUnknownError,
   isRecordNotFoundError,
-  IsRecordToUpdateNotFoundError,
   isUniqueConstraintError,
 } from '../util/prismaError';
 import { ChangeMemberStatusResultDto } from './dto/change-member-status-result.dto';
@@ -248,7 +248,7 @@ export class ChannelService {
         });
 
         if (this.isUserInChannel(channelMember)) {
-          return await this.getJoinedChannelInfo(id, channelId); // 이미 들어가 있는 사용자 => 채널 정보만 리턴.
+          return; // 이미 들어가 있는 사용자 => 채널 정보만 리턴.
         }
 
         if (channelMember?.memberType === ChannelMemberType.BANNED) {
@@ -285,10 +285,11 @@ export class ChannelService {
             },
           },
         });
-        return await this.getJoinedChannelInfo(id, channelId); // 참가한 채널의 정보 리턴
       });
 
-      return newServiceOkResponse(info);
+      return newServiceOkResponse(
+        await this.getJoinedChannelInfo(id, channelId),
+      );
     } catch (error) {
       if (error instanceof ServiceError) {
         this.logger.debug(
