@@ -1,7 +1,7 @@
 'use client';
 import { Button } from '@/components/common/Button';
 import FriendAvatar from '@/components/friend/utils/FriendAvatar';
-import { useCallback, useContext, useEffect } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { ModalLayout } from '../channel/modals/ModalLayout';
@@ -9,12 +9,14 @@ import { Loading } from '../common/Loading';
 import { TextBox } from './TextBox';
 import { CardType, HistoryCard } from './history/HistoryCard';
 import { LongCard } from '../common/LongCard';
+import { useRouter } from 'next/navigation';
 
 interface ModalProfileProps {
   isOpen: boolean;
   onClose: () => void;
   targetId: string;
   readonly refetchPage?: () => Promise<unknown>;
+  openInvite: () => void;
 }
 
 export const ProfileModal: React.FC<ModalProfileProps> = ({
@@ -22,8 +24,10 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
   onClose,
   targetId,
   refetchPage,
+  openInvite,
 }) => {
   const { api } = useContext(ApiContext);
+  const router = useRouter();
   const {
     isLoading: userInfoLoading,
     isError: userInfoError,
@@ -125,7 +129,7 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
       content = '나';
     } else {
       content = '게임하기';
-      handler = () => alert('game api');
+      handler = () => openInvite();
     }
     return (
       <Button
@@ -147,7 +151,7 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
       content = '나';
     } else {
       content = 'DM';
-      handler = () => alert('move to dm');
+      handler = () => router.push(`/dm/${userInfoData.nickname}`);
     }
     return (
       <Button
@@ -257,7 +261,7 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
     }
 
     return (
-      <div className="p-xl flex flex-col gap-md">
+      <div className="p-xl flex flex-col gap-md z-[10]">
         <div className="flex felx-row gap-xl">
           <FriendAvatar imageUrl={userInfoData.imageUrl} size={80} />
           <TextBox

@@ -94,8 +94,42 @@ export class EventsGateway
     }
   }
 
+  private async storeGameStateToDB(gameState: GameState, pong: Pong): Promise<void> {
+    try {
+      await this.prisma.pongGameHistory.create({
+        data: {
+          player1Id: pong.player1Id,
+          player2Id: pong.player2Id,
+          player1Score: gameState.score1,
+          player2Score: gameState.score2,
+          isPlayer1win: gameState.score1 > gameState.score2,
+        },
+      });
+      console.log('Game state saved to DB');
+    } catch (error) {
+      console.error('Failed to save game state to DB:', error);
+    }
+  }
+
+  // 연결 끊김: 게임중이었으면 상대방에게 연결 종료 알림, DB에 게임 기록 저장
   async handleDisconnect(client: Socket) {
     this.logger.log(`Client disconnected: ${client.id}`);
+
+    if (this.pongMap.has(client.data.userId)) {
+      const pong = this.pongMap.get(client.data.userId);
+
+      if (pong && pong.getGameState().gameStart) {
+        await this.storeGameStateToDB(pong.getGameState(), pong);
+
+        const opponentId = client.data.userId === pong.player1Id ? pong.player2Id : pong.player1Id;
+        const opponentPong = this.pongMap.get(opponentId);
+        if (opponentPong) {
+          this.server.to(opponentId).emit('opponentDisconnected');
+        }
+        this.pongMap.delete(client.data.userId);
+        this.pongMap.delete(opponentId);
+      }
+    }
     this.eventsService.handleDisconnect(client);
   }
 
@@ -183,10 +217,120 @@ export class EventsGateway
     this.tryItemMatch();
   }
 
-  // 초대 로직 (나중에!)
-  // @SubscribeMessage('inviteToMatch')
-  // handleInviteToMatch(@MessageBody() data: { inviteeId: string }, @ConnectedSocket() client: Socket) {
-  // }
+  // 초대 상태 관리를 위한 맵
+  private activeInvitations = new Map<string, { inviterId: string, inviterSocket: Socket, inviteeSocket: Socket | undefined, timeout: NodeJS.Timeout }>();
+
+  // 초대 요청 처리
+  @SubscribeMessage('inviteNormalMatch')
+  async handleInviteNormalMatch(
+    @ConnectedSocket() client: UserSocket,
+    @MessageBody() data: { friendId: string },
+  ) {
+    const { friendId } = data;
+    const friendSocket = this.findSocketByUserId(friendId);
+    if (friendSocket) {
+      friendSocket.emit('invitedNormalMatch', {
+        inviterId: client.data.userId,
+        mode: 'normal',
+      });
+
+      const timeout = setTimeout(() => {
+        this.handleAutomaticDecline(friendId, client.data.userId);
+      }, 30000);
+
+      this.activeInvitations.set(friendId, { inviterId: client.data.userId, inviterSocket: client, inviteeSocket: friendSocket, timeout });
+    } else {
+      client.emit('friendOffline');
+    }
+  }
+
+  @SubscribeMessage('inviteItemMatch')
+  async handleInviteItemMatch(
+    @ConnectedSocket() client: UserSocket,
+    @MessageBody() data: { friendId: string },
+  ) {
+    const { friendId } = data;
+    const friendSocket = this.findSocketByUserId(friendId);
+    if (friendSocket) {
+      friendSocket.emit('invitedItemMatch', {
+        inviterId: client.data.userId,
+        mode: 'item',
+      });
+
+      const timeout = setTimeout(() => {
+        this.handleAutomaticDecline(friendId, client.data.userId);
+      }, 30000);
+
+      this.activeInvitations.set(friendId, { inviterId: client.data.userId, inviterSocket: client, inviteeSocket: friendSocket, timeout });
+    } else {
+      client.emit('friendOffline');
+    }
+  }
+
+  // 초대 수락 처리
+  @SubscribeMessage('acceptNormalMatch')
+  async handleAcceptNormalMatch(
+    @ConnectedSocket() client: UserSocket,
+    @MessageBody() data: { inviterId: string },
+  ) {
+    const { inviterId } = data;
+    const invitation = this.activeInvitations.get(inviterId);
+    if (invitation) {
+      clearTimeout(invitation.timeout);
+      this.activeInvitations.delete(inviterId);
+
+      const inviterSocket = invitation.inviterSocket;
+      if (inviterSocket) {
+        this.createGameRoom(client, inviterSocket, false);
+      } else {
+        client.emit('friendIsOffline');
+      }
+    }
+  }
+
+  @SubscribeMessage('acceptItemMatch')
+  async handleAcceptItemMatch(
+    @ConnectedSocket() client: UserSocket,
+    @MessageBody() data: { inviterId: string },
+  ) {
+    const { inviterId } = data;
+    const invitation = this.activeInvitations.get(inviterId);
+    if (invitation) {
+      clearTimeout(invitation.timeout);
+      this.activeInvitations.delete(inviterId);
+
+      const inviterSocket = invitation.inviterSocket;
+      if (inviterSocket) {
+        this.createGameRoom(client, inviterSocket, true);
+      } else {
+        client.emit('friendIsOffline');
+      }
+    }
+  }
+
+  private handleAutomaticDecline(friendId: string, inviterId: string) {
+    const invitation = this.activeInvitations.get(friendId);
+    if (invitation && invitation.inviterId === inviterId) {
+      this.activeInvitations.delete(friendId);
+
+      const inviterSocket = invitation.inviterSocket;
+      if (inviterSocket) {
+        inviterSocket.emit('inviteDeclined', { userId: friendId });
+      }
+    }
+  }
+
+  private findSocketByUserId(userId: string): Socket | undefined {
+    for (let [key, value] of this.activeInvitations) {
+      if (value.inviterId === userId) {
+        return value.inviterSocket;
+      }
+      if (key === userId) {
+        return value.inviteeSocket;
+      }
+    }
+    return undefined;
+  }
 
   private normalMatchQueue = new Set<Socket>();
   private itemMatchQueue = new Set<Socket>();
@@ -334,6 +478,7 @@ export class EventsGateway
     const jwtKeyValue = cookieKeyValues.find((el) => el[0] === key);
     return jwtKeyValue !== undefined ? jwtKeyValue[1] : null;
   };
+
   private isValidJwtAndPhase = (client: UserSocket) => {
     if (client.handshake.headers.cookie === undefined) {
       throw new WsException(
