@@ -5,7 +5,7 @@ import { Title } from '@/components/common/Title';
 import { useRouter } from 'next/navigation';
 import { useCallback, useContext } from 'react';
 import { useQuery } from 'react-query';
-import { HistoryCard } from './HistoryCard';
+import { CardType, HistoryCard } from './HistoryCard';
 
 export function HistoryBox() {
   const router = useRouter();
@@ -29,9 +29,7 @@ export function HistoryBox() {
         <Button onClick={() => router.push('/profile/history')} size={'big'}>
           더보기
         </Button>
-        <div className="flex flex-col h-[500px] mt-xl w-[90%] overflow-y-scroll">
-          {render()}
-        </div>
+        <div className="flex flex-col h-[400px] mt-xl w-[90%]">{render()}</div>
       </div>
     </div>
   );
@@ -43,13 +41,13 @@ export function HistoryBox() {
       return <p className="text-center">Something went wrong</p>;
     }
 
-    if (data.data.length === 0) {
+    if (data.data.records.length === 0) {
       return <p className="text-center">아직 게임 히스토리가 없습니다.</p>;
     }
 
     return (
-      <div className="flex flex-col items-center w-[80%] h-[500px] overflow-y-scroll">
-        {data.data.map((history) => (
+      <div className="flex flex-col items-center w-[100%] h-[400px] overflow-y-scroll">
+        {data.data.records.map((history: any) => (
           <HistoryCard
             key={history.id}
             user1Name={history.player1.nickname}
@@ -58,6 +56,7 @@ export function HistoryBox() {
             user2Avatar={history.player2.profileImageUrl}
             user1Score={history.player1Score}
             user2Score={history.player2Score}
+            type={CardType.Small}
           />
         ))}
       </div>
