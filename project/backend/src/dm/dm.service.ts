@@ -227,6 +227,24 @@ export class DmService {
     }
   }
 
+  async canSendDm(nickname: string, userId: string) {
+    try {
+      const targetUser = await this.prisma.user.findUniqueOrThrow({
+        where: { nickname },
+      });
+      if (!targetUser) return false;
+      const blockList = await this.getBlockUserList(userId);
+      const isBlock = blockList.find((el) => el.followeeId === targetUser.id);
+      if (isBlock) return false;
+      return true;
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        return false;
+      }
+      return false;
+    }
+  }
+
   private async getDmMessages(channelIdList: string[]) {
     return await this.prisma.$queryRaw`SELECT DISTINCT ON ("channelId") *
     FROM "DMMessage"

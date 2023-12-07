@@ -26,14 +26,14 @@ export function SelectPenalty({
           text="kick"
           width="40px"
           height="25px"
-          classStyle="text-[11px] bg-pink-500"
+          classStyle="text-[11px] bg-ball-pink"
         ></ChannelButton>
         <ChannelButton
           onClick={handleBan}
           text="ben"
           width="40px"
           height="25px"
-          classStyle="text-[11px] bg-pink-500"
+          classStyle="text-[11px] bg-ball-pink"
         ></ChannelButton>
       </div>
       <div>
@@ -42,7 +42,7 @@ export function SelectPenalty({
           text="mute"
           width="40px"
           height="25px"
-          classStyle="text-[11px] bg-pink-500"
+          classStyle="text-[11px] bg-ball-pink"
         ></ChannelButton>
         <ChannelButton
           onClick={handlePromote}

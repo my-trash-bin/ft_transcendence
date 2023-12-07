@@ -61,14 +61,14 @@ export function AllChannelList({ searchChannel }: { searchChannel: string }) {
 
   return (
     <>
-      <Portal selector={'#modal-channel'}>
+      <Portal selector={'#backdrop-root'}>
         <EnterPasswordModal
           isModalOpen={isPasswordModalOpen}
           setIsModalOpen={setPasswordModalOpen}
           targetChannelId={selectedChannelId}
         />
       </Portal>
-      <Portal selector={'#modal-channel'}>
+      <Portal selector={'#backdrop-root'}>
         <ParticipationModal
           isModalOpen={isParticipationModalOpen}
           setIsModalOpen={setParticipationModalOpen}

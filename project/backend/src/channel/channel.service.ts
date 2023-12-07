@@ -14,21 +14,21 @@ import { PrismaService } from '../base/prisma.service';
 import { ChannelId, UserId } from '../common/Id';
 import { ServiceError } from '../common/ServiceError';
 import {
+  ServiceResponse,
   newServiceFailPrismaUnKnownResponse,
   newServiceFailResponse,
   newServiceFailUnhandledResponse,
   newServiceOkResponse,
-  ServiceResponse,
 } from '../common/ServiceResponse';
 import { DmService } from '../dm/dm.service';
 import { MessageWithMemberDto } from '../dm/dto/message-with-member';
 import { UserDto, userDtoSelect } from '../users/dto/user.dto';
 import {
-  createPrismaErrorMessage,
   IsForeignKeyConstraintFailError,
+  IsRecordToUpdateNotFoundError,
+  createPrismaErrorMessage,
   isPrismaUnknownError,
   isRecordNotFoundError,
-  IsRecordToUpdateNotFoundError,
   isUniqueConstraintError,
 } from '../util/prismaError';
 import { ChangeMemberStatusResultDto } from './dto/change-member-status-result.dto';
@@ -108,7 +108,10 @@ export class ChannelService {
   async findByUser(id: UserId) {
     const prismaChannelRelations =
       await this.prismaService.channelMember.findMany({
-        where: { memberId: id.value },
+        where: {
+          memberId: id.value,
+          memberType: { not: ChannelMemberType.BANNED },
+        },
         select: {
           memberType: true,
           mutedUntil: true,
@@ -699,6 +702,7 @@ export class ChannelService {
       const result = await this.prismaService.channelMember.findMany({
         where: {
           channelId: channelId.value,
+          memberType: { not: ChannelMemberType.BANNED },
         },
         include: {
           member: {
@@ -824,6 +828,7 @@ export class ChannelService {
         where: {
           channelId: channelId.value,
           memberId: userId.value,
+          memberType: { not: ChannelMemberType.BANNED },
         },
       });
       if (result) return newServiceOkResponse(true);
