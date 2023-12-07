@@ -2,7 +2,6 @@
 import { Button } from '@/components/common/Button';
 import FriendAvatar from '@/components/friend/utils/FriendAvatar';
 import {
-  Dispatch,
   SetStateAction,
   useCallback,
   useContext,
@@ -24,7 +23,7 @@ interface ModalProfileProps {
   targetId: string;
   readonly refetchPage?: () => Promise<unknown>;
   openInvite: () => void;
-  setGameMode: React.Dispatch<SetStateAction<'normal' | 'item'>>; // Update prop name here
+  setGameMode: React.Dispatch<SetStateAction<'normal' | 'item'>>;
 }
 
 export const ProfileModal: React.FC<ModalProfileProps> = ({
