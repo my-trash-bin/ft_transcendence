@@ -2,7 +2,6 @@
 import { Button } from '@/components/common/Button';
 import FriendAvatar from '@/components/friend/utils/FriendAvatar';
 import {
-  Dispatch,
   SetStateAction,
   useCallback,
   useContext,
@@ -24,7 +23,7 @@ interface ModalProfileProps {
   targetId: string;
   readonly refetchPage?: () => Promise<unknown>;
   openInvite: () => void;
-  setGameMode: React.Dispatch<SetStateAction<'normal' | 'item'>>; // Update prop name here
+  setGameMode: React.Dispatch<SetStateAction<'normal' | 'item'>>;
 }
 
 export const ProfileModal: React.FC<ModalProfileProps> = ({
@@ -37,6 +36,8 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
 }) => {
   const { api } = useContext(ApiContext);
   const router = useRouter();
+  // const active = onActive ? 'Active' : 'Inactive';
+  const active = 'Active';
   const {
     isLoading: userInfoLoading,
     isError: userInfoError,
@@ -158,7 +159,7 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
         onMouseLeave={() => setIsHovered(false)}
         className="relative w-[75px] h-[30px]"
       >
-        {isHovered ? (
+        {isHovered && !disabled ? (
           <div className="absolute bottom-[-15px]">
             <Button isModal={true} onClick={() => startNormal()}>
               {'일반모드'}
@@ -298,7 +299,13 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
     return (
       <div className="p-xl flex flex-col gap-md z-[10]">
         <div className="flex felx-row gap-xl">
-          <FriendAvatar imageUrl={userInfoData.imageUrl} size={80} />
+          <div className="flex flex-col items-center gap-md">
+            <FriendAvatar imageUrl={userInfoData.imageUrl} size={80} />
+            <div className="flex flex-row items-center gap-sm">
+              <div className="w-[10px] h-[10px] rounded-[10px] bg-dark-purple" />
+              <p className="text-sm">{active}</p>
+            </div>
+          </div>
           <TextBox
             nickname={userInfoData.nickname}
             win={historyData?.stats.wins}
