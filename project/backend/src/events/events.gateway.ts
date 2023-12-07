@@ -183,10 +183,98 @@ export class EventsGateway
     this.tryItemMatch();
   }
 
-  // 초대 로직 (나중에!)
-  // @SubscribeMessage('inviteToMatch')
-  // handleInviteToMatch(@MessageBody() data: { inviteeId: string }, @ConnectedSocket() client: Socket) {
-  // }
+  // 초대 상태 관리를 위한 맵
+  private activeInvitations = new Map<string, { inviterId: string, inviterSocket: Socket, inviteeSocket: Socket | undefined, timeout: NodeJS.Timeout }>();
+
+  // 초대 요청 처리
+  @SubscribeMessage('inviteItemMatch')
+  async handleInviteItemMatch(
+    @ConnectedSocket() client: UserSocket,
+    @MessageBody() data: { friendId: string },
+  ) {
+    const { friendId } = data;
+    const friendSocket = this.findSocketByUserId(friendId);
+    if (friendSocket) {
+      friendSocket.emit('onInviteItemMatch', {
+        inviterId: client.data.userId,
+        mode: 'item',
+      });
+
+      const timeout = setTimeout(() => {
+        this.handleAutomaticDecline(friendId, client.data.userId);
+      }, 30000);
+
+      this.activeInvitations.set(friendId, { inviterId: client.data.userId, inviterSocket: client, inviteeSocket: friendSocket, timeout });
+    } else {
+      client.emit('friendIsOffline');
+    }
+  }
+
+  // 초대 수락 처리
+  @SubscribeMessage('acceptItemMatch')
+  async handleAcceptItemMatch(
+    @ConnectedSocket() client: UserSocket,
+    @MessageBody() data: { inviterId: string },
+  ) {
+    const { inviterId } = data;
+    const invitation = this.activeInvitations.get(inviterId);
+    if (invitation) {
+      clearTimeout(invitation.timeout);
+      this.activeInvitations.delete(inviterId);
+
+      const inviterSocket = invitation.inviterSocket;
+      if (inviterSocket) {
+        this.createGameRoom(client, inviterSocket, true);
+      } else {
+        client.emit('friendIsOffline');
+      }
+    }
+  }
+
+  // 초대 거절 처리
+  @SubscribeMessage('declineItemMatch')
+  async handleDeclineItemMatch(
+    @ConnectedSocket() client: UserSocket,
+    @MessageBody() data: { inviterId: string },
+  ) {
+    const { inviterId } = data;
+    const invitation = this.activeInvitations.get(inviterId);
+    if (invitation) {
+      clearTimeout(invitation.timeout);
+      this.activeInvitations.delete(inviterId);
+
+      const inviterSocket = invitation.inviterSocket;
+      if (inviterSocket) {
+        inviterSocket.emit('friendDeclineGame', { userId: client.data.userId });
+      }
+    }
+  }
+
+  // 초대 자동 거절 처리 메소드
+  private handleAutomaticDecline(friendId: string, inviterId: string) {
+    const invitation = this.activeInvitations.get(friendId);
+    if (invitation && invitation.inviterId === inviterId) {
+      this.activeInvitations.delete(friendId);
+
+      const inviterSocket = invitation.inviterSocket;
+      if (inviterSocket) {
+        inviterSocket.emit('timeOutGame', { userId: friendId });
+      }
+    }
+  }
+
+  // 특정 사용자 ID에 해당하는 소켓을 찾는 메소드
+  private findSocketByUserId(userId: string): Socket | undefined {
+    for (let [key, value] of this.activeInvitations) {
+      if (value.inviterId === userId) {
+        return value.inviterSocket;
+      }
+      if (key === userId) {
+        return value.inviteeSocket;
+      }
+    }
+    return undefined;
+  }
 
   private normalMatchQueue = new Set<Socket>();
   private itemMatchQueue = new Set<Socket>();

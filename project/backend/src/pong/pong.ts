@@ -93,12 +93,12 @@ export class Pong {
     }
 
     this.setIsItemMode(this.IsItemMode);
-    const interval = setInterval(() => {
+    const interval = setInterval(async () => {
       if (this.updateGameLogic()) {
         clearInterval(interval);
         (async () => {
           try {
-            this.prisma.pongGameHistory.create({
+            await this.prisma.pongGameHistory.create({
               data: {
                 player1Id: this.player1Id,
                 player2Id: this.player2Id,
