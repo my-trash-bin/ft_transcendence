@@ -388,6 +388,7 @@ export class ChannelService {
       ) {
         return newServiceFailResponse(createPrismaErrorMessage(error), 500); // prisma.channel.update 과정에서 병렬실행으로 인해 에러가 날 수도, 어쨋든 내부에러니 500
       }
+      this.logger.error(error);
       return newServiceFailUnhandledResponse(500);
     }
   }
@@ -524,6 +525,7 @@ export class ChannelService {
       ) {
         throw new BadRequestException(createPrismaErrorMessage(error));
       }
+      this.logger.error(error);
       return newServiceFailUnhandledResponse(500);
     }
   }
@@ -535,37 +537,36 @@ export class ChannelService {
   ): Promise<ServiceResponse<MessageWithMemberDto>> {
     try {
       const result = await this.prismaService.$transaction(async (prisma) => {
-        const prismaChannel = await prisma.channel.findUnique({
+        const channel = await prisma.channel.findUnique({
           where: { id: channelId.value },
-          select: {
-            id: true,
-            members: {
-              where: {
-                channelId: channelId.value,
-                memberId: userId.value,
-              },
-              select: {
-                channelId: true,
-                memberId: true,
-                memberType: true,
-                mutedUntil: true,
-              },
-              take: 1,
-            },
-          },
         });
         // 1. 올바른 채널 ID
-        if (prismaChannel === null) {
+        if (channel === null) {
           throw new ServiceError('유효하지 않은 channelId', 400);
         }
         // 2. 방에 속한 유저만이 행동 할 수 있다.
-        const user = prismaChannel.members ? prismaChannel.members[0] : null;
-        if (!user || user.memberType === ChannelMemberType.BANNED) {
-          throw new ServiceError('채널에 속하지 않은 유저입니다.', 400);
+        const channelMember = await prisma.channelMember.findUnique({
+          where: {
+            channelId_memberId: {
+              channelId: channelId.value,
+              memberId: userId.value,
+            },
+          },
+          include: {
+            member: true,
+          },
+        });
+
+        if (!this.isUserInChannel(channelMember)) {
+          throw new ServiceError(
+            '채널에 속하지 않은 유저는 메시지를 보낼 수 없습니다.',
+            400,
+          );
         }
-        if (new Date(user.mutedUntil) > new Date()) {
+        if (new Date(channelMember!.mutedUntil) > new Date()) {
           throw new ServiceError('뮤트 상태의 유저입니다.', 400);
         }
+
         return await prisma.channelMessage.create({
           data: {
             channelId: channelId.value,
