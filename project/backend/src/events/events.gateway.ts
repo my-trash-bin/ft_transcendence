@@ -274,7 +274,6 @@ export class EventsGateway
     }
   }
 
-  // 초대 자동 거절 처리 메소드
   private handleAutomaticDecline(friendId: string, inviterId: string) {
     const invitation = this.activeInvitations.get(friendId);
     if (invitation && invitation.inviterId === inviterId) {
@@ -287,7 +286,6 @@ export class EventsGateway
     }
   }
 
-  // 특정 사용자 ID에 해당하는 소켓을 찾는 메소드
   private findSocketByUserId(userId: string): Socket | undefined {
     for (let [key, value] of this.activeInvitations) {
       if (value.inviterId === userId) {
@@ -446,6 +444,7 @@ export class EventsGateway
     const jwtKeyValue = cookieKeyValues.find((el) => el[0] === key);
     return jwtKeyValue !== undefined ? jwtKeyValue[1] : null;
   };
+
   private isValidJwtAndPhase = (client: UserSocket) => {
     if (client.handshake.headers.cookie === undefined) {
       throw new WsException(
