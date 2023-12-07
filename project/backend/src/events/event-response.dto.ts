@@ -46,14 +46,6 @@ export type JoiningChannelInfo = {
 };
 
 export type LeavingChannelInfo = {
-  id: string;
-  title: string;
-  isPublic: boolean;
-  password: string | null;
-  createdAt: Date;
-  lastActiveAt: Date;
-  ownerId: string | null;
-  memberCount: number;
-  maximumMemberCount: number;
+  channel: ChannelDto;
   member: UserDto;
 };
