@@ -111,25 +111,35 @@ export class EventsGateway
     }
   }
 
-  // 연결 끊김: 게임중이었으면 상대방에게 연결 종료 알림, DB에 게임 기록 저장
+  private async finalizeGame(client: Socket) {
+    if (!this.pongMap.has(client.data.userId)) {
+      return;
+    }
+
+    const pong = this.pongMap.get(client.data.userId);
+    pong?.setGameOver();
+    if (!pong || !pong.getGameState().gameStart) {
+      return;
+    }
+    await this.storeGameStateToDB(pong.getGameState(), pong);
+    // 상대방에게 연결 종료 알림
+    const opponentSocketId = client.id === pong.player1SocketId ? pong.player2SocketId : pong.player1SocketId;
+    this.server.to(opponentSocketId).emit('opponentDisconnected', { userId: client.data.userId, opponentId: opponentSocketId });
+
+    this.pongMap.delete(pong.player1Id);
+    this.pongMap.delete(pong.player2Id);
+  }
+
+  @SubscribeMessage('leaveGameBoard')
+  async handleLeaveGameBoard(@ConnectedSocket() client: Socket) {
+    this.logger.log(`Client left game board: ${client.id}`);
+    await this.finalizeGame(client);
+    this.eventsService.handleDisconnect(client);
+  }
+
   async handleDisconnect(client: Socket) {
     this.logger.log(`Client disconnected: ${client.id}`);
-
-    if (this.pongMap.has(client.data.userId)) {
-      const pong = this.pongMap.get(client.data.userId);
-
-      if (pong && pong.getGameState().gameStart) {
-        await this.storeGameStateToDB(pong.getGameState(), pong);
-
-        const opponentId = client.data.userId === pong.player1Id ? pong.player2Id : pong.player1Id;
-        const opponentPong = this.pongMap.get(opponentId);
-        if (opponentPong) {
-          this.server.to(opponentId).emit('opponentDisconnected');
-        }
-        this.pongMap.delete(client.data.userId);
-        this.pongMap.delete(opponentId);
-      }
-    }
+    await this.finalizeGame(client);
     this.eventsService.handleDisconnect(client);
   }
 
@@ -416,7 +426,8 @@ export class EventsGateway
     setTimeout(() => {
       const player1Id = player1.data.userId;
       const player2Id = player2.data.userId;
-      const pong = new Pong(this.prisma, player1Id, player2Id, mode, () => {
+      const pong = new Pong(this.prisma, player1Id, player2Id, player1.id, player2.id,
+        mode, () => {
         this.pongMap.delete(player1Id);
         this.pongMap.delete(player2Id);
       });
