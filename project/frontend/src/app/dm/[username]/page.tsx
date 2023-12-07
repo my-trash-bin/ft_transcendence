@@ -1,6 +1,6 @@
 'use client';
 
-import withAuth from '@/components/auth/Auth';
+import withDmAuth from '@/components/auth/DmAuth';
 import { DmUserList } from '@/components/dm/dm-user/DmUserList';
 import { MessageSearch } from '@/components/dm/message-search/MessageSearch';
 import { MessageBox } from '@/components/dm/message/MessageBox';
@@ -53,4 +53,4 @@ function DmPage({ params }: Readonly<{ params: { username: string } }>) {
   );
 }
 
-export default withAuth(DmPage);
+export default withDmAuth(DmPage);

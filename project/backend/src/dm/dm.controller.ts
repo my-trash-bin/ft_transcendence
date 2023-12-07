@@ -64,4 +64,19 @@ export class DmController {
     const res = await this.dmService.getMyDmList(userId.value);
     return res;
   }
+
+  @Get('valid/:nickname')
+  @UseGuards(JwtGuard, PhaseGuard)
+  @Phase('complete')
+  @ApiOkResponse({
+    type: () => Boolean,
+  })
+  async canSendDm(
+    @Param('nickname') nickname: string,
+    @Request() req: ExpressRequest,
+  ) {
+    const userId = (req.user as JwtPayloadPhaseComplete).id;
+    const res = await this.dmService.canSendDm(nickname, userId.value);
+    return res;
+  }
 }
