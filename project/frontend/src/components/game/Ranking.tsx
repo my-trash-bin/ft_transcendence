@@ -2,7 +2,7 @@ import { ApiContext } from '@/app/_internal/provider/ApiContext';
 import { useCallback, useContext } from 'react';
 import { useQuery } from 'react-query';
 import RankingCard from './RankingCard';
-import { mockUser } from './mockUser';
+import { LongCard } from '../common/LongCard';
 
 export function Ranking() {
   const { api } = useContext(ApiContext);
@@ -15,14 +15,13 @@ export function Ranking() {
     ),
   );
 
+  const localMe = localStorage.getItem('me');
+  const me = localMe ? JSON.parse(localMe) : null;
+  const myData = data?.filter((item) => item.user.nickname === me.nickname);
+
   return (
     <div>
-      <RankingCard
-        rank={mockUser[0].rank}
-        name={mockUser[0].name}
-        avatar={mockUser[0].avatar}
-        isUser={true}
-      />
+      {myRank()}
       <div className={'max-w-[620px] mx-auto'}>
         {data &&
           data
@@ -39,4 +38,21 @@ export function Ranking() {
       </div>
     </div>
   );
+  function myRank() {
+    if (myData)
+      return (
+        <RankingCard
+          rank={myData[0].rank}
+          name={myData[0].user.nickname}
+          avatar={myData[0].user.profileImageUrl}
+          isUser={true}
+        />
+      );
+    else
+      return (
+        <LongCard size={'big'} color={'color'}>
+          아직 나의 랭킹이 없습니다.
+        </LongCard>
+      );
+  }
 }

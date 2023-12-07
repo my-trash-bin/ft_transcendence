@@ -42,7 +42,7 @@ export default function SignInPage() {
     );
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-screen flex items-center justify-center font-sejong">
       {nickname === '' ? getNicknameComponent : getAvatarComponent}
     </div>
   );
