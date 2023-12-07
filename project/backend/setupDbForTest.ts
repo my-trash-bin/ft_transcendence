@@ -111,7 +111,7 @@ class TestAuthUser {
     this.userId = getSimpleUuid(digit);
     this.metadataJson = { id: this.id };
     this.profileImageUrl = Avartars[n % 4];
-    this.nickname = getSimpleId(digit, 6);
+    this.nickname = `testUser${digit}`;
     this.mfaPasswordHash = null;
   }
 }
@@ -272,6 +272,8 @@ async function main() {
   await prisma.user.deleteMany();
   await prisma.auth.deleteMany();
 
+  await prisma.pongGameHistory.deleteMany();
+
   const testAuthUsers = getSimpleAuthUsers(testInfo.numOfUser);
 
   await prisma.$transaction(async (prisma) => {
@@ -330,6 +332,65 @@ async function main() {
         password: channelInfo.password,
         maximumMemberCount: channelInfo.maximumMemberCount,
       })),
+    });
+
+    // get inserted userId
+    const userIds = await prisma.user.findMany({
+      select: { id: true },
+    });
+
+    // 4. game history 생성 with userIds
+    await prisma.pongGameHistory.createMany({
+      data: [
+        {
+          player1Id: userIds[0].id,
+          player2Id: userIds[1].id,
+          player1Score: 10,
+          player2Score: 5,
+          isPlayer1win: true,
+          createdAt: new Date(),
+        },
+        {
+          player1Id: userIds[0].id,
+          player2Id: userIds[2].id,
+          player1Score: 10,
+          player2Score: 5,
+          isPlayer1win: true,
+          createdAt: new Date(),
+        },
+        {
+          player1Id: userIds[0].id,
+          player2Id: userIds[3].id,
+          player1Score: 10,
+          player2Score: 5,
+          isPlayer1win: true,
+          createdAt: new Date(),
+        },
+        {
+          player1Id: userIds[1].id,
+          player2Id: userIds[3].id,
+          player1Score: 10,
+          player2Score: 5,
+          isPlayer1win: true,
+          createdAt: new Date(),
+        },
+        {
+          player1Id: userIds[1].id,
+          player2Id: userIds[3].id,
+          player1Score: 10,
+          player2Score: 5,
+          isPlayer1win: true,
+          createdAt: new Date(),
+        },
+        {
+          player1Id: userIds[2].id,
+          player2Id: userIds[3].id,
+          player1Score: 10,
+          player2Score: 5,
+          isPlayer1win: true,
+          createdAt: new Date(),
+        },
+      ],
     });
 
     await prisma.channelMember.createMany({
