@@ -31,8 +31,12 @@ export function ParticipationModal({
       console.log('Participate channel successfully');
       setIsModalOpen(false);
       router.push(`/channel/${targetChannelId}`);
-    } catch (error) {
-      // console.error('Error participate channel:', error);
+    } catch (error: any) {
+      console.error('Error participate channel:', error);
+
+      if (error?.error.message === '밴된 유저는 채널에 들어갈 수 없습니다.')
+        alert('해당 채널에서 BEN된 유저입니다.');
+      setIsModalOpen(false);
     }
   }, [api, targetChannelId, targetChannelType, router, setIsModalOpen]);
 
