@@ -35,16 +35,16 @@ export function HistoryCard({
         <Image
           src={avatarToUrl(player1Img)}
           alt="avatar"
-          width={type === CardType.Default ? 50 : 30}
-          height={type === CardType.Default ? 50 : 30}
-          className="absolute left-sm"
+          width={type === CardType.Default ? 45 : 30}
+          height={type === CardType.Default ? 45 : 30}
+          className="absolute left-sm rounded-sm"
         />
         <Image
           src={avatarToUrl(player2Img)}
           alt="avatar"
-          width={type === CardType.Default ? 50 : 30}
-          height={type === CardType.Default ? 50 : 30}
-          className="absolute right-sm"
+          width={type === CardType.Default ? 45 : 30}
+          height={type === CardType.Default ? 45 : 30}
+          className="absolute right-sm rounded-sm"
         />
         <span
           className={`absolute text-left ${

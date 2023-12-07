@@ -68,6 +68,7 @@ export function ProfileBox() {
                 alt="avatar"
                 width={150}
                 height={150}
+                style={{ objectFit: 'cover' }}
               />
             ) : (
               <Image

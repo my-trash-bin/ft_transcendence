@@ -10,13 +10,7 @@ type FriendAvatarProps = {
 export default function FriendAvatar(props: FriendAvatarProps) {
   return (
     <div
-      style={{
-        width: props.size,
-        height: props.size,
-        display: 'inline-block',
-        overflowX: 'hidden',
-        overflowY: 'hidden',
-      }}
+      className={`w-${props.size} h-${props.size} inline-block overflow-hidden`}
     >
       {props.imageUrl ? (
         <Image
@@ -29,6 +23,7 @@ export default function FriendAvatar(props: FriendAvatarProps) {
             'rounded-md flex items-center justify-center hover:bg-default'
           }
           onClick={props.onClick}
+          style={{ objectFit: 'cover' }}
         />
       ) : (
         <Image

@@ -116,6 +116,7 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
               alt="avatar"
               width={100}
               height={100}
+              className="rounded-md"
             />
           ) : (
             <Image

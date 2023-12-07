@@ -31,8 +31,9 @@ export default function RankingCard({
             <Image
               src={avatarToUrl(imageUrl)}
               alt={`${name}'s avatar`}
-              width={50}
-              height={50}
+              width={45}
+              height={45}
+              className="rounded-sm"
             />
           </div>
         </LongCard>
