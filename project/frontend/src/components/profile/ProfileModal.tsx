@@ -36,6 +36,8 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
 }) => {
   const { api } = useContext(ApiContext);
   const router = useRouter();
+  // const active = onActive ? 'Active' : 'Inactive';
+  const active = 'Active';
   const {
     isLoading: userInfoLoading,
     isError: userInfoError,
@@ -297,7 +299,13 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
     return (
       <div className="p-xl flex flex-col gap-md z-[10]">
         <div className="flex felx-row gap-xl">
-          <FriendAvatar imageUrl={userInfoData.imageUrl} size={80} />
+          <div className="flex flex-col items-center gap-md">
+            <FriendAvatar imageUrl={userInfoData.imageUrl} size={80} />
+            <div className="flex flex-row items-center gap-sm">
+              <div className="w-[10px] h-[10px] rounded-[10px] bg-dark-purple" />
+              <p className="text-sm">{active}</p>
+            </div>
+          </div>
           <TextBox
             nickname={userInfoData.nickname}
             win={historyData?.stats.wins}
