@@ -187,6 +187,29 @@ export class EventsGateway
   private activeInvitations = new Map<string, { inviterId: string, inviterSocket: Socket, inviteeSocket: Socket | undefined, timeout: NodeJS.Timeout }>();
 
   // 초대 요청 처리
+  @SubscribeMessage('inviteNormalMatch')
+  async handleInviteNormalMatch(
+    @ConnectedSocket() client: UserSocket,
+    @MessageBody() data: { friendId: string },
+  ) {
+    const { friendId } = data;
+    const friendSocket = this.findSocketByUserId(friendId);
+    if (friendSocket) {
+      friendSocket.emit('invitedNormalMatch', {
+        inviterId: client.data.userId,
+        mode: 'normal',
+      });
+
+      const timeout = setTimeout(() => {
+        this.handleAutomaticDecline(friendId, client.data.userId);
+      }, 30000);
+
+      this.activeInvitations.set(friendId, { inviterId: client.data.userId, inviterSocket: client, inviteeSocket: friendSocket, timeout });
+    } else {
+      client.emit('friendOffline');
+    }
+  }
+
   @SubscribeMessage('inviteItemMatch')
   async handleInviteItemMatch(
     @ConnectedSocket() client: UserSocket,
@@ -195,7 +218,7 @@ export class EventsGateway
     const { friendId } = data;
     const friendSocket = this.findSocketByUserId(friendId);
     if (friendSocket) {
-      friendSocket.emit('onInviteItemMatch', {
+      friendSocket.emit('invitedItemMatch', {
         inviterId: client.data.userId,
         mode: 'item',
       });
@@ -206,11 +229,31 @@ export class EventsGateway
 
       this.activeInvitations.set(friendId, { inviterId: client.data.userId, inviterSocket: client, inviteeSocket: friendSocket, timeout });
     } else {
-      client.emit('friendIsOffline');
+      client.emit('friendOffline');
     }
   }
 
   // 초대 수락 처리
+  @SubscribeMessage('acceptNormalMatch')
+  async handleAcceptNormalMatch(
+    @ConnectedSocket() client: UserSocket,
+    @MessageBody() data: { inviterId: string },
+  ) {
+    const { inviterId } = data;
+    const invitation = this.activeInvitations.get(inviterId);
+    if (invitation) {
+      clearTimeout(invitation.timeout);
+      this.activeInvitations.delete(inviterId);
+
+      const inviterSocket = invitation.inviterSocket;
+      if (inviterSocket) {
+        this.createGameRoom(client, inviterSocket, false);
+      } else {
+        client.emit('friendIsOffline');
+      }
+    }
+  }
+
   @SubscribeMessage('acceptItemMatch')
   async handleAcceptItemMatch(
     @ConnectedSocket() client: UserSocket,
@@ -231,25 +274,6 @@ export class EventsGateway
     }
   }
 
-  // 초대 거절 처리
-  @SubscribeMessage('declineItemMatch')
-  async handleDeclineItemMatch(
-    @ConnectedSocket() client: UserSocket,
-    @MessageBody() data: { inviterId: string },
-  ) {
-    const { inviterId } = data;
-    const invitation = this.activeInvitations.get(inviterId);
-    if (invitation) {
-      clearTimeout(invitation.timeout);
-      this.activeInvitations.delete(inviterId);
-
-      const inviterSocket = invitation.inviterSocket;
-      if (inviterSocket) {
-        inviterSocket.emit('friendDeclineGame', { userId: client.data.userId });
-      }
-    }
-  }
-
   // 초대 자동 거절 처리 메소드
   private handleAutomaticDecline(friendId: string, inviterId: string) {
     const invitation = this.activeInvitations.get(friendId);
@@ -258,7 +282,7 @@ export class EventsGateway
 
       const inviterSocket = invitation.inviterSocket;
       if (inviterSocket) {
-        inviterSocket.emit('timeOutGame', { userId: friendId });
+        inviterSocket.emit('inviteDeclined', { userId: friendId });
       }
     }
   }
