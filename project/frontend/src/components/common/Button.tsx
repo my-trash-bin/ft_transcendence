@@ -12,7 +12,7 @@ const ButtonCVA = cva(['text-center font-mayo font-semibold'], {
         'bg-default hover:bg-light-background border-dark-purple',
         'text-black',
       ],
-      modal: ['bg-white hover:bg-white border-dark-purple', 'text-black'],
+      modal: ['bg-white hover:bg-light-gray border-dark-purple', 'text-black'],
       disabled: ['bg-gray border-dark-gray', 'text-white'],
     },
   },

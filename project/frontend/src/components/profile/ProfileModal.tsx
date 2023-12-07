@@ -1,7 +1,14 @@
 'use client';
 import { Button } from '@/components/common/Button';
 import FriendAvatar from '@/components/friend/utils/FriendAvatar';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { useQuery } from 'react-query';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { ModalLayout } from '../channel/modals/ModalLayout';
@@ -17,6 +24,7 @@ interface ModalProfileProps {
   targetId: string;
   readonly refetchPage?: () => Promise<unknown>;
   openInvite: () => void;
+  setGameMode: React.Dispatch<SetStateAction<'normal' | 'item'>>; // Update prop name here
 }
 
 export const ProfileModal: React.FC<ModalProfileProps> = ({
@@ -25,6 +33,7 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
   targetId,
   refetchPage,
   openInvite,
+  setGameMode,
 }) => {
   const { api } = useContext(ApiContext);
   const router = useRouter();
@@ -129,18 +138,44 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
       content = '나';
     } else {
       content = '게임하기';
-      handler = () => openInvite();
+    }
+    return <DualFunctionButton content={content} disabled={disabled} />;
+  }
+  function DualFunctionButton({ content, disabled }) {
+    const [isHovered, setIsHovered] = useState(false);
+
+    function startNormal() {
+      setGameMode('normal');
+      openInvite();
+    }
+    function startItem() {
+      setGameMode('item');
+      openInvite();
     }
     return (
-      <Button
-        isModal={true}
-        disabled={disabled}
-        onClick={!disabled ? handler : undefined}
+      <div
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        className="relative w-[75px] h-[30px]"
       >
-        {content}
-      </Button>
+        {isHovered ? (
+          <div className="absolute bottom-[-15px]">
+            <Button isModal={true} onClick={() => startNormal()}>
+              {'일반모드'}
+            </Button>
+            <Button isModal={true} onClick={() => startItem()}>
+              {'아이템모드'}
+            </Button>
+          </div>
+        ) : (
+          <Button isModal={true} disabled={disabled}>
+            {content}
+          </Button>
+        )}
+      </div>
     );
   }
+
   function handlerDmButton() {
     if (!userInfoData) return <p>error</p>;
     let handler;

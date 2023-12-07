@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { Button } from '../common/Button';
+import FriendInvite from '../game/FriendInvite';
 import { FriendSetting } from './FriendSetting';
 import { CommonCard } from './utils/CommonCard';
 import { useRouter } from 'next/navigation';
@@ -17,6 +19,42 @@ export function FriendCard({
   refetch,
 }: FriendCardProps) {
   const router = useRouter();
+  const [isInviteOpen, setIsInviteOpen] = useState(false);
+  const [gameMode, setGameMode] = useState<'normal' | 'item'>('normal');
+  const handleInviteClose = () => {
+    setIsInviteOpen(false);
+  };
+  const handleInviteOpen = () => {
+    setIsInviteOpen(true);
+  };
+  function DualFunctionButton({ content }) {
+    const [isHovered, setIsHovered] = useState(false);
+
+    function startNormal() {
+      setGameMode('normal');
+      handleInviteOpen();
+    }
+    function startItem() {
+      setGameMode('item');
+      handleInviteOpen();
+    }
+    return (
+      <div
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        className="relative w-[75px] h-[30px]"
+      >
+        {isHovered ? (
+          <div className="absolute bottom-[-15px]">
+            <Button onClick={() => startNormal()}>{'일반모드'}</Button>
+            <Button onClick={() => startItem()}>{'아이템모드'}</Button>
+          </div>
+        ) : (
+          <Button>{content}</Button>
+        )}
+      </div>
+    );
+  }
 
   return (
     <CommonCard
@@ -26,10 +64,16 @@ export function FriendCard({
       refetch={refetch}
     >
       <div className="flex flex-row justify-center items-center gap-md">
-        <Button onClick={() => alert('call game start api')}>게임하기</Button>
-        <Button onClick={() => router.push('/dm')}>메세지</Button>
+        <DualFunctionButton content={'게임하기'} />
+        <Button onClick={() => router.push(`/dm/${id}`)}>메세지</Button>
         <FriendSetting targetId={id} refetch={refetch} />
       </div>
+      <FriendInvite
+        isOpen={isInviteOpen}
+        onClose={handleInviteClose}
+        mode={gameMode}
+        friendId={id}
+      />
     </CommonCard>
   );
 }
