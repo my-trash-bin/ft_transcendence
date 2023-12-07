@@ -9,8 +9,7 @@ import { Loading } from '../common/Loading';
 import { TextBox } from './TextBox';
 import { CardType, HistoryCard } from './history/HistoryCard';
 import { LongCard } from '../common/LongCard';
-import FriendInvite from '../game/FriendInvite';
-import Portal from '../common/Portal';
+import { useRouter } from 'next/navigation';
 
 interface ModalProfileProps {
   isOpen: boolean;
@@ -28,6 +27,7 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
   openInvite,
 }) => {
   const { api } = useContext(ApiContext);
+  const router = useRouter();
   const {
     isLoading: userInfoLoading,
     isError: userInfoError,
@@ -151,7 +151,7 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
       content = '나';
     } else {
       content = 'DM';
-      handler = () => alert('move to dm');
+      handler = () => router.push(`/dm/${userInfoData.nickname}`);
     }
     return (
       <Button

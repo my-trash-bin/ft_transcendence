@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useCallback, useContext } from 'react';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
+import { useRouter } from 'next/navigation';
 
 interface NotiCardProps {
   isRead: boolean;
@@ -16,7 +17,9 @@ export const NotiCard: React.FC<NotiCardProps> = ({ content }) => {
 
   const [isHovered, setHovered] = useState(false);
   const { api } = useContext(ApiContext);
+  const route = useRouter();
   const sourceId = obj.sourceId;
+  const sourceName = obj.sourceName;
   function handleMouseEnter() {
     setHovered(true);
   }
@@ -47,12 +50,12 @@ export const NotiCard: React.FC<NotiCardProps> = ({ content }) => {
     case 'newMessageDm':
       notificationContent = `으로부터 새로운 메세지가 도착했습니다.`;
       hoverContent = '메세지창으로 이동';
-      handlerFunction = () => alert('move to dm');
+      handlerFunction = () => route.push(`/dm/${sourceName}`);
       break;
     case 'newMessageChannel':
       notificationContent = `으로부터 새로운 메세지가 도착했습니다.`;
       hoverContent = '메세지창으로 이동';
-      handlerFunction = () => alert('move to channel');
+      handlerFunction = () => route.push(`/channel/${sourceId}`);
       break;
     case 'gameRequest':
       notificationContent = `가 1대1 게임을 요청했습니다.`;
@@ -71,7 +74,7 @@ export const NotiCard: React.FC<NotiCardProps> = ({ content }) => {
       onClick={() => handlerFunction()}
     >
       <div className={`relative ${isHovered ? 'hidden' : 'block'} `}>
-        <strong>{obj.sourceName}</strong>
+        <strong>{sourceName}</strong>
         {notificationContent}
       </div>
       <div
