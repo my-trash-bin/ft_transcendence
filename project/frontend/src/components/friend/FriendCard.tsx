@@ -1,9 +1,10 @@
 import { useRouter } from 'next/navigation';
-import { ReactNode, useState } from 'react';
+import { ReactNode, useCallback, useState } from 'react';
 import { Button } from '../common/Button';
 import FriendInvite from '../game/FriendInvite';
 import { FriendSetting } from './FriendSetting';
 import { CommonCard } from './utils/CommonCard';
+import { GameInviteButtons } from '../game/GameInviteButtons';
 
 interface FriendCardProps {
   readonly nickname: string;
@@ -21,40 +22,12 @@ export function FriendCard({
   const router = useRouter();
   const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [gameMode, setGameMode] = useState<'normal' | 'item'>('normal');
-  const handleInviteClose = () => {
+  const handleInviteClose = useCallback(() => {
     setIsInviteOpen(false);
-  };
-  const handleInviteOpen = () => {
+  }, [setIsInviteOpen]);
+  const handleInviteOpen = useCallback(() => {
     setIsInviteOpen(true);
-  };
-  function DualFunctionButton({ content }: { readonly content: ReactNode }) {
-    const [isHovered, setIsHovered] = useState(false);
-
-    function startNormal() {
-      setGameMode('normal');
-      handleInviteOpen();
-    }
-    function startItem() {
-      setGameMode('item');
-      handleInviteOpen();
-    }
-    return (
-      <div
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        className="relative w-[75px] h-[30px]"
-      >
-        {isHovered ? (
-          <div className="absolute bottom-[-15px]">
-            <Button onClick={() => startNormal()}>{'일반모드'}</Button>
-            <Button onClick={() => startItem()}>{'아이템모드'}</Button>
-          </div>
-        ) : (
-          <Button>{content}</Button>
-        )}
-      </div>
-    );
-  }
+  }, [setIsInviteOpen]);
 
   return (
     <CommonCard
@@ -64,7 +37,13 @@ export function FriendCard({
       refetch={refetch}
     >
       <div className="flex flex-row justify-center items-center gap-md">
-        <DualFunctionButton content={'게임하기'} />
+        <GameInviteButtons
+          content={'게임하기'}
+          setGameMode={setGameMode}
+          handleInviteOpen={handleInviteOpen}
+          isModal={false}
+          friendId={id}
+        />
         <Button onClick={() => router.push(`/dm/${nickname}`)}>메세지</Button>
         <FriendSetting targetId={id} refetch={refetch} />
       </div>
@@ -72,7 +51,6 @@ export function FriendCard({
         isOpen={isInviteOpen}
         onClose={handleInviteClose}
         mode={gameMode}
-        friendId={id}
       />
     </CommonCard>
   );

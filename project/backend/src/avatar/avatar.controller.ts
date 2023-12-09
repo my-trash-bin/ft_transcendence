@@ -3,11 +3,17 @@ import {
   ApiBody,
   ApiCreatedResponse,
   ApiOperation,
+  ApiProperty,
   ApiTags,
 } from '@nestjs/swagger';
 import { Request } from 'express';
 import { JwtGuard } from '../auth/jwt.guard';
 import { AvatarService } from './avatar.service';
+
+export class FilePathResponse {
+  @ApiProperty({ description: '저장된 파일 경로' })
+  filepath!: string;
+}
 
 @ApiTags('avatar')
 @Controller('/api/v1/avatar')
@@ -19,7 +25,7 @@ export class AvatarController {
   @ApiOperation({ summary: '바이너리 아바타 업로드' })
   @ApiCreatedResponse({
     description: '이미지 URL 리턴',
-    type: String,
+    type: () => FilePathResponse,
   })
   @ApiBody({ description: '바이너리 이미지 파일', type: 'file' })
   @Post('upload')

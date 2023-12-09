@@ -1,18 +1,8 @@
-// {
-//   "phase": "complete",
-//   "id": {
-//     "value": "a3e1e0b0-cdca-4c77-a68b-fe4619e82553"
-//   },
-//   "iat": 1701079951,
-//   "exp": 1701166351
-// }
+import 'dotenv/config';
 
-// import { Jwt } from 'jsonwebtoken';
-import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
-import { getSimpleAuthUsers } from './setupDbForTest';
 
-dotenv.config();
+import { getSimpleAuthUsers } from './setupDbForTest';
 
 function createToken(phase: string, uuids: string[], expiresInDays: number) {
   const secret = process.env.JWT_SECRET;

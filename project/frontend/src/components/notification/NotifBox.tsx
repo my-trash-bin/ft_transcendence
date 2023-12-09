@@ -1,10 +1,10 @@
+import { unwrap } from '@/api/unwrap';
 import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
-import { NotiCard } from './NotiCard';
-import { SelectNotif } from './SelectNotif';
-import { useCallback, useContext } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useQuery } from 'react-query';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
+import { NotiCard } from './NotiCard';
+import { SelectNotif } from './SelectNotif';
 
 export function NotifBox({
   active,
@@ -19,11 +19,11 @@ export function NotifBox({
   const { api } = useContext(ApiContext);
   const { isLoading, isError, data, refetch } = useQuery(
     'fetchNotifications',
-    useCallback(async () => {
-      if (active) {
-        return (await api.notificationControllerFindManyAndUpdateRead()).data;
-      }
-    }, [api, active]),
+    useCallback(
+      async () =>
+        unwrap(await api.notificationControllerFindManyAndUpdateRead()),
+      [api, active],
+    ),
     {
       enabled: active,
     },
@@ -41,11 +41,12 @@ export function NotifBox({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [setActive]);
+  return active && render();
 
-  if (isLoading) return <p>로딩중</p>;
-  else if (isError) return <p>something wrong!</p>;
-  return (
-    active && (
+  function render() {
+    if (isLoading) return <p>로딩중</p>;
+    if (isError || !data) return <p>something wrong!</p>;
+    return (
       <div
         ref={boxRef}
         className={
@@ -80,6 +81,6 @@ export function NotifBox({
             return null;
           })}
       </div>
-    )
-  );
+    );
+  }
 }

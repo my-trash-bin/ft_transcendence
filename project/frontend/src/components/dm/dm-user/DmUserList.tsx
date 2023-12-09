@@ -32,11 +32,12 @@ export function DmUserList({
   searchUsername,
 }: Readonly<{ searchUsername: string }>) {
   const { api } = useContext(ApiContext);
-  const { isLoading, data }: { isLoading: boolean; data: any } = useQuery(
+  const { isLoading, isError, data } = useQuery(
     'myDmList',
     useCallback(async () => await api.dmControllerGetMyDmList(), [api]),
   );
   if (isLoading) return <p>로딩중...</p>;
+  if (isError) return <p>알 수 없는 에러</p>;
   const renderData = getRenderData(data?.data, searchUsername);
 
   return (

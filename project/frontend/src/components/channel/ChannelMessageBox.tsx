@@ -1,5 +1,6 @@
+import { unwrap } from '@/api/unwrap';
 import { ApiContext } from '@/app/_internal/provider/ApiContext';
-import { useContext } from 'react';
+import { useCallback, useContext } from 'react';
 import { useQuery } from 'react-query';
 import { MessageContent, messageType } from '../dm/message/MessageContent';
 import { MessageSendBox } from '../dm/message/MessageSendBox';
@@ -9,16 +10,23 @@ export function ChannleMessageBox({
   channelId,
 }: Readonly<{ channelId: string }>) {
   const { api } = useContext(ApiContext);
-  const channelApi = () => api.channelControllerFindChannelInfo(channelId);
 
-  const { isLoading, data } = useQuery('channelInfo', channelApi);
+  const channelApi = () => api.channelControllerFindChannelInfo(channelId);
+  const { isLoading, isError, data } = useQuery(
+    'channelInfo',
+    useCallback(
+      async () => unwrap(await api.channelControllerFindChannelInfo(channelId)),
+      [api, channelId],
+    ),
+  );
 
   if (isLoading) return <div>Loading...</div>;
+  if (isError || !data) return <p>알 수 없는 에러</p>;
 
   const localMe = localStorage.getItem('me');
   const me = localMe ? JSON.parse(localMe) : null;
 
-  const myAuthority: any = data?.data.members.filter((mem: any) => {
+  const myAuthority: any = data.members.filter((mem: any) => {
     return mem.memberId === me.id;
   });
   if (isLoading) return <div>Loading...</div>;
@@ -27,7 +35,7 @@ export function ChannleMessageBox({
     <>
       <ChannelInfo
         channelId={channelId}
-        channelData={data?.data}
+        channelData={data}
         myAuthority={myAuthority[0]?.memberType}
         myNickname={me.nickname}
       />

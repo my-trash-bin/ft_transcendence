@@ -1,56 +1,42 @@
 import { useRouter } from 'next/navigation';
 import React, { useEffect } from 'react';
+import { ModalLayout } from '../channel/modals/ModalLayout';
 import useStore from '../pong/Update';
 import { getGameSocket } from '../pong/gameSocket';
-import { ModalLayout } from '../channel/modals/ModalLayout';
 
 interface FriendInviteProps {
   isOpen: boolean;
   onClose: () => void;
   mode: 'normal' | 'item';
-  friendId: string;
 }
 
 const FriendInvite: React.FC<FriendInviteProps> = ({
   isOpen,
   onClose,
   mode,
-  friendId,
 }) => {
   const router = useRouter();
   const socket = getGameSocket();
   const { setIsPlayer1 } = useStore();
 
   useEffect(() => {
-    if (isOpen) {
-      if (mode === 'normal') {
-        socket.emit('inviteNormalMatch', friendId);
-        console.log('inviteNormalMatch', friendId);
-      } else if (mode === 'item') {
-        socket.emit('inviteItemMatch', friendId);
-        console.log('inviteItemMatch', friendId);
-      }
-    }
-  }, [isOpen, onClose, router, socket]);
+    const handleGoPong = () => {
+      onClose();
+      router.push('/pong');
+    };
 
-  const handleGoPong = () => {
-    onClose();
-    router.push('/pong');
-  };
-
-  const handlePlayerRole = (role: string) => {
-    setIsPlayer1(role === 'player1');
-    console.log('playerRole', role);
-    socket.off('playerRole', handlePlayerRole);
-  };
-  useEffect(() => {
+    const handlePlayerRole = (role: string) => {
+      setIsPlayer1(role === 'player1');
+      console.log('playerRole', role);
+      socket.off('playerRole', handlePlayerRole);
+    };
     socket.on('GoPong', handleGoPong);
     socket.on('playerRole', handlePlayerRole);
     return () => {
       socket.off('GoPong', handleGoPong);
       socket.off('playerRole', handlePlayerRole);
     };
-  }, []);
+  }, [onClose, router, setIsPlayer1, socket]);
 
   const size = 'py-sm px-lg w-[498px] h-[308px]';
   const textCSS = 'text-dark-purple text-h2';

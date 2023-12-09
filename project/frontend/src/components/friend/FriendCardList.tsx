@@ -35,7 +35,7 @@ export function FriendCardList({
     if (isLoading) return <Loading width={500} />;
 
     if (isError || !data) {
-      return <p className="font-normal text-h2">Something wrong</p>;
+      return <p className="font-normal text-h2">알 수 없는 에러</p>;
     }
     if (data.length === 0) {
       return <p className="font-semibold text-h2">아직 친구가 없습니다.</p>;

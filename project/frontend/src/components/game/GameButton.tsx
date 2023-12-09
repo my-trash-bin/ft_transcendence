@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import MatchingModal from './ModalMatch';
+import { getGameSocket } from '../pong/gameSocket';
 
 interface ButtonComponentProps {
   mode: 'normal' | 'item';
@@ -8,12 +9,22 @@ interface ButtonComponentProps {
 const ButtonComponent: React.FC<ButtonComponentProps> = ({ mode }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [buttonActive, setButtonActive] = useState(0);
+  const socket = getGameSocket();
 
   const handleButtonClick = () => {
+    if (mode === 'normal') {
+      socket.emit('joinNormalMatch');
+      console.log('joinNormalMatch');
+    } else if (mode === 'item') {
+      socket.emit('joinItemMatch');
+      console.log('joinItemMatch');
+    }
     setIsModalOpen(true);
   };
 
   const handleModalClose = () => {
+    socket.emit('cancelMatch', mode);
+    console.log('cancelMatch');
     setIsModalOpen(false);
     setButtonActive((prev) => (prev === 0 ? 1 : 0));
   };

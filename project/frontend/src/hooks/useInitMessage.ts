@@ -1,3 +1,4 @@
+import { unwrap } from '@/api/unwrap';
 import { ApiContext } from '@/app/_internal/provider/ApiContext';
 import {
   MessageContentInterface,
@@ -18,9 +19,9 @@ export const useInitMessage = (
     'fetchChannelMsg',
     useCallback(async () => {
       if (type === messageType.DM && targetName) {
-        return (await api.dmControllerGetDmChannelMessages(targetName)).data;
+        return unwrap(await api.dmControllerGetDmChannelMessages(targetName));
       } else if (channelId) {
-        return (await api.channelControllerGetChannelMessages(channelId)).data;
+        return unwrap(await api.channelControllerGetChannelMessages(channelId));
       }
     }, [api, channelId, type, targetName]),
     { enabled: false },

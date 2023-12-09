@@ -1,26 +1,24 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { WsException } from '@nestjs/websockets';
-import { ChangeActionType, ChannelService } from '../channel/channel.service';
-import { ChannelId, ClientId, UserId, idOf } from '../common/Id';
-import { DmService } from '../dm/dm.service';
-import { UserFollowService } from '../user-follow/user-follow.service';
-import { UsersService } from '../users/users.service';
-// import { ChatRoomDto, ChatRoomStatusDto } from './chat.dto'
 import { Server, Socket } from 'socket.io';
 import { v4 as uuidv4 } from 'uuid';
 import { PrismaService } from '../base/prisma.service';
+import { ChangeActionType, ChannelService } from '../channel/channel.service';
 import { ChangeMemberStatusResultDto } from '../channel/dto/change-member-status-result.dto';
 import { JoinedChannelInfoDto } from '../channel/dto/joined-channel-info.dto';
 import { LeavingChannelResponseDto } from '../channel/dto/leave-channel-response.dto';
 import { GateWayEvents } from '../common/gateway-events.enum';
+import { ChannelId, ClientId, idOf, UserId } from '../common/Id';
+import { DmService } from '../dm/dm.service';
 import { MessageWithMemberDto } from '../dm/dto/message-with-member';
 import { NotificationService } from '../notification/notification.service';
 import { PongLogService } from '../pong-log/pong-log.service';
 import { GameState, Pong } from '../pong/pong';
+import { UserFollowService } from '../user-follow/user-follow.service';
 import { UserDto } from '../users/dto/user.dto';
+import { UsersService } from '../users/users.service';
 import { DmChannelInfoType } from './event-response.dto';
 import { UserSocket } from './events.gateway';
-// import { NotificationService } from '../notification/notification.service';
 
 export enum ChannelRoomType {
   NORMAL = 'normal',
@@ -43,7 +41,6 @@ type InvitationType = {
   inviterId: string;
   inviterSocket: Socket;
   inviteeSocket: Socket | undefined;
-  timeout: NodeJS.Timeout;
 };
 
 @Injectable()
@@ -213,7 +210,7 @@ export class EventsService {
       idOf(userId),
     );
 
-    const blockedIdList = relationship?.isBlock ? [userId] : [];
+    const blockedIdList = relationship?.isBlock ? [toId.value] : [];
 
     const channelId = result.data!.channelId;
 
@@ -335,7 +332,7 @@ export class EventsService {
     if ([ChangeActionType.BANNED, ChangeActionType.KICK].includes(actionType)) {
       this.removeUserFromChannel(
         this.channels[type][channelId.value],
-        idOf(userId),
+        idOf(toId.value),
       ); // BAN or KICK => 채널에서 나가짐 반영
     }
   }
@@ -463,16 +460,13 @@ export class EventsService {
     this.logger.log(`blockedIdList: ${blockedIdList}`);
     this.logger.log(this.getChannelArray(type, channelId));
     this.getChannelArray(type, channelId)
-      ?.filter((userId) =>
-        blockedIdList.every((blockedId) => blockedId !== userId),
-      )
+      ?.filter((userId) => !blockedIdList.includes(userId))
       .forEach((userId) =>
         this.broadcastToUserClients(idOf(userId), eventName, data),
       );
   }
   private broadcastToUserClients(userId: UserId, eventName: string, data: any) {
     this.logger.debug(`broadcastToUserClients: ${userId.value}, ${eventName}`);
-    this.logger.debug(`socketMap: ${this.socketMap.get(userId.value)}`);
     this.socketMap
       .get(userId.value)
       ?.forEach((client) => client.emit(eventName, data));
@@ -524,11 +518,15 @@ export class EventsService {
       q.delete(player1);
       q.delete(player2);
 
-      this.createGameRoom(player1, player2, false);
+      this.createGameRoom(player1, player2, itemMode);
     }
   }
 
-  private async alarmInvited(myId: UserId, friendId: UserId, isItemMode: boolean) {
+  private async alarmInvited(
+    myId: UserId,
+    friendId: UserId,
+    isItemMode: boolean,
+  ) {
     const eventName = 'newGameInvitaion';
     const prismaUser = await this.prismaService.user.findUnique({
       where: { id: friendId.value },
@@ -576,46 +574,47 @@ export class EventsService {
 
     this.alarmInvited(idOf(userId), idOf(friendId), isItemMode);
 
-    const timeout = setTimeout(() => {
-      this.handleAutomaticDecline(friendId, userId);
-    }, 30000);
-
     this.activeInvitations.set(friendId, {
       inviterId: userId,
       inviterSocket: client,
       inviteeSocket: friendSocket,
-      timeout,
     });
   }
 
-  handleAcceptMatch(client: UserSocket, inviterId: string) {
+  handleCancelInvite(client: UserSocket, inviteeId: string) {
+    const userId = client.data.userId as string;
+    const eventName = 'canceledInvite';
+
+    const invitation = this.activeInvitations.get(inviteeId);
+    if (invitation) {
+      this.activeInvitations.delete(inviteeId);
+
+      const inviteeSocket = invitation.inviteeSocket;
+      if (inviteeSocket) {
+        inviteeSocket.emit(eventName, { userId });
+      }
+    }
+  }
+
+  handleCancelMatch(client: UserSocket, itemMode: boolean) {
+    const q = itemMode ? this.itemMatchQueue : this.normalMatchQueue;
+    q.delete(client);
+  }
+
+  handleAcceptMatch(client: UserSocket, inviterId: string, isItemMode: boolean) {
     const invitation = this.activeInvitations.get(inviterId);
 
     if (!invitation) {
       return;
     }
 
-    clearTimeout(invitation.timeout);
     this.activeInvitations.delete(inviterId);
 
     const inviterSocket = invitation.inviterSocket;
     if (inviterSocket) {
-      // TODO
-      this.createGameRoom(client, inviterSocket, true);
+      this.createGameRoom(client, inviterSocket, isItemMode);
     } else {
       client.emit('friendIsOffline');
-    }
-  }
-
-  private handleAutomaticDecline(friendId: string, inviterId: string) {
-    const invitation = this.activeInvitations.get(friendId);
-    if (invitation && invitation.inviterId === inviterId) {
-      this.activeInvitations.delete(friendId);
-
-      const inviterSocket = invitation.inviterSocket;
-      if (inviterSocket) {
-        inviterSocket.emit('inviteDeclined', { userId: friendId });
-      }
     }
   }
 

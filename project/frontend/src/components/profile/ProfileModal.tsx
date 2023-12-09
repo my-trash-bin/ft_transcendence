@@ -17,6 +17,8 @@ import { CardType, HistoryCard } from './history/HistoryCard';
 import { LongCard } from '../common/LongCard';
 import { useRouter } from 'next/navigation';
 import { LiveStatus } from '../common/LiveStatus';
+import { unwrap } from '@/api/unwrap';
+import { GameInviteButtons } from '../game/GameInviteButtons';
 
 interface ModalProfileProps {
   isOpen: boolean;
@@ -46,7 +48,7 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
     [targetId, 'profile'],
     useCallback(
       async () =>
-        (await api.usersControllerGetUserInfo({ targetUser: targetId })).data,
+        unwrap(await api.usersControllerGetUserInfo({ targetUser: targetId })),
       [api, targetId],
     ),
     {
@@ -54,14 +56,14 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
     },
   );
   const {
-    // isLoading: historyLoading,
-    // isError: historyError,
+    isLoading: historyLoading,
+    isError: historyError,
     data: historyData,
   } = useQuery(
     [targetId, 'fetchHistory'],
     useCallback(
       async () =>
-        (await api.pongLogControllerGetUserGameHistories(targetId)).data,
+        unwrap(await api.pongLogControllerGetUserGameHistories(targetId)),
       [api, targetId],
     ),
     {
@@ -139,47 +141,20 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
     } else {
       content = '게임하기';
     }
-    return <DualFunctionButton content={content} disabled={disabled} />;
-  }
-  
-  function DualFunctionButton({
-    content,
-    disabled,
-  }: {
-    content: string;
-    disabled: boolean;
-  }) {
-    const [isHovered, setIsHovered] = useState(false);
-
-    function startNormal() {
-      setGameMode('normal');
-      openInvite();
-    }
-    function startItem() {
-      setGameMode('item');
-      openInvite();
-    }
+    if (disabled)
+      return (
+        <Button isModal={true} disabled={true}>
+          {content}
+        </Button>
+      );
     return (
-      <div
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        className="relative w-[75px] h-[30px]"
-      >
-        {isHovered && !disabled ? (
-          <div className="flex absolute left-[-30px]">
-            <Button isModal={true} onClick={() => startNormal()}>
-              {'일반모드'}
-            </Button>
-            <Button isModal={true} onClick={() => startItem()}>
-              {'아이템모드'}
-            </Button>
-          </div>
-        ) : (
-          <Button isModal={true} disabled={disabled}>
-            {content}
-          </Button>
-        )}
-      </div>
+      <GameInviteButtons
+        content={content}
+        setGameMode={setGameMode}
+        handleInviteOpen={openInvite}
+        isModal={true}
+        friendId={targetId}
+      />
     );
   }
 
@@ -293,9 +268,9 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
   );
 
   function renderProfileContent() {
-    if (userInfoLoading) return <Loading width={300} />;
+    if (userInfoLoading || historyLoading) return <Loading width={300} />;
 
-    if (userInfoError) {
+    if (userInfoError || historyError) {
       return <p>Error loading profile data.</p>;
     }
     if (!userInfoData) {

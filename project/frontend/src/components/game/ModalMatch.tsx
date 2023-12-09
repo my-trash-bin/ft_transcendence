@@ -20,35 +20,24 @@ const MatchingModal: React.FC<MatchingModalProps> = ({
   const { setIsPlayer1 } = useStore();
 
   useEffect(() => {
-    if (isOpen) {
-      if (mode === 'normal') {
-        socket.emit('joinNormalMatch');
-        console.log('joinNormalMatch');
-      } else if (mode === 'item') {
-        socket.emit('joinItemMatch');
-        console.log('joinItemMatch');
-      }
-    }
-  }, [isOpen, onClose, router, socket]);
+    const handleGoPong = () => {
+      onClose();
+      router.push('/pong');
+    };
 
-  const handleGoPong = () => {
-    onClose();
-    router.push('/pong');
-  };
+    const handlePlayerRole = (role: string) => {
+      setIsPlayer1(role === 'player1');
+      console.log('playerRole', role);
+      socket.off('playerRole', handlePlayerRole);
+    };
 
-  const handlePlayerRole = (role: string) => {
-    setIsPlayer1(role === 'player1');
-    console.log('playerRole', role);
-    socket.off('playerRole', handlePlayerRole);
-  };
-  useEffect(() => {
     socket.on('GoPong', handleGoPong);
     socket.on('playerRole', handlePlayerRole);
     return () => {
       socket.off('GoPong', handleGoPong);
       socket.off('playerRole', handlePlayerRole);
     };
-  }, []);
+  }, [onClose, router, setIsPlayer1, socket]);
 
   const bgCSS = 'bg-default rounded-md';
   const size = 'py-sm px-lg w-[498px] h-[308px]';
