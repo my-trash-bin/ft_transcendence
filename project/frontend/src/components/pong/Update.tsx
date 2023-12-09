@@ -46,4 +46,17 @@ const useStore = create<ExtendedGameState>((set) => ({
   setplayer2Info: (playerInfo) => set({ player2Info: playerInfo }),
 }));
 
+interface InviteState {
+  invite: {
+    inviterId: string;
+    mode: string;
+  };
+  setInvite: (inviterId: string, mode: string) => void;
+}
+
+export const inviteStore = create<InviteState>((set) => ({
+  invite: { inviterId: '', mode: '' },
+  setInvite: (inviterId: string, mode: string) => set({ invite: { inviterId, mode } }),
+}));
+
 export default useStore;
