@@ -58,7 +58,7 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
     // isError: historyError,
     data: historyData,
   } = useQuery(
-    [targetId, 'historyFromProfileModal'],
+    [targetId, 'fetchHistory'],
     useCallback(
       async () =>
         (await api.pongLogControllerGetUserGameHistories(targetId)).data,
