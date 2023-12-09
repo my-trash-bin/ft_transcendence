@@ -87,8 +87,8 @@ export class ChannelController {
     const userId = (req.user as JwtPayloadPhaseComplete).id;
     let { type, title, password, capacity } = dto;
     const isPublic = type !== ChannelType.Private;
-    if (!isPublic) {
-      password = null; // private => password X
+    if (type !== ChannelType.Protected) {
+      password = null;
     }
     const result = await this.channelService.create(
       userId,
@@ -124,8 +124,8 @@ export class ChannelController {
     const { id } = req.user as JwtPayloadPhaseComplete;
     let { channelId, type, title, password, capacity } = dto;
     const isPublic = type !== ChannelType.Private;
-    if (!isPublic) {
-      password = null; // private => password X
+    if (type !== ChannelType.Protected) {
+      password = null;
     }
     const result = await this.channelService.channelUpdate(
       id,
