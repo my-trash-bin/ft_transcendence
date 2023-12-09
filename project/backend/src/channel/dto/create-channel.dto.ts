@@ -21,7 +21,12 @@ export class CreateChannelDto {
   @Length(6, 20)
   title!: string;
 
-  @ApiPropertyOptional({ description: '채널 암호', type: String })
+  @ApiPropertyOptional({
+    description: '채널 암호',
+    type: String,
+    required: false,
+    nullable: true,
+  })
   @IsString()
   @Length(6, 12)
   @IsOptional()
