@@ -1,14 +1,26 @@
 'use client';
 
+import { Api } from '@/api/api';
+import { Title } from '@/components/common/Title';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useMutation } from 'react-query';
 import { ChannelButton } from '../ChannelButton';
+import { ChannelSelector } from './ChannelSelector';
 import { inputValidator } from './InputValidator';
 
+export enum ChannelType {
+  PUBLIC = 'public',
+  PRIVATE = 'private',
+  PROTECTED = 'protected',
+}
+
 export function SettingModal({
+  channelId,
   closeModal,
   modalStateFunctions,
 }: {
+  channelId: string;
   closeModal: () => void;
   modalStateFunctions: {
     setModalParticipant: () => void;
@@ -17,9 +29,55 @@ export function SettingModal({
   };
 }) {
   const [password, setPassword] = useState('');
-  const [passwordValid, setPasswordValid] = useState(false);
+  const [channelType, setChannelType] = useState(ChannelType.PUBLIC);
+  // TODO: 현재 채널의 타입 가지고 와야 함!
+  const [passwordValid, setPasswordValid] = useState(
+    channelType !== ChannelType.PROTECTED,
+  );
 
-  const validText = 'text-[12px] mt-[5px]';
+  const channelTypeChangeEvent = (channelType: ChannelType) => {
+    switch (channelType) {
+      case ChannelType.PUBLIC:
+        setChannelType(ChannelType.PUBLIC);
+        break;
+      case ChannelType.PRIVATE:
+        setChannelType(ChannelType.PRIVATE);
+        break;
+      case ChannelType.PROTECTED:
+        setChannelType(ChannelType.PROTECTED);
+        break;
+    }
+  };
+
+  useEffect(() => {
+    setPasswordValid(channelType !== ChannelType.PROTECTED);
+  }, [channelType]);
+
+  const mutation = useMutation(new Api().api.channelControllerChannelUpdate, {
+    onSuccess: () => {
+      closeModal();
+      alert('채널 설정 변경에 성공했습니다.');
+    },
+    onError: () => {
+      alert('채널 설정 변경에 실패했습니다.');
+    },
+  });
+
+  function updateChannel() {
+    const channelUpdateData =
+      channelType !== ChannelType.PUBLIC
+        ? {
+            channelId: channelId,
+            type: channelType,
+            password: password,
+          }
+        : {
+            channelId: channelId,
+            type: channelType,
+          };
+    mutation.mutate(channelUpdateData);
+  }
+  const validText = 'text-[12px] mt-[5px] text-dark-gray';
   const invalidText = 'text-[12px] mt-[5px] text-red-400';
   return (
     <>
@@ -36,27 +94,44 @@ export function SettingModal({
           />
         </button>
       </div>
-      <div className="h-[400px] flex flex-col justify-center items-center">
-        <p className="mb-[15px]">비밀번호 설정</p>
-        <input
-          type="password"
-          placeholder="비밀번호를 입력하세요."
-          value={password}
-          onChange={(e) => {
-            setPasswordValid(inputValidator('password', e.target.value));
-            setPassword(e.target.value);
-          }}
-          className="pl-[10px] rounded-sm outline-none placeholder:text-[12px] placeholder:text-center"
-        />
-        <p className={passwordValid ? validText : invalidText}>
-          비밀번호는 숫자 6자리로 입력해 주세요.
-        </p>
+      <div className="flex flex-col justify-center items-center">
+        <Title>채널 설정 변경</Title>
+        <div className="h-[300px] flex flex-col justify-center gap-md p-md">
+          <div className="flex flex-row pl-lg">
+            <p className="">채널 타입 변경:</p>
+            <ChannelSelector
+              channelType={channelType}
+              channelTypeChangeEvent={channelTypeChangeEvent}
+              isRow={false}
+            />
+          </div>
+
+          <div className="flex flex-row gap-sm">
+            <p className="pl-lg">비밀번호 설정:</p>
+            <div className="flex flex-col">
+              <input
+                type="password"
+                placeholder="비밀번호 입력"
+                value={password}
+                disabled={channelType !== ChannelType.PROTECTED}
+                onChange={(e) => {
+                  setPasswordValid(inputValidator('password', e.target.value));
+                  setPassword(e.target.value);
+                }}
+                className="pl-[10px] rounded-sm outline-none placeholder:text-[12px] placeholder:text-center w-[150px]"
+              ></input>
+              <p className={passwordValid ? validText : invalidText}>
+                숫자 6자리로 입력해 주세요.
+              </p>
+            </div>
+          </div>
+        </div>
         <div className="mt-[30px] pl-[20px] pr-[20px] w-[200px] flex flex-row justify-between">
           <ChannelButton
             text="적용"
             width="60px"
             height="35px"
-            onClick={closeModal}
+            onClick={updateChannel}
             disable={!passwordValid}
           />
           <ChannelButton

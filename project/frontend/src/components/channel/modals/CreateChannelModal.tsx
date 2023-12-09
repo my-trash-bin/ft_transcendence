@@ -90,6 +90,7 @@ export function CreateChannelModal({
             <ChannelSelector
               channelType={channelType}
               channelTypeChangeEvent={channelTypeChangeEvent}
+              isRow={true}
             />
             <ChannelCreateContent
               channelType={channelType}

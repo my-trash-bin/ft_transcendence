@@ -37,7 +37,7 @@ export function BlockCardList({
       return <p className="font-normal text-h2">Something wrong</p>;
     }
     if (data.length === 0) {
-      return <p className="font-semibold text-h2">No elements</p>;
+      return <p className="font-semibold text-h2">차단한 사람이 없습니다.</p>;
     }
     return data.map((val) => (
       <BlockCard
