@@ -85,8 +85,11 @@ export class ChannelController {
   @Phase('complete')
   async create(@Body() dto: CreateChannelDto, @Request() req: ExpressRequest) {
     const userId = (req.user as JwtPayloadPhaseComplete).id;
-    const { type, title, password, capacity } = dto;
+    let { type, title, password, capacity } = dto;
     const isPublic = type !== ChannelType.Private;
+    if (!isPublic) {
+      password = null; // private => password X
+    }
     const result = await this.channelService.create(
       userId,
       isPublic,
@@ -119,12 +122,16 @@ export class ChannelController {
     @Body() dto: UpdateChannelDto,
   ) {
     const { id } = req.user as JwtPayloadPhaseComplete;
-    const { channelId, type, title, password, capacity } = dto;
+    let { channelId, type, title, password, capacity } = dto;
+    const isPublic = type !== ChannelType.Private;
+    if (!isPublic) {
+      password = null; // private => password X
+    }
     const result = await this.channelService.channelUpdate(
       id,
       idOf(channelId),
       title,
-      type !== ChannelType.Private,
+      isPublic,
       capacity,
       password,
     );

@@ -25,7 +25,7 @@ export const TextBox: React.FC<TextBoxProps> = ({
         <br />
         전적 : {win}승 {lose}패 {roundedRatio}%
       </p>
-      <p className={`${textSize} text-dark-gray`}>
+      <p className={`text-md text-dark-gray`}>
         상태메세지 <br />
         {statusMessage === '' ? 'no status message' : statusMessage}
       </p>

@@ -1,37 +1,23 @@
 import { useRouter } from 'next/navigation';
 import React, { useEffect } from 'react';
+import { ModalLayout } from '../channel/modals/ModalLayout';
 import useStore from '../pong/Update';
 import { getGameSocket } from '../pong/gameSocket';
-import { ModalLayout } from '../channel/modals/ModalLayout';
 
 interface FriendInviteProps {
   isOpen: boolean;
   onClose: () => void;
   mode: 'normal' | 'item';
-  friendId: string;
 }
 
 const FriendInvite: React.FC<FriendInviteProps> = ({
   isOpen,
   onClose,
   mode,
-  friendId,
 }) => {
   const router = useRouter();
   const socket = getGameSocket();
   const { setIsPlayer1 } = useStore();
-
-  useEffect(() => {
-    if (isOpen) {
-      if (mode === 'normal') {
-        socket.emit('inviteNormalMatch', friendId);
-        console.log('inviteNormalMatch', friendId);
-      } else if (mode === 'item') {
-        socket.emit('inviteItemMatch', friendId);
-        console.log('inviteItemMatch', friendId);
-      }
-    }
-  }, [isOpen, onClose, router, socket, mode, friendId]);
 
   useEffect(() => {
     const handleGoPong = () => {

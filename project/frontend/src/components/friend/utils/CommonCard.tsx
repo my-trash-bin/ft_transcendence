@@ -61,7 +61,6 @@ export function CommonCard({
         isOpen={isInviteOpen}
         onClose={handleInviteClose}
         mode={gameMode}
-        friendId={id}
       />
     </div>
   );

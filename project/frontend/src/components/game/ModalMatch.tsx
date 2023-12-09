@@ -20,19 +20,6 @@ const MatchingModal: React.FC<MatchingModalProps> = ({
   const { setIsPlayer1 } = useStore();
 
   useEffect(() => {
-    if (isOpen) {
-      if (mode === 'normal') {
-        socket.emit('joinNormalMatch');
-        console.log('joinNormalMatch');
-      } else if (mode === 'item') {
-        socket.emit('joinItemMatch');
-        console.log('joinItemMatch');
-      }
-    }
-  }, [isOpen, onClose, router, socket, mode]);
-
-  useEffect(() => {
-    console.log({ test: 'HELLO WORLD!' });
     const handleGoPong = () => {
       onClose();
       router.push('/pong');

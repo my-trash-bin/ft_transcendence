@@ -202,7 +202,7 @@ const testInfo = {
         channelId: getSimpleUuid(getOneHexUpperDigits(2)),
         ownerId: getSimpleUuid(getOneHexUpperDigits(9)),
         title: 'Protected Channel',
-        isPublic: false,
+        isPublic: true,
         password: TEST_CHANNEL_PASSWORD,
         maximumMemberCount: 10,
       },
