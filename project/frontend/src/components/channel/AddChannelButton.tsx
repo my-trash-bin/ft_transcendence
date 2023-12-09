@@ -17,13 +17,7 @@ export function AddChannelButton() {
         <CreateChannelModal isOpen={isOpen} closeModal={closeModal} />
       </Portal>
       <button onClick={openModal}>
-        <Image
-          alt="add channel"
-          src="/icon/add.svg"
-          width={25}
-          height={25}
-          layout="relative"
-        />
+        <Image alt="add channel" src="/icon/add.svg" width={25} height={25} />
       </button>
     </>
   );
