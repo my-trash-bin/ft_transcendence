@@ -18,7 +18,7 @@ import { LongCard } from '../common/LongCard';
 import { useRouter } from 'next/navigation';
 import { LiveStatus } from '../common/LiveStatus';
 import { unwrap } from '@/api/unwrap';
-import { DualFunctionButton } from '../game/GameInviteButtons';
+import { GameInviteButtons } from '../game/GameInviteButtons';
 
 interface ModalProfileProps {
   isOpen: boolean;
@@ -141,12 +141,19 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
     } else {
       content = '게임하기';
     }
-    // if (disabled)
+    if (disabled)
+      return (
+        <Button isModal={true} disabled={true}>
+          {content}
+        </Button>
+      );
     return (
-      <DualFunctionButton
+      <GameInviteButtons
         content={content}
         setGameMode={setGameMode}
         handleInviteOpen={openInvite}
+        isModal={true}
+        friendId={targetId}
       />
     );
   }
