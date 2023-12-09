@@ -192,7 +192,7 @@ export class ChannelService {
         },
       });
 
-      if (this.isUserInChannel(channelMember)) {
+      if (!this.isUserInChannel(channelMember)) {
         throw new ServiceError(
           `채널에 참여중인 사용자만 채널의 정보를 업데이트 할 수 있습니다.`,
           400,
