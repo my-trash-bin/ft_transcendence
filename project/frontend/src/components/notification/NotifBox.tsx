@@ -1,8 +1,8 @@
+import { unwrap } from '@/api/unwrap';
 import Image from 'next/image';
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useQuery } from 'react-query';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
-import { unwrap } from '@/api/unwrap';
 import { NotiCard } from './NotiCard';
 import { SelectNotif } from './SelectNotif';
 
@@ -19,11 +19,11 @@ export function NotifBox({
   const { api } = useContext(ApiContext);
   const { isLoading, isError, data, refetch } = useQuery(
     'fetchNotifications',
-    useCallback(async () => {
-      if (active) {
-        return unwrap(await api.notificationControllerFindManyAndUpdateRead());
-      }
-    }, [api, active]),
+    useCallback(
+      async () =>
+        unwrap(await api.notificationControllerFindManyAndUpdateRead()),
+      [api, active],
+    ),
     {
       enabled: active,
     },
