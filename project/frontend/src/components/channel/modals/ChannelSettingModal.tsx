@@ -45,6 +45,7 @@ const getModalContent = (
     case ModalType.SETTING:
       return (
         <SettingModal
+          channelId={channelId}
           closeModal={closeModal}
           modalStateFunctions={modalStateFunctions}
         />

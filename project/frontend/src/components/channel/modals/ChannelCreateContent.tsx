@@ -25,12 +25,12 @@ export const ChannelCreateContent = ({
 }) => {
   const [titleValid, setTitleValid] = useState(false);
   const [passwordValid, setPasswordValid] = useState(
-    channelType === ChannelType.PUBLIC,
+    channelType !== ChannelType.PROTECTED,
   );
   const [sizeValid, setSizeValid] = useState(true);
 
   useEffect(() => {
-    setPasswordValid(channelType === ChannelType.PUBLIC);
+    setPasswordValid(channelType !== ChannelType.PROTECTED);
     setTitleValid(false);
     setInputTitle('');
     setInputPassword('');
@@ -39,7 +39,7 @@ export const ChannelCreateContent = ({
     setIsValid(false);
   }, [channelType, setIsValid, setInputTitle, setInputPassword, setInputSize]);
 
-  const validText = 'text-[12px] mt-[5px]';
+  const validText = 'text-[12px] mt-[5px] text-dark-gray';
   const invalidText = 'text-[12px] mt-[5px] text-red-400';
 
   return (
@@ -65,7 +65,7 @@ export const ChannelCreateContent = ({
           autoComplete="off"
           className="w-[200px] h-[25px] pl-[5px] rounded-sm focus:outline-none focus:border-purple-500 focus:ring-purple-500 focus:ring-2 disabled:bg-slate-300"
           type="password"
-          disabled={channelType === ChannelType.PUBLIC}
+          disabled={channelType !== ChannelType.PROTECTED}
           onChange={(e) => {
             let res = inputValidator('password', e.target.value);
             setPasswordValid(res);
@@ -76,7 +76,7 @@ export const ChannelCreateContent = ({
           value={inputPassword}
         ></input>
         <p className={passwordValid ? validText : invalidText}>
-          숫자 6자리로 입력해 주세요.
+          비밀번호는 숫자 6자리로 입력해 주세요.
         </p>
       </div>
       <div className="flex flex-col ml-[20px]">
