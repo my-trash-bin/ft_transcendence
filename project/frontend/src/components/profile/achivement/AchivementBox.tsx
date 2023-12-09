@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useQuery } from 'react-query';
 import { ApiContext } from '@/app/_internal/provider/ApiContext';
 import { Loading } from '@/components/common/Loading';
+import { unwrap } from '@/api/unwrap';
 
 export function AchivementBox() {
   const router = useRouter();
@@ -13,7 +14,7 @@ export function AchivementBox() {
   const { isLoading, isError, data } = useQuery(
     'fetchAchievement',
     useCallback(
-      async () => (await api.achievementControllerFindAll()).data,
+      async () => unwrap(await api.achievementControllerFindAll()),
       [api],
     ),
   );

@@ -23,7 +23,6 @@ export const AvatarEditModal: React.FC<ModalProfileProps> = ({
   isOpen,
   onClose,
   fetchData,
-  defaultData,
 }) => {
   const { api } = useContext(ApiContext);
   const [selectedAvatar, setSelectedAvatar] = useState<string>(() => '');

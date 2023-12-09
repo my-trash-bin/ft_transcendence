@@ -8,6 +8,7 @@ import { Loading } from '../common/Loading';
 import { AvatarEditModal } from './AvatarEditModal';
 import { ProfileEditModal } from './ProfileEditModal';
 import { TextBox } from './TextBox';
+import { unwrap } from '@/api/unwrap';
 
 export function ProfileBox() {
   const { api } = useContext(ApiContext);
@@ -15,7 +16,15 @@ export function ProfileBox() {
   const [avatarEditModal, setAvatarEditModal] = useState(false);
   const { isLoading, isError, data, refetch } = useQuery(
     'myProfile',
-    useCallback(async () => (await api.usersControllerMyProfile()).data, [api]),
+    useCallback(
+      async () => unwrap(await api.usersControllerMyProfile()),
+      [api],
+    ),
+    {
+      onSuccess: (fetchedData) => {
+        localStorage.setItem('me', JSON.stringify(fetchedData.me));
+      },
+    },
   );
   const localMe = localStorage.getItem('me');
   const me = localMe ? JSON.parse(localMe) : null;
@@ -26,7 +35,8 @@ export function ProfileBox() {
   } = useQuery(
     [me, 'fetchHistory'],
     useCallback(
-      async () => (await api.pongLogControllerGetUserGameHistories(me.id)).data,
+      async () =>
+        unwrap(await api.pongLogControllerGetUserGameHistories(me.id)),
       [api, me],
     ),
   );
@@ -50,9 +60,9 @@ export function ProfileBox() {
   );
 
   function renderProfileContent() {
-    if (isLoading) return <Loading width={300} />;
+    if (isLoading || historyLoading) return <Loading width={300} />;
 
-    if (isError) {
+    if (isError || historyError) {
       return <p>Error loading profile data.</p>;
     }
     if (!data) {

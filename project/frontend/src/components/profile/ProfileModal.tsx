@@ -17,6 +17,7 @@ import { CardType, HistoryCard } from './history/HistoryCard';
 import { LongCard } from '../common/LongCard';
 import { useRouter } from 'next/navigation';
 import { LiveStatus } from '../common/LiveStatus';
+import { unwrap } from '@/api/unwrap';
 
 interface ModalProfileProps {
   isOpen: boolean;
@@ -46,7 +47,7 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
     [targetId, 'profile'],
     useCallback(
       async () =>
-        (await api.usersControllerGetUserInfo({ targetUser: targetId })).data,
+        unwrap(await api.usersControllerGetUserInfo({ targetUser: targetId })),
       [api, targetId],
     ),
     {
@@ -61,7 +62,7 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
     [targetId, 'fetchHistory'],
     useCallback(
       async () =>
-        (await api.pongLogControllerGetUserGameHistories(targetId)).data,
+        unwrap(await api.pongLogControllerGetUserGameHistories(targetId)),
       [api, targetId],
     ),
     {
@@ -141,7 +142,7 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
     }
     return <DualFunctionButton content={content} disabled={disabled} />;
   }
-  
+
   function DualFunctionButton({
     content,
     disabled,

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useContext } from 'react';
 import { useQuery } from 'react-query';
 import { HistoryCard } from './HistoryCard';
+import { unwrap } from '@/api/unwrap';
 
 export function HistoryArticle() {
   const { api } = useContext(ApiContext);
@@ -16,7 +17,8 @@ export function HistoryArticle() {
   const { isLoading, isError, data } = useQuery(
     [me, 'fetchHistory'],
     useCallback(
-      async () => (await api.pongLogControllerGetUserGameHistories(me.id)).data,
+      async () =>
+        unwrap(await api.pongLogControllerGetUserGameHistories(me.id)),
       [api, me],
     ),
   );

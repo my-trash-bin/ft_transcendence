@@ -6,6 +6,7 @@ import { useQuery } from 'react-query';
 import { Badge } from './Badge';
 import { Button } from '@/components/common/Button';
 import { useRouter } from 'next/navigation';
+import { unwrap } from '@/api/unwrap';
 
 export function AchivementArticle() {
   const { api } = useContext(ApiContext);
@@ -13,7 +14,7 @@ export function AchivementArticle() {
   const { isLoading, isError, data } = useQuery(
     'fetchAchievement',
     useCallback(
-      async () => (await api.achievementControllerFindAll()).data,
+      async () => unwrap(await api.achievementControllerFindAll()),
       [api],
     ),
   );
