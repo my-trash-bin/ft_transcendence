@@ -46,9 +46,10 @@ export function AllChannelList({ searchChannel }: { searchChannel: string }) {
     [],
   );
 
-  const { isLoading, data } = useQuery('allChannels', apiCall);
+  const { isLoading, isError, data } = useQuery('allChannels', apiCall);
 
   if (isLoading) return <p>로딩중...</p>;
+  if (isError) return <p>알 수 없는 에러</p>;
 
   let renderData = getRenderData(
     data?.data,

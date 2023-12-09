@@ -28,9 +28,10 @@ export function MyChannelList({
     () => new Api().api.channelControllerFindMyChannels(),
     [],
   );
-  const { isLoading, data } = useQuery('myChannels', apiCall);
+  const { isLoading, isError, data } = useQuery('myChannels', apiCall);
 
   if (isLoading) return <p>로딩중...</p>;
+  if (isError) return <p>알 수 없는 에러</p>;
   let renderData = getRenderData(data?.data, searchChannel);
 
   return (

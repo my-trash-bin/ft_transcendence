@@ -54,7 +54,7 @@ export function SearchCardList({
 
   function render() {
     if (isError && !isLoading) {
-      return <p className="font-normal text-h2">Something wrong</p>;
+      return <p className="font-normal text-h2">알 수 없는 에러</p>;
     }
     if (isLoading || !data) return <Loading width={500} />;
     if (data.length === 0) {
