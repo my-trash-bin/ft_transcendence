@@ -1,8 +1,7 @@
 import { ProfileModal } from '@/components/profile/ProfileModal';
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useState } from 'react';
 import FriendAvatar from './FriendAvatar';
 import FriendInvite from '@/components/game/FriendInvite';
-import { getSocket } from '@/lib/Socket';
 import { LiveStatus } from '@/components/common/LiveStatus';
 
 interface CommonCardProps {
