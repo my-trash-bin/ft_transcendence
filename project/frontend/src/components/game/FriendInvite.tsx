@@ -1,8 +1,8 @@
 import { useRouter } from 'next/navigation';
 import React, { useEffect } from 'react';
+import { ModalLayout } from '../channel/modals/ModalLayout';
 import useStore from '../pong/Update';
 import { getGameSocket } from '../pong/gameSocket';
-import { ModalLayout } from '../channel/modals/ModalLayout';
 
 interface FriendInviteProps {
   isOpen: boolean;

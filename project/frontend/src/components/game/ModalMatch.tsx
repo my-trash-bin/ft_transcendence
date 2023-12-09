@@ -29,26 +29,28 @@ const MatchingModal: React.FC<MatchingModalProps> = ({
         console.log('joinItemMatch');
       }
     }
-  }, [isOpen, onClose, router, socket]);
+  }, [isOpen, onClose, router, socket, mode]);
 
-  const handleGoPong = () => {
-    onClose();
-    router.push('/pong');
-  };
-
-  const handlePlayerRole = (role: string) => {
-    setIsPlayer1(role === 'player1');
-    console.log('playerRole', role);
-    socket.off('playerRole', handlePlayerRole);
-  };
   useEffect(() => {
+    console.log({ test: 'HELLO WORLD!' });
+    const handleGoPong = () => {
+      onClose();
+      router.push('/pong');
+    };
+
+    const handlePlayerRole = (role: string) => {
+      setIsPlayer1(role === 'player1');
+      console.log('playerRole', role);
+      socket.off('playerRole', handlePlayerRole);
+    };
+
     socket.on('GoPong', handleGoPong);
     socket.on('playerRole', handlePlayerRole);
     return () => {
       socket.off('GoPong', handleGoPong);
       socket.off('playerRole', handlePlayerRole);
     };
-  }, []);
+  }, [onClose, router, setIsPlayer1, socket]);
 
   const bgCSS = 'bg-default rounded-md';
   const size = 'py-sm px-lg w-[498px] h-[308px]';
