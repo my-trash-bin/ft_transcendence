@@ -14,12 +14,12 @@ import { JoinedChannelInfoDto } from '../channel/dto/joined-channel-info.dto';
 import { LeavingChannelResponseDto } from '../channel/dto/leave-channel-response.dto';
 import { GateWayEvents } from '../common/gateway-events.enum';
 import { MessageWithMemberDto } from '../dm/dto/message-with-member';
+import { NotificationService } from '../notification/notification.service';
 import { PongLogService } from '../pong-log/pong-log.service';
 import { GameState, Pong } from '../pong/pong';
 import { UserDto } from '../users/dto/user.dto';
 import { DmChannelInfoType } from './event-response.dto';
 import { UserSocket } from './events.gateway';
-import { NotificationService } from '../notification/notification.service';
 // import { NotificationService } from '../notification/notification.service';
 
 export enum ChannelRoomType {
@@ -528,6 +528,39 @@ export class EventsService {
     }
   }
 
+  private async alarmInvited(myId: UserId, friendId: UserId, isItemMode: boolean) {
+    const eventName = 'newGameInvitaion';
+    const prismaUser = await this.prismaService.user.findUnique({
+      where: { id: friendId.value },
+    });
+
+    const myPrismaUser = await this.prismaService.user.findUnique({
+      where: { id: myId.value },
+    });
+
+    if (!prismaUser || !myPrismaUser) {
+      // error
+      this.logger.error(`alarmInvited: 유저 조회 실패`);
+      return;
+    }
+
+    await this.notificationService.create(
+      friendId,
+      JSON.stringify({
+        type: eventName,
+        sourceId: friendId.value,
+        sourceName: myPrismaUser.nickname,
+        mode: isItemMode ? 'item' : 'normal',
+      }),
+    );
+
+    const data = {
+      nickname: myPrismaUser.nickname,
+      mode: isItemMode ? 'item' : 'normal',
+    };
+    this.broadcastToUserClients(friendId, eventName, data);
+  }
+
   handleInviteMatch(client: UserSocket, friendId: string, isItemMode: boolean) {
     const userId = client.data.userId as string;
     const eventName = isItemMode ? 'invitedItemMatch' : 'invitedNormalMatch';
@@ -541,10 +574,7 @@ export class EventsService {
       return;
     }
 
-    friendSocket.emit(eventName, {
-      inviterId: client.data.userId,
-      mode,
-    });
+    this.alarmInvited(idOf(userId), idOf(friendId), isItemMode);
 
     const timeout = setTimeout(() => {
       this.handleAutomaticDecline(friendId, userId);
@@ -793,22 +823,4 @@ export class EventsService {
     status = status ?? this.getUserStatus(userId);
     this.notiUserStatusUpdate(status, userId.value);
   }
-
-  // private temp(triggerId: UserId, mode: string) {
-  //   await this.notificationService.create(
-  //     targetId,
-  //     JSON.stringify({
-  //       type: 'newGameInvitaion',
-  //       sourceId: triggerId.value,
-  //       sourceName: result.data!.follower.nickname,
-  //     }),
-  //   );
-  //   // 소켓통신은 스텝 2
-  //   // const eventName = GateWayEvents.Notification
-  //   // const data = {
-  //   //   id: "",
-  //   //   mode: "",
-  //   // }
-  //   // this.broadcastToUserClients(targetId, eventName, data);
-  // }
 }
