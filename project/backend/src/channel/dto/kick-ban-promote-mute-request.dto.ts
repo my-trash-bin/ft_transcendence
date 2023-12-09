@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsUUID } from 'class-validator';
 import { ChangeActionType } from '../channel.service';
 
-export class kickBanPromoteMuteRequsetDto {
+export class KickBanPromoteMuteRequestDto {
   @ApiProperty({ description: '대상 채널 UUID' })
   @IsUUID()
   channelId!: string;

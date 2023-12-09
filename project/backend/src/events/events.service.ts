@@ -558,7 +558,7 @@ export class EventsService {
       nickname: myPrismaUser.nickname,
       mode: isItemMode ? 'item' : 'normal',
     };
-    this.broadcastToUserClients(friendId, eventName, data);
+    this.broadcastToUserClients(friendId, 'noti', data);
   }
 
   handleInviteMatch(client: UserSocket, friendId: string, isItemMode: boolean) {

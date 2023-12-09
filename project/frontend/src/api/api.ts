@@ -367,22 +367,22 @@ export interface CreateChannelDto {
   /** 채널 제목 */
   title: string;
   /** 채널 암호 */
-  password?: string;
+  password?: string | null;
   /** 채널 최대 인원수 */
   capacity: number;
 }
 
 export interface UpdateChannelDto {
   /** 채널 Id */
-  channelId: string;
+  channelId?: string;
   /** 채널 타입: public | protected | private */
-  type: 'public' | 'protected' | 'private';
+  type?: 'public' | 'protected' | 'private';
   /** 채널 제목 */
-  title: string;
+  title?: string;
   /** 채널 암호 */
-  password?: string;
+  password?: string | null;
   /** 채널 최대 인원수 */
-  capacity: number;
+  capacity?: number;
 }
 
 export interface ChannelMemberDto {
@@ -455,7 +455,7 @@ export interface ParticipateChannelDto {
   /** 채널 ID */
   channelId: string;
   /** 채널 암호 */
-  password?: string;
+  password?: string | null;
 }
 
 export interface JoinedChannelInfoDto {
@@ -479,7 +479,7 @@ export interface LeavingChannelResponseDto {
   member: UserDto;
 }
 
-export interface KickBanPromoteMuteRequsetDto {
+export interface KickBanPromoteMuteRequestDto {
   /** 대상 채널 UUID */
   channelId: string;
   /** 대상 유저 UUID */
@@ -1469,7 +1469,7 @@ export class Api<
      * @request POST:/api/v1/channel/kickBanPromoteMute
      */
     channelControllerKickBanPromoteMute: (
-      data: KickBanPromoteMuteRequsetDto,
+      data: KickBanPromoteMuteRequestDto,
       params: RequestParams = {},
     ) =>
       this.request<ChannelMemberDetailDto, any>({
