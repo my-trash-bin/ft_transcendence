@@ -5,7 +5,7 @@ import FriendInvite from '../game/FriendInvite';
 import { FriendSetting } from './FriendSetting';
 import { CommonCard } from './utils/CommonCard';
 import { getGameSocket } from '../pong/gameSocket';
-import { DualFunctionButton } from '../game/GameInviteButtons';
+import { GameInviteButtons } from '../game/GameInviteButtons';
 
 interface FriendCardProps {
   readonly nickname: string;
@@ -38,10 +38,11 @@ export function FriendCard({
       refetch={refetch}
     >
       <div className="flex flex-row justify-center items-center gap-md">
-        <DualFunctionButton
+        <GameInviteButtons
           content={'게임하기'}
           setGameMode={setGameMode}
           handleInviteOpen={handleInviteOpen}
+          isModal={false}
         />
         <Button onClick={() => router.push(`/dm/${nickname}`)}>메세지</Button>
         <FriendSetting targetId={id} refetch={refetch} />
