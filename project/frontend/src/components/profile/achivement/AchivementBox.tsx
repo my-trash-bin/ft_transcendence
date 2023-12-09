@@ -10,8 +10,8 @@ import { Loading } from '@/components/common/Loading';
 export function AchivementBox() {
   const router = useRouter();
   const { api } = useContext(ApiContext);
-  const { isLoading, data } = useQuery(
-    'fetchAchievement1',
+  const { isLoading, isError, data } = useQuery(
+    'fetchAchievement',
     useCallback(
       async () => (await api.achievementControllerFindAll()).data,
       [api],
@@ -32,7 +32,9 @@ export function AchivementBox() {
 
   function render() {
     if (isLoading) return <Loading width={300} />;
-
+    if (isError || !data) {
+      return <p className="text-center">Something went wrong</p>;
+    }
     const filteredData = data?.filter((badge) => badge.isMine);
 
     if (filteredData?.length === 0 || !filteredData)

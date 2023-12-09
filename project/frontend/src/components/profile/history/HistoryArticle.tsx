@@ -14,7 +14,7 @@ export function HistoryArticle() {
   const me = localMe ? JSON.parse(localMe) : null;
 
   const { isLoading, isError, data } = useQuery(
-    ['fetchHistory2'],
+    [me, 'fetchHistory'],
     useCallback(
       async () => (await api.pongLogControllerGetUserGameHistories(me.id)).data,
       [api, me],

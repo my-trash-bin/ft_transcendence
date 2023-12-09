@@ -4,6 +4,7 @@ import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { MessageSearchInput } from '../dm/message-search/MessageSearchInput';
 import { SearchCard } from './SearchCard';
 import { Loading } from '../common/Loading';
+import { unwrap } from '@/api/unwrap';
 
 export function SearchCardList({
   activeScreen,
@@ -16,11 +17,11 @@ export function SearchCardList({
     ['searchList', searchName],
     useCallback(
       async () =>
-        (
+        unwrap(
           await api.usersControllerSearchByNickname({
             q: searchName,
-          })
-        ).data,
+          }),
+        ),
       [api, searchName],
     ),
   );
@@ -52,11 +53,10 @@ export function SearchCardList({
   );
 
   function render() {
-    if (isLoading) return <Loading width={500} />;
-
-    if (isError || !data) {
+    if (isError && !isLoading) {
       return <p className="font-normal text-h2">Something wrong</p>;
     }
+    if (isLoading || !data) return <Loading width={500} />;
     if (data.length === 0) {
       return <p className="font-semibold text-h2">No elements</p>;
     }

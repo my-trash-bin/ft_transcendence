@@ -41,6 +41,9 @@ export function NotifBox({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [setActive]);
+
+  if (isLoading) return <p>로딩중</p>;
+  else if (isError) return <p>something wrong!</p>;
   return (
     active && (
       <div
@@ -60,7 +63,7 @@ export function NotifBox({
             width={20}
             height={20}
             className="w-[20px] h-[20px] self-center mr-sm"
-            onClick={() => alert('refetch')}
+            onClick={() => refetch()}
           />
         </div>
         {data &&

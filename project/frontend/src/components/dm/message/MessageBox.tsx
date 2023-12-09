@@ -13,24 +13,24 @@ export function MessageBox({ username }: { readonly username: string }) {
 
   const { isLoading, data } = useQuery('userByNickanme', apiCall);
 
-  if (isLoading) return <div>loading... 👾</div>;
+  if (isLoading || !data) return <div>loading... 👾</div>;
 
   const localMe = localStorage.getItem('me');
   const me = localMe ? JSON.parse(localMe) : null;
   return (
     <>
       <UserInfo
-        imageUri={data?.data.profileImageUrl}
-        username={data?.data.nickname}
+        imageUri={data.data.profileImageUrl}
+        username={data.data.nickname}
         onActive={false}
-        targetId={data?.data.id}
+        targetId={data.data.id}
       />
       <MessageContent
         type={messageType.DM}
         myNickname={me?.nickname}
         targetName={username}
       />
-      <MessageSendBox type={messageType.DM} targetUserId={data?.data.id} />
+      <MessageSendBox type={messageType.DM} targetUserId={data.data.id} />
     </>
   );
 }

@@ -11,7 +11,7 @@ export function AchivementArticle() {
   const { api } = useContext(ApiContext);
   const router = useRouter();
   const { isLoading, isError, data } = useQuery(
-    'fetchAchievement2',
+    'fetchAchievement',
     useCallback(
       async () => (await api.achievementControllerFindAll()).data,
       [api],
