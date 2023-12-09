@@ -41,11 +41,12 @@ export function NotifBox({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [setActive]);
-  console.log(data);
-  if (isLoading) return <p>로딩중</p>;
-  if (isError || !data) return <p>something wrong!</p>;
-  return (
-    active && (
+  return active && render();
+
+  function render() {
+    if (isLoading) return <p>로딩중</p>;
+    if (isError || !data) return <p>something wrong!</p>;
+    return (
       <div
         ref={boxRef}
         className={
@@ -80,6 +81,6 @@ export function NotifBox({
             return null;
           })}
       </div>
-    )
-  );
+    );
+  }
 }
