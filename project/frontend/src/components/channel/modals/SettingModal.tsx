@@ -30,7 +30,6 @@ export function SettingModal({
 }) {
   const [password, setPassword] = useState('');
   const [channelType, setChannelType] = useState(ChannelType.PUBLIC);
-  // TODO: 현재 채널의 타입 가지고 와야 함!
   const [passwordValid, setPasswordValid] = useState(
     channelType !== ChannelType.PROTECTED,
   );
@@ -65,7 +64,7 @@ export function SettingModal({
 
   function updateChannel() {
     const channelUpdateData =
-      channelType !== ChannelType.PUBLIC
+      channelType === ChannelType.PROTECTED
         ? {
             channelId: channelId,
             type: channelType,
