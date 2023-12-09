@@ -1,7 +1,7 @@
 import { HttpResponse } from './api';
 
 export function unwrap<T>(response: HttpResponse<T>): T {
-  console.log('unwrap', { response });
+  // console.log('unwrap', { response });
   if (!response.ok) {
     const errorMessage = response.body
       ? response.body.toString()

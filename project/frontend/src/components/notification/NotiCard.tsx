@@ -20,6 +20,8 @@ export const NotiCard: React.FC<NotiCardProps> = ({ content }) => {
   const route = useRouter();
   const sourceId = obj.sourceId;
   const sourceName = obj.sourceName;
+  const mode = obj.mode;
+
   function handleMouseEnter() {
     setHovered(true);
   }
@@ -57,10 +59,13 @@ export const NotiCard: React.FC<NotiCardProps> = ({ content }) => {
       hoverContent = '메세지창으로 이동';
       handlerFunction = () => route.push(`/channel/${sourceId}`);
       break;
-    case 'gameRequest':
+    case 'newGameInvitaion':
       notificationContent = `가 1대1 게임을 요청했습니다.`;
       hoverContent = '게임 참여하기';
       handlerFunction = () => alert('game api');
+      console.log('mode: ', mode);
+      console.log('id: ', sourceId);
+      // TODO : 게임 수락 여기서
       break;
     default:
       return null; // Handle unknown type or return a default component
