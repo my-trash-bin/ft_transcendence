@@ -589,7 +589,6 @@ export class EventsService {
     if (invitation) {
       this.activeInvitations.delete(inviteeId);
 
-      console.log('handleCancelInvite', userId, inviteeId, eventName);
       const inviteeSocket = invitation.inviteeSocket;
       if (inviteeSocket) {
         inviteeSocket.emit(eventName, { userId });
