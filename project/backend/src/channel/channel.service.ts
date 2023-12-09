@@ -204,12 +204,16 @@ export class ChannelService {
         );
       }
 
+      if (password) {
+        password = await this.mfaPasswordHash(password);
+      }
+
       const result = await this.prismaService.channel.update({
         where: { id: channelId.value },
         data: {
           title,
           isPublic,
-          password: password ? await this.mfaPasswordHash(password) : password,
+          password,
           maximumMemberCount,
         },
       });
@@ -279,7 +283,7 @@ export class ChannelService {
           throw new ServiceError('최대 사용자 수 초과', 400);
         }
 
-        if (!channel.isPublic && channel.password === null) {
+        if (!channel.isPublic) {
           throw new ServiceError('private 방에는 접속 할 수 없습니다.', 400);
         }
 
