@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useCallback, useContext } from 'react';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { useRouter } from 'next/navigation';
+import { getGameSocket } from '../pong/gameSocket';
 
 interface NotiCardProps {
   isRead: boolean;
@@ -60,12 +61,18 @@ export const NotiCard: React.FC<NotiCardProps> = ({ content }) => {
       handlerFunction = () => route.push(`/channel/${sourceId}`);
       break;
     case 'newGameInvitaion':
+      const socket = getGameSocket();
       notificationContent = `가 1대1 게임을 요청했습니다.`;
       hoverContent = '게임 참여하기';
-      handlerFunction = () => alert('game api');
-      console.log('mode: ', mode);
-      console.log('id: ', sourceId);
-      // TODO : 게임 수락 여기서
+      handlerFunction = () => {
+        if (mode === 'normal') {
+          socket.emit('acceptNormalMatch', sourceId);
+          route.push('/pong');
+        } else {
+          socket.emit('acceptItemMatch', sourceId);
+          route.push('/pong');
+        }
+      }
       break;
     default:
       return null; // Handle unknown type or return a default component
