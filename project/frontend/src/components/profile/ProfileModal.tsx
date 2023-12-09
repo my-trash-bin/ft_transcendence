@@ -55,8 +55,8 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
     },
   );
   const {
-    // isLoading: historyLoading,
-    // isError: historyError,
+    isLoading: historyLoading,
+    isError: historyError,
     data: historyData,
   } = useQuery(
     [targetId, 'fetchHistory'],
@@ -294,9 +294,9 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
   );
 
   function renderProfileContent() {
-    if (userInfoLoading) return <Loading width={300} />;
+    if (userInfoLoading || historyLoading) return <Loading width={300} />;
 
-    if (userInfoError) {
+    if (userInfoError || historyError) {
       return <p>Error loading profile data.</p>;
     }
     if (!userInfoData) {

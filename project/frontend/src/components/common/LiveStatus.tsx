@@ -25,7 +25,7 @@ export function LiveStatus({ targetId }: { targetId: string }) {
   const socket = getSocket();
   const activeColor =
     active === 'online'
-      ? 'bg-default border-1 border-dark-purple'
+      ? 'bg-dark-purple border-1 border-dark-purple'
       : active === 'offline'
       ? 'bg-gray'
       : 'bg-dark-purple';
