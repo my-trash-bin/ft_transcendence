@@ -236,6 +236,7 @@ export class EventsGateway
     @ConnectedSocket() client: UserSocket,
     @MessageBody() inviterId: string,
   ) {
+    console.log('acceptItemMatch == ', inviterId);
     this.eventsService.handleAcceptMatch(client, inviterId, true);
   }
 
