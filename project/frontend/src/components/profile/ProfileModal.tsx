@@ -18,6 +18,7 @@ import { LongCard } from '../common/LongCard';
 import { useRouter } from 'next/navigation';
 import { LiveStatus } from '../common/LiveStatus';
 import { unwrap } from '@/api/unwrap';
+import { DualFunctionButton } from '../game/GameInviteButtons';
 
 interface ModalProfileProps {
   isOpen: boolean;
@@ -140,47 +141,13 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
     } else {
       content = '게임하기';
     }
-    return <DualFunctionButton content={content} disabled={disabled} />;
-  }
-
-  function DualFunctionButton({
-    content,
-    disabled,
-  }: {
-    content: string;
-    disabled: boolean;
-  }) {
-    const [isHovered, setIsHovered] = useState(false);
-
-    function startNormal() {
-      setGameMode('normal');
-      openInvite();
-    }
-    function startItem() {
-      setGameMode('item');
-      openInvite();
-    }
+    // if (disabled)
     return (
-      <div
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        className="relative w-[75px] h-[30px]"
-      >
-        {isHovered && !disabled ? (
-          <div className="flex absolute left-[-30px]">
-            <Button isModal={true} onClick={() => startNormal()}>
-              {'일반모드'}
-            </Button>
-            <Button isModal={true} onClick={() => startItem()}>
-              {'아이템모드'}
-            </Button>
-          </div>
-        ) : (
-          <Button isModal={true} disabled={disabled}>
-            {content}
-          </Button>
-        )}
-      </div>
+      <DualFunctionButton
+        content={content}
+        setGameMode={setGameMode}
+        handleInviteOpen={openInvite}
+      />
     );
   }
 
