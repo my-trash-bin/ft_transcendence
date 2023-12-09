@@ -2,15 +2,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import { UserId } from '../../common/Id';
 import { PongLogStatDto } from '../../pong-log/dto/pong-log-stat.dto';
 
-// export enum EnumRelation {
-//   'friend',
-//   'block',
-//   'none',
-//   'me',
-// }
-
-// export type RelationKey = 'friend' | 'block' | 'none' | 'me';
-
 export enum RelationStatus {
   Friend = 'friend',
   Block = 'block',
