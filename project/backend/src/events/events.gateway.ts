@@ -24,6 +24,7 @@ import {
   CreateDmChannelDto,
   DmMessageDto,
   SendMessageDto,
+  UserStatusDto,
 } from './event-request.dto';
 import { EventsService } from './events.service';
 
@@ -143,6 +144,16 @@ export class EventsGateway
     this.logger.log(`Client disconnected: ${client.id}`);
     await this.finalizeGame(client);
     this.eventsService.handleDisconnect(client);
+  }
+
+  @SubscribeMessage(GateWayEvents.UserStatus)
+  async userStatusRequest(
+    @ConnectedSocket() client: UserSocket,
+    @MessageBody() data: UserStatusDto,
+  ) {
+    const { userId } = data;
+    this.logger.debug(`userStatusRequest: ${userId}`);
+    this.eventsService.handleUserStatusRequest(client, idOf(userId));
   }
 
   // only 일반채널

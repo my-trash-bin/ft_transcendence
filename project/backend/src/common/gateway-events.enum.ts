@@ -17,5 +17,6 @@ export enum GateWayEvents {
 
   Notification = 'noti',
 
+  UserStatus = 'userStatus',
   // 기타 이벤트들...
 }

@@ -27,6 +27,12 @@ type ChannelIdKey = string;
 type UserIdKey = string;
 type ClientIdKey = string;
 
+export enum EnumUserStatus {
+  ONLINE = 'online',
+  OFFLINE = 'offline',
+  ONGAME = 'ongame',
+}
+
 @Injectable()
 export class EventsService {
   server!: Server;
@@ -402,6 +408,11 @@ export class EventsService {
       .filter(([_userId, sockets]) => sockets.length)
       .map(([userId, _sockets]) => userId);
   };
+  private getUserStatus = (id: UserId): EnumUserStatus => {
+    // TODO: 게임상태까지
+    const isUserOnline = !!this.socketMap.get(id.value)?.length;
+    return isUserOnline ? EnumUserStatus.ONLINE : EnumUserStatus.OFFLINE;
+  };
   private addClientAtSocketMap(client: UserSocket) {
     const userId = client.data.userId as string;
     const sockets: UserSocket[] = this.socketMap.get(userId) ?? [];
@@ -453,16 +464,16 @@ export class EventsService {
     this.server.emit(eventName, data);
   }
   private notiUserStatusUpdate(status: string, userId: string) {
-    this.broadcastAll('userStatus', { status, userId });
+    this.broadcastAll(GateWayEvents.UserStatus, { status, userId });
   }
   private notiUserOn(userId: string) {
-    this.notiUserStatusUpdate('online', userId);
+    this.notiUserStatusUpdate(EnumUserStatus.ONLINE, userId);
   }
   private notiUserOff(userId: string) {
-    this.notiUserStatusUpdate('offline', userId);
+    this.notiUserStatusUpdate(EnumUserStatus.OFFLINE, userId);
   }
   private notiUserGame(userId: string) {
-    this.notiUserStatusUpdate('game', userId);
+    this.notiUserStatusUpdate(EnumUserStatus.ONGAME, userId);
   }
 
   private async getUserJoinedChannelInfos(client: UserSocket) {
@@ -492,5 +503,15 @@ export class EventsService {
       data.player2Score,
       data.isPlayer1win,
     );
+  }
+
+  handleUserStatusRequest(client: UserSocket, userId: UserId) {
+    const status = this.getUserStatus(userId);
+    if (status !== EnumUserStatus.OFFLINE) {
+      client.emit(GateWayEvents.UserStatus, {
+        status,
+        userId: userId.value,
+      });
+    }
   }
 }

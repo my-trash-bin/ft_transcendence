@@ -1,9 +1,26 @@
 import { getSocket } from '@/lib/Socket';
-import { useEffect, useState, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+
+export enum EnumUserStatus {
+  ONLINE = 'online',
+  OFFLINE = 'offline',
+  ONGAME = 'ongame',
+}
+
+const USER_STATUS_EVENT_NAME = 'userStatus';
+
+const isValidStatus = (status: string) =>
+  (
+    [
+      EnumUserStatus.ONLINE,
+      EnumUserStatus.OFFLINE,
+      EnumUserStatus.ONGAME,
+    ] as string[]
+  ).includes(status);
 
 export function LiveStatus({ targetId }: { targetId: string }) {
-  const [active, setActive] = useState<'online' | 'offline' | 'on game'>(
-    'offline',
+  const [active, setActive] = useState<EnumUserStatus>(
+    () => EnumUserStatus.OFFLINE,
   );
   const socket = getSocket();
   const activeColor =
@@ -16,20 +33,20 @@ export function LiveStatus({ targetId }: { targetId: string }) {
   const handleStatus = useCallback(
     (data: { status: string; userId: string }) => {
       console.log('status', data.status, 'userId', data.userId);
-      if (targetId === data.userId && data.status === 'online') {
-        setActive('online');
-      }
-      if (targetId === data.userId && data.status === 'offline') {
-        setActive('offline');
+      if (targetId === data.userId && isValidStatus(data.status)) {
+        setActive(data.status as EnumUserStatus);
       }
     },
     [targetId],
   );
 
   useEffect(() => {
-    socket.on('userStatus', handleStatus);
+    socket.on(USER_STATUS_EVENT_NAME, handleStatus);
+    if (targetId) {
+      socket.emit(USER_STATUS_EVENT_NAME, { userId: targetId });
+    }
     return () => {
-      socket.off('userStatus', handleStatus);
+      socket.off(USER_STATUS_EVENT_NAME, handleStatus);
     };
   }, [handleStatus, socket, targetId]);
 
