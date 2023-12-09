@@ -32,7 +32,7 @@ import { ChannelWithAllInfoDto } from './dto/channel-with-all-info.dto';
 import { ChannelDto } from './dto/channel.dto';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { JoinedChannelInfoDto } from './dto/joined-channel-info.dto';
-import { kickBanPromoteMuteRequsetDto } from './dto/kick-ban-promote-mute-requset.dto';
+import { KickBanPromoteMuteRequestDto } from './dto/kick-ban-promote-mute-request.dto';
 import { LeavingChannelResponseDto } from './dto/leave-channel-response.dto';
 import { LeaveChannelDto } from './dto/leave-channel.dto';
 import { ParticipateChannelDto } from './dto/participate-channel.dto';
@@ -268,7 +268,7 @@ export class ChannelController {
   @UseGuards(JwtGuard, PhaseGuard)
   @Phase('complete')
   async kickBanPromoteMute(
-    @Body() dto: kickBanPromoteMuteRequsetDto,
+    @Body() dto: KickBanPromoteMuteRequestDto,
     @Request() req: ExpressRequest,
   ) {
     const userId = (req.user as JwtPayloadPhaseComplete).id;
