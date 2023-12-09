@@ -9,11 +9,13 @@ export function ParticipationModal({
   setIsModalOpen,
   targetChannelId,
   targetChannelType,
+  setMyChannel,
 }: Readonly<{
   isModalOpen: boolean;
   setIsModalOpen: (isOpen: boolean) => void;
   targetChannelId: string;
   targetChannelType: string;
+  setMyChannel: (myChannel: boolean) => void;
 }>) {
   const { api } = useContext(ApiContext);
   const router = useRouter();
@@ -31,6 +33,7 @@ export function ParticipationModal({
       console.log('Participate channel successfully');
       setIsModalOpen(false);
       router.push(`/channel/${targetChannelId}`);
+      setMyChannel(true);
     } catch (error: any) {
       console.error('Error participate channel:', error);
       if (error?.error.message === '밴된 유저는 채널에 들어갈 수 없습니다.') {
@@ -38,7 +41,14 @@ export function ParticipationModal({
         setIsModalOpen(false);
       }
     }
-  }, [api, targetChannelId, targetChannelType, router, setIsModalOpen]);
+  }, [
+    api,
+    targetChannelId,
+    targetChannelType,
+    router,
+    setIsModalOpen,
+    setMyChannel,
+  ]);
 
   return (
     <ModalLayout

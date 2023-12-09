@@ -1,9 +1,9 @@
 'use client';
 
-import { Api } from '@/api/api';
+import { ApiContext } from '@/app/_internal/provider/ApiContext';
 import { Title } from '@/components/common/Title';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useMutation } from 'react-query';
 import { ChannelButton } from '../ChannelButton';
 import { ChannelSelector } from './ChannelSelector';
@@ -28,6 +28,7 @@ export function SettingModal({
     setModalAdd: () => void;
   };
 }) {
+  const { api } = useContext(ApiContext);
   const [password, setPassword] = useState('');
   const [channelType, setChannelType] = useState(ChannelType.PUBLIC);
   const [passwordValid, setPasswordValid] = useState(
@@ -52,7 +53,7 @@ export function SettingModal({
     setPasswordValid(channelType !== ChannelType.PROTECTED);
   }, [channelType]);
 
-  const mutation = useMutation(new Api().api.channelControllerChannelUpdate, {
+  const mutation = useMutation(api.channelControllerChannelUpdate, {
     onSuccess: () => {
       closeModal();
       alert('채널 설정 변경에 성공했습니다.');
