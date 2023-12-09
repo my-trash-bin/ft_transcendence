@@ -36,6 +36,7 @@ export const useSocket = (type: any, setMessages: any) => {
         ) {
           if (res.data.targetUser.id === me.id) {
             alert('채널에서 강퇴당했습니다.');
+            console.log(res);
             location.href = '/channel';
           }
         } else if (res.data.actionType === 'PROMOTE') {

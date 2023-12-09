@@ -11,6 +11,7 @@ const getRenderedData = (
   myAuthority: string,
   myNickname: string,
   channelId: string,
+  ownerId: string,
 ) => {
   return data.map((p: any) => {
     return (
@@ -22,6 +23,7 @@ const getRenderedData = (
         isMyself={p.member.nickname === myNickname}
         channelId={channelId}
         memberId={p.member.id}
+        ownerId={ownerId}
       />
     );
   });
@@ -33,6 +35,7 @@ export function ParticipantModal({
   channelId,
   myAuthority,
   myNickname,
+  ownerId,
 }: {
   closeModal: () => void;
   modalStateFunctions: {
@@ -43,6 +46,7 @@ export function ParticipantModal({
   channelId: string;
   myAuthority: string;
   myNickname: any;
+  ownerId: string;
 }) {
   const apiCall = useCallback(
     () =>
@@ -59,6 +63,7 @@ export function ParticipantModal({
     myAuthority,
     myNickname,
     channelId,
+    ownerId,
   );
 
   return (

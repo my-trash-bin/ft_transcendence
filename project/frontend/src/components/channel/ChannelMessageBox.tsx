@@ -1,4 +1,5 @@
-import { Api } from '@/api/api';
+import { ApiContext } from '@/app/_internal/provider/ApiContext';
+import { useContext } from 'react';
 import { useQuery } from 'react-query';
 import { MessageContent, messageType } from '../dm/message/MessageContent';
 import { MessageSendBox } from '../dm/message/MessageSendBox';
@@ -7,8 +8,8 @@ import { ChannelInfo } from './ChannelInfo';
 export function ChannleMessageBox({
   channelId,
 }: Readonly<{ channelId: string }>) {
-  const channelApi = () =>
-    new Api().api.channelControllerFindChannelInfo(channelId);
+  const { api } = useContext(ApiContext);
+  const channelApi = () => api.channelControllerFindChannelInfo(channelId);
 
   const { isLoading, data } = useQuery('channelInfo', channelApi);
 
