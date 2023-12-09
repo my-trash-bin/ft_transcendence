@@ -4,6 +4,7 @@ import { useCallback, useContext, useEffect, useState } from 'react';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { ModalLayout } from '../channel/modals/ModalLayout';
 import { Button } from '../common/Button';
+import { avatarToUrl } from '@/app/_internal/util/avatarToUrl';
 
 interface ModalProfileProps {
   isOpen: boolean;
@@ -52,7 +53,7 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
         password: password,
       });
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       if (error.status === 400) {
         alert(
           '비밀번호는 6-12자의 영문, 숫자, 하이픈(-), 언더스코어(_)만 사용 가능합니다',
@@ -111,10 +112,11 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
           <p className="text-h2 font-taebaek text-dark-purple">프로필 수정</p>
           {defaultData.me.profileImageUrl ? (
             <Image
-              src={defaultData.me.profileImageUrl}
+              src={avatarToUrl(defaultData.me.profileImageUrl)}
               alt="avatar"
               width={100}
               height={100}
+              className="rounded-md"
             />
           ) : (
             <Image

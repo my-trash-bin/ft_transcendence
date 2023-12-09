@@ -20,7 +20,7 @@ const LongCardCVA = cva(
     variants: {
       size: {
         small: ['w-[320px] h-[40px] ', 'text-md ', 'border-2 mb-md'],
-        medium: ['w-[600px] h-sm ', 'text-h2', 'border-3 mb-xl'],
+        medium: ['w-[600px] h-[60px] ', 'text-h2', 'border-3 mb-lg'],
         big: ['w-[600px] h-md ', 'text-h2 ', 'mt-xl mb-xl ', 'border-3'],
       },
       color: {

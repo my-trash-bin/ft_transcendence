@@ -16,6 +16,7 @@ import { TextBox } from './TextBox';
 import { CardType, HistoryCard } from './history/HistoryCard';
 import { LongCard } from '../common/LongCard';
 import { useRouter } from 'next/navigation';
+import { LiveStatus } from '../common/LiveStatus';
 
 interface ModalProfileProps {
   isOpen: boolean;
@@ -36,8 +37,6 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
 }) => {
   const { api } = useContext(ApiContext);
   const router = useRouter();
-  // const active = onActive ? 'Active' : 'Inactive';
-  const active = 'Active';
   const {
     isLoading: userInfoLoading,
     isError: userInfoError,
@@ -59,7 +58,7 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
     // isError: historyError,
     data: historyData,
   } = useQuery(
-    [targetId, 'history'],
+    [targetId, 'historyFromProfileModal'],
     useCallback(
       async () =>
         (await api.pongLogControllerGetUserGameHistories(targetId)).data,
@@ -142,7 +141,13 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
     }
     return <DualFunctionButton content={content} disabled={disabled} />;
   }
-  function DualFunctionButton({ content, disabled }) {
+  function DualFunctionButton({
+    content,
+    disabled,
+  }: {
+    content: string;
+    disabled: boolean;
+  }) {
     const [isHovered, setIsHovered] = useState(false);
 
     function startNormal() {
@@ -160,7 +165,7 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
         className="relative w-[75px] h-[30px]"
       >
         {isHovered && !disabled ? (
-          <div className="absolute bottom-[-15px]">
+          <div className="flex absolute left-[-30px]">
             <Button isModal={true} onClick={() => startNormal()}>
               {'일반모드'}
             </Button>
@@ -301,10 +306,7 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
         <div className="flex felx-row gap-xl">
           <div className="flex flex-col items-center gap-md">
             <FriendAvatar imageUrl={userInfoData.imageUrl} size={80} />
-            <div className="flex flex-row items-center gap-sm">
-              <div className="w-[10px] h-[10px] rounded-[10px] bg-dark-purple" />
-              <p className="text-sm">{active}</p>
-            </div>
+            <LiveStatus targetId={userInfoData.id} />
           </div>
           <TextBox
             nickname={userInfoData.nickname}

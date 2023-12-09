@@ -58,7 +58,13 @@ export function EnterPasswordModal({
             height={25}
           ></Image>
         </button>
-        <form className="flex flex-col items-center">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            participateChannel();
+          }}
+          className="flex flex-col items-center"
+        >
           <p className="mb-[15px] mt-[20px]">비밀번호 입력</p>
           <input
             autoComplete="off"

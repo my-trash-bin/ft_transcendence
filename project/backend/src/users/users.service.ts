@@ -183,7 +183,6 @@ export class UsersService {
     id: UserId,
     nickname: string,
   ): Promise<UserRelationshipDto[]> {
-    console.log('searchByBickname', nickname);
     const where: Prisma.UserWhereInput | undefined = !nickname
       ? undefined
       : {

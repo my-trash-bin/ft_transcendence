@@ -1,3 +1,4 @@
+import { avatarToUrl } from '@/app/_internal/util/avatarToUrl';
 import Image from 'next/image';
 
 type FriendAvatarProps = {
@@ -9,17 +10,11 @@ type FriendAvatarProps = {
 export default function FriendAvatar(props: FriendAvatarProps) {
   return (
     <div
-      style={{
-        width: props.size,
-        height: props.size,
-        display: 'inline-block',
-        overflowX: 'hidden',
-        overflowY: 'hidden',
-      }}
+      className={`w-${props.size} h-${props.size} inline-block overflow-hidden`}
     >
       {props.imageUrl ? (
         <Image
-          src={props.imageUrl}
+          src={avatarToUrl(props.imageUrl)}
           priority={true}
           alt="avatar"
           width={props.size}
@@ -28,6 +23,7 @@ export default function FriendAvatar(props: FriendAvatarProps) {
             'rounded-md flex items-center justify-center hover:bg-default'
           }
           onClick={props.onClick}
+          style={{ objectFit: 'cover' }}
         />
       ) : (
         <Image

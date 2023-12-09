@@ -48,3 +48,8 @@ export class KickBanPromoDto {
 
   actionType!: ChangeActionType;
 }
+
+export class UserStatusDto {
+  @IsUUID()
+  userId!: string;
+}

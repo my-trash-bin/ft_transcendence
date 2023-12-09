@@ -51,7 +51,7 @@ export function HistoryArticle() {
     }
 
     return (
-      <div className="flex flex-col items-center w-[80%] h-[500px] overflow-y-scroll">
+      <div className="flex flex-col items-center w-[80%] h-[500px] overflow-y-scroll pt-sm">
         {data.records.map((history: any) => (
           <HistoryCard
             key={history.id}

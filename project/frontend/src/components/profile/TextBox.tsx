@@ -1,8 +1,8 @@
 interface TextBoxProps {
   readonly nickname: string;
-  readonly win: number;
-  readonly lose: number;
-  readonly ratio: number;
+  readonly win?: number;
+  readonly lose?: number;
+  readonly ratio?: number;
   readonly statusMessage: string;
   readonly isModal?: boolean;
 }

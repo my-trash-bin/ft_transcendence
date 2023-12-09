@@ -23,6 +23,20 @@ export interface MessageContentInterface {
   };
 }
 
+const isSystemMessage = (message: { type: string }) =>
+  ['leave', 'join'].includes(message.type);
+const isMySessage = (
+  msg1: { data: { member: { nickname: string } } },
+  msg2: { data: { member: { nickname: string } } },
+) => msg1.data.member.nickname === msg2.data.member.nickname;
+const calIsFirst = (
+  mesaageList: { type: string; data: { member: { nickname: string } } }[],
+  idx: number,
+) =>
+  idx === 0 ||
+  isSystemMessage(mesaageList[idx - 1]) ||
+  !isMySessage(mesaageList[idx - 1], mesaageList[idx]);
+
 export function MessageContent({
   channelId,
   type,
@@ -64,15 +78,6 @@ export function MessageContent({
             />
           );
         } else {
-          let isFirst = false;
-          if (
-            idx == 0 ||
-            (idx != 0 &&
-              messages[idx - 1].data.member.nickname !=
-                message.data.member.nickname)
-          ) {
-            isFirst = true;
-          }
           return (
             <OtherChat
               key={message.data.id}
@@ -81,7 +86,7 @@ export function MessageContent({
               profileImage={message.data.member.profileImageUrl}
               targetId={message.data.member.id}
               targetNickname={message.data.member.nickname}
-              isFirst={isFirst}
+              isFirst={calIsFirst(messages, idx)}
             />
           );
         }

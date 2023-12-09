@@ -1,3 +1,4 @@
+import { avatarToUrl } from '@/app/_internal/util/avatarToUrl';
 import Image from 'next/image';
 import { SelectPenalty } from '../SelectPenalty';
 
@@ -22,7 +23,7 @@ export function ParticipantCard({
     ) : (
       ''
     );
-  const imagePath = imageUrl ? imageUrl : '';
+  const imagePath = imageUrl ? avatarToUrl(imageUrl) : '';
   return (
     <div className="bg-white mb-[10px] pl-[10px] w-[280px] h-[70px] border border-default rounded-[10px] flex flex-row justify-between shrink-0">
       <div className="flex flex-row items-center">

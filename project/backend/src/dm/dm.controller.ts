@@ -6,7 +6,7 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request as ExpressRequest } from 'express';
 import { JwtPayloadPhaseComplete } from '../auth/auth.service';
 import { JwtGuard } from '../auth/jwt.guard';
@@ -34,6 +34,7 @@ export class DmController {
   // }
 
   @Get(':nickname')
+  @ApiOperation({ summary: '특정 유저와의 DM 채널 정보' })
   @UseGuards(JwtGuard, PhaseGuard)
   @Phase('complete')
   @ApiOkResponse({
@@ -53,6 +54,7 @@ export class DmController {
   }
 
   @Get()
+  @ApiOperation({ summary: '유저에게 보여줄 DM 채널 리스트' })
   @UseGuards(JwtGuard, PhaseGuard)
   @Phase('complete')
   @ApiOkResponse({

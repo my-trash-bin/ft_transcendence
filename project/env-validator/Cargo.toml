@@ -1,7 +1,0 @@
-[package]
-name = "env-validator"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]
-dotenv-parser = "0.1.3"

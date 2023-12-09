@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { ModalLayout } from '../channel/modals/ModalLayout';
 import { Button } from '../common/Button';
 import useStore from '../pong/Update';
+import { avatarToUrl } from '@/app/_internal/util/avatarToUrl';
 
 interface ModalProfileProps {
   isOpen: boolean;
@@ -29,7 +30,9 @@ export const GameFinishModal: React.FC<ModalProfileProps> = ({
         <div className="flex flex-row justify-between">
           <div className={userLayout}>
             <Image
-              src={isPlayer1 ? player2Info.avatarUrl : player1Info.avatarUrl}
+              src={avatarToUrl(
+                isPlayer1 ? player2Info.avatarUrl : player1Info.avatarUrl,
+              )}
               alt="avatar"
               width={100}
               height={100}
@@ -38,8 +41,9 @@ export const GameFinishModal: React.FC<ModalProfileProps> = ({
               {isPlayer1 ? player2Info.nickname : player1Info.nickname}
             </div>
             <div className="text-center font-taebaek text-dark-purple">
-             {(isPlayer1 && score2 > score1) || (!isPlayer1 && score1 > score2)
-              ? '승!!' : '패..ㅠ'}
+              {(isPlayer1 && score2 > score1) || (!isPlayer1 && score1 > score2)
+                ? '승!!'
+                : '패..ㅠ'}
             </div>
           </div>
           <div className="flex flex-col">
@@ -49,7 +53,9 @@ export const GameFinishModal: React.FC<ModalProfileProps> = ({
           </div>
           <div className={userLayout}>
             <Image
-              src={isPlayer1 ? player1Info.avatarUrl : player2Info.avatarUrl}
+              src={avatarToUrl(
+                isPlayer1 ? player1Info.avatarUrl : player2Info.avatarUrl,
+              )}
               alt="avatar"
               width={100}
               height={100}
@@ -59,7 +65,8 @@ export const GameFinishModal: React.FC<ModalProfileProps> = ({
             </div>
             <div className="text-center font-taebaek text-dark-purple">
               {(isPlayer1 && score1 > score2) || (!isPlayer1 && score2 > score1)
-              ? '승!!' : '패..ㅠ'}
+                ? '승!!'
+                : '패..ㅠ'}
             </div>
           </div>
         </div>
