@@ -65,7 +65,6 @@ export function MessageSendBox({
             src="/icon/message-send.svg"
             width={30}
             height={30}
-            layout="relative"
           />
         </button>
       </div>
