@@ -65,7 +65,7 @@ export function FriendCard({
     >
       <div className="flex flex-row justify-center items-center gap-md">
         <DualFunctionButton content={'게임하기'} />
-        <Button onClick={() => router.push(`/dm/${id}`)}>메세지</Button>
+        <Button onClick={() => router.push(`/dm/${nickname}`)}>메세지</Button>
         <FriendSetting targetId={id} refetch={refetch} />
       </div>
       <FriendInvite
