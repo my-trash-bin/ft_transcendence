@@ -21,7 +21,6 @@ export function UserInfo({
           src={avatarToUrl(imageUri)}
           width={35}
           height={40}
-          layout="relative"
         />
       </div>
       <p className="top-[10px] left-[100px] text-[22px] absolute">

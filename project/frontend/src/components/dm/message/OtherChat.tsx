@@ -55,7 +55,6 @@ export function OtherChat({
               src={avatarToUrl(profileImage)}
               width={40}
               height={40}
-              layout="responsive"
             />
           </button>
         ) : (
