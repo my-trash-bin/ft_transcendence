@@ -4,6 +4,7 @@ import {
   Controller,
   Get,
   HttpStatus,
+  Logger,
   Post,
   Request,
   UseGuards,
@@ -28,6 +29,7 @@ import { UserFollowService } from './user-follow.service';
 @ApiTags('friends')
 @Controller('/api/v1/friends')
 export class UserFollowController {
+  private logger = new Logger('UserFollowController');
   constructor(
     private readonly userFollowService: UserFollowService,
     private readonly notificationService: NotificationService,
@@ -44,14 +46,19 @@ export class UserFollowController {
     if (!result.ok) {
       throw new BadRequestException(result!.error?.message);
     }
-    await this.notificationService.create(
-      idOf(dto.targetUser),
-      JSON.stringify({
-        type: 'newFriend',
-        sourceId: (req.user as JwtPayloadPhaseComplete).id.value,
-        sourceName: result.data!.follower.nickname,
-      }),
-    );
+    try {
+      await this.notificationService.create(
+        idOf(dto.targetUser),
+        JSON.stringify({
+          type: 'newFriend',
+          sourceId: (req.user as JwtPayloadPhaseComplete).id.value,
+          sourceName: result.data!.follower.nickname,
+        }),
+      );
+      this.logger.log(`친구 요청 성공 후, 노티 생성 성공`);
+    } catch (error) {
+      this.logger.error(`친구 요청 성공 후, 노티 생성시 에러: ${error}`);
+    }
     return result!.data;
   }
 
@@ -127,6 +134,9 @@ export class UserFollowController {
     const userId = (req.user as JwtPayloadPhaseComplete).id;
     const isBlock = false;
     const result = await this.userFollowService.findByUsers(userId, isBlock);
+    this.logger.log(
+      `유저(${userId.value})의 친구 목록 조회 결과: 총 ${result.length}명`,
+    );
     return result.map((el) => new UserFollowDto(el));
   }
 
@@ -140,10 +150,12 @@ export class UserFollowController {
   @UseGuards(JwtGuard, PhaseGuard)
   @Phase('complete')
   async findBlocks(@Request() req: ExpressRequest): Promise<UserFollowDto[]> {
-    console.log('findBlocks', req.user);
     const userId = (req.user as JwtPayloadPhaseComplete).id;
     const isBlock = true;
     const result = await this.userFollowService.findByUsers(userId, isBlock);
+    this.logger.log(
+      `유저(${userId.value})의 차단 목록 조회 결과: 총 ${result.length}명`,
+    );
     return result.map((el) => new UserFollowDto(el));
   }
 

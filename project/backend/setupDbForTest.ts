@@ -1,4 +1,8 @@
 import { PrismaClient } from '@prisma/client';
+import dotenv from 'dotenv';
+import { scrypt } from 'node:crypto';
+
+dotenv.config();
 
 type LowercaseAlphabet =
   | 'a'
@@ -129,6 +133,20 @@ enum ChannelMemberType {
   BANNED = 'BANNED',
 }
 
+function mfaPasswordHash(password: string): Promise<string> {
+  const salt = process.env.PASSWORD_SALT;
+  if (!salt) {
+    throw new Error('PASSWORD_SALT ENV 있는 곳으로 가!');
+  }
+  return new Promise<string>((resolve, reject) => {
+    scrypt(password, salt, 32, (err, buffer) => {
+      if (err) reject(err);
+      else resolve(buffer.toString());
+    });
+  });
+}
+const TEST_CHANNEL_PASSWORD = 'somePassword';
+
 const testInfo = {
   numOfUser: 10,
   friendship: [
@@ -143,7 +161,7 @@ const testInfo = {
     {
       channelInfo: {
         channelId: getSimpleUuid(getOneHexUpperDigits(0)),
-        userId: 0,
+        ownerId: getSimpleUuid(getOneHexUpperDigits(0)), // 모두 0번 유저가 생성
         title: 'Public Channel',
         isPublic: true,
         password: undefined,
@@ -165,7 +183,7 @@ const testInfo = {
     {
       channelInfo: {
         channelId: getSimpleUuid(getOneHexUpperDigits(1)),
-        userId: 1,
+        ownerId: getSimpleUuid(getOneHexUpperDigits(1)),
         title: 'Private Channel',
         isPublic: false,
         password: undefined,
@@ -183,10 +201,10 @@ const testInfo = {
     {
       channelInfo: {
         channelId: getSimpleUuid(getOneHexUpperDigits(2)),
-        userId: 9,
+        ownerId: getSimpleUuid(getOneHexUpperDigits(9)),
         title: 'Protected Channel',
         isPublic: false,
-        password: 'somePassword',
+        password: TEST_CHANNEL_PASSWORD,
         maximumMemberCount: 10,
       },
       members: [
@@ -212,45 +230,50 @@ const achievements = [
     description: '채널을 1번 이상 생성!',
   },
   {
+    imageUrl: '/achivement/tree.png',
+    title: '게임왕',
+    description: '게임 1승 성공!',
+  },
+  {
     imageUrl: '/achivement/reindeer.png',
-    title: '방랑자',
-    description: '채널을 5번 이상 생성!',
+    title: '게임러버1',
+    description: '게임 1회 이상 플레이!',
   },
   {
     imageUrl: '/achivement/santa.png',
-    title: '게임러버',
+    title: '게임러버2',
     description: '게임 5회 이상 플레이!',
   },
   {
     imageUrl: '/achivement/snowflake.png',
-    title: '출석왕',
-    description: '출석 5회 이상 성공!',
+    title: '게임러버3',
+    description: '게임 10회 이상 플레이!',
   },
   {
     imageUrl: '/achivement/snowman.png',
-    title: '인싸',
-    description: '친구 30명 이상!',
+    title: '인싸1',
+    description: '친구 1명 이상!',
   },
   {
     imageUrl: '/achivement/star.png',
-    title: '중꺾마',
-    description: '2연패 후 3연승 성공!',
+    title: '인싸2',
+    description: '친구 5명 이상!',
   },
-  {
-    imageUrl: '/achivement/tree.png',
-    title: '게임왕',
-    description: '랭킹 1위 성공!',
-  },
+
   {
     imageUrl: '/achivement/wreath.png',
-    title: '수다왕',
-    description: '메시지 100번 이상 전송 성공!',
+    title: '인싸3',
+    description: '친구 10명 이상!',
   },
 ];
 
 const prisma = new PrismaClient();
 
 async function main() {
+  const TEST_CHANNEL_HASHED_PASSWORD = await mfaPasswordHash(
+    TEST_CHANNEL_PASSWORD,
+  );
+
   // 0. 초기화
   await prisma.dMMessage.deleteMany();
   await prisma.dMChannelInfo.deleteMany();
@@ -284,7 +307,7 @@ async function main() {
         id: getSimpleUuid(getOneHexUpperDigits(idx)),
       })),
     });
-    // 1. 10명의 유저 생성
+    // 1. 10명의 유저 생성 && 생성 업적 부여
     await prisma.auth.createMany({
       data: testAuthUsers.map(({ type, id, metadataJson }) => ({
         type,
@@ -299,13 +322,7 @@ async function main() {
         profileImageUrl,
       })),
     });
-    // 1.2 10명의 유저의 생성 업적 부여
-    await prisma.userAchievement.createMany({
-      data: testAuthUsers.map(({ userId }) => ({
-        userId,
-        achievementId: getSimpleUuid(getOneHexUpperDigits(0)),
-      })),
-    });
+
     // 2. 적당한 관계 형성
     await prisma.userFollow.createMany({
       data: [
@@ -323,14 +340,18 @@ async function main() {
         ]),
       ],
     });
+
     // 3. 채널 생성
     await prisma.channel.createMany({
       data: testInfo.channels.map(({ channelInfo }, idx) => ({
         id: channelInfo.channelId,
         title: channelInfo.title,
         isPublic: channelInfo.isPublic,
-        password: channelInfo.password,
+        password: channelInfo.password
+          ? TEST_CHANNEL_HASHED_PASSWORD
+          : undefined,
         maximumMemberCount: channelInfo.maximumMemberCount,
+        ownerId: channelInfo.ownerId,
       })),
     });
 
@@ -367,6 +388,22 @@ async function main() {
           createdAt: new Date(),
         },
         {
+          player1Id: userIds[0].id,
+          player2Id: userIds[4].id,
+          player1Score: 10,
+          player2Score: 5,
+          isPlayer1win: true,
+          createdAt: new Date(),
+        },
+        {
+          player1Id: userIds[0].id,
+          player2Id: userIds[5].id,
+          player1Score: 10,
+          player2Score: 5,
+          isPlayer1win: true,
+          createdAt: new Date(),
+        },
+        {
           player1Id: userIds[1].id,
           player2Id: userIds[3].id,
           player1Score: 10,
@@ -393,6 +430,39 @@ async function main() {
       ],
     });
 
+    await prisma.userAchievement.createMany({
+      data: [
+        ...Array.from({ length: 10 }).map((_, idx) => ({
+          userId: getSimpleUuid(getOneHexUpperDigits(idx)),
+          achievementId: getSimpleUuid(getOneHexUpperDigits(0)), // 손님
+        })),
+        ...[0, 1, 9].map((i) => ({
+          userId: getSimpleUuid(getOneHexUpperDigits(i)),
+          achievementId: getSimpleUuid(getOneHexUpperDigits(1)), // 리더
+        })),
+        {
+          userId: getSimpleUuid(getOneHexUpperDigits(0)), // 0번 유저가 1위
+          achievementId: getSimpleUuid(getOneHexUpperDigits(2)), // 게임왕
+        },
+        ...[0, 1, 2, 3, 4, 5].map((i) => ({
+          userId: userIds[i].id,
+          achievementId: getSimpleUuid(getOneHexUpperDigits(3)), // 게임러버1
+        })),
+        {
+          userId: userIds[0].id,
+          achievementId: getSimpleUuid(getOneHexUpperDigits(4)), // 게임러버2
+        },
+        ...[0, 1, 2, 3, 9].map((i) => ({
+          userId: userIds[i].id,
+          achievementId: getSimpleUuid(getOneHexUpperDigits(6)), // 인싸1
+        })),
+        ...[0, 1, 2, 3].map((i) => ({
+          userId: userIds[i].id,
+          achievementId: getSimpleUuid(getOneHexUpperDigits(7)), // 인싸2
+        })),
+      ],
+    });
+
     await prisma.channelMember.createMany({
       data: testInfo.channels.flatMap(({ channelInfo, members }) =>
         members.map((memberInfo) => ({
@@ -403,6 +473,59 @@ async function main() {
           memberType: memberInfo[1] as ChannelMemberType,
         })),
       ),
+    });
+
+    // 방 인원수 업데이트
+    await prisma.channel.update({
+      where: { id: getSimpleUuid(getOneHexUpperDigits(0)) },
+      data: {
+        memberCount: testInfo.channels[0].members.filter(
+          (member) => member[1] !== ChannelMemberType.BANNED,
+        ).length,
+      },
+    });
+    await prisma.channel.update({
+      where: { id: getSimpleUuid(getOneHexUpperDigits(1)) },
+      data: {
+        memberCount: testInfo.channels[1].members.filter(
+          (member) => member[1] !== ChannelMemberType.BANNED,
+        ).length,
+      },
+    });
+    await prisma.channel.update({
+      where: { id: getSimpleUuid(getOneHexUpperDigits(2)) },
+      data: {
+        memberCount: testInfo.channels[2].members.filter(
+          (member) => member[1] !== ChannelMemberType.BANNED,
+        ).length,
+      },
+    });
+
+    // 각 방의 메시지 생성
+    await prisma.channelMessage.createMany({
+      data: [
+        ...[0, 1, 8, 9].flatMap((userIdx) =>
+          [0, 1, 2, 3].map((msgIdx) => ({
+            channelId: getSimpleUuid(getOneHexUpperDigits(0)), // 0번 채널
+            memberId: getSimpleUuid(getOneHexUpperDigits(userIdx)),
+            messageJson: `${userIdx}번 유저의 ${msgIdx + 1}번째 메시지 `,
+          })),
+        ),
+        ...[0, 1, 2, 3, 4, 7].flatMap((userIdx) =>
+          [0, 1, 2, 3].map((msgIdx) => ({
+            channelId: getSimpleUuid(getOneHexUpperDigits(1)), // 1번 채널
+            memberId: getSimpleUuid(getOneHexUpperDigits(userIdx)),
+            messageJson: `${userIdx}번 유저의 ${msgIdx + 1}번째 메시지 `,
+          })),
+        ),
+        ...[0, 1, 7, 8, 9].flatMap((userIdx) =>
+          [0, 1, 2, 3].map((msgIdx) => ({
+            channelId: getSimpleUuid(getOneHexUpperDigits(2)), // 2번 채널
+            memberId: getSimpleUuid(getOneHexUpperDigits(userIdx)),
+            messageJson: `${userIdx}번 유저의 ${msgIdx + 1}번째 메시지 `,
+          })),
+        ),
+      ],
     });
   });
 }

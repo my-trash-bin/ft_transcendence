@@ -112,9 +112,12 @@ export class UsersController {
     @Query() query: SearchByNicknameQuery,
   ) {
     const { q: nickname } = query;
-    console.log('complete', nickname, req.user);
     const userId = (req.user as JwtPayloadPhaseComplete).id;
-    return await this.usersService.searchByBickname(userId, nickname);
+    const users = await this.usersService.searchByBickname(userId, nickname);
+    this.logger.log(
+      `닉네임으로 유저 검색 (${nickname}): 총${users.length}개 검색`,
+    );
+    return users;
   }
 
   @Get('profile')

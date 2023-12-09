@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { AchievementService } from '../achievement/achievement.service';
 import { PrismaService } from '../base/prisma.service';
 import { UserId } from '../common/Id';
@@ -19,6 +23,7 @@ import {
 
 @Injectable()
 export class UserFollowService {
+  private logger = new Logger('UserFollowService');
   constructor(
     private prismaService: PrismaService,
     private achievementService: AchievementService,
@@ -60,19 +65,32 @@ export class UserFollowService {
           followOrBlockedAt: true,
         },
       });
-      const count = await this.prismaService.userFollow.count({
-        where: {
-          followerId: followerId.value,
-          isBlock: false,
-        },
-      });
-      if (isBlock) {
-        await this.achievementService.checkGrantAchievement(followeeId, [
+      if (!isBlock) {
+        const count = await this.prismaService.userFollow.count({
+          where: {
+            followerId: followerId.value,
+            isBlock: false,
+          },
+        });
+        const friends = await this.prismaService.userFollow.findMany({
+          where: {
+            followerId: followerId.value,
+            isBlock: false,
+          },
+        });
+        this.logger.debug(friends);
+        const result = await this.achievementService.checkGrantAchievement([
           {
+            userId: followerId,
             eventType: 'newFriend',
             eventValue: count,
           },
         ]);
+        this.logger.verbose(
+          `친구 요청 성공 후(${count}), 업적 부여 체크: ${JSON.stringify(
+            result,
+          )}`,
+        );
       }
       return newServiceOkResponse(result);
     } catch (error) {

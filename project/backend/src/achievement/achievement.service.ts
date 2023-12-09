@@ -20,18 +20,24 @@ import { UserAchievementWithAchievementDto } from './dto/user-achievement-with-a
 export class AchievementService {
   private logger = new Logger('AchievementService');
   private monitorEvents: Record<string, Record<number, string>> = {
-    newMessage: {
-      100: '수다왕',
+    newUser: {
+      1: '손님',
     },
     newFriend: {
-      30: '인싸',
+      1: '인싸1',
+      5: '인싸2',
+      10: '인싸3',
     },
     newChannel: {
       1: '리더',
-      5: '방랑자',
     },
     endGame: {
-      5: '게임러버',
+      1: '게임러버1',
+      5: '게임러버2',
+      10: '게임러버3',
+    },
+    winGame: {
+      1: '게임왕',
     },
   };
   constructor(private prisma: PrismaService) {}
@@ -91,8 +97,7 @@ export class AchievementService {
   }
 
   async checkGrantAchievement(
-    userId: UserId,
-    eventDatas: { eventType: string; eventValue: number }[],
+    eventDatas: { userId: UserId; eventType: string; eventValue: number }[],
   ): Promise<UserAchievementWithAchievementDto[]> {
     const promises = eventDatas.reduce(
       (prev, cur) =>
@@ -101,7 +106,7 @@ export class AchievementService {
           ? [
               ...prev,
               this.grantAchievement(
-                userId,
+                cur.userId,
                 this.monitorEvents[cur.eventType][cur.eventValue],
               ),
             ]
