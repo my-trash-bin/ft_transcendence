@@ -54,7 +54,7 @@ export function ParticipationModal({
             src="/icon/cross-small.svg"
             width={25}
             height={25}
-          ></Image>
+          />
         </button>
         <div className="flex flex-col items-center">
           <p className="mb-[15px] mt-[20px]">참여하시겠습니까?</p>

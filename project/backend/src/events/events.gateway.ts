@@ -15,8 +15,8 @@ import {
 import { Server, Socket } from 'socket.io';
 import { PrismaService } from '../base/prisma.service';
 import { ChangeActionType } from '../channel/channel.service';
-import { GateWayEvents } from '../common/gateway-events.enum';
 import { idOf } from '../common/Id';
+import { GateWayEvents } from '../common/gateway-events.enum';
 import { Pong } from '../pong/pong';
 import {
   ChannelIdentityDto,
@@ -42,7 +42,7 @@ export type UserSocket = Socket & {
   };
 };
 
-@WebSocketGateway(parseInt(process.env.WS_PORT as string), {
+@WebSocketGateway(parseInt(process.env.SOCKET_IO_PORT as string), {
   cors: { origin: process.env.FRONTEND_ORIGIN, credentials: true },
 })
 @Injectable()

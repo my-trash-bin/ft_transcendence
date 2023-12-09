@@ -3,4 +3,3 @@
 next-env.d.ts
 tsconfig.tsbuildinfo
 .DS_Store
-src/api/api.ts

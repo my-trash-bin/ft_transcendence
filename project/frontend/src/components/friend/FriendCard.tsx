@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { ReactNode, useState } from 'react';
 import { Button } from '../common/Button';
 import FriendInvite from '../game/FriendInvite';
 import { FriendSetting } from './FriendSetting';
 import { CommonCard } from './utils/CommonCard';
-import { useRouter } from 'next/navigation';
 
 interface FriendCardProps {
   readonly nickname: string;
@@ -27,7 +27,7 @@ export function FriendCard({
   const handleInviteOpen = () => {
     setIsInviteOpen(true);
   };
-  function DualFunctionButton({ content }) {
+  function DualFunctionButton({ content }: { readonly content: ReactNode }) {
     const [isHovered, setIsHovered] = useState(false);
 
     function startNormal() {

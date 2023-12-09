@@ -1,11 +1,11 @@
 'use client';
 
+import { avatarToUrl } from '@/app/_internal/util/avatarToUrl';
 import Portal from '@/components/common/Portal';
 import { ProfileModal } from '@/components/profile/ProfileModal';
 import Image from 'next/image';
 import { ReactNode, useState } from 'react';
 import { formatAMPM } from '../utils/FromatAmPm';
-import { avatarToUrl } from '@/app/_internal/util/avatarToUrl';
 
 export function OtherChat({
   message,
@@ -40,6 +40,8 @@ export function OtherChat({
           isOpen={isModalOpen}
           onClose={handleModalClose}
           targetId={targetId}
+          openInvite={() => alert('// TODO: openInvite')}
+          setGameMode={() => alert('// TODO: setGameMode')}
         />
       </Portal>
       <div className="flex flex-row pl-[3%] mb-[1.5%] items-center">
@@ -57,7 +59,7 @@ export function OtherChat({
             />
           </button>
         ) : (
-          <div className="w-[50px] h-[50px] mt-[5px]"></div>
+          <div className="w-[50px] h-[50px] mt-[5px]" />
         )}
         <div className="flex flex-col w-[80%] pl-[2%]">
           {isFirst === true ? (

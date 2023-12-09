@@ -23,6 +23,7 @@ export function MessageBox({ username }: { readonly username: string }) {
         imageUri={data?.data.profileImageUrl}
         username={data?.data.nickname}
         onActive={false}
+        targetId={data?.data.id}
       />
       <MessageContent
         type={messageType.DM}

@@ -2,7 +2,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "start": "nest start",
+    "start": "node dist/main",
     "build": "nest build",
     "dev": "npm run build && npx nest start --watch"
   },
