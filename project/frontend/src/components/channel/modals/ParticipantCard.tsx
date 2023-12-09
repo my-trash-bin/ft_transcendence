@@ -36,8 +36,18 @@ export function ParticipantCard({
           </p>
         )}
         <p className="ml-[10px]">{nickname}</p>
-        {ownerId === memberId ? <p className="ml-[3px]">(관리자)</p> : ''}
       </div>
+      {ownerId === memberId ? (
+        <Image
+          src="/icon/crown.png"
+          width={30}
+          height={30}
+          alt="crown"
+          className="self-center mr-[10px]"
+        ></Image>
+      ) : (
+        ''
+      )}
       {button}
     </div>
   );
