@@ -24,7 +24,10 @@ function ChannelHome() {
           {myChannel ? (
             <MyChannelList searchChannel={searchChannel} />
           ) : (
-            <AllChannelList searchChannel={searchChannel} />
+            <AllChannelList
+              searchChannel={searchChannel}
+              setMyChannel={setMyChannel}
+            />
           )}
         </div>
         <div className="w-[520px] h-[750px] flex flex-col items-center justify-center">

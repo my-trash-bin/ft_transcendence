@@ -1,14 +1,14 @@
-import { Title } from '@/components/common/Title';
-import { Badge } from './Badge';
-import { useContext, useCallback } from 'react';
-import { Button } from '@/components/common/Button';
-import { useRouter } from 'next/navigation';
-import { useQuery } from 'react-query';
-import { ApiContext } from '@/app/_internal/provider/ApiContext';
-import { Loading } from '@/components/common/Loading';
 import { unwrap } from '@/api/unwrap';
+import { ApiContext } from '@/app/_internal/provider/ApiContext';
+import { Button } from '@/components/common/Button';
+import { Loading } from '@/components/common/Loading';
+import { Title } from '@/components/common/Title';
+import { useRouter } from 'next/navigation';
+import { useCallback, useContext } from 'react';
+import { useQuery } from 'react-query';
+import { Badge } from './Badge';
 
-export function AchivementBox() {
+export function AchievementBox() {
   const router = useRouter();
   const { api } = useContext(ApiContext);
   const { isLoading, isError, data } = useQuery(
@@ -23,7 +23,10 @@ export function AchivementBox() {
     <div className="w-[435px] h-[420px] bg-light-background rounded-lg relative">
       <div className="h-[inherit] pt-3xl pb-xl flex flex-col items-center">
         <Title location="top-left">나의 업적</Title>
-        <Button onClick={() => router.push('/profile/achivement')} size={'big'}>
+        <Button
+          onClick={() => router.push('/profile/achievement')}
+          size={'big'}
+        >
           더보기
         </Button>
         <div className="w-[100%] pt-xl flex justify-center">{render()}</div>

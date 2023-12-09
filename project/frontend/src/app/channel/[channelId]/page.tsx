@@ -37,7 +37,10 @@ function ChannelHome({ params }: Readonly<{ params: { channelId: string } }>) {
           {myChannel ? (
             <MyChannelList searchChannel={searchChannel} />
           ) : (
-            <AllChannelList searchChannel={searchChannel} />
+            <AllChannelList
+              searchChannel={searchChannel}
+              setMyChannel={setMyChannel}
+            />
           )}
         </div>
         <div className="w-[520px] h-[750px] flex flex-col items-center">

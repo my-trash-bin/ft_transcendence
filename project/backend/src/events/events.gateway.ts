@@ -222,6 +222,25 @@ export class EventsGateway
     this.eventsService.handleInviteMatch(client, friendId, isItemMode);
   }
 
+  @SubscribeMessage('cancelMatch')
+  async handleCancelMatch(@ConnectedSocket() client: UserSocket, @MessageBody() mode: string) {
+    if (mode === 'normal') {
+      this.eventsService.handleCancelMatch(client, false);
+    }
+    else if (mode === 'item') {
+      this.eventsService.handleCancelMatch(client, true);
+    }
+  }
+
+  @SubscribeMessage('cancelInvite')
+  async handleCancelInvite(
+    @ConnectedSocket() client: UserSocket,
+    @MessageBody() inviteeId: string
+  ) {
+    console.log('cancelInvite == ', inviteeId);
+    this.eventsService.handleCancelInvite(client, inviteeId);
+  }
+
   // 초대 수락 처리
   @SubscribeMessage('acceptNormalMatch')
   async handleAcceptNormalMatch(

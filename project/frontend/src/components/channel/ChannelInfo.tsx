@@ -33,6 +33,7 @@ export function ChannelInfo({
           channelId={channelId}
           myAuthority={myAuthority}
           myNickname={myNickname}
+          ownerId={channelData.ownerId}
         />
       </Portal>
       <div className="w-[95%] h-[80px] border-b border-default relative flex justify-center items-center">

@@ -338,8 +338,3 @@ export class DmService {
     return associationsWithMessages;
   }
 }
-// id          String   @id @default(uuid()) @db.Uuid
-// channelId   String   @db.Uuid
-// memberId    String   @db.Uuid
-// sentAt      DateTime @default(now())
-// messageJson String

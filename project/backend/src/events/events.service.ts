@@ -41,7 +41,6 @@ type InvitationType = {
   inviterId: string;
   inviterSocket: Socket;
   inviteeSocket: Socket | undefined;
-  timeout: NodeJS.Timeout;
 };
 
 @Injectable()
@@ -575,50 +574,47 @@ export class EventsService {
 
     this.alarmInvited(idOf(userId), idOf(friendId), isItemMode);
 
-    const timeout = setTimeout(() => {
-      this.handleAutomaticDecline(friendId, userId);
-    }, 30000);
-
     this.activeInvitations.set(friendId, {
       inviterId: userId,
       inviterSocket: client,
       inviteeSocket: friendSocket,
-      timeout,
     });
   }
 
-  handleAcceptMatch(
-    client: UserSocket,
-    inviterId: string,
-    isItemMode: boolean,
-  ) {
+  handleCancelInvite(client: UserSocket, inviteeId: string) {
+    const userId = client.data.userId as string;
+    const eventName = 'canceledInvite';
+
+    const invitation = this.activeInvitations.get(inviteeId);
+    if (invitation) {
+      this.activeInvitations.delete(inviteeId);
+
+      const inviteeSocket = invitation.inviteeSocket;
+      if (inviteeSocket) {
+        inviteeSocket.emit(eventName, { userId });
+      }
+    }
+  }
+
+  handleCancelMatch(client: UserSocket, itemMode: boolean) {
+    const q = itemMode ? this.itemMatchQueue : this.normalMatchQueue;
+    q.delete(client);
+  }
+
+  handleAcceptMatch(client: UserSocket, inviterId: string, isItemMode: boolean) {
     const invitation = this.activeInvitations.get(inviterId);
 
     if (!invitation) {
       return;
     }
 
-    clearTimeout(invitation.timeout);
     this.activeInvitations.delete(inviterId);
 
     const inviterSocket = invitation.inviterSocket;
     if (inviterSocket) {
-      // TODO
       this.createGameRoom(client, inviterSocket, isItemMode);
     } else {
       client.emit('friendIsOffline');
-    }
-  }
-
-  private handleAutomaticDecline(friendId: string, inviterId: string) {
-    const invitation = this.activeInvitations.get(friendId);
-    if (invitation && invitation.inviterId === inviterId) {
-      this.activeInvitations.delete(friendId);
-
-      const inviterSocket = invitation.inviterSocket;
-      if (inviterSocket) {
-        inviterSocket.emit('inviteDeclined', { userId: friendId });
-      }
     }
   }
 

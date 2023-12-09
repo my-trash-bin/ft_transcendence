@@ -1,17 +1,17 @@
-import { Api } from '@/api/api';
+import { unwrap } from '@/api/unwrap';
+import { ApiContext } from '@/app/_internal/provider/ApiContext';
+import { useCallback, useContext } from 'react';
 import { useQuery } from 'react-query';
 import { MessageContent, messageType } from '../dm/message/MessageContent';
 import { MessageSendBox } from '../dm/message/MessageSendBox';
 import { ChannelInfo } from './ChannelInfo';
-import { useCallback, useContext } from 'react';
-import { ApiContext } from '@/app/_internal/provider/ApiContext';
-import { unwrap } from '@/api/unwrap';
 
 export function ChannleMessageBox({
   channelId,
 }: Readonly<{ channelId: string }>) {
   const { api } = useContext(ApiContext);
 
+  const channelApi = () => api.channelControllerFindChannelInfo(channelId);
   const { isLoading, isError, data } = useQuery(
     'channelInfo',
     useCallback(

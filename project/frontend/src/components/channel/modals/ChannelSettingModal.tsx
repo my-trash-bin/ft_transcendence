@@ -16,6 +16,7 @@ const getModalContent = (
   channelId: string,
   myAuthority: string,
   myNickname: any,
+  ownerId: string,
 ) => {
   const setModalParticipant = () => {
     setModalType(ModalType.PARTICIPANT);
@@ -40,6 +41,7 @@ const getModalContent = (
           channelId={channelId}
           myAuthority={myAuthority}
           myNickname={myNickname}
+          ownerId={ownerId}
         />
       );
     case ModalType.SETTING:
@@ -59,12 +61,14 @@ export function ChannelSettingModal({
   channelId,
   myAuthority,
   myNickname,
+  ownerId,
 }: {
   isOpen: boolean;
   closeModal: () => void;
   channelId: string;
   myAuthority: string;
   myNickname: any;
+  ownerId: string;
 }) {
   const [modalType, setModalType] = useState(ModalType.PARTICIPANT);
   const modalCloseAndSetParticipant = () => {
@@ -78,6 +82,7 @@ export function ChannelSettingModal({
     channelId,
     myAuthority,
     myNickname,
+    ownerId,
   );
   return (
     <ModalLayout

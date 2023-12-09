@@ -6,12 +6,3 @@ export class ChannelMemberDetailDto extends ChannelMemberDto {
   @ApiProperty()
   member!: UserDto;
 }
-
-// export const channelMemberDetailDtoSelect = {
-//   ...channelMemberDtoSelect,
-//   member: {
-//     select: {
-//       userDtoSelect,
-//     },
-//   },
-// };
