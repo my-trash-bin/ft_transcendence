@@ -27,8 +27,8 @@ const FriendInvite: React.FC<FriendInviteProps> = ({
         socket.emit('inviteNormalMatch', friendId);
         console.log('inviteNormalMatch', friendId);
       } else if (mode === 'item') {
-        socket.emit('inviteItemMatch');
-        console.log('inviteItemMatch');
+        socket.emit('inviteItemMatch', friendId);
+        console.log('inviteItemMatch', friendId);
       }
     }
   }, [isOpen, onClose, router, socket]);
