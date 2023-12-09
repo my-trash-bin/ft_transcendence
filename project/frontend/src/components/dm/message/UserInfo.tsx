@@ -1,14 +1,17 @@
 import { avatarToUrl } from '@/app/_internal/util/avatarToUrl';
+import { LiveStatus } from '@/components/common/LiveStatus';
 import Image from 'next/image';
 
 export function UserInfo({
   imageUri,
   username,
   onActive,
+  targetId,
 }: Readonly<{
   imageUri: any;
   username: any;
   onActive: boolean;
+  targetId: string;
 }>) {
   const active = onActive ? 'Active' : 'Inactive';
   const activeStyle = onActive
@@ -26,12 +29,10 @@ export function UserInfo({
           layout="relative"
         />
       </div>
-      <p className="top-[10px] left-[100px] text-[22px] absolute">{username}</p>
-      <div
-        className={`absolute w-[8px] h-[8px] rounded-[50px] top-[50px] left-[100px] translate-y-[50%]
-        ${activeStyle}`}
-      ></div>
-      <p className="absolute left-[120px] top-[49px] text-[12px]">{active}</p>
+      <p className="top-[10px] left-[100px] text-[22px] absolute">
+        {username}
+        <LiveStatus targetId={targetId} />
+      </p>
     </div>
   );
 }
