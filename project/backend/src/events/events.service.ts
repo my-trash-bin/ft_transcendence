@@ -7,12 +7,15 @@ import { UserFollowService } from '../user-follow/user-follow.service';
 import { UsersService } from '../users/users.service';
 // import { ChatRoomDto, ChatRoomStatusDto } from './chat.dto'
 import { Server, Socket } from 'socket.io';
+import { v4 as uuidv4 } from 'uuid';
+import { PrismaService } from '../base/prisma.service';
 import { ChangeMemberStatusResultDto } from '../channel/dto/change-member-status-result.dto';
 import { JoinedChannelInfoDto } from '../channel/dto/joined-channel-info.dto';
 import { LeavingChannelResponseDto } from '../channel/dto/leave-channel-response.dto';
 import { GateWayEvents } from '../common/gateway-events.enum';
 import { MessageWithMemberDto } from '../dm/dto/message-with-member';
 import { PongLogService } from '../pong-log/pong-log.service';
+import { GameState, Pong } from '../pong/pong';
 import { UserDto } from '../users/dto/user.dto';
 import { DmChannelInfoType } from './event-response.dto';
 import { UserSocket } from './events.gateway';
@@ -26,6 +29,7 @@ type ChannelRoomTypeKey = string;
 type ChannelIdKey = string;
 type UserIdKey = string;
 type ClientIdKey = string;
+type ChannelRecordType = Record<ChannelIdKey, Set<UserIdKey>>;
 
 export enum EnumUserStatus {
   ONLINE = 'online',
@@ -33,18 +37,28 @@ export enum EnumUserStatus {
   ONGAME = 'ongame',
 }
 
+type InvitationType = {
+  inviterId: string;
+  inviterSocket: Socket;
+  inviteeSocket: Socket | undefined;
+  timeout: NodeJS.Timeout;
+};
+
 @Injectable()
 export class EventsService {
   server!: Server;
 
   private logger = new Logger('EventsService');
-  private channels!: Record<
-    ChannelRoomTypeKey,
-    Record<ChannelIdKey, Set<UserIdKey>>
-  >;
+  private channels!: Record<ChannelRoomTypeKey, ChannelRecordType>;
   private socketMap = new Map<UserIdKey, UserSocket[]>(); // 소켓맵은 이곳에서 초기화 상태
 
+  private pongMap = new Map<string, Pong>();
+  private activeInvitations = new Map<string, InvitationType>();
+  private normalMatchQueue = new Set<Socket>();
+  private itemMatchQueue = new Set<Socket>();
+
   constructor(
+    private prismaService: PrismaService,
     private usersService: UsersService,
     private dmService: DmService,
     private channelService: ChannelService,
@@ -489,6 +503,268 @@ export class EventsService {
     channel.delete(userId.value); // 스스로 방에서 나가거나, 쫓겨나거나
   }
 
+  /**
+   * 게임 코드 영역
+   */
+
+  tryMatch(client: UserSocket, itemMode: boolean) {
+    const q = itemMode ? this.itemMatchQueue : this.normalMatchQueue;
+    q.add(client);
+
+    if (q.size >= 2) {
+      this.logger.debug(`${itemMode ? 'itemGame' : 'normalGame'} Matched!`);
+
+      const playersIterator = q.values();
+      const player1 = playersIterator.next().value;
+      const player2 = playersIterator.next().value;
+
+      q.delete(player1);
+      q.delete(player2);
+
+      this.createGameRoom(player1, player2, false);
+    }
+  }
+
+  handleInviteMatch(client: UserSocket, friendId: string, isItemMode: boolean) {
+    const userId = client.data.userId as string;
+    const eventName = isItemMode ? 'invitedItemMatch' : 'invitedNormalMatch';
+    const mode = isItemMode ? 'item' : 'normal';
+
+    const friendSocket = this.findSocketByUserId(friendId);
+
+    if (!friendSocket) {
+      client.emit('friendOffline');
+      return;
+    }
+
+    friendSocket.emit(eventName, {
+      inviterId: client.data.userId,
+      mode,
+    });
+
+    const timeout = setTimeout(() => {
+      this.handleAutomaticDecline(friendId, userId);
+    }, 30000);
+
+    this.activeInvitations.set(friendId, {
+      inviterId: userId,
+      inviterSocket: client,
+      inviteeSocket: friendSocket,
+      timeout,
+    });
+  }
+
+  handleAcceptMatch(client: UserSocket, inviterId: string) {
+    const invitation = this.activeInvitations.get(inviterId);
+
+    if (!invitation) {
+      return;
+    }
+
+    clearTimeout(invitation.timeout);
+    this.activeInvitations.delete(inviterId);
+
+    const inviterSocket = invitation.inviterSocket;
+    if (inviterSocket) {
+      // TODO
+      this.createGameRoom(client, inviterSocket, true);
+    } else {
+      client.emit('friendIsOffline');
+    }
+  }
+
+  private handleAutomaticDecline(friendId: string, inviterId: string) {
+    const invitation = this.activeInvitations.get(friendId);
+    if (invitation && invitation.inviterId === inviterId) {
+      this.activeInvitations.delete(friendId);
+
+      const inviterSocket = invitation.inviterSocket;
+      if (inviterSocket) {
+        inviterSocket.emit('inviteDeclined', { userId: friendId });
+      }
+    }
+  }
+
+  private findSocketByUserId(userId: string): Socket | undefined {
+    for (let [key, value] of this.activeInvitations) {
+      if (value.inviterId === userId) {
+        return value.inviterSocket;
+      }
+      if (key === userId) {
+        return value.inviteeSocket;
+      }
+    }
+    return undefined;
+  }
+
+  private async fetchPlayerInfo(
+    playerId: string,
+  ): Promise<{ nickname: string; avatarUrl: string }> {
+    try {
+      const prismaUser = await this.prismaService.user.findUniqueOrThrow({
+        where: {
+          id: playerId,
+        },
+      });
+      console.log(prismaUser);
+      return {
+        nickname: prismaUser.nickname,
+        avatarUrl: prismaUser.profileImageUrl ?? '',
+      };
+    } catch (error) {
+      console.error('플레이어 정보를 가져오는 데 실패했습니다:', error);
+      return {
+        nickname: 'player',
+        avatarUrl: '../frontend/public/avatar/avartar-black.svg',
+      };
+    }
+  }
+
+  private async emitPlayerInfo(
+    player1Id: string,
+    player2Id: string,
+    roomName: string,
+  ) {
+    const player1Info = await this.fetchPlayerInfo(player1Id);
+    this.server.to(roomName).emit('player1Info', player1Info);
+
+    const player2Info = await this.fetchPlayerInfo(player2Id);
+    this.server.to(roomName).emit('player2Info', player2Info);
+  }
+
+  private createGameRoom(
+    player1: Socket,
+    player2: Socket,
+    mode: boolean,
+  ): void {
+    // 룸 생성 및 클라이언트 추가
+    const roomName = uuidv4();
+    player1.join(roomName);
+    player2.join(roomName);
+    this.server.to(roomName).emit('GoPong', { room: roomName });
+
+    // playerRole 알림
+    this.server.to(player1.id).emit('playerRole', 'player1');
+    this.server.to(player2.id).emit('playerRole', 'player2');
+
+    setTimeout(() => {
+      const player1Id = player1.data.userId as string; // string | undefined
+      const player2Id = player2.data.userId as string; // string | undefined
+      const pong = new Pong(
+        this.prismaService,
+        player1Id,
+        player2Id,
+        player1.id,
+        player2.id,
+        mode,
+        (data: {
+          player1Id: UserId;
+          player2Id: UserId;
+          player1Score: number;
+          player2Score: number;
+          isPlayer1win: boolean;
+        }) => {
+          this.endGame(data);
+          this.handleOffGame(data.player1Id);
+          this.handleOffGame(data.player2Id);
+          // this.pongMap.delete(player1Id);
+          // this.pongMap.delete(player2Id);
+        },
+      );
+      this.emitPlayerInfo(player1Id, player2Id, roomName);
+      pong.onGameUpdate.on('gameState', (gameState: GameState) => {
+        player1.emit('gameUpdate', gameState);
+        player2.emit('gameUpdate', gameState);
+      });
+      this.handleOnGame(idOf(player1Id), pong);
+      this.handleOnGame(idOf(player2Id), pong);
+      // this.pongMap.set(player1Id, pong);
+      // this.pongMap.set(player2Id, pong);
+    }, 3000);
+  }
+
+  handlePaddleMove(client: UserSocket, directionIsUp: boolean) {
+    const userId = client.data.userId as string | undefined;
+
+    if (userId === undefined) {
+      this.logger.error(`paddleMove시 userId가 없음: ${userId}`);
+      return;
+    }
+    const inGame = this.pongMap.get(userId);
+
+    if (inGame === undefined) {
+      this.logger.error(
+        `paddleMove시 userId에 해당하는 pong이 없음: ${userId}`,
+      );
+      return;
+    }
+
+    if (!inGame.getGameState().gameStart) {
+      return; // 정상적임
+    }
+
+    const isPlayer1 = userId === inGame.player1Id;
+
+    inGame.handlePaddleMove(directionIsUp, isPlayer1);
+  }
+
+  private handleOnGame(id: UserId, pong: Pong) {
+    this.pongMap.set(id.value, pong);
+    this.handleOnOffGameForUserStatusBroadcast(id, EnumUserStatus.ONGAME);
+  }
+
+  private handleOffGame(id: UserId) {
+    this.pongMap.delete(id.value);
+    this.handleOnOffGameForUserStatusBroadcast(id);
+  }
+
+  private async storeGameStateToDB(
+    gameState: GameState,
+    pong: Pong,
+  ): Promise<void> {
+    try {
+      await this.endGame({
+        player1Id: idOf(pong.player1Id),
+        player2Id: idOf(pong.player2Id),
+        player1Score: gameState.score1,
+        player2Score: gameState.score2,
+        isPlayer1win: gameState.score1 > gameState.score2,
+      });
+      this.logger.log('Game state saved to DB');
+      console.log();
+    } catch (error) {
+      this.logger.error('Failed to save game state to DB:', error);
+    }
+  }
+
+  async finalizeGame(client: UserSocket) {
+    const pong = this.pongMap.get(client.data.userId);
+
+    if (pong === undefined) {
+      return;
+    }
+
+    pong.setGameOver();
+    if (pong.getGameState().gameStart) {
+      return;
+    }
+
+    await this.storeGameStateToDB(pong.getGameState(), pong);
+
+    // 상대방에게 연결 종료 알림
+    const opponentSocketId =
+      client.id === pong.player1SocketId
+        ? pong.player2SocketId
+        : pong.player1SocketId;
+    this.server.to(opponentSocketId).emit('opponentDisconnected', {
+      userId: client.data.userId,
+      opponentId: opponentSocketId,
+    });
+
+    this.pongMap.delete(pong.player1Id);
+    this.pongMap.delete(pong.player2Id);
+  }
+
   async endGame(data: {
     player1Id: UserId;
     player2Id: UserId;
@@ -513,5 +789,13 @@ export class EventsService {
         userId: userId.value,
       });
     }
+  }
+
+  handleOnOffGameForUserStatusBroadcast(
+    userId: UserId,
+    status?: EnumUserStatus,
+  ) {
+    status = status ?? this.getUserStatus(userId);
+    this.notiUserStatusUpdate(status, userId.value);
   }
 }
