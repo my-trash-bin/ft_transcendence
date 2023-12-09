@@ -88,7 +88,9 @@ export class ChannelService {
 
   // Channel
   async findAll() {
-    const prismaChannels = await this.prismaService.channel.findMany();
+    const prismaChannels = await this.prismaService.channel.findMany({
+      where: { isPublic: true },
+    });
     return prismaChannels.map((prismaChannel) => new ChannelDto(prismaChannel));
   }
 
