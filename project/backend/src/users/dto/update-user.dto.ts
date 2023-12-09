@@ -4,6 +4,7 @@ import { IsOptional, IsString, Matches } from 'class-validator';
 export class UpdateUserDto {
   @ApiPropertyOptional({
     description: '6~12 영문, 숫자 ㅡ하이픈, 언더스코어만 사용가능한 닉네임',
+    required: false,
   })
   @IsString()
   @Matches(/^[A-Za-z0-9_-]{6,12}$/, {
@@ -13,12 +14,16 @@ export class UpdateUserDto {
   @IsOptional()
   nickname?: string;
 
-  @ApiPropertyOptional({ description: '프로필 아바타 이미지 주소' })
+  @ApiPropertyOptional({
+    description: '프로필 아바타 이미지 주소',
+    required: false,
+  })
   @IsOptional()
+  @IsString()
   profileImageUrl?: string;
 
-  @ApiPropertyOptional({ description: '프로필 상태 메세지' })
-  @IsString()
+  @ApiPropertyOptional({ description: '프로필 상태 메세지', required: false })
   @IsOptional()
+  @IsString()
   statusMessage?: string;
 }

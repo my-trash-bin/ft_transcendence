@@ -12,7 +12,12 @@ export class ParticipateChannelDto {
   @IsUUID()
   channelId!: string;
 
-  @ApiPropertyOptional({ description: '채널 암호', type: String })
+  @ApiPropertyOptional({
+    description: '채널 암호',
+    type: String,
+    required: false,
+    nullable: true,
+  })
   @IsString()
   @IsOptional()
   password?: string | null;
