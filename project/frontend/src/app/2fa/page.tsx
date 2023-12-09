@@ -27,7 +27,8 @@ export default function TwofactorPage() {
         router.push('/friend');
       }
     } catch (error) {
-      if (error.status === 401) {
+      // TODO: if (error instanceof ??? && error.status === 401)로 바꿀 것
+      if ((error as any).status === 401) {
         alert('비밀번호 오류입니다. 다시 입력하세요!');
       } else {
         alert('알 수 없는 오류입니다!');

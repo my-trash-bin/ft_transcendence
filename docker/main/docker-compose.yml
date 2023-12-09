@@ -8,9 +8,10 @@ services:
     build:
       context: .
       dockerfile: http.Dockerfile
-    image: ft_transcendence-http-production
+    image: ft_transcendence-http
     ports:
-      - 8080:80
+      - 443:443
+      - 4242:4242
     depends_on:
       - backend
       - frontend
@@ -21,30 +22,28 @@ services:
     build:
       context: ../..
       dockerfile: docker/main/backend.Dockerfile
-    image: ft_transcendence-backend-production
+    image: ft_transcendence-backend
     depends_on:
       - db
-      - redis
-      - azurite
-    volumes:
-      - ./volume/redis:/data
     networks:
       - ft_transcendence
     env_file:
       - ../../.env
+    volumes:
+      - ./volume/uploads:/usr/src/dist/uploads
     restart: always
   frontend:
     build:
       context: ../..
       dockerfile: docker/main/frontend.Dockerfile
-    image: ft_transcendence-frontend-production
+    image: ft_transcendence-frontend
     networks:
       - ft_transcendence
     env_file:
       - ../../.env
     restart: always
   db:
-    image: postgres
+    image: postgres:16.1-alpine
     environment:
       POSTGRES_USER: ft_transcendence
       POSTGRES_PASSWORD: "supersecretpassword"

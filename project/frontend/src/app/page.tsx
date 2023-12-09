@@ -24,6 +24,7 @@ function Page() {
             <FriendAvatar imageUrl={'/avatar/avatar-big.svg'} size={50} />
             <FriendAvatar imageUrl={'/avatar/avatar-blue.svg'} size={50} />
           </div>
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
           <a href="/api/auth/42" className={CSS}>
             42 intra 로그인
           </a>

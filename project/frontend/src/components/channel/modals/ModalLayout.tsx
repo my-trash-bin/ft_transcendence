@@ -20,7 +20,7 @@ export const ModalLayout = ({
       <div
         className={`fixed inset-0 z-[10] bg-[#f3f0f8] opacity-50`}
         onClick={closeModal}
-      ></div>
+      />
       <div
         style={{ width: width, height: height }}
         className={`fixed top-1/2 left-1/2 rounded-[5px] border-3 border-dark-purple transform -translate-x-1/2 \

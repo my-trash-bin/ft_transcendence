@@ -9,7 +9,7 @@ interface NavIconProps {
 }
 const NavIcon = (props: NavIconProps) => {
   const path = usePathname();
-  const isActive = path.startsWith(`/${props.type}`);
+  const isActive = path?.startsWith(`/${props.type}`);
   const activeClass: string = isActive
     ? 'border-3 border-dark-purple hover:bg-light-background'
     : 'border-3 border-default hover:border-dark-gray hover:bg-light-background';

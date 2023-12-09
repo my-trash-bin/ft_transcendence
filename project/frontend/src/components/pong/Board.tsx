@@ -1,6 +1,7 @@
+import { avatarToUrl } from '@/app/_internal/util/avatarToUrl';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React, { useMemo, useEffect, useCallback, useState, use } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import usePaddleMovement from './KeyHandle';
 import useStore from './Update';
 import {
@@ -11,11 +12,10 @@ import {
   ITEM_SIZE,
   PADDLE_HEIGHT,
   PADDLE_WIDTH,
-  SMALL_PADDLE_HEIGHT,
   PlayerInfo,
+  SMALL_PADDLE_HEIGHT,
 } from './gameConstants';
 import { getGameSocket } from './gameSocket';
-import { avatarToUrl } from '@/app/_internal/util/avatarToUrl';
 
 const usePaddleHeight = (type: number) => {
   return useMemo(() => {
@@ -38,7 +38,7 @@ const preloadImages = (imagePaths: string[], callback: () => void) => {
   });
 };
 
-const Board: React.FC = () => {
+function Board() {
   const {
     ball,
     paddle1,
@@ -63,18 +63,21 @@ const Board: React.FC = () => {
 
   usePaddleMovement();
 
-  const handleGameUpdate = useCallback((gameState: GameState) => {
-    if (!gameState.gameStart) {
-      console.log('game not started');
-    } else if (!gameState.gameOver) {
-      setGameState(gameState);
-    } else {
-      console.log('gameOver');
-      setGameState(gameState);
-      router.push('/game');
-      useStore.setState({ gameOver: true });
-    }
-  }, [setGameState, router]);
+  const handleGameUpdate = useCallback(
+    (gameState: GameState) => {
+      if (!gameState.gameStart) {
+        console.log('game not started');
+      } else if (!gameState.gameOver) {
+        setGameState(gameState);
+      } else {
+        console.log('gameOver');
+        setGameState(gameState);
+        router.push('/game');
+        useStore.setState({ gameOver: true });
+      }
+    },
+    [setGameState, router],
+  );
 
   useEffect(() => {
     socket.on('gameUpdate', handleGameUpdate);
@@ -240,7 +243,7 @@ const Board: React.FC = () => {
       </div>
     </div>
   );
-};
+}
 
 const getBallColor = (type: number) => {
   switch (type) {
@@ -261,7 +264,7 @@ interface PlayerAvatarProps {
 }
 
 const PlayerAvatar: React.FC<PlayerAvatarProps> = React.memo(
-  ({ avatarUrl, playerName }) => {
+  function PlayerAvatar({ avatarUrl, playerName }) {
     return (
       <div className="flex items-center">
         <div className="relative w-[30px] h-[30px] rounded-full overflow-hidden mr-[10px]">

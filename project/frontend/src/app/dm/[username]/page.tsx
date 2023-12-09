@@ -39,7 +39,7 @@ function DmPage({ params }: Readonly<{ params: { username: string } }>) {
 
   return (
     <>
-      <div id="backdrop-root"></div>
+      <div id="backdrop-root" />
       <div className="flex flex-row bg-light-background rounded-[20px] w-[inherit]">
         <div className="w-[380px] h-[750px] border-r flex flex-col items-center">
           <MessageSearch userSearchCallback={userSearchCallback} />

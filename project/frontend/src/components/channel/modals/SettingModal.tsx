@@ -25,12 +25,7 @@ export function SettingModal({
     <>
       <div className="flex flex-row justify-between pt-[10px] pl-[10px] pr-[10px]">
         <button onClick={modalStateFunctions.setModalParticipant}>
-          <Image
-            alt="return"
-            src="/icon/return.svg"
-            width={20}
-            height={20}
-          ></Image>
+          <Image alt="return" src="/icon/return.svg" width={20} height={20} />
         </button>
         <button onClick={closeModal}>
           <Image
@@ -38,7 +33,7 @@ export function SettingModal({
             src="/icon/cross-small.svg"
             width={25}
             height={25}
-          ></Image>
+          />
         </button>
       </div>
       <div className="h-[400px] flex flex-col justify-center items-center">
@@ -52,7 +47,7 @@ export function SettingModal({
             setPassword(e.target.value);
           }}
           className="pl-[10px] rounded-sm outline-none placeholder:text-[12px] placeholder:text-center"
-        ></input>
+        />
         <p className={passwordValid ? validText : invalidText}>
           비밀번호는 숫자 6자리로 입력해 주세요.
         </p>

@@ -10,6 +10,8 @@ import { join } from 'path';
 import { AppModule } from './app/app.module';
 import { env } from './util/env';
 
+export const STATIC_UPLOADS_DIR = join(__dirname, '..', 'dist', 'uploads');
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { snapshot: true });
 
@@ -22,11 +24,10 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   // 폴더 자동생성 확인
-  const staticDir = join(__dirname, '..', 'dist', 'uploads');
   app.use(
     '/uploads',
     cors({ origin: process.env.FRONTEND_ORIGIN }),
-    express.static(staticDir),
+    express.static(STATIC_UPLOADS_DIR),
   );
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }));

@@ -16,8 +16,8 @@ import { Server, Socket } from 'socket.io';
 import { v4 as uuidv4 } from 'uuid';
 import { PrismaService } from '../base/prisma.service';
 import { ChangeActionType } from '../channel/channel.service';
+import { UserId, idOf } from '../common/Id';
 import { GateWayEvents } from '../common/gateway-events.enum';
-import { idOf, UserId } from '../common/Id';
 import { GameState, Pong } from '../pong/pong';
 import {
   ChannelIdentityDto,
@@ -43,7 +43,7 @@ export type UserSocket = Socket & {
   };
 };
 
-@WebSocketGateway(parseInt(process.env.WS_PORT as string), {
+@WebSocketGateway(parseInt(process.env.SOCKET_IO_PORT as string), {
   cors: { origin: process.env.FRONTEND_ORIGIN, credentials: true },
 })
 @Injectable()
@@ -126,8 +126,16 @@ export class EventsGateway
     }
     await this.storeGameStateToDB(pong.getGameState(), pong);
     // 상대방에게 연결 종료 알림
-    const opponentSocketId = client.id === pong.player1SocketId ? pong.player2SocketId : pong.player1SocketId;
-    this.server.to(opponentSocketId).emit('opponentDisconnected', { userId: client.data.userId, opponentId: opponentSocketId });
+    const opponentSocketId =
+      client.id === pong.player1SocketId
+        ? pong.player2SocketId
+        : pong.player1SocketId;
+    this.server
+      .to(opponentSocketId)
+      .emit('opponentDisconnected', {
+        userId: client.data.userId,
+        opponentId: opponentSocketId,
+      });
 
     this.pongMap.delete(pong.player1Id);
     this.pongMap.delete(pong.player2Id);
@@ -241,7 +249,15 @@ export class EventsGateway
   }
 
   // 초대 상태 관리를 위한 맵
-  private activeInvitations = new Map<string, { inviterId: string, inviterSocket: Socket, inviteeSocket: Socket | undefined, timeout: NodeJS.Timeout }>();
+  private activeInvitations = new Map<
+    string,
+    {
+      inviterId: string;
+      inviterSocket: Socket;
+      inviteeSocket: Socket | undefined;
+      timeout: NodeJS.Timeout;
+    }
+  >();
 
   // 초대 요청 처리
   @SubscribeMessage('inviteNormalMatch')
@@ -261,7 +277,12 @@ export class EventsGateway
         this.handleAutomaticDecline(friendId, client.data.userId);
       }, 30000);
 
-      this.activeInvitations.set(friendId, { inviterId: client.data.userId, inviterSocket: client, inviteeSocket: friendSocket, timeout });
+      this.activeInvitations.set(friendId, {
+        inviterId: client.data.userId,
+        inviterSocket: client,
+        inviteeSocket: friendSocket,
+        timeout,
+      });
     } else {
       client.emit('friendOffline');
     }
@@ -284,7 +305,12 @@ export class EventsGateway
         this.handleAutomaticDecline(friendId, client.data.userId);
       }, 30000);
 
-      this.activeInvitations.set(friendId, { inviterId: client.data.userId, inviterSocket: client, inviteeSocket: friendSocket, timeout });
+      this.activeInvitations.set(friendId, {
+        inviterId: client.data.userId,
+        inviterSocket: client,
+        inviteeSocket: friendSocket,
+        timeout,
+      });
     } else {
       client.emit('friendOffline');
     }

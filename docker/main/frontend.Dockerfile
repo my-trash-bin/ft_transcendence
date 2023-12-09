@@ -4,10 +4,8 @@ WORKDIR /usr/src/app
 
 COPY project/frontend .
 
-RUN npm install --omit=dev && npm run build
+RUN npm install && npm run build && npm install --omit=dev
 
 EXPOSE 80
 
-ENV NODE_ENV=development
-
-CMD ["npm", "start", "--", "--port", "80"]
+CMD ["npm", "start"]

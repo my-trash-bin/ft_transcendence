@@ -30,7 +30,7 @@ export function UserInfo({
       <div
         className={`absolute w-[8px] h-[8px] rounded-[50px] top-[50px] left-[100px] translate-y-[50%]
         ${activeStyle}`}
-      ></div>
+      />
       <p className="absolute left-[120px] top-[49px] text-[12px]">{active}</p>
     </div>
   );
