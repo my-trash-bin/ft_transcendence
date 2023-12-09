@@ -1,10 +1,11 @@
-import { Api } from '@/api/api';
-import { useCallback, useState } from 'react';
 import { useQuery } from 'react-query';
 import Portal from '../common/Portal';
 import { AllChannelCard } from './AllChannelCard';
 import { EnterPasswordModal } from './modals/EnterPasswordModal';
 import { ParticipationModal } from './modals/ParticipationModal';
+import { useCallback, useContext, useState } from 'react';
+import { ApiContext } from '@/app/_internal/provider/ApiContext';
+import { unwrap } from '@/api/unwrap';
 
 function getRenderData(
   channelData: any,
@@ -41,18 +42,21 @@ export function AllChannelList({ searchChannel }: { searchChannel: string }) {
     useState<boolean>(false);
   const [selectedChannelId, setSelectedChannelId] = useState<string>('');
   const [selectedChannelType, setSelectedChannelType] = useState<string>('');
-  const apiCall = useCallback(
-    () => new Api().api.channelControllerFindAll(),
-    [],
+  const { api } = useContext(ApiContext);
+
+  const { isLoading, isError, data } = useQuery(
+    'allChannels',
+    useCallback(
+      async () => unwrap(await api.channelControllerFindAll()),
+      [api],
+    ),
   );
 
-  const { isLoading, isError, data } = useQuery('allChannels', apiCall);
-
   if (isLoading) return <p>로딩중...</p>;
-  if (isError) return <p>알 수 없는 에러</p>;
+  if (isError || !data) return <p>알 수 없는 에러</p>;
 
   let renderData = getRenderData(
-    data?.data,
+    data,
     setPasswordModalOpen,
     setParticipationModalOpen,
     setSelectedChannelId,

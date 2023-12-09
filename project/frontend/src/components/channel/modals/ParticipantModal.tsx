@@ -1,10 +1,11 @@
-import { Api } from '@/api/api';
 import { Title } from '@/components/common/Title';
 import Image from 'next/image';
-import { useCallback } from 'react';
+import { useCallback, useContext } from 'react';
 import { useQuery } from 'react-query';
 import { ModalButtons } from './ModalButtons';
 import { ParticipantCard } from './ParticipantCard';
+import { ApiContext } from '@/app/_internal/provider/ApiContext';
+import { unwrap } from '@/api/unwrap';
 
 const getRenderedData = (
   data: any,
@@ -44,18 +45,23 @@ export function ParticipantModal({
   myAuthority: string;
   myNickname: any;
 }) {
-  const apiCall = useCallback(
-    () =>
-      new Api().api.channelControllerFindChannelMembersByChannelId(channelId),
-    [channelId],
+  const { api } = useContext(ApiContext);
+  const { isLoading, isError, data } = useQuery(
+    'channelMembers',
+    useCallback(
+      async () =>
+        unwrap(
+          await api.channelControllerFindChannelMembersByChannelId(channelId),
+        ),
+      [api, channelId],
+    ),
   );
-  const { isLoading, isError, data } = useQuery('channelMembers', apiCall);
 
-  if (isLoading) return <div>Loading...</div>;
-  if (isError) throw new Error('Error fetching data');
+  if (isLoading) return <p>로딩중...</p>;
+  if (isError || !data) return <p>알 수 없는 에러</p>;
 
   const renderedData = getRenderedData(
-    data?.data,
+    data,
     myAuthority,
     myNickname,
     channelId,

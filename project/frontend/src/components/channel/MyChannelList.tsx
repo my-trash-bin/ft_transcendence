@@ -1,7 +1,9 @@
 import { Api } from '@/api/api';
-import { useCallback } from 'react';
+import { useCallback, useContext } from 'react';
 import { useQuery } from 'react-query';
 import { MyChannelCard } from './MyChannelCard';
+import { ApiContext } from '@/app/_internal/provider/ApiContext';
+import { unwrap } from '@/api/unwrap';
 
 function getRenderData(channelData: any, searchChannel: string) {
   const filteredData = channelData?.filter((channel: any) =>
@@ -24,15 +26,18 @@ export function MyChannelList({
 }: {
   readonly searchChannel: string;
 }) {
-  const apiCall = useCallback(
-    () => new Api().api.channelControllerFindMyChannels(),
-    [],
+  const { api } = useContext(ApiContext);
+  const { isLoading, isError, data } = useQuery(
+    'myChannels',
+    useCallback(
+      async () => unwrap(await api.channelControllerFindMyChannels()),
+      [api],
+    ),
   );
-  const { isLoading, isError, data } = useQuery('myChannels', apiCall);
 
   if (isLoading) return <p>로딩중...</p>;
   if (isError) return <p>알 수 없는 에러</p>;
-  let renderData = getRenderData(data?.data, searchChannel);
+  let renderData = getRenderData(data, searchChannel);
 
   return (
     <div className="w-[350px] h-[600px] flex-grow-1 flex flex-col items-center gap-sm overflow-y-scroll">

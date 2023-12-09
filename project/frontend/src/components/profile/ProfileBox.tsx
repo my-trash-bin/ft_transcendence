@@ -8,6 +8,7 @@ import { Loading } from '../common/Loading';
 import { AvatarEditModal } from './AvatarEditModal';
 import { ProfileEditModal } from './ProfileEditModal';
 import { TextBox } from './TextBox';
+import { unwrap } from '@/api/unwrap';
 
 export function ProfileBox() {
   const { api } = useContext(ApiContext);
@@ -15,7 +16,10 @@ export function ProfileBox() {
   const [avatarEditModal, setAvatarEditModal] = useState(false);
   const { isLoading, isError, data, refetch } = useQuery(
     'myProfile',
-    useCallback(async () => (await api.usersControllerMyProfile()).data, [api]),
+    useCallback(
+      async () => unwrap(await api.usersControllerMyProfile()),
+      [api],
+    ),
     {
       onSuccess: (fetchedData) => {
         localStorage.setItem('me', JSON.stringify(fetchedData.me));
@@ -31,7 +35,8 @@ export function ProfileBox() {
   } = useQuery(
     [me, 'fetchHistory'],
     useCallback(
-      async () => (await api.pongLogControllerGetUserGameHistories(me.id)).data,
+      async () =>
+        unwrap(await api.pongLogControllerGetUserGameHistories(me.id)),
       [api, me],
     ),
   );

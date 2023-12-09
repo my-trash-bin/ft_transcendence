@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useContext } from 'react';
 import { useQuery } from 'react-query';
 import { CardType, HistoryCard } from './HistoryCard';
+import { unwrap } from '@/api/unwrap';
 
 export function HistoryBox() {
   const router = useRouter();
@@ -17,7 +18,8 @@ export function HistoryBox() {
   const { isLoading, isError, data } = useQuery(
     [me, 'fetchHistory'],
     useCallback(
-      async () => (await api.pongLogControllerGetUserGameHistories(me.id)).data,
+      async () =>
+        unwrap(await api.pongLogControllerGetUserGameHistories(me.id)),
       [api, me.id],
     ),
   );

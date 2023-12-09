@@ -8,7 +8,6 @@ import { unwrap } from '@/api/unwrap';
 
 export function MessageBox({ username }: { readonly username: string }) {
   const { api } = useContext(ApiContext);
-
   const { isLoading, isError, data } = useQuery(
     'userByNickanme',
     useCallback(
