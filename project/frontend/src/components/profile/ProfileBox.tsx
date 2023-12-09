@@ -16,6 +16,11 @@ export function ProfileBox() {
   const { isLoading, isError, data, refetch } = useQuery(
     'myProfile',
     useCallback(async () => (await api.usersControllerMyProfile()).data, [api]),
+    {
+      onSuccess: (fetchedData) => {
+        localStorage.setItem('me', JSON.stringify(fetchedData.me));
+      },
+    },
   );
   const localMe = localStorage.getItem('me');
   const me = localMe ? JSON.parse(localMe) : null;
@@ -50,9 +55,9 @@ export function ProfileBox() {
   );
 
   function renderProfileContent() {
-    if (isLoading) return <Loading width={300} />;
+    if (isLoading || historyLoading) return <Loading width={300} />;
 
-    if (isError) {
+    if (isError || historyError) {
       return <p>Error loading profile data.</p>;
     }
     if (!data) {
