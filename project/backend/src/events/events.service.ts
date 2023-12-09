@@ -524,7 +524,7 @@ export class EventsService {
       q.delete(player1);
       q.delete(player2);
 
-      this.createGameRoom(player1, player2, false);
+      this.createGameRoom(player1, player2, itemMode);
     }
   }
 
@@ -588,7 +588,7 @@ export class EventsService {
     });
   }
 
-  handleAcceptMatch(client: UserSocket, inviterId: string) {
+  handleAcceptMatch(client: UserSocket, inviterId: string, isItemMode: boolean) {
     const invitation = this.activeInvitations.get(inviterId);
 
     if (!invitation) {
@@ -601,7 +601,7 @@ export class EventsService {
     const inviterSocket = invitation.inviterSocket;
     if (inviterSocket) {
       // TODO
-      this.createGameRoom(client, inviterSocket, true);
+      this.createGameRoom(client, inviterSocket, isItemMode);
     } else {
       client.emit('friendIsOffline');
     }
