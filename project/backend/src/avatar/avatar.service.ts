@@ -12,10 +12,11 @@ import { promises as fs } from 'fs';
 import { extname, join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 
+import { STATIC_UPLOADS_DIR } from '../main';
+
 @Injectable()
 export class AvatarService {
   private readonly logger = new Logger('AvatarService');
-  private readonly uploadDir: string;
   private readonly maxFileSize: number = 10 * 1024 * 1024; // 10MB
   private readonly allowedMimeTypes: string[] = [
     'image/jpeg',
@@ -24,16 +25,15 @@ export class AvatarService {
   ];
 
   constructor() {
-    this.uploadDir = join(__dirname, '..', 'uploads');
     this.ensureUploadDir();
   }
 
   // 'uploads' 디렉토리가 없으면 생성
   private async ensureUploadDir() {
     try {
-      await fs.access(this.uploadDir);
+      await fs.access(STATIC_UPLOADS_DIR);
     } catch (error) {
-      await fs.mkdir(this.uploadDir);
+      await fs.mkdir(STATIC_UPLOADS_DIR);
     }
   }
 
@@ -75,7 +75,7 @@ export class AvatarService {
     this.validateImageFile(file); // 이미지 검증
     try {
       const uniqueFileName = this.generateUniqueFileName(file.originalname);
-      const filePath = join(this.uploadDir, uniqueFileName);
+      const filePath = join(STATIC_UPLOADS_DIR, uniqueFileName);
       await fs.writeFile(filePath, file.buffer);
       return { filePath };
     } catch (error) {
@@ -87,7 +87,7 @@ export class AvatarService {
     this.validateImageFile(file);
 
     const hashedFileName = this.generateHashedFileName(file.buffer);
-    const filePath = join(this.uploadDir, hashedFileName);
+    const filePath = join(STATIC_UPLOADS_DIR, hashedFileName);
 
     try {
       await fs.access(filePath);
@@ -154,7 +154,7 @@ export class AvatarService {
 
           const ext = ctype?.slice('image/'.length);
           const hashedFileName = this.generateHashedFileName(data);
-          const filePath = join(this.uploadDir, hashedFileName + '.' + ext);
+          const filePath = join(STATIC_UPLOADS_DIR, hashedFileName + '.' + ext);
 
           const returnFilePath = hashedFileName + '.' + ext;
           const { ok, error } = await this.storeFile(filePath, data);

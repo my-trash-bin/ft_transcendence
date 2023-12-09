@@ -112,13 +112,13 @@ export function CreateChannelModal({
             width="60px"
             height="30px"
             disable={!isValid}
-          ></ChannelButton>
+          />
           <ChannelButton
             onClick={closeAndChangeTypePublic}
             text="취소"
             width="60px"
             height="30px"
-          ></ChannelButton>
+          />
         </div>
       </form>
     </ModalLayout>

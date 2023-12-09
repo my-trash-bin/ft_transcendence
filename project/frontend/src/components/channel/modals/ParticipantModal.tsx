@@ -1,10 +1,10 @@
 import { Api } from '@/api/api';
+import { Title } from '@/components/common/Title';
 import Image from 'next/image';
 import { useCallback } from 'react';
 import { useQuery } from 'react-query';
 import { ModalButtons } from './ModalButtons';
 import { ParticipantCard } from './ParticipantCard';
-import { Title } from '@/components/common/Title';
 
 const getRenderedData = (
   data: any,
@@ -70,7 +70,7 @@ export function ParticipantModal({
           width={25}
           height={25}
           onClick={closeModal}
-        ></Image>
+        />
       </div>
       <div className="flex flex-col items-center gap-md">
         <Title>참여자 목록</Title>

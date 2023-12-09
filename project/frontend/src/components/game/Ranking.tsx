@@ -1,8 +1,8 @@
 import { ApiContext } from '@/app/_internal/provider/ApiContext';
 import { useCallback, useContext } from 'react';
 import { useQuery } from 'react-query';
-import RankingCard from './RankingCard';
 import { LongCard } from '../common/LongCard';
+import RankingCard from './RankingCard';
 import { Loading } from '../common/Loading';
 
 export function Ranking() {
@@ -29,9 +29,9 @@ export function Ranking() {
         {data &&
           data
             .slice(0, 5)
-            .map((item) => (
+            .map((item, i) => (
               <RankingCard
-                key={item.user.nickname}
+                key={item.id}
                 rank={item.rank}
                 name={item.user.nickname}
                 avatar={item.user.profileImageUrl}

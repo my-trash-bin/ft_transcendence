@@ -91,7 +91,7 @@ export function MessageContent({
           );
         }
       })}
-      <div ref={messageEndRef}></div>
+      <div ref={messageEndRef} />
     </div>
   );
 }

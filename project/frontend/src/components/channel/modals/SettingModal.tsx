@@ -1,13 +1,13 @@
 'use client';
 
 import { Api } from '@/api/api';
+import { Title } from '@/components/common/Title';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import { ChannelButton } from '../ChannelButton';
-import { inputValidator } from './InputValidator';
-import { Title } from '@/components/common/Title';
-import { ChannelSelector } from './ChannelSelector';
 import { useMutation } from 'react-query';
+import { ChannelButton } from '../ChannelButton';
+import { ChannelSelector } from './ChannelSelector';
+import { inputValidator } from './InputValidator';
 
 export enum ChannelType {
   PUBLIC = 'public',
@@ -83,12 +83,7 @@ export function SettingModal({
     <>
       <div className="flex flex-row justify-between pt-[10px] pl-[10px] pr-[10px]">
         <button onClick={modalStateFunctions.setModalParticipant}>
-          <Image
-            alt="return"
-            src="/icon/return.svg"
-            width={20}
-            height={20}
-          ></Image>
+          <Image alt="return" src="/icon/return.svg" width={20} height={20} />
         </button>
         <button onClick={closeModal}>
           <Image
@@ -96,7 +91,7 @@ export function SettingModal({
             src="/icon/cross-small.svg"
             width={25}
             height={25}
-          ></Image>
+          />
         </button>
       </div>
       <div className="flex flex-col justify-center items-center">

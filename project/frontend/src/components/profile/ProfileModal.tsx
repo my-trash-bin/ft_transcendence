@@ -141,6 +141,7 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
     }
     return <DualFunctionButton content={content} disabled={disabled} />;
   }
+  
   function DualFunctionButton({
     content,
     disabled,

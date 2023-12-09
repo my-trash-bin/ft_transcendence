@@ -47,7 +47,7 @@ export function ChannelInfo({
             width={35}
             height={50}
             layout="relative"
-          ></Image>
+          />
         </button>
       </div>
     </>
