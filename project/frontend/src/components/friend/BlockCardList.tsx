@@ -3,6 +3,7 @@ import { useQuery } from 'react-query';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { BlockCard } from './BlockCard';
 import { Loading } from '../common/Loading';
+import { unwrap } from '@/api/unwrap';
 
 export function BlockCardList({
   activeScreen,
@@ -13,7 +14,7 @@ export function BlockCardList({
   const { isLoading, isError, data, refetch } = useQuery(
     'blockList',
     useCallback(
-      async () => (await api.userFollowControllerFindBlocks()).data,
+      async () => unwrap(await api.userFollowControllerFindBlocks()),
       [api],
     ),
   );

@@ -5,7 +5,6 @@ import { ChannelId, ClientId, UserId, idOf } from '../common/Id';
 import { DmService } from '../dm/dm.service';
 import { UserFollowService } from '../user-follow/user-follow.service';
 import { UsersService } from '../users/users.service';
-// import { ChatRoomDto, ChatRoomStatusDto } from './chat.dto'
 import { Server, Socket } from 'socket.io';
 import { v4 as uuidv4 } from 'uuid';
 import { PrismaService } from '../base/prisma.service';
@@ -20,7 +19,6 @@ import { GameState, Pong } from '../pong/pong';
 import { UserDto } from '../users/dto/user.dto';
 import { DmChannelInfoType } from './event-response.dto';
 import { UserSocket } from './events.gateway';
-// import { NotificationService } from '../notification/notification.service';
 
 export enum ChannelRoomType {
   NORMAL = 'normal',
@@ -524,7 +522,7 @@ export class EventsService {
       q.delete(player1);
       q.delete(player2);
 
-      this.createGameRoom(player1, player2, false);
+      this.createGameRoom(player1, player2, itemMode);
     }
   }
 
@@ -588,7 +586,7 @@ export class EventsService {
     });
   }
 
-  handleAcceptMatch(client: UserSocket, inviterId: string) {
+  handleAcceptMatch(client: UserSocket, inviterId: string, isItemMode: boolean) {
     const invitation = this.activeInvitations.get(inviterId);
 
     if (!invitation) {
@@ -601,7 +599,7 @@ export class EventsService {
     const inviterSocket = invitation.inviterSocket;
     if (inviterSocket) {
       // TODO
-      this.createGameRoom(client, inviterSocket, true);
+      this.createGameRoom(client, inviterSocket, isItemMode);
     } else {
       client.emit('friendIsOffline');
     }

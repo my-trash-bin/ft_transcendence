@@ -228,7 +228,7 @@ export class EventsGateway
     @ConnectedSocket() client: UserSocket,
     @MessageBody() inviterId: string,
   ) {
-    this.eventsService.handleAcceptMatch(client, inviterId);
+    this.eventsService.handleAcceptMatch(client, inviterId, false);
   }
 
   @SubscribeMessage('acceptItemMatch')
@@ -236,7 +236,8 @@ export class EventsGateway
     @ConnectedSocket() client: UserSocket,
     @MessageBody() inviterId: string,
   ) {
-    this.eventsService.handleAcceptMatch(client, inviterId);
+    console.log('acceptItemMatch == ', inviterId);
+    this.eventsService.handleAcceptMatch(client, inviterId, true);
   }
 
   @SubscribeMessage('paddleMove')

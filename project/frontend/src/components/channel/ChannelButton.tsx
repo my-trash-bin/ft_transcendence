@@ -24,6 +24,7 @@ export const ChannelButton = ({
       style={{ width: width, height: height }}
       className={disable ? disableStyle : enableStyle}
       onClick={onClick}
+      type="button"
     >
       {text}
     </button>

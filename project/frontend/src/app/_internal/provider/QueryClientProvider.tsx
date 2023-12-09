@@ -18,7 +18,7 @@ const queryClientConfig: QueryClientConfig = {
         ) {
           location.href = '/';
         }
-        throw error;
+        // throw error;
       },
       retry: 0,
     },

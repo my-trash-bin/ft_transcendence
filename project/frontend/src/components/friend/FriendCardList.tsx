@@ -3,6 +3,7 @@ import { useQuery } from 'react-query';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { FriendCard } from './FriendCard';
 import { Loading } from '../common/Loading';
+import { unwrap } from '@/api/unwrap';
 
 export function FriendCardList({
   activeScreen,
@@ -13,7 +14,7 @@ export function FriendCardList({
   const { isLoading, isError, data, refetch } = useQuery(
     'friendList',
     useCallback(
-      async () => (await api.userFollowControllerFindFriends()).data,
+      async () => unwrap(await api.userFollowControllerFindFriends()),
       [api],
     ),
   );

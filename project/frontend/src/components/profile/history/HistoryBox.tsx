@@ -15,7 +15,7 @@ export function HistoryBox() {
   const me = localMe ? JSON.parse(localMe) : null;
 
   const { isLoading, isError, data } = useQuery(
-    ['fetchHistory1'],
+    [me, 'fetchHistory'],
     useCallback(
       async () => (await api.pongLogControllerGetUserGameHistories(me.id)).data,
       [api, me.id],
