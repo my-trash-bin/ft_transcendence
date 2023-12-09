@@ -17,7 +17,7 @@ export default function withAuth(Component: any) {
         }
       };
       validate();
-    }, []);
+    }, [api]);
     return <Component {...props} />;
   };
 }

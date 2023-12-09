@@ -29,7 +29,7 @@ export function FriendCard({
     socket.emit('cancelInvite', id);
     console.log('cancelInvite');
     setIsInviteOpen(false);
-  }, [setIsInviteOpen, socket]);
+  }, [setIsInviteOpen, socket, id]);
 
   const handleInviteOpen = useCallback(() => {
     setIsInviteOpen(true);

@@ -31,7 +31,7 @@ export default function withDmAuth(Component: any) {
       };
 
       validateAndCheckParticipation();
-    }, [api, props.channelId, props.params.username]);
+    }, [api, props.channelId, props.params.username, router]);
 
     return <Component {...props} />;
   };
