@@ -24,8 +24,8 @@ function DmPage() {
           alt="dm image"
           src="/images/dm-page.png"
           priority={true}
-          width={300}
-          height={300}
+          width={435}
+          height={350}
         />
       </div>
     </div>
