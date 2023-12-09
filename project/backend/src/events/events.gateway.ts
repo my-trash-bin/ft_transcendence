@@ -222,6 +222,11 @@ export class EventsGateway
     this.eventsService.handleInviteMatch(client, friendId, isItemMode);
   }
 
+  @SubscribeMessage('cancalMatch')
+  async handleCancelMatch(@ConnectedSocket() client: UserSocket) {
+    this.eventsService.handleCancelMatch(client);
+  }
+
   // 초대 수락 처리
   @SubscribeMessage('acceptNormalMatch')
   async handleAcceptNormalMatch(

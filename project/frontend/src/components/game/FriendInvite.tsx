@@ -31,26 +31,26 @@ const FriendInvite: React.FC<FriendInviteProps> = ({
         console.log('inviteItemMatch', friendId);
       }
     }
-  }, [isOpen, onClose, router, socket]);
+  }, [isOpen, onClose, router, socket, mode, friendId]);
 
-  const handleGoPong = () => {
-    onClose();
-    router.push('/pong');
-  };
-
-  const handlePlayerRole = (role: string) => {
-    setIsPlayer1(role === 'player1');
-    console.log('playerRole', role);
-    socket.off('playerRole', handlePlayerRole);
-  };
   useEffect(() => {
+    const handleGoPong = () => {
+      onClose();
+      router.push('/pong');
+    };
+
+    const handlePlayerRole = (role: string) => {
+      setIsPlayer1(role === 'player1');
+      console.log('playerRole', role);
+      socket.off('playerRole', handlePlayerRole);
+    };
     socket.on('GoPong', handleGoPong);
     socket.on('playerRole', handlePlayerRole);
     return () => {
       socket.off('GoPong', handleGoPong);
       socket.off('playerRole', handlePlayerRole);
     };
-  }, []);
+  }, [onClose, router, setIsPlayer1, socket]);
 
   const size = 'py-sm px-lg w-[498px] h-[308px]';
   const textCSS = 'text-dark-purple text-h2';
