@@ -4,7 +4,6 @@ import { Button } from '../common/Button';
 import FriendInvite from '../game/FriendInvite';
 import { FriendSetting } from './FriendSetting';
 import { CommonCard } from './utils/CommonCard';
-import { getGameSocket } from '../pong/gameSocket';
 import { GameInviteButtons } from '../game/GameInviteButtons';
 
 interface FriendCardProps {
@@ -43,6 +42,7 @@ export function FriendCard({
           setGameMode={setGameMode}
           handleInviteOpen={handleInviteOpen}
           isModal={false}
+          friendId={id}
         />
         <Button onClick={() => router.push(`/dm/${nickname}`)}>메세지</Button>
         <FriendSetting targetId={id} refetch={refetch} />

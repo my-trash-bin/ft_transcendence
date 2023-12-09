@@ -153,6 +153,7 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
         setGameMode={setGameMode}
         handleInviteOpen={openInvite}
         isModal={true}
+        friendId={targetId}
       />
     );
   }
