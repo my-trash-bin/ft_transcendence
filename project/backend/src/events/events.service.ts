@@ -1,22 +1,22 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { WsException } from '@nestjs/websockets';
-import { ChangeActionType, ChannelService } from '../channel/channel.service';
-import { ChannelId, ClientId, UserId, idOf } from '../common/Id';
-import { DmService } from '../dm/dm.service';
-import { UserFollowService } from '../user-follow/user-follow.service';
-import { UsersService } from '../users/users.service';
 import { Server, Socket } from 'socket.io';
 import { v4 as uuidv4 } from 'uuid';
 import { PrismaService } from '../base/prisma.service';
+import { ChangeActionType, ChannelService } from '../channel/channel.service';
 import { ChangeMemberStatusResultDto } from '../channel/dto/change-member-status-result.dto';
 import { JoinedChannelInfoDto } from '../channel/dto/joined-channel-info.dto';
 import { LeavingChannelResponseDto } from '../channel/dto/leave-channel-response.dto';
 import { GateWayEvents } from '../common/gateway-events.enum';
+import { ChannelId, ClientId, idOf, UserId } from '../common/Id';
+import { DmService } from '../dm/dm.service';
 import { MessageWithMemberDto } from '../dm/dto/message-with-member';
 import { NotificationService } from '../notification/notification.service';
 import { PongLogService } from '../pong-log/pong-log.service';
 import { GameState, Pong } from '../pong/pong';
+import { UserFollowService } from '../user-follow/user-follow.service';
 import { UserDto } from '../users/dto/user.dto';
+import { UsersService } from '../users/users.service';
 import { DmChannelInfoType } from './event-response.dto';
 import { UserSocket } from './events.gateway';
 
@@ -523,7 +523,11 @@ export class EventsService {
     }
   }
 
-  private async alarmInvited(myId: UserId, friendId: UserId, isItemMode: boolean) {
+  private async alarmInvited(
+    myId: UserId,
+    friendId: UserId,
+    isItemMode: boolean,
+  ) {
     const eventName = 'newGameInvitaion';
     const prismaUser = await this.prismaService.user.findUnique({
       where: { id: friendId.value },
@@ -583,7 +587,11 @@ export class EventsService {
     });
   }
 
-  handleAcceptMatch(client: UserSocket, inviterId: string, isItemMode: boolean) {
+  handleAcceptMatch(
+    client: UserSocket,
+    inviterId: string,
+    isItemMode: boolean,
+  ) {
     const invitation = this.activeInvitations.get(inviterId);
 
     if (!invitation) {
