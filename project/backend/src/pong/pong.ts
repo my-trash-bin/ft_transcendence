@@ -1,6 +1,7 @@
 // events.game.ts
 import { EventEmitter } from 'events';
 import { PrismaService } from '../base/prisma.service';
+import { idOf, UserId } from '../common/Id';
 
 // 게임 상수
 const BOARD_WIDTH = 800;
@@ -42,7 +43,13 @@ export class Pong {
     public readonly player1SocketId: string,
     public readonly player2SocketId: string,
     private IsItemMode: boolean,
-    private readonly onEnd: () => void,
+    private readonly onEnd: (data: {
+      player1Id: UserId;
+      player2Id: UserId;
+      player1Score: number;
+      player2Score: number;
+      isPlayer1win: boolean;
+    }) => void,
   ) {
     this.player1Id = player1Id;
     this.player2Id = player2Id;
@@ -100,27 +107,16 @@ export class Pong {
 
     this.setIsItemMode(this.IsItemMode);
 
-
     const interval = setInterval(async () => {
       if (this.updateGameLogic()) {
         clearInterval(interval);
-        (async () => {
-          try {
-            await this.prisma.pongGameHistory.create({
-              data: {
-                player1Id: this.player1Id,
-                player2Id: this.player2Id,
-                player1Score: this.gameState.score1,
-                player2Score: this.gameState.score2,
-                isPlayer1win: this.gameState.score1 > this.gameState.score2,
-              },
-            });
-          } catch (error) {
-            console.error(error);
-          } finally {
-            this.onEnd();
-          }
-        })();
+        this.onEnd({
+          player1Id: idOf(this.player1Id),
+          player2Id: idOf(this.player2Id),
+          player1Score: this.gameState.score1,
+          player2Score: this.gameState.score2,
+          isPlayer1win: this.gameState.score1 > this.gameState.score2,
+        });
       }
     }, 1000 / 60);
 

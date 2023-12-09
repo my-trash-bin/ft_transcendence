@@ -8,7 +8,6 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { ChannelMemberType, Prisma, PrismaClient } from '@prisma/client';
 import { DefaultArgs } from '@prisma/client/runtime/library';
-import * as bcrypt from 'bcrypt';
 import { scrypt } from 'crypto';
 import { PrismaService } from '../base/prisma.service';
 import { ChannelId, UserId } from '../common/Id';
@@ -130,7 +129,7 @@ export class ChannelService {
   ): Promise<ServiceResponse<ChannelDto>> {
     try {
       if (password) {
-        password = await bcrypt.hash(password, 10);
+        password = await this.mfaPasswordHash(password);
       }
       const prismaChannel = await this.prismaService.channel.create({
         data: {
@@ -280,14 +279,14 @@ export class ChannelService {
           throw new ServiceError('최대 사용자 수 초과', 400);
         }
 
-        if (!channel.isPublic) {
+        if (!channel.isPublic && channel.password === null) {
           throw new ServiceError('private 방에는 접속 할 수 없습니다.', 400);
         }
 
         if (
           channel.password &&
           (!inputPassword ||
-            !(await bcrypt.compare(inputPassword, channel.password)))
+            (await this.mfaPasswordHash(inputPassword)) !== channel.password)
         ) {
           throw new ServiceError('올바른 비밀번호 입력이 필요합니다.', 400);
         }

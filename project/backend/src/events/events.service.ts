@@ -12,6 +12,7 @@ import { JoinedChannelInfoDto } from '../channel/dto/joined-channel-info.dto';
 import { LeavingChannelResponseDto } from '../channel/dto/leave-channel-response.dto';
 import { GateWayEvents } from '../common/gateway-events.enum';
 import { MessageWithMemberDto } from '../dm/dto/message-with-member';
+import { PongLogService } from '../pong-log/pong-log.service';
 import { UserDto } from '../users/dto/user.dto';
 import { DmChannelInfoType } from './event-response.dto';
 import { UserSocket } from './events.gateway';
@@ -42,6 +43,7 @@ export class EventsService {
     private dmService: DmService,
     private channelService: ChannelService,
     private userFollowService: UserFollowService,
+    private pongLogService: PongLogService,
   ) {}
 
   async afterInit(server: Server) {
@@ -474,5 +476,21 @@ export class EventsService {
   // only DM채널
   private removeUserFromChannel(channel: Set<UserIdKey>, userId: UserId) {
     channel.delete(userId.value); // 스스로 방에서 나가거나, 쫓겨나거나
+  }
+
+  async endGame(data: {
+    player1Id: UserId;
+    player2Id: UserId;
+    player1Score: number;
+    player2Score: number;
+    isPlayer1win: boolean;
+  }) {
+    await this.pongLogService.create(
+      data.player1Id,
+      data.player2Id,
+      data.player1Score,
+      data.player2Score,
+      data.isPlayer1win,
+    );
   }
 }

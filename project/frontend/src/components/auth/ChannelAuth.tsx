@@ -1,9 +1,11 @@
 import { ApiContext } from '@/app/_internal/provider/ApiContext';
 import { useContext, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function withChannelAuth(Component: any) {
   return function WrappedComponent(props: any) {
     const { api } = useContext(ApiContext);
+    const router = useRouter();
 
     useEffect(() => {
       const validateAndCheckParticipation = async () => {
@@ -13,21 +15,22 @@ export default function withChannelAuth(Component: any) {
 
           const participationRes: any =
             await api.channelControllerIsParticipated(props.params.channelId);
-          if (!participationRes.data.data) {
+          if (!participationRes.data) {
             throw { error: { type: 'participant' } };
           }
         } catch (e: any) {
           if (e?.error?.type === 'participant') {
-            window.location.href = '/channel';
+            router.replace('/channel'); // window.location.href = '/channel';
           }
 
           if (e?.error?.statusCode === 401 || e?.error?.statusCode == 403)
-            window.location.href = '/';
+            router.replace('/'); // window.location.href = '/';
         }
       };
-
+      if (router) {
       validateAndCheckParticipation();
-    }, [api, props.channelId, props.params.channelId]);
+      }
+    }, [api, router, props.channelId, props.params.channelId]);
 
     return <Component {...props} />;
   };

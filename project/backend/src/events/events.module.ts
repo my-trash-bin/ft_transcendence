@@ -2,6 +2,7 @@ import { forwardRef, Module } from '@nestjs/common';
 import { BaseModule } from '../base/base.module';
 import { ChannelModule } from '../channel/channel.module';
 import { DmModule } from '../dm/dm.module';
+import { PongLogModule } from '../pong-log/pong-log.module';
 import { UserFollowModule } from '../user-follow/user-follow.module';
 import { UsersModule } from '../users/users.module';
 import { EventsGateway } from './events.gateway';
@@ -13,6 +14,7 @@ import { EventsService } from './events.service';
     forwardRef(() => UserFollowModule),
     forwardRef(() => ChannelModule),
     forwardRef(() => DmModule),
+    forwardRef(() => PongLogModule),
     BaseModule,
   ],
   providers: [EventsGateway, EventsService],

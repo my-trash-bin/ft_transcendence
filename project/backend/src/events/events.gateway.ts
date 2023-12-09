@@ -17,7 +17,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { PrismaService } from '../base/prisma.service';
 import { ChangeActionType } from '../channel/channel.service';
 import { GateWayEvents } from '../common/gateway-events.enum';
-import { idOf } from '../common/Id';
+import { idOf, UserId } from '../common/Id';
 import { GameState, Pong } from '../pong/pong';
 import {
   ChannelIdentityDto,
@@ -94,20 +94,22 @@ export class EventsGateway
     }
   }
 
-  private async storeGameStateToDB(gameState: GameState, pong: Pong): Promise<void> {
+  private async storeGameStateToDB(
+    gameState: GameState,
+    pong: Pong,
+  ): Promise<void> {
     try {
-      await this.prisma.pongGameHistory.create({
-        data: {
-          player1Id: pong.player1Id,
-          player2Id: pong.player2Id,
-          player1Score: gameState.score1,
-          player2Score: gameState.score2,
-          isPlayer1win: gameState.score1 > gameState.score2,
-        },
+      await this.eventsService.endGame({
+        player1Id: idOf(pong.player1Id),
+        player2Id: idOf(pong.player2Id),
+        player1Score: gameState.score1,
+        player2Score: gameState.score2,
+        isPlayer1win: gameState.score1 > gameState.score2,
       });
-      console.log('Game state saved to DB');
+      this.logger.log('Game state saved to DB');
+      console.log();
     } catch (error) {
-      console.error('Failed to save game state to DB:', error);
+      this.logger.error('Failed to save game state to DB:', error);
     }
   }
 
@@ -426,11 +428,25 @@ export class EventsGateway
     setTimeout(() => {
       const player1Id = player1.data.userId;
       const player2Id = player2.data.userId;
-      const pong = new Pong(this.prisma, player1Id, player2Id, player1.id, player2.id,
-        mode, () => {
-        this.pongMap.delete(player1Id);
-        this.pongMap.delete(player2Id);
-      });
+      const pong = new Pong(
+        this.prisma,
+        player1Id,
+        player2Id,
+        player1.id,
+        player2.id,
+        mode,
+        (data: {
+          player1Id: UserId;
+          player2Id: UserId;
+          player1Score: number;
+          player2Score: number;
+          isPlayer1win: boolean;
+        }) => {
+          this.eventsService.endGame(data);
+          this.pongMap.delete(player1Id);
+          this.pongMap.delete(player2Id);
+        },
+      );
       this.emitPlayerInfo(player1Id, player2Id, roomName);
       pong.onGameUpdate.on('gameState', (gameState: GameState) => {
         player1.emit('gameUpdate', gameState);

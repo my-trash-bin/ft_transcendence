@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { AchievementService } from '../achievement/achievement.service';
 import { PrismaService } from '../base/prisma.service';
 import { GameHistoryId, UserId } from '../common/Id';
 import {
@@ -27,14 +28,17 @@ import { PongLogDto } from './dto/pong-log.dto';
 @Injectable()
 export class PongLogService {
   private logger = new Logger('PongLogService');
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly achievementService: AchievementService,
+  ) {}
 
   async getUserGameHistories(
     id: UserId,
   ): Promise<ServiceResponse<PongLogHistoryResponse>> {
     try {
       const gameHistories: PongGameHistoryWithPlayerType[] =
-        await this.prisma.pongGameHistory.findMany({
+        await this.prismaService.pongGameHistory.findMany({
           where: { OR: [{ player1Id: id.value }, { player2Id: id.value }] },
           include: {
             player1: true,
@@ -57,9 +61,10 @@ export class PongLogService {
 
   async findOne(id: GameHistoryId): Promise<ServiceResponse<PongLogDto>> {
     try {
-      const gameHistory = await this.prisma.pongGameHistory.findUniqueOrThrow({
-        where: { id: id.value },
-      });
+      const gameHistory =
+        await this.prismaService.pongGameHistory.findUniqueOrThrow({
+          where: { id: id.value },
+        });
       return newServiceOkResponse(gameHistory);
     } catch (error) {
       if (
@@ -75,17 +80,63 @@ export class PongLogService {
     }
   }
 
-  async create(player1Id: UserId, player2Id: UserId, createdAt?: Date) {
+  async create(
+    player1Id: UserId,
+    player2Id: UserId,
+    player1Score: number,
+    player2Score: number,
+    isPlayer1win: boolean,
+  ) {
     try {
-      const result = await this.prisma.pongGameHistory.create({
+      const winner = isPlayer1win ? player1Id : player2Id;
+
+      const result = await this.prismaService.pongGameHistory.create({
         data: {
           player1Id: player1Id.value,
           player2Id: player2Id.value,
-          player1Score: 0,
-          player2Score: 0,
-          createdAt,
+          player1Score,
+          player2Score,
+          isPlayer1win,
         },
       });
+
+      const counts = await Promise.all([
+        ...[player1Id.value, player2Id.value].map((userId) =>
+          this.prismaService.pongGameHistory.count({
+            where: { OR: [{ player1Id: userId }, { player2Id: userId }] },
+          }),
+        ),
+        this.prismaService.pongGameHistory.count({
+          where: {
+            OR: [
+              { player1Id: winner.value, isPlayer1win: true },
+              { player2Id: winner.value, isPlayer1win: false },
+            ],
+          },
+        }),
+      ]);
+
+      const achieveResult = await this.achievementService.checkGrantAchievement(
+        [
+          {
+            userId: player1Id,
+            eventType: 'endGame',
+            eventValue: counts[0],
+          },
+          {
+            userId: player2Id,
+            eventType: 'endGame',
+            eventValue: counts[1],
+          },
+          {
+            userId: winner,
+            eventType: 'winGame',
+            eventValue: counts[2],
+          },
+        ],
+      );
+      this.logger.verbose(counts);
+      this.logger.debug(achieveResult);
 
       return newServiceOkResponse(result);
     } catch (error) {
@@ -107,7 +158,7 @@ export class PongLogService {
     },
   ) {
     try {
-      const result = await this.prisma.pongGameHistory.update({
+      const result = await this.prismaService.pongGameHistory.update({
         where: {
           id: id.value,
         },
@@ -137,7 +188,7 @@ export class PongLogService {
     },
   ) {
     try {
-      const result = await this.prisma.pongGameHistory.update({
+      const result = await this.prismaService.pongGameHistory.update({
         where: {
           id: id.value,
         },
@@ -160,7 +211,7 @@ export class PongLogService {
   }
 
   async getRanking(): Promise<PongLogRankingRecordDto[]> {
-    const users = await this.prisma.user.findMany({
+    const users = await this.prismaService.user.findMany({
       include: {
         pongGameHistory1: {
           select: {

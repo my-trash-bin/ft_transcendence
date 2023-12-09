@@ -1,9 +1,11 @@
 import { ApiContext } from '@/app/_internal/provider/ApiContext';
+import { useRouter } from 'next/navigation';
 import { useContext, useEffect } from 'react';
 
 export default function withDmAuth(Component: any) {
   return function WrappedComponent(props: any) {
     const { api } = useContext(ApiContext);
+    const router = useRouter();
 
     useEffect(() => {
       const validateAndCheckParticipation = async () => {
@@ -20,11 +22,11 @@ export default function withDmAuth(Component: any) {
           }
         } catch (e: any) {
           if (e?.error?.type === 'block') {
-            window.location.href = '/dm';
+            router.replace('/dm'); // window.location.href = '/dm';
           }
 
           if (e?.error?.statusCode === 401 || e?.error?.statusCode == 403)
-            window.location.href = '/';
+            router.replace('/'); // window.location.href = '/';
         }
       };
 
