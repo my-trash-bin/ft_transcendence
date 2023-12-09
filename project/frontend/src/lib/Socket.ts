@@ -7,6 +7,7 @@ export function getSocket() {
     socket = io(process.env.NEXT_PUBLIC_WS_ENDPOINT as string, {
       reconnectionAttempts: 0,
       withCredentials: true,
+      transports: ['websocket'],
     });
   }
 
