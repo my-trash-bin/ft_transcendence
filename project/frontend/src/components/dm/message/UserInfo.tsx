@@ -13,11 +13,6 @@ export function UserInfo({
   onActive: boolean;
   targetId: string;
 }>) {
-  const active = onActive ? 'Active' : 'Inactive';
-  const activeStyle = onActive
-    ? '.border-live-interactive'
-    : 'bg-gray-interactive';
-
   return (
     <div className="h-[80px] w-[95%] border-b border-default relative">
       <div className="w-[45px] h-[50px] absolute left-[30px] top-[20px]">
