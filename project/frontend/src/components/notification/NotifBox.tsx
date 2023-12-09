@@ -5,6 +5,7 @@ import { SelectNotif } from './SelectNotif';
 import { useCallback, useContext } from 'react';
 import { useQuery } from 'react-query';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
+import { unwrap } from '@/api/unwrap';
 
 export function NotifBox({
   active,
@@ -21,7 +22,7 @@ export function NotifBox({
     'fetchNotifications',
     useCallback(async () => {
       if (active) {
-        return (await api.notificationControllerFindManyAndUpdateRead()).data;
+        return unwrap(await api.notificationControllerFindManyAndUpdateRead());
       }
     }, [api, active]),
     {
@@ -43,7 +44,7 @@ export function NotifBox({
   }, [setActive]);
 
   if (isLoading) return <p>로딩중</p>;
-  else if (isError) return <p>something wrong!</p>;
+  if (isError || !data) return <p>something wrong!</p>;
   return (
     active && (
       <div
