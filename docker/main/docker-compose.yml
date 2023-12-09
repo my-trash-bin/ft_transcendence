@@ -30,7 +30,7 @@ services:
     env_file:
       - ../../.env
     volumes:
-      - ./volume/uploads:/usr/src/dist/uploads
+      - ./volume/uploads:/usr/src/app/dist/uploads
     restart: always
   frontend:
     build:

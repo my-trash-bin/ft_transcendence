@@ -70,7 +70,7 @@ export class Pong {
       score2: 0,
       gameOver: false,
       gameStart: true,
-      isItemMode: false,
+      isItemMode: IsItemMode,
       pongItem: { x: 0, y: 0, type: 0 },
     };
     this.gameInit();
@@ -120,6 +120,7 @@ export class Pong {
       }
     }, 1000 / 60);
 
+    console.log('item mode = ', this.gameState.isItemMode);
     if (this.gameState.isItemMode) {
       const itemInterval = setInterval(() => {
         if (this.makeItemRandomPosition()) clearInterval(itemInterval);
