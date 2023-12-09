@@ -333,7 +333,7 @@ export class EventsService {
     if ([ChangeActionType.BANNED, ChangeActionType.KICK].includes(actionType)) {
       this.removeUserFromChannel(
         this.channels[type][channelId.value],
-        idOf(userId),
+        idOf(toId.value),
       ); // BAN or KICK => 채널에서 나가짐 반영
     }
   }
