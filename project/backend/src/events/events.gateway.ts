@@ -237,6 +237,7 @@ export class EventsGateway
     @ConnectedSocket() client: UserSocket,
     @MessageBody() inviteeId: string
   ) {
+    console.log('cancelInvite == ', inviteeId);
     this.eventsService.handleCancelInvite(client, inviteeId);
   }
 
