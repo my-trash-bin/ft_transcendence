@@ -36,7 +36,13 @@ function getRenderData(
   });
 }
 
-export function AllChannelList({ searchChannel }: { searchChannel: string }) {
+export function AllChannelList({
+  searchChannel,
+  setMyChannel,
+}: {
+  searchChannel: string;
+  setMyChannel: (myChannel: boolean) => void;
+}) {
   const [isPasswordModalOpen, setPasswordModalOpen] = useState<boolean>(false);
   const [isParticipationModalOpen, setParticipationModalOpen] =
     useState<boolean>(false);
@@ -75,6 +81,7 @@ export function AllChannelList({ searchChannel }: { searchChannel: string }) {
           setIsModalOpen={setParticipationModalOpen}
           targetChannelId={selectedChannelId}
           targetChannelType={selectedChannelType}
+          setMyChannel={setMyChannel}
         />
       </Portal>
 
