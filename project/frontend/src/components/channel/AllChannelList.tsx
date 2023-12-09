@@ -26,6 +26,7 @@ function getRenderData(
         now={channel.memberCount}
         max={channel.maximumMemberCount}
         isPublic={channel.isPublic}
+        needPassword={channel.needPassword}
         participateModalOpen={setParticipationModalOpen}
         passwordModalOpen={setPasswordModalOpen}
         setSelectedChannelId={setSelectedChannelId}

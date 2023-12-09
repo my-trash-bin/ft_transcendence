@@ -1,5 +1,5 @@
-import { Api } from '@/api/api';
-import { useState } from 'react';
+import { ApiContext } from '@/app/_internal/provider/ApiContext';
+import { useContext, useState } from 'react';
 import { useMutation } from 'react-query';
 import { ChannelButton } from '../ChannelButton';
 import { ChannelCreateContent } from './ChannelCreateContent';
@@ -24,6 +24,7 @@ export function CreateChannelModal({
   const [inputTitle, setInputTitle] = useState('');
   const [inputPassword, setInputPassword] = useState('');
   const [inputSize, setInputSize] = useState(2);
+  const { api } = useContext(ApiContext);
 
   const channelTypeChangeEvent = (channelType: ChannelType) => {
     switch (channelType) {
@@ -42,10 +43,10 @@ export function CreateChannelModal({
     setChannelType(ChannelType.PUBLIC);
     closeModal();
   };
-  const mutation = useMutation(new Api().api.channelControllerCreate, {
+  const mutation = useMutation(api.channelControllerCreate, {
     onSuccess: () => {
-      closeModal();
       alert('채널 생성에 성공했습니다.');
+      closeAndChangeTypePublic();
     },
     onError: () => {
       alert('채널 생성에 실패했습니다.');
@@ -54,7 +55,7 @@ export function CreateChannelModal({
 
   const sendCreateChannel = () => {
     const channelCreateData =
-      channelType !== ChannelType.PUBLIC
+      channelType === ChannelType.PROTECTED
         ? {
             title: inputTitle,
             type: channelType,

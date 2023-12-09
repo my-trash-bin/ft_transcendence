@@ -25,6 +25,7 @@ export const useSocket = (type: any, setMessages: any) => {
         } else setMessages((messages: any) => [...messages, res]);
       });
       socket.on('join', (res) => {
+        console.log(res);
         setMessages((messages: any) => [...messages, res]);
       });
 
