@@ -1,7 +1,7 @@
 'use client';
 import withAuth from '@/components/auth/Auth';
 import { ProfileBox } from '../../components/profile/ProfileBox';
-import { AchivementBox } from '../../components/profile/achivement/AchivementBox';
+import { AchievementBox } from '../../components/profile/achievement/AchievementBox';
 import { HistoryBox } from '../../components/profile/history/HistoryBox';
 
 function ProfilePage() {
@@ -10,7 +10,7 @@ function ProfilePage() {
       <div className="flex flex-col items-center max-w-[100%] max-h-[100%]">
         <ProfileBox />
         <div className="flex flex-row">
-          <AchivementBox />
+          <AchievementBox />
           <HistoryBox />
         </div>
       </div>

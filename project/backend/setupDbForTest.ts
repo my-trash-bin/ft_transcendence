@@ -219,48 +219,48 @@ const testInfo = {
 
 const achievements = [
   {
-    imageUrl: '/achivement/bell.png',
+    imageUrl: '/achievement/bell.png',
     title: '손님',
     description: '토토로퐁에 가입 완료!',
   },
   {
-    imageUrl: '/achivement/party.png',
+    imageUrl: '/achievement/party.png',
     title: '리더',
     description: '채널을 1번 이상 생성!',
   },
   {
-    imageUrl: '/achivement/tree.png',
+    imageUrl: '/achievement/tree.png',
     title: '게임왕',
     description: '게임 1승 성공!',
   },
   {
-    imageUrl: '/achivement/reindeer.png',
+    imageUrl: '/achievement/reindeer.png',
     title: '게임러버1',
     description: '게임 1회 이상 플레이!',
   },
   {
-    imageUrl: '/achivement/santa.png',
+    imageUrl: '/achievement/santa.png',
     title: '게임러버2',
     description: '게임 5회 이상 플레이!',
   },
   {
-    imageUrl: '/achivement/snowflake.png',
+    imageUrl: '/achievement/snowflake.png',
     title: '게임러버3',
     description: '게임 10회 이상 플레이!',
   },
   {
-    imageUrl: '/achivement/snowman.png',
+    imageUrl: '/achievement/snowman.png',
     title: '인싸1',
     description: '친구 1명 이상!',
   },
   {
-    imageUrl: '/achivement/star.png',
+    imageUrl: '/achievement/star.png',
     title: '인싸2',
     description: '친구 5명 이상!',
   },
 
   {
-    imageUrl: '/achivement/wreath.png',
+    imageUrl: '/achievement/wreath.png',
     title: '인싸3',
     description: '친구 10명 이상!',
   },
