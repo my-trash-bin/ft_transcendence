@@ -40,7 +40,7 @@ export type UserSocket = Socket & {
   };
 };
 
-@WebSocketGateway(parseInt(process.env.SOCKET_IO_PORT as string), {
+@WebSocketGateway(parseInt(process.env.WS_PORT as string), {
   cors: { origin: process.env.FRONTEND_ORIGIN, credentials: true },
 })
 @Injectable()
@@ -206,7 +206,7 @@ export class EventsGateway
   @SubscribeMessage('inviteNormalMatch')
   async inviteNormalMatchRequest(
     @ConnectedSocket() client: UserSocket,
-    @MessageBody() friendId: string ,
+    @MessageBody() friendId: string,
   ) {
     const isItemMode = false;
     this.eventsService.handleInviteMatch(client, friendId, isItemMode);
@@ -215,7 +215,7 @@ export class EventsGateway
   @SubscribeMessage('inviteItemMatch')
   async inviteItemMatchRequest(
     @ConnectedSocket() client: UserSocket,
-    @MessageBody() friendId: string ,
+    @MessageBody() friendId: string,
   ) {
     const isItemMode = true;
     console.log('inviteItemMatchRequest == ', friendId);
@@ -226,7 +226,7 @@ export class EventsGateway
   @SubscribeMessage('acceptNormalMatch')
   async handleAcceptNormalMatch(
     @ConnectedSocket() client: UserSocket,
-    @MessageBody() inviterId: string ,
+    @MessageBody() inviterId: string,
   ) {
     this.eventsService.handleAcceptMatch(client, inviterId);
   }
@@ -234,7 +234,7 @@ export class EventsGateway
   @SubscribeMessage('acceptItemMatch')
   async handleAcceptItemMatch(
     @ConnectedSocket() client: UserSocket,
-    @MessageBody() inviterId: string ,
+    @MessageBody() inviterId: string,
   ) {
     this.eventsService.handleAcceptMatch(client, inviterId);
   }
