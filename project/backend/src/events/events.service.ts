@@ -211,7 +211,7 @@ export class EventsService {
       idOf(userId),
     );
 
-    const blockedIdList = relationship?.isBlock ? [userId] : [];
+    const blockedIdList = relationship?.isBlock ? [toId.value] : [];
 
     const channelId = result.data!.channelId;
 
@@ -461,16 +461,13 @@ export class EventsService {
     this.logger.log(`blockedIdList: ${blockedIdList}`);
     this.logger.log(this.getChannelArray(type, channelId));
     this.getChannelArray(type, channelId)
-      ?.filter((userId) =>
-        blockedIdList.every((blockedId) => blockedId !== userId),
-      )
+      ?.filter((userId) => !blockedIdList.includes(userId))
       .forEach((userId) =>
         this.broadcastToUserClients(idOf(userId), eventName, data),
       );
   }
   private broadcastToUserClients(userId: UserId, eventName: string, data: any) {
     this.logger.debug(`broadcastToUserClients: ${userId.value}, ${eventName}`);
-    this.logger.debug(`socketMap: ${this.socketMap.get(userId.value)}`);
     this.socketMap
       .get(userId.value)
       ?.forEach((client) => client.emit(eventName, data));
