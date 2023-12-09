@@ -37,6 +37,7 @@ export function MessageSearchInput({
 
   const crossOnClick = (event: any) => {
     setSearchInput('');
+    setCallApi(true);
   };
 
   return (
