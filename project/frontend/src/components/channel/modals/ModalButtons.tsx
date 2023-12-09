@@ -29,18 +29,13 @@ export function ModalButtons({
             src="/icon/setting.svg"
             width={20}
             height={20}
-          ></Image>
+          />
         ) : (
           ''
         )}
       </button>
       <button onClick={exitChannel}>
-        <Image
-          alt="exit button"
-          src="/icon/exit.svg"
-          width={20}
-          height={20}
-        ></Image>
+        <Image alt="exit button" src="/icon/exit.svg" width={20} height={20} />
       </button>
     </div>
   );

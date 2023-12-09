@@ -37,12 +37,7 @@ export function AddModal({
     <>
       <div className="flex flex-row justify-between pt-[10px] pl-[10px] pr-[10px]">
         <button onClick={modalStateFunctions.setModalParticipant}>
-          <Image
-            alt="return"
-            src="/icon/return.svg"
-            width={20}
-            height={20}
-          ></Image>
+          <Image alt="return" src="/icon/return.svg" width={20} height={20} />
         </button>
         <button onClick={closeModal}>
           <Image
@@ -50,7 +45,7 @@ export function AddModal({
             src="/icon/cross-small.svg"
             width={25}
             height={25}
-          ></Image>
+          />
         </button>
       </div>
       <div className="flex flex-col items-center">
@@ -59,6 +54,9 @@ export function AddModal({
           width="280px"
           height="30px"
           placeholder="search user.."
+          eventFunction={(searchInput) =>
+            alert(`// TODO: searchInput: ${searchInput}`)
+          }
         />
         <div className="w-[300px] h-[380px] mt-[15px] flex flex-col items-center overflow-y-scroll">
           {par.map((p) => (
@@ -67,6 +65,10 @@ export function AddModal({
               nickname={p.nickname}
               imageUrl={p.imageUri}
               type="ADD"
+              // TODO: 빠진 프로퍼티 채우기. 일단 타입 에러 때문에 임의로 아무거나 넣었습니다
+              channelId="0x42"
+              memberId="0x42"
+              isMyself={false}
             />
           ))}
         </div>

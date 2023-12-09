@@ -38,7 +38,7 @@ export default function SignInPage() {
     avatar === '' ? (
       <ChooseAvatar avatars={avatars} onChooseClick={handleChooseClick} />
     ) : (
-      <RegisterUser imageUrl={avatar} nickname={nickname}></RegisterUser>
+      <RegisterUser imageUrl={avatar} nickname={nickname} />
     );
 
   return (

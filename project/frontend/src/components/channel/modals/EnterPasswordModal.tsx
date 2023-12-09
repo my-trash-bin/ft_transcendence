@@ -56,7 +56,7 @@ export function EnterPasswordModal({
             src="/icon/cross-small.svg"
             width={25}
             height={25}
-          ></Image>
+          />
         </button>
         <form
           onSubmit={(e) => {
@@ -72,7 +72,7 @@ export function EnterPasswordModal({
             placeholder="비밀번호를 입력하세요."
             onChange={handlePassword}
             className="pl-[10px] rounded-sm outline-none placeholder:text-[12px] placeholder:text-center w-[200px]"
-          ></input>
+          />
           <button
             type="button"
             className="mt-[30px] pl-[20px] pr-[20px] w-[200px] h-[35px] bg-dark-purple rounded-md text-white"

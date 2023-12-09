@@ -24,7 +24,7 @@ function ChannelHome({ params }: Readonly<{ params: { channelId: string } }>) {
   );
   return (
     <>
-      <div id="backdrop-root"></div>
+      <div id="backdrop-root" />
       <div
         className={`bg-opacity-50 flex flex-row bg-light-background rounded-[20px] w-[inherit]`}
       >

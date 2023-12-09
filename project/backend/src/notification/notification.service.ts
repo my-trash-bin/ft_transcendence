@@ -2,14 +2,15 @@ import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../base/prisma.service';
 import { UserId } from '../common/Id';
 import {
+  ServiceResponse,
   newServiceFailPrismaKnownResponse,
   newServiceFailUnhandledResponse,
   newServiceOkResponse,
-  ServiceResponse,
 } from '../common/ServiceResponse';
+import { UserDto, userDtoSelect } from '../users/dto/user.dto';
 import {
-  isRecordNotFoundError,
   IsRecordToUpdateNotFoundError,
+  isRecordNotFoundError,
   isUniqueConstraintError,
 } from '../util/prismaError';
 import { NotificationDto } from './dto/notification.dto';

@@ -24,7 +24,7 @@ export function ProfileBox() {
     isError: historyError,
     data: historyData,
   } = useQuery(
-    [me, 'historyFromProfilePage'],
+    [me, 'fetchHistory'],
     useCallback(
       async () => (await api.pongLogControllerGetUserGameHistories(me.id)).data,
       [api, me],

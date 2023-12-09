@@ -1,14 +1,15 @@
 import { ApiContext } from '@/app/_internal/provider/ApiContext';
 import { useCallback, useContext } from 'react';
 import { useQuery } from 'react-query';
-import RankingCard from './RankingCard';
 import { LongCard } from '../common/LongCard';
+import RankingCard from './RankingCard';
+import { Loading } from '../common/Loading';
 
 export function Ranking() {
   const { api } = useContext(ApiContext);
 
   const { isLoading, isError, data } = useQuery(
-    [''],
+    'ranking',
     useCallback(
       async () => (await api.pongLogControllerGetRanking()).data,
       [api],
@@ -19,6 +20,8 @@ export function Ranking() {
   const me = localMe ? JSON.parse(localMe) : null;
   const myData = data?.filter((item) => item.user.nickname === me.nickname);
 
+  if (isLoading) return <Loading width={500} />;
+  if (isError) return <p>알 수 없는 오류가 발생했습니다.</p>;
   return (
     <div>
       {myRank()}
@@ -26,7 +29,7 @@ export function Ranking() {
         {data &&
           data
             .slice(0, 5)
-            .map((item) => (
+            .map((item, i) => (
               <RankingCard
                 key={item.id}
                 rank={item.rank}

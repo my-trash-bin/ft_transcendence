@@ -4,10 +4,8 @@ WORKDIR /usr/src/app
 
 COPY project/backend .
 
-RUN npm install --omit=dev
+RUN npm install && npm run build && npm install --omit=dev
 
-EXPOSE 8080
+EXPOSE 80 4242
 
-ENV NODE_ENV=production
-
-CMD ["npm", "start"]
+CMD ["sh", "-c", "npx -y prisma migrate deploy && npm start"]

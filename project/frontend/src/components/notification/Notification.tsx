@@ -1,16 +1,29 @@
 'use client';
 import { getSocket } from '@/lib/Socket';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { NotifBox } from './NotifBox';
 
 export function Notification() {
   const [isHovered, setIsHovered] = useState(false);
   const [active, setActive] = useState(false);
   const [newNotif, setNewNotif] = useState(false);
-
   const socket = getSocket();
-  socket.on('noti', () => setNewNotif(true));
+
+
+  const handleNoti = () => {
+    setNewNotif(true);
+  }
+
+  useEffect(() => {
+    if (!socket) {
+      return;
+    }
+    socket.on('noti', handleNoti);
+    return () => {
+      socket.off('noti');
+    };
+  }), [socket, handleNoti];
 
   return (
     <div

@@ -1,8 +1,7 @@
-import { PrismaClient } from '@prisma/client';
-import dotenv from 'dotenv';
 import { scrypt } from 'node:crypto';
 
-dotenv.config();
+import { PrismaClient } from '@prisma/client';
+import 'dotenv/config';
 
 type LowercaseAlphabet =
   | 'a'

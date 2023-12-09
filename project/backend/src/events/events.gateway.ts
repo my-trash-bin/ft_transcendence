@@ -13,11 +13,9 @@ import {
   WsException,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { PrismaService } from '../base/prisma.service';
 import { ChangeActionType } from '../channel/channel.service';
-import { GateWayEvents } from '../common/gateway-events.enum';
 import { idOf } from '../common/Id';
-import { Pong } from '../pong/pong';
+import { GateWayEvents } from '../common/gateway-events.enum';
 import {
   ChannelIdentityDto,
   CreateDmChannelDto,
@@ -56,17 +54,13 @@ export class EventsGateway
   @WebSocketServer()
   server!: Server;
 
-  private pongMap: Map<string, Pong>;
   private logger = new Logger('eventsGateway');
 
   constructor(
     private jwtService: JwtService,
     private configService: ConfigService,
     private eventsService: EventsService,
-    private prisma: PrismaService,
-  ) {
-    this.pongMap = new Map();
-  }
+  ) {}
 
   afterInit(server: Server) {
     this.eventsService.afterInit(server);
@@ -98,7 +92,6 @@ export class EventsGateway
   async handleLeaveGameBoard(@ConnectedSocket() client: Socket) {
     this.logger.log(`Client left game board: ${client.id}`);
     await this.eventsService.finalizeGame(client);
-    this.eventsService.handleDisconnect(client);
   }
 
   async handleDisconnect(client: Socket) {
@@ -213,36 +206,37 @@ export class EventsGateway
   @SubscribeMessage('inviteNormalMatch')
   async inviteNormalMatchRequest(
     @ConnectedSocket() client: UserSocket,
-    @MessageBody() data: { friendId: string },
+    @MessageBody() friendId: string,
   ) {
     const isItemMode = false;
-    this.eventsService.handleInviteMatch(client, data.friendId, isItemMode);
+    this.eventsService.handleInviteMatch(client, friendId, isItemMode);
   }
 
   @SubscribeMessage('inviteItemMatch')
   async inviteItemMatchRequest(
     @ConnectedSocket() client: UserSocket,
-    @MessageBody() data: { friendId: string },
+    @MessageBody() friendId: string,
   ) {
     const isItemMode = true;
-    this.eventsService.handleInviteMatch(client, data.friendId, isItemMode);
+    console.log('inviteItemMatchRequest == ', friendId);
+    this.eventsService.handleInviteMatch(client, friendId, isItemMode);
   }
 
   // 초대 수락 처리
   @SubscribeMessage('acceptNormalMatch')
   async handleAcceptNormalMatch(
     @ConnectedSocket() client: UserSocket,
-    @MessageBody() data: { inviterId: string },
+    @MessageBody() inviterId: string,
   ) {
-    this.eventsService.handleAcceptMatch(client, data.inviterId);
+    this.eventsService.handleAcceptMatch(client, inviterId);
   }
 
   @SubscribeMessage('acceptItemMatch')
   async handleAcceptItemMatch(
     @ConnectedSocket() client: UserSocket,
-    @MessageBody() data: { inviterId: string },
+    @MessageBody() inviterId: string,
   ) {
-    this.eventsService.handleAcceptMatch(client, data.inviterId);
+    this.eventsService.handleAcceptMatch(client, inviterId);
   }
 
   @SubscribeMessage('paddleMove')

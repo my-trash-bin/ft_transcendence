@@ -1,4 +1,0 @@
-include:
-  - path: docker/main/docker-compose.yaml
-    project_directory: docker/main
-    env_file: .env

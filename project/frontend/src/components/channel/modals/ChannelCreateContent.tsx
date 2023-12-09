@@ -55,7 +55,7 @@ export const ChannelCreateContent = ({
             setInputTitle(e.target.value);
           }}
           value={inputTitle}
-        ></input>
+        />
         <p className={titleValid ? validText : invalidText}>
           6 ~ 20자 이내로 입력해 주세요. (특수문자 제외)
         </p>
@@ -74,7 +74,7 @@ export const ChannelCreateContent = ({
             setInputPassword(e.target.value);
           }}
           value={inputPassword}
-        ></input>
+        />
         <p className={passwordValid ? validText : invalidText}>
           비밀번호는 숫자 6자리로 입력해 주세요.
         </p>
@@ -93,7 +93,7 @@ export const ChannelCreateContent = ({
             else setIsValid(false);
             setInputSize(parseInt(e.target.value));
           }}
-        ></input>
+        />
         <p className={sizeValid ? validText : invalidText}>
           2 ~ 10명 사이로 입력해주세요.
         </p>
