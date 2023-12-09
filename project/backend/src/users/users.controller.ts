@@ -174,11 +174,11 @@ export class UsersController {
     @Param() param: GetUsetByNicknameParam,
   ): Promise<UserDto> {
     const { nickname } = param;
-    console.log(`nickname : ${nickname}`);
     const result = await this.usersService.findOneByNickname(nickname);
     if (result === null) {
       throw new BadRequestException(`올바르지 않은 닉네임: ${nickname}`);
     }
+    this.logger.log(`유저 1명 기본 조회 성공: ${JSON.stringify(result)})`);
     return result;
   }
 

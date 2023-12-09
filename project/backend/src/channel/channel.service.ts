@@ -88,7 +88,9 @@ export class ChannelService {
 
   // Channel
   async findAll() {
-    const prismaChannels = await this.prismaService.channel.findMany();
+    const prismaChannels = await this.prismaService.channel.findMany({
+      where: { isPublic: true },
+    });
     return prismaChannels.map((prismaChannel) => new ChannelDto(prismaChannel));
   }
 
@@ -190,7 +192,7 @@ export class ChannelService {
         },
       });
 
-      if (this.isUserInChannel(channelMember)) {
+      if (!this.isUserInChannel(channelMember)) {
         throw new ServiceError(
           `채널에 참여중인 사용자만 채널의 정보를 업데이트 할 수 있습니다.`,
           400,
@@ -204,12 +206,16 @@ export class ChannelService {
         );
       }
 
+      if (password) {
+        password = await this.mfaPasswordHash(password);
+      }
+
       const result = await this.prismaService.channel.update({
         where: { id: channelId.value },
         data: {
           title,
           isPublic,
-          password: password ? await this.mfaPasswordHash(password) : password,
+          password,
           maximumMemberCount,
         },
       });
@@ -279,7 +285,7 @@ export class ChannelService {
           throw new ServiceError('최대 사용자 수 초과', 400);
         }
 
-        if (!channel.isPublic && channel.password === null) {
+        if (!channel.isPublic) {
           throw new ServiceError('private 방에는 접속 할 수 없습니다.', 400);
         }
 

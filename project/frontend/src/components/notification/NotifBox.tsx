@@ -1,3 +1,4 @@
+import { unwrap } from '@/api/unwrap';
 import Image from 'next/image';
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useQuery } from 'react-query';
@@ -18,11 +19,11 @@ export function NotifBox({
   const { api } = useContext(ApiContext);
   const { isLoading, isError, data, refetch } = useQuery(
     'fetchNotifications',
-    useCallback(async () => {
-      if (active) {
-        return (await api.notificationControllerFindManyAndUpdateRead()).data;
-      }
-    }, [api, active]),
+    useCallback(
+      async () =>
+        unwrap(await api.notificationControllerFindManyAndUpdateRead()),
+      [api, active],
+    ),
     {
       enabled: active,
     },
@@ -40,11 +41,12 @@ export function NotifBox({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [setActive]);
-  console.log(data);
-  if (isLoading) return <p>로딩중</p>;
-  else if (isError) return <p>something wrong!</p>;
-  return (
-    active && (
+  return active && render();
+
+  function render() {
+    if (isLoading) return <p>로딩중</p>;
+    if (isError || !data) return <p>something wrong!</p>;
+    return (
       <div
         ref={boxRef}
         className={
@@ -79,6 +81,6 @@ export function NotifBox({
             return null;
           })}
       </div>
-    )
-  );
+    );
+  }
 }

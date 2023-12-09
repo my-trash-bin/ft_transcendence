@@ -119,13 +119,6 @@ export class Pong {
         });
       }
     }, 1000 / 60);
-
-    console.log('item mode = ', this.gameState.isItemMode);
-    if (this.gameState.isItemMode) {
-      const itemInterval = setInterval(() => {
-        if (this.makeItemRandomPosition()) clearInterval(itemInterval);
-      }, 3000);
-    }
   }
 
   handlePaddleMove(directionIsUp: boolean, player1: boolean) {
@@ -165,6 +158,8 @@ export class Pong {
     }
   }
 
+  private counter = 0;
+
   private updateGameLogic(): boolean {
     // 공의 위치 업데이트
     this.moveBall();
@@ -180,6 +175,14 @@ export class Pong {
 
     // 게임 업데이트
     this.onGameUpdate.emit('gameState', this.gameState);
+
+    this.counter++;
+    if (this.IsItemMode) {
+      // item
+      if (this.counter % 180 == 0) {
+        this.makeItemRandomPosition();
+      }
+    }
 
     return this.gameState.gameOver;
   }
