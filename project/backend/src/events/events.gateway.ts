@@ -13,11 +13,9 @@ import {
   WsException,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { PrismaService } from '../base/prisma.service';
 import { ChangeActionType } from '../channel/channel.service';
 import { idOf } from '../common/Id';
 import { GateWayEvents } from '../common/gateway-events.enum';
-import { Pong } from '../pong/pong';
 import {
   ChannelIdentityDto,
   CreateDmChannelDto,
@@ -56,17 +54,13 @@ export class EventsGateway
   @WebSocketServer()
   server!: Server;
 
-  private pongMap: Map<string, Pong>;
   private logger = new Logger('eventsGateway');
 
   constructor(
     private jwtService: JwtService,
     private configService: ConfigService,
     private eventsService: EventsService,
-    private prisma: PrismaService,
-  ) {
-    this.pongMap = new Map();
-  }
+  ) {}
 
   afterInit(server: Server) {
     this.eventsService.afterInit(server);
