@@ -345,7 +345,7 @@ export class EventsService {
     if (!(channelId.value in this.channels[type])) {
       this.channels[type][channelId.value] = new Set();
     }
-    const isNewUser = !(userId.value in this.channels[type][channelId.value]);
+    const isNewUser = !this.channels[type][channelId.value].has(userId.value);
     this.channels[type][channelId.value].add(userId.value);
     return isNewUser;
   }
