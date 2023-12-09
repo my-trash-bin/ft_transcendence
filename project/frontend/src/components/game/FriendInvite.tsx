@@ -21,18 +21,6 @@ const FriendInvite: React.FC<FriendInviteProps> = ({
   const socket = getGameSocket();
   const { setIsPlayer1 } = useStore();
 
-  useEffect(() => {
-    if (isOpen) {
-      if (mode === 'normal') {
-        socket.emit('inviteNormalMatch', friendId);
-        console.log('inviteNormalMatch', friendId);
-      } else if (mode === 'item') {
-        socket.emit('inviteItemMatch', friendId);
-        console.log('inviteItemMatch', friendId);
-      }
-    }
-  }, [isOpen, onClose, router, socket]);
-
   const handleGoPong = () => {
     onClose();
     router.push('/pong');

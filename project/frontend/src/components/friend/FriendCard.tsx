@@ -4,6 +4,7 @@ import { Button } from '../common/Button';
 import FriendInvite from '../game/FriendInvite';
 import { FriendSetting } from './FriendSetting';
 import { CommonCard } from './utils/CommonCard';
+import { getGameSocket } from '../pong/gameSocket';
 
 interface FriendCardProps {
   readonly nickname: string;
@@ -21,6 +22,7 @@ export function FriendCard({
   const router = useRouter();
   const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [gameMode, setGameMode] = useState<'normal' | 'item'>('normal');
+  const socket = getGameSocket();
   const handleInviteClose = () => {
     setIsInviteOpen(false);
   };
@@ -31,10 +33,12 @@ export function FriendCard({
     const [isHovered, setIsHovered] = useState(false);
 
     function startNormal() {
+      socket.emit('inviteNormalMatch', id);
       setGameMode('normal');
       handleInviteOpen();
     }
     function startItem() {
+      socket.emit('inviteItemMatch', id);
       setGameMode('item');
       handleInviteOpen();
     }
