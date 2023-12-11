@@ -13,6 +13,11 @@ export default function withDmAuth(Component: any) {
           const res = await api.usersControllerMyProfile();
           localStorage.setItem('me', JSON.stringify(res.data.me));
 
+          if (res.data.phase === 'register') window.location.href = '/sign-in';
+          else if (res.data.phase === 'complete')
+            window.location.href = '/friend';
+          else if (res.data.phase === '2fa') window.location.href = '/2fa';
+
           const canSend: any = await api.dmControllerCanSendDm(
             props.params.username,
           );
