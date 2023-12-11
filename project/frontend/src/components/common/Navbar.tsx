@@ -7,7 +7,9 @@ import { getGameSocket } from '../pong/gameSocket';
 
 const Navbar = () => {
   const [showInvitationExpiredToast, setShowInvitationExpiredToast] = useState(false);
+  const [showOfflineToast, setShowOfflineToast] = useState(false);
   const socket = getGameSocket();
+
   useEffect(() => {
     const handleGameInvitationExpired = () => {
       if (!showInvitationExpiredToast) {
@@ -17,8 +19,13 @@ const Navbar = () => {
       }
     };
     socket.on('gameInvitationExpired', handleGameInvitationExpired);
+    socket.on('friendOffline', () => {
+      setShowOfflineToast(true);
+      setTimeout(() => setShowOfflineToast(false), 2000);
+    });
     return () => {
       socket.off('gameInvitationExpired', handleGameInvitationExpired);
+      socket.off('friendOffline');
     };
   }, [
     socket,
@@ -33,6 +40,11 @@ const Navbar = () => {
         이미 사용한 초대장이에요!
       </div>
     )}
+      {showOfflineToast && (
+        <div className="fixed w-[300px] h-[100px] left-1/2 top-1/4 flex justify-center items-center bg-default border-3 border-dark-purple text-dark-purple rounded-md z-50 text-h3">
+          친구가 오프라인이에요 ㅠ
+        </div>
+      )}
     <nav
       className={
         'flex flex-col w-[80px] min-h-[750px] h-[inherit] bg-default items-center'

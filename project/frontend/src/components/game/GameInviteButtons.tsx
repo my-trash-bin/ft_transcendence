@@ -1,4 +1,4 @@
-import { ReactNode, useCallback, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useState } from 'react';
 import { Button } from '../common/Button';
 import { getGameSocket } from '../pong/gameSocket';
 
@@ -21,20 +21,26 @@ export function GameInviteButtons({
   const layout = isModal
     ? 'flex felx-row left-[-30px]'
     : 'flex flex-col bottom-[-15px]';
-    
+
   const startNormal = useCallback(() => {
     socket.emit('inviteNormalMatch', friendId);
     setGameMode('normal');
+  }, [setGameMode, friendId, socket]);
 
-    handleInviteOpen();
-  }, [setGameMode, handleInviteOpen, friendId, socket]);
+  useEffect(() => {
+    socket.on('waitingFriend', () => {
+      handleInviteOpen();
+    });
+
+    return () => {
+      socket.off('waitingFriend');
+    };
+  }, [socket, handleInviteOpen]);
 
   const startItem = useCallback(() => {
     socket.emit('inviteItemMatch', friendId);
     setGameMode('item');
-
-    handleInviteOpen();
-  }, [setGameMode, handleInviteOpen, friendId, socket]);
+  }, [setGameMode, friendId, socket]);
   return (
     <div
       onMouseEnter={() => setIsHovered(true)}

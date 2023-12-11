@@ -45,9 +45,7 @@ export const NotiCard: React.FC<NotiCardProps> = ({ content }) => {
     const handleGoPong = () => {
       route.push('/pong');
     };
-
     socket.on('GoPong', handleGoPong);
-
     return () => {
       socket.off('GoPong', handleGoPong);
     };
