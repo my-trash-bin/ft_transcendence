@@ -37,7 +37,7 @@ const Navbar = () => {
     <>
     {showInvitationExpiredToast && (
       <div className="fixed w-[300px] h-[100px] left-1/2 top-1/4 flex justify-center items-center bg-default border-3 border-dark-purple text-dark-purple rounded-md z-50 text-h2">
-        이미 사용한 초대장이에요!
+        만료된 초대장이에요!
       </div>
     )}
       {showOfflineToast && (
