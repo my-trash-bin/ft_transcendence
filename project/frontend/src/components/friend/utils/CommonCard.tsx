@@ -1,5 +1,5 @@
 import { LiveStatus } from '@/components/common/LiveStatus';
-import FriendInvite from '@/components/game/FriendInvite';
+import FriendInvite from '@/components/game/InviteModal';
 import { ProfileModal } from '@/components/profile/ProfileModal';
 import { ReactNode, useState } from 'react';
 import FriendAvatar from './FriendAvatar';

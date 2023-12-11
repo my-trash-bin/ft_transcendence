@@ -143,8 +143,6 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
     return (
       <GameInviteButtons
         content={content}
-        setGameMode={setGameMode}
-        handleInviteOpen={openInvite}
         isModal={true}
         friendId={targetId}
       />

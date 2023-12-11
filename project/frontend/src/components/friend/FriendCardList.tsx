@@ -43,8 +43,8 @@ export function FriendCardList({
     return data.map((val) => (
       <FriendCard
         key={val.followee.id}
-        imageUrl={val.followee.profileImageUrl}
         nickname={val.followee.nickname}
+        imageUrl={val.followee.profileImageUrl}
         id={val.followee.id}
         refetch={refetch}
       />
