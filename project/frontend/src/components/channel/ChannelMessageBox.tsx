@@ -27,7 +27,7 @@ export function ChannleMessageBox({
   const me = localMe ? JSON.parse(localMe) : null;
 
   const myAuthority: any = data.members.filter((mem: any) => {
-    return mem.memberId === me.id;
+    return mem.memberId === me?.id;
   });
   if (isLoading) return <div>Loading...</div>;
   if (!myAuthority) return <></>;
@@ -37,12 +37,12 @@ export function ChannleMessageBox({
         channelId={channelId}
         channelData={data}
         myAuthority={myAuthority[0]?.memberType}
-        myNickname={me.nickname}
+        myNickname={me?.nickname}
       />
       <MessageContent
         channelId={channelId}
         type={messageType.CHANNEL}
-        myNickname={me.nickname}
+        myNickname={me?.nickname}
       />
       <MessageSendBox channelId={channelId} type={messageType.CHANNEL} />
     </>

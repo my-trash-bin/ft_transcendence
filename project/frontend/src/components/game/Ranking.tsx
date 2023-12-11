@@ -19,7 +19,7 @@ export function Ranking() {
 
   const localMe = localStorage.getItem('me');
   const me = localMe ? JSON.parse(localMe) : null;
-  const myData = data?.filter((item) => item.user.nickname === me.nickname);
+  const myData = data?.filter((item) => item.user.nickname === me?.nickname);
 
   if (isLoading) return <Loading width={500} />;
   if (isError || !data) return <p>알 수 없는 오류가 발생했습니다.</p>;
