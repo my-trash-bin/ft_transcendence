@@ -9,7 +9,7 @@ export default function loginAuth(Component: any) {
         try {
           const res = await api.usersControllerMyProfile();
           localStorage.setItem('me', JSON.stringify(res.data.me));
-          location.href = '/profile';
+          location.href = '/friend';
         } catch (e: any) {
           //error시 / 그대로 유지
         }
