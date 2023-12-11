@@ -1,24 +1,18 @@
 'use client';
+import { unwrap } from '@/api/unwrap';
 import { Button } from '@/components/common/Button';
 import FriendAvatar from '@/components/friend/utils/FriendAvatar';
-import {
-  SetStateAction,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import { useRouter } from 'next/navigation';
+import { SetStateAction, useCallback, useContext, useEffect } from 'react';
 import { useQuery } from 'react-query';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { ModalLayout } from '../channel/modals/ModalLayout';
+import { LiveStatus } from '../common/LiveStatus';
 import { Loading } from '../common/Loading';
+import { LongCard } from '../common/LongCard';
+import { GameInviteButtons } from '../game/GameInviteButtons';
 import { TextBox } from './TextBox';
 import { CardType, HistoryCard } from './history/HistoryCard';
-import { LongCard } from '../common/LongCard';
-import { useRouter } from 'next/navigation';
-import { LiveStatus } from '../common/LiveStatus';
-import { unwrap } from '@/api/unwrap';
-import { GameInviteButtons } from '../game/GameInviteButtons';
 
 interface ModalProfileProps {
   isOpen: boolean;
@@ -132,7 +126,6 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
   }
   function handlerGameButton() {
     if (!userInfoData) return <p>error</p>;
-    let handler;
     let content;
     let disabled = false;
     if (userInfoData.relation === 'me') {

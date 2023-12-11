@@ -8,7 +8,7 @@ export default function TwofactorPage() {
   const { api } = useContext(ApiContext);
   const router = useRouter();
   const [password, setPassword] = useState('');
-
+  const [isError, setIsError] = useState(false);
   function handlePassword(e: React.ChangeEvent<HTMLInputElement>) {
     setPassword(e.target.value);
   }
@@ -26,14 +26,13 @@ export default function TwofactorPage() {
       } else {
         router.push('/friend');
       }
-    } catch (error) {
-      // TODO: if (error instanceof ??? && error.status === 401)로 바꿀 것
-      if ((error as any).status === 401) {
+    } catch (error: any) {
+      if (error.status === 401) {
         alert('비밀번호 오류입니다. 다시 입력하세요!');
       } else {
-        alert('알 수 없는 오류입니다!');
+        setIsError(true);
       }
-      console.error('Error during 2fa login:', error);
+      console.error('Error 2fa login:', error);
     }
   }, [api, password, router]);
 
@@ -41,6 +40,15 @@ export default function TwofactorPage() {
     <div className="min-h-screen flex items-center justify-center font-sejong">
       <div className="w-2xl h-[400px] bg-light-background rounded-lg flex flex-col justify-center items-center">
         <h2 className="font-bold mb-xl">2차 인증 비밀번호를 입력하세요.</h2>
+        {render()}
+      </div>
+    </div>
+  );
+  function render() {
+    if (isError) {
+      return <div>알 수 없는 에러입니다.</div>;
+    } else {
+      return (
         <div className="flex flex-col">
           <input
             type="password"
@@ -55,7 +63,7 @@ export default function TwofactorPage() {
             </Button>
           </div>
         </div>
-      </div>
-    </div>
-  );
+      );
+    }
+  }
 }
