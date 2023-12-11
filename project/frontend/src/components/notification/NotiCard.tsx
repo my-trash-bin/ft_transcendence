@@ -52,6 +52,7 @@ export const NotiCard: React.FC<NotiCardProps> = ({ content }) => {
       }
     };
     if (isInvited) {
+      setIsInvited(false);
       socket.on('gameInvitationExpired', handleGameInvitationExpired);
     }
     return () => {
@@ -66,7 +67,6 @@ export const NotiCard: React.FC<NotiCardProps> = ({ content }) => {
     setShowInvitationExpiredToast,
     showInvitationExpiredToast,
   ]);
-
   // useEffect(() => {
   //   if (showInvitationExpiredToast) {
   //     setTimeout(() => setShowInvitationExpiredToast(false), 2000);
@@ -118,7 +118,7 @@ export const NotiCard: React.FC<NotiCardProps> = ({ content }) => {
         console.log('isInvited', isInvited);
         if (mode === 'normal') {
           socket.emit('acceptNormalMatch', sourceId);
-        } else {
+        } else if (mode === 'item') {
           socket.emit('acceptItemMatch', sourceId);
         }
         setIsInvited(true);
