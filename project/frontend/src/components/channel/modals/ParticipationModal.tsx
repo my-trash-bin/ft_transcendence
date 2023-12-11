@@ -25,19 +25,20 @@ export function ParticipationModal({
 
   const participateChannel = useCallback(async () => {
     try {
-      console.log('Participate channel');
       await api.channelControllerParticipateChannel({
         type: targetChannelType === 'public' ? 'public' : 'protected',
         channelId: targetChannelId,
       });
-      console.log('Participate channel successfully');
+
       setIsModalOpen(false);
       router.push(`/channel/${targetChannelId}`);
       setMyChannel(true);
     } catch (error: any) {
-      console.error('Error participate channel:', error);
       if (error?.error.message === '밴된 유저는 채널에 들어갈 수 없습니다.') {
         alert('해당 채널에서 BAN된 유저입니다.');
+        setIsModalOpen(false);
+      } else if (error?.error.message === '최대 사용자 수 초과') {
+        alert('channel에 맴버가 꽉 찼습니다.');
         setIsModalOpen(false);
       }
     }

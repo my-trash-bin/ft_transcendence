@@ -2,9 +2,10 @@
 
 import { avatarToUrl } from '@/app/_internal/util/avatarToUrl';
 import Portal from '@/components/common/Portal';
+import FriendInvite from '@/components/game/FriendInvite';
 import { ProfileModal } from '@/components/profile/ProfileModal';
 import Image from 'next/image';
-import { ReactNode, useState } from 'react';
+import { useState } from 'react';
 import { formatAMPM } from '../utils/FromatAmPm';
 
 export function OtherChat({
@@ -24,7 +25,8 @@ export function OtherChat({
 }>) {
   const timeAMPM = formatAMPM(time);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalData, setModalData] = useState<ReactNode>('');
+  const [isInviteOpen, setIsInviteOpen] = useState(false);
+  const [gameMode, setGameMode] = useState<'normal' | 'item'>('normal');
 
   const handleModalClose = () => {
     setIsModalOpen(false);
@@ -32,7 +34,12 @@ export function OtherChat({
   const handleModalOpen = () => {
     setIsModalOpen(true);
   };
-
+  const handleInviteClose = () => {
+    setIsInviteOpen(false);
+  };
+  const handleInviteOpen = () => {
+    setIsInviteOpen(true);
+  };
   return (
     <>
       <Portal selector={'#backdrop-root'}>
@@ -40,8 +47,13 @@ export function OtherChat({
           isOpen={isModalOpen}
           onClose={handleModalClose}
           targetId={targetId}
-          openInvite={() => alert('// TODO: openInvite')}
-          setGameMode={() => alert('// TODO: setGameMode')}
+          openInvite={handleInviteOpen}
+          setGameMode={setGameMode}
+        />
+        <FriendInvite
+          isOpen={isInviteOpen}
+          onClose={handleInviteClose}
+          mode={gameMode}
         />
       </Portal>
       <div className="flex flex-row pl-[3%] mb-[1.5%] items-center">

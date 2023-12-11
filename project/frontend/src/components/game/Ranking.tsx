@@ -1,10 +1,10 @@
+import { unwrap } from '@/api/unwrap';
 import { ApiContext } from '@/app/_internal/provider/ApiContext';
 import { useCallback, useContext } from 'react';
 import { useQuery } from 'react-query';
+import { Loading } from '../common/Loading';
 import { LongCard } from '../common/LongCard';
 import RankingCard from './RankingCard';
-import { Loading } from '../common/Loading';
-import { unwrap } from '@/api/unwrap';
 
 export function Ranking() {
   const { api } = useContext(ApiContext);
@@ -19,31 +19,27 @@ export function Ranking() {
 
   const localMe = localStorage.getItem('me');
   const me = localMe ? JSON.parse(localMe) : null;
-  const myData = data?.filter((item) => item.user.nickname === me.nickname);
-
+  const myData = data?.filter((item) => item.user.nickname === me?.nickname);
   if (isLoading) return <Loading width={500} />;
   if (isError || !data) return <p>알 수 없는 오류가 발생했습니다.</p>;
   return (
     <div>
       {myRank()}
       <div className={'max-w-[620px] mx-auto'}>
-        {data &&
-          data
-            .slice(0, 5)
-            .map((item, i) => (
-              <RankingCard
-                key={item.user.nickname}
-                rank={item.rank}
-                name={item.user.nickname}
-                avatar={item.user.profileImageUrl}
-                isUser={false}
-              />
-            ))}
+        {data.slice(0, 5).map((item, i) => (
+          <RankingCard
+            key={item.user.nickname}
+            rank={item.rank}
+            name={item.user.nickname}
+            avatar={item.user.profileImageUrl}
+            isUser={false}
+          />
+        ))}
       </div>
     </div>
   );
   function myRank() {
-    if (myData)
+    if (myData && myData.length > 0)
       return (
         <RankingCard
           rank={myData[0].rank}

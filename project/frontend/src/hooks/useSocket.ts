@@ -23,24 +23,22 @@ export const useSocket = (
         setMessages((messages: any) => [...messages, res]);
       });
       socket.on('leave', (res) => {
-        if (res.data.member.id === me.id) {
+        if (res.data.member.id === me?.id) {
           alert('채널에서 나갔습니다.');
           location.href = '/channel';
         } else setMessages((messages: any) => [...messages, res]);
       });
       socket.on('join', (res) => {
-        console.log(res);
         setMessages((messages: any) => [...messages, res]);
       });
 
       socket.on('kickBanPromote', (res) => {
-        console.dir(res);
         if (
           res.data.actionType === 'KICK' ||
           res.data.actionType === 'BANNED'
         ) {
           if (
-            res.data.targetUser.id === me.id &&
+            res.data.targetUser.id === me?.id &&
             channelId === res.data.channelId
           ) {
             alert('채널에서 강퇴당했습니다.');
@@ -50,12 +48,12 @@ export const useSocket = (
           res.data.actionType === 'PROMOTE' &&
           channelId === res.data.channelId
         ) {
-          if (res.data.targetUser.id === me.id) {
+          if (res.data.targetUser.id === me?.id) {
             alert('채널에서 관리자가 되었습니다.');
           }
         } else {
           if (
-            res.data.targetUser.id === me.id &&
+            res.data.targetUser.id === me?.id &&
             channelId === res.data.channelId
           ) {
             alert('채널에서 뮤트 되었습니다.');
@@ -74,5 +72,5 @@ export const useSocket = (
         socket.off('kickBanPromote');
       }
     };
-  }, [type, setMessages]);
+  }, [type, setMessages, channelId]);
 };
