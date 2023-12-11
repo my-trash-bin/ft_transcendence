@@ -61,8 +61,8 @@ export function ProfileBox() {
       if (!result.ok) {
         console.error({ result });
       } else {
-        localStorage.removeItem('me');
         router.push('/');
+        localStorage.removeItem('me');
       }
     } catch (error) {
       alert('알 수 없는 오류입니다!');
