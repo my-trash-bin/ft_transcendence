@@ -1,22 +1,20 @@
 import { ReactNode, useCallback, useEffect, useState } from 'react';
 import { Button } from '../common/Button';
 import { getGameSocket } from '../pong/gameSocket';
+import useFriendInviteStore from '../common/FriendInvite';
 
 export function GameInviteButtons({
   content,
-  setGameMode,
-  handleInviteOpen,
   isModal,
   friendId,
 }: {
   readonly content: ReactNode;
-  readonly setGameMode: (mode: 'normal' | 'item') => void;
-  readonly handleInviteOpen: () => void;
   readonly isModal: boolean;
   readonly friendId: string;
 }) {
   const [isHovered, setIsHovered] = useState(false);
   const socket = getGameSocket();
+  const { setIsInviteOpen, setGameMode} = useFriendInviteStore();
 
   const layout = isModal
     ? 'flex felx-row left-[-30px]'
@@ -29,13 +27,13 @@ export function GameInviteButtons({
 
   useEffect(() => {
     socket.on('waitingFriend', () => {
-      handleInviteOpen();
+      setIsInviteOpen(true);
     });
 
     return () => {
       socket.off('waitingFriend');
     };
-  }, [socket, handleInviteOpen]);
+  }, [socket, setIsInviteOpen]);
 
   const startItem = useCallback(() => {
     socket.emit('inviteItemMatch', friendId);
