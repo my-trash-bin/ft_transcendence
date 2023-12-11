@@ -29,12 +29,10 @@ export const useSocket = (
         } else setMessages((messages: any) => [...messages, res]);
       });
       socket.on('join', (res) => {
-        console.log(res);
         setMessages((messages: any) => [...messages, res]);
       });
 
       socket.on('kickBanPromote', (res) => {
-        console.dir(res);
         if (
           res.data.actionType === 'KICK' ||
           res.data.actionType === 'BANNED'
@@ -74,5 +72,5 @@ export const useSocket = (
         socket.off('kickBanPromote');
       }
     };
-  }, [type, setMessages]);
+  }, [type, setMessages, channelId]);
 };
