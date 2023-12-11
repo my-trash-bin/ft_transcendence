@@ -11,7 +11,6 @@ export function ChannleMessageBox({
 }: Readonly<{ channelId: string }>) {
   const { api } = useContext(ApiContext);
 
-  const channelApi = () => api.channelControllerFindChannelInfo(channelId);
   const { isLoading, isError, data } = useQuery(
     'channelInfo',
     useCallback(

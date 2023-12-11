@@ -1,5 +1,7 @@
+import { unwrap } from '@/api/unwrap';
 import { avatarToUrl } from '@/app/_internal/util/avatarToUrl';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useCallback, useContext, useState } from 'react';
 import { useQuery } from 'react-query';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
@@ -8,12 +10,12 @@ import { Loading } from '../common/Loading';
 import { AvatarEditModal } from './AvatarEditModal';
 import { ProfileEditModal } from './ProfileEditModal';
 import { TextBox } from './TextBox';
-import { unwrap } from '@/api/unwrap';
 
 export function ProfileBox() {
   const { api } = useContext(ApiContext);
   const [profileEditModal, setProfileEditModal] = useState(false);
   const [avatarEditModal, setAvatarEditModal] = useState(false);
+  const router = useRouter();
   const { isLoading, isError, data, refetch } = useQuery(
     'myProfile',
     useCallback(
@@ -52,6 +54,21 @@ export function ProfileBox() {
   const handleCloseAvatar = () => {
     setAvatarEditModal(false);
   };
+
+  const handleLogout = useCallback(async () => {
+    try {
+      const result = await api.authControllerLogout();
+      if (!result.ok) {
+        console.error({ result });
+      } else {
+        router.push('/');
+        localStorage.removeItem('me');
+      }
+    } catch (error) {
+      alert('알 수 없는 오류입니다!');
+      console.error('Error during logout:', error);
+    }
+  }, [api, router]);
 
   return (
     <div className="w-[900px] h-xl bg-light-background rounded-lg mb-[30px] relative p-lg flex justify-center items-center">
@@ -103,6 +120,7 @@ export function ProfileBox() {
             <Button onClick={handleOpenProfile}>프로필 수정</Button>
           </div>
         </div>
+        <Button onClick={handleLogout}>로그아웃</Button>
         <ProfileEditModal
           isOpen={profileEditModal}
           onClose={handleCloseProfile}

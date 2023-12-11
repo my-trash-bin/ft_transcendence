@@ -345,7 +345,7 @@ export class EventsService {
     if (!(channelId.value in this.channels[type])) {
       this.channels[type][channelId.value] = new Set();
     }
-    const isNewUser = !(userId.value in this.channels[type][channelId.value]);
+    const isNewUser = !this.channels[type][channelId.value].has(userId.value);
     this.channels[type][channelId.value].add(userId.value);
     return isNewUser;
   }
@@ -355,9 +355,13 @@ export class EventsService {
     channelId: ChannelId,
     userId: UserId,
   ) {
-    if (!(channelId.value in this.channels[type])) {
+    const newUserOut =
+      channelId.value in this.channels[type] &&
+      this.channels[type][channelId.value].has(userId.value);
+    if (newUserOut) {
       this.channels[type][channelId.value].delete(userId.value);
     }
+    return newUserOut;
   }
 
   handleNotificationToUser(userId: UserId, data: any) {
@@ -388,13 +392,15 @@ export class EventsService {
     userId: UserId,
     data: LeavingChannelResponseDto,
   ) {
-    this.handleUserLeaveChannel(type, channelId, userId);
+    const newUserOut = this.handleUserLeaveChannel(type, channelId, userId);
 
-    const eventName = GateWayEvents.Leave;
-    this.broadcastToChannel(type, channelId, [], eventName, {
-      type: eventName,
-      data,
-    });
+    if (newUserOut) {
+      const eventName = GateWayEvents.Leave;
+      this.broadcastToChannel(type, channelId, [], eventName, {
+        type: eventName,
+        data,
+      });
+    }
   }
 
   onKickBanPromoteByApi(
@@ -404,17 +410,22 @@ export class EventsService {
     actionType: ChangeActionType,
     data: ChangeMemberStatusResultDto,
   ) {
+    let isNeedBroadCast = true;
     if ([ChangeActionType.BANNED, ChangeActionType.KICK].includes(actionType)) {
-      this.handleUserLeaveChannel(type, channelId, userId);
+      const newUserOut = this.handleUserLeaveChannel(type, channelId, userId);
+      isNeedBroadCast = newUserOut;
     }
-    const eventName = GateWayEvents.KickBanPromote;
-    this.broadcastToChannel(type, channelId, [], eventName, {
-      type: eventName,
-      data: {
-        ...data,
-        actionType,
-      },
-    });
+    this.logger.debug(`kickbanpromote 브로드캐스트 여부: ${isNeedBroadCast}`);
+    if (isNeedBroadCast) {
+      const eventName = GateWayEvents.KickBanPromote;
+      this.broadcastToChannel(type, channelId, [], eventName, {
+        type: eventName,
+        data: {
+          ...data,
+          actionType,
+        },
+      });
+    }
   }
 
   private getAllOnlineUsers = () => {
@@ -423,9 +434,14 @@ export class EventsService {
       .map(([userId, _sockets]) => userId);
   };
   private getUserStatus = (id: UserId): EnumUserStatus => {
-    // TODO: 게임상태까지
+    // TODO: 이것으로 게임상태 표현으로 충분한지.
     const isUserOnline = !!this.socketMap.get(id.value)?.length;
-    return isUserOnline ? EnumUserStatus.ONLINE : EnumUserStatus.OFFLINE;
+    const isOnGame = isUserOnline && this.pongMap.has(id.value);
+    return isOnGame
+      ? EnumUserStatus.ONGAME
+      : isUserOnline
+      ? EnumUserStatus.ONLINE
+      : EnumUserStatus.OFFLINE;
   };
   private addClientAtSocketMap(client: UserSocket) {
     const userId = client.data.userId as string;
@@ -601,7 +617,11 @@ export class EventsService {
     q.delete(client);
   }
 
-  handleAcceptMatch(client: UserSocket, inviterId: string, isItemMode: boolean) {
+  handleAcceptMatch(
+    client: UserSocket,
+    inviterId: string,
+    isItemMode: boolean,
+  ) {
     const invitation = this.activeInvitations.get(inviterId);
 
     if (!invitation) {
@@ -734,12 +754,12 @@ export class EventsService {
 
   private handleOnGame(id: UserId, pong: Pong) {
     this.pongMap.set(id.value, pong);
-    this.handleOnOffGameForUserStatusBroadcast(id, EnumUserStatus.ONGAME);
+    this.notiUserStatusUpdate(EnumUserStatus.ONGAME, id.value);
   }
 
   private handleOffGame(id: UserId) {
     this.pongMap.delete(id.value);
-    this.handleOnOffGameForUserStatusBroadcast(id);
+    this.notiUserStatusUpdate(this.getUserStatus(id), id.value);
   }
 
   private async storeGameStateToDB(
@@ -805,21 +825,10 @@ export class EventsService {
     );
   }
 
-  handleUserStatusRequest(client: UserSocket, userId: UserId) {
-    const status = this.getUserStatus(userId);
-    if (status !== EnumUserStatus.OFFLINE) {
-      client.emit(GateWayEvents.UserStatus, {
-        status,
-        userId: userId.value,
-      });
-    }
-  }
-
-  handleOnOffGameForUserStatusBroadcast(
-    userId: UserId,
-    status?: EnumUserStatus,
-  ) {
-    status = status ?? this.getUserStatus(userId);
-    this.notiUserStatusUpdate(status, userId.value);
+  handleUserStatusRequest(client: UserSocket, targetUserId: UserId) {
+    client.emit(GateWayEvents.UserStatus, {
+      status: this.getUserStatus(targetUserId),
+      userId: targetUserId.value,
+    });
   }
 }

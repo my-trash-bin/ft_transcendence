@@ -9,6 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { ChannelMemberType, Prisma, PrismaClient } from '@prisma/client';
 import { DefaultArgs } from '@prisma/client/runtime/library';
 import { scrypt } from 'crypto';
+import { AchievementService } from '../achievement/achievement.service';
 import { PrismaService } from '../base/prisma.service';
 import { ChannelId, UserId } from '../common/Id';
 import { ServiceError } from '../common/ServiceError';
@@ -84,6 +85,7 @@ export class ChannelService {
     private readonly prismaService: PrismaService,
     private readonly configService: ConfigService,
     private readonly dmService: DmService,
+    private readonly achievementService: AchievementService,
   ) {}
 
   // Channel
@@ -151,6 +153,21 @@ export class ChannelService {
           },
         },
       });
+
+      const achieveResult = await this.achievementService.checkGrantAchievement(
+        [
+          {
+            userId: id,
+            eventType: 'newChannel',
+            eventValue: 1,
+          },
+        ],
+      );
+      this.logger.verbose(
+        `채널생성 요청 성공 후, 업적 부여 체크: ${JSON.stringify(
+          achieveResult,
+        )}`,
+      );
       return newServiceOkResponse(new ChannelDto(prismaChannel));
     } catch (error) {
       if (
