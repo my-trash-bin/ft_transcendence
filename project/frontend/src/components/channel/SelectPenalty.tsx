@@ -30,7 +30,7 @@ export function SelectPenalty({
         />
         <ChannelButton
           onClick={handleBan}
-          text="ben"
+          text="ban"
           width="40px"
           height="25px"
           classStyle="text-[11px] bg-ball-pink"

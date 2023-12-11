@@ -24,10 +24,10 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Request as ExpressRequest } from 'express';
-import { JwtPayloadPhaseComplete } from '../auth/auth.service';
+import { JwtPayload, JwtPayloadPhaseComplete } from '../auth/auth.service';
 import { JwtGuard } from '../auth/jwt.guard';
 import { Phase, PhaseGuard } from '../auth/phase.guard';
-import { UserId, idOf } from '../common/Id';
+import { idOf, UserId } from '../common/Id';
 import { PongLogService } from '../pong-log/pong-log.service';
 import { UserFollowService } from '../user-follow/user-follow.service';
 import { NicknameCheckUserDto } from './dto/nickname-check-user.dto';
@@ -64,15 +64,22 @@ export class UsersController {
   @ApiOkResponse({
     type: () => ({ phase: String, id: String, me: Object }),
   })
-  @UseGuards(JwtGuard, PhaseGuard)
-  @Phase('complete')
+  @UseGuards(JwtGuard)
   async myProfile(@Request() req: ExpressRequest) {
-    const { id } = req.user as JwtPayloadPhaseComplete;
+    const { phase, id } = req.user as JwtPayload;
 
-    const me = await this.usersService.me(id);
+    if (phase !== 'complete') {
+      return {
+        phase,
+        id: id as string,
+      };
+    }
+
+    const userId = id as UserId;
+    const me = await this.usersService.me(userId); // 본인, 타인 통합인듯
 
     return {
-      phase: 'complete',
+      phase,
       id: (id as UserId).value,
       me,
     };
