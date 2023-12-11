@@ -982,7 +982,7 @@ export class ChannelService {
         32,
         (err, buffer) => {
           if (err) reject(err);
-          else resolve(buffer.toString());
+          else resolve(buffer.toString('base64'));
         },
       );
     });
