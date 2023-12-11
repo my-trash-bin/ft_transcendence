@@ -27,12 +27,17 @@ export default function ChooseAvatar({
 
     if (!newSelectedFile) {
       alert('파일을 선택하세요.');
-      return;
     } else if (newSelectedFile.size > 10 * 1024 * 1024) {
       event.target.value = null;
       alert('파일의 최대 크기는 10MB 입니다.');
-      return;
     } else {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target) {
+          setFileUrl(e.target.result);
+        }
+      };
+      reader.readAsDataURL(newSelectedFile);
       setSelectedFile(newSelectedFile);
     }
   };
@@ -51,7 +56,6 @@ export default function ChooseAvatar({
           console.log('Uploaded image successfully', response);
           const responseData = await response.json();
           setSelectedAvatar(responseData.filePath);
-          setFileUrl(responseData.filePath);
         } else {
           setIsError(true);
           console.error('Error uploading file', response);
@@ -69,7 +73,7 @@ export default function ChooseAvatar({
       callApi(selectedFile);
     }
   }, [selectedFile, callApi]);
-  // console.log(selectedAvatar);
+
   return (
     <div className="w-2xl h-[400px] bg-light-background rounded-lg flex flex-col justify-center items-center px-2xl">
       <h2 className="font-bold mb-lg">2. 사용하실 아바타를 선택하세요.</h2>
