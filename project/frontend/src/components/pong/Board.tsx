@@ -108,7 +108,7 @@ function Board() {
         setplayer2Info(info);
       }
     },
-    [player1Info, player2Info],
+    [player1Info, player2Info, setplayer1Info, setplayer2Info],
   );
 
   useEffect(() => {

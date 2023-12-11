@@ -15,7 +15,7 @@ export default function loginAuth(Component: any) {
         }
       };
       validate();
-    }, []);
+    }, [api]);
     return <Component {...props} />;
   };
 }

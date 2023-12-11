@@ -22,7 +22,7 @@ export function NotifBox({
     useCallback(
       async () =>
         unwrap(await api.notificationControllerFindManyAndUpdateRead()),
-      [api, active],
+      [api],
     ),
     {
       enabled: active,

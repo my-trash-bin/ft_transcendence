@@ -7,7 +7,7 @@ export function Loading({ width }: { readonly width: number }) {
       priority={true}
       alt="avatar"
       width={width}
-      height={(width * 3) / 5}
+      height={(width * 299) / 500}
     />
   );
 }

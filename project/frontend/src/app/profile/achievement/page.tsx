@@ -1,11 +1,11 @@
 'use client';
 import withAuth from '@/components/auth/Auth';
-import { AchivementArticle } from '../../../components/profile/achivement/AchivementArticle';
+import { AchievementArticle } from '../../../components/profile/achievement/AchievementArticle';
 
 function ProfilePage() {
   return (
     <div className="w-[100%] h-[100%] bg-light-background rounded-lg">
-      <AchivementArticle />
+      <AchievementArticle />
     </div>
   );
 }

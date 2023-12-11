@@ -4,16 +4,27 @@
 
 ## Usage
 
-See descriptive `Makefile`.
+See descriptive `Makefile`, or [Production](#production) section.
 
 ## Development
 
-This project's IDE is Visual Studio Code.
+This project uses Visual Studio Code as its IDE.
 
-```shell
-sh init.sh
-```
+### Frontend
 
-Run `init.sh` to generate `*.code-workspace` files.
+- Write the `project/frontend/.env` file, referring to `project/frontend/.env.sample.dev`.
+- Run `npm run dev` in the `project/frontend` directory.
 
-Open one of the generated `*.code-workspace` files, using Visual Studio Code.
+### Backend
+
+- Write the `project/backend/.env` file, referring to `project/backend/.env.sample.dev`.
+  - Use `docker/dev` if the database is not configured.
+- Ensure the database is set up.
+  - Execute `npx prisma migrate deploy && npx ts-node setupDbForTest.ts` in the `project/backend` directory.
+- Run `npm run dev` in the `project/backend` directory.
+
+## Production
+
+- Ensure the working tree is clean. (Use `make fclean`)
+- Write the `.env` file, referring to `.env.sample`.
+- Execute `make`.

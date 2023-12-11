@@ -21,12 +21,14 @@ export function GameInviteButtons({
   const layout = isModal
     ? 'flex felx-row left-[-30px]'
     : 'flex flex-col bottom-[-15px]';
+    
   const startNormal = useCallback(() => {
     socket.emit('inviteNormalMatch', friendId);
     setGameMode('normal');
 
     handleInviteOpen();
   }, [setGameMode, handleInviteOpen, friendId, socket]);
+
   const startItem = useCallback(() => {
     socket.emit('inviteItemMatch', friendId);
     setGameMode('item');

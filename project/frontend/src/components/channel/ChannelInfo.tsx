@@ -47,7 +47,6 @@ export function ChannelInfo({
             src={'/icon/message-setting.svg'}
             width={35}
             height={50}
-            layout="relative"
           />
         </button>
       </div>
