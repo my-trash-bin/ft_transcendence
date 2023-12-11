@@ -1,8 +1,8 @@
+import { LiveStatus } from '@/components/common/LiveStatus';
+import FriendInvite from '@/components/game/FriendInvite';
 import { ProfileModal } from '@/components/profile/ProfileModal';
 import { ReactNode, useState } from 'react';
 import FriendAvatar from './FriendAvatar';
-import FriendInvite from '@/components/game/FriendInvite';
-import { LiveStatus } from '@/components/common/LiveStatus';
 
 interface CommonCardProps {
   readonly children: ReactNode;
