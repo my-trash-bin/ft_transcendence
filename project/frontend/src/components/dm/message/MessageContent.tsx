@@ -19,6 +19,7 @@ export interface MessageContentInterface {
       id: string;
       nickname: string;
       profileImageUrl: string;
+      joinedAt: Date;
     };
   };
 }
@@ -52,7 +53,7 @@ export function MessageContent({
   const messageEndRef = useRef<HTMLDivElement>(null);
 
   useInitMessage(type, setMessages, channelId, targetName);
-  useSocket(type, setMessages);
+  useSocket(type, setMessages, channelId);
 
   useEffect(() => {
     messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -64,7 +65,7 @@ export function MessageContent({
         if (message.type === 'leave' || message.type === 'join') {
           return (
             <UserStateAnnounce
-              key={message.data.id}
+              key={crypto.randomUUID()}
               nickname={message.data.member.nickname}
               userState={message.type}
             />
