@@ -14,8 +14,8 @@ const avatars: string[] = [
 ];
 
 function SignInPage() {
-  const [nickname, setNickname] = useState('');
-  const [avatar, setAvatar] = useState('');
+  const [nickname, setNickname] = useState(() => '');
+  const [avatar, setAvatar] = useState(() => '');
 
   const handleNicknameSubmit = useCallback(
     (newNickname: string) => {
