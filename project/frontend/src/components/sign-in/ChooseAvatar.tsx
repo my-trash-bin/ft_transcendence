@@ -3,7 +3,7 @@
 import { ApiContext } from '@/app/_internal/provider/ApiContext';
 import { avatarToUrl } from '@/app/_internal/util/avatarToUrl';
 import Image from 'next/image';
-import { useContext, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { Button } from '../common/Button';
 import { SelectAvatar } from './SelectAvatar';
 
@@ -17,58 +17,59 @@ export default function ChooseAvatar({
   onChooseClick,
 }: ChooseAvatarProps) {
   const [selectedAvatar, setSelectedAvatar] = useState<string>(() => '');
-  const [uploadImage, setUploadImage] = useState<any>(null);
+  const [selectedFile, setSelectedFile] = useState<any>(undefined);
+  const [fileUrl, setFileUrl] = useState<any>(undefined);
   const { api } = useContext(ApiContext);
   const [isError, setIsError] = useState(false);
 
   const handleFileChange = async (event: any) => {
-    const selectedFile = event.target.files[0];
-    if (selectedFile) {
-      const maxSize = 10 * 1024 * 1024; // 10MB
+    const newSelectedFile = event.target.files[0];
 
-      if (selectedFile.size > maxSize) {
-        alert(
-          'File size exceeds the maximum allowed size (1MB). Please choose a smaller file.',
-        );
-        event.target.value = null;
-        return;
-      } else {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          if (e.target) {
-            setUploadImage(e.target.result);
-          }
-        };
-        reader.readAsDataURL(selectedFile);
-        await callApi(selectedFile);
-      }
+    if (!newSelectedFile) {
+      alert('파일을 선택하세요.');
+      return;
+    } else if (newSelectedFile.size > 10 * 1024 * 1024) {
+      event.target.value = null;
+      alert('파일의 최대 크기는 10MB 입니다.');
+      return;
     } else {
-      alert('Please select a file.');
+      setSelectedFile(newSelectedFile);
     }
   };
 
-  const callApi = async function (selectedFile: any) {
-    try {
-      const response = await api.avatarControllerUploadFile({
-        body: selectedFile,
-        headers: {
-          'Content-Type': selectedFile.type,
-        },
-      });
-      if (response.ok) {
-        console.log('Uploaded image successfully');
-        const responseData = await response.json();
-        setSelectedAvatar(responseData.filePath);
-      } else {
+  const callApi = useCallback(
+    async (uploadFile: any) => {
+      try {
+        console.log('call api with', uploadFile);
+        const response = await api.avatarControllerUploadFile({
+          body: uploadFile,
+          headers: {
+            'Content-Type': uploadFile.type,
+          },
+        });
+        if (response.ok) {
+          console.log('Uploaded image successfully', response);
+          const responseData = await response.json();
+          setSelectedAvatar(responseData.filePath);
+          setFileUrl(responseData.filePath);
+        } else {
+          setIsError(true);
+          console.error('Error uploading file', response);
+        }
+      } catch (error) {
         setIsError(true);
-        console.error('Error uploading file', response);
+        console.error('Error uploading file1:', error);
       }
-    } catch (error) {
-      setIsError(true);
-      console.error('Error uploading file:', error);
-    }
-  };
+    },
+    [api],
+  );
 
+  useEffect(() => {
+    if (selectedFile) {
+      callApi(selectedFile);
+    }
+  }, [selectedFile, callApi]);
+  // console.log(selectedAvatar);
   return (
     <div className="w-2xl h-[400px] bg-light-background rounded-lg flex flex-col justify-center items-center px-2xl">
       <h2 className="font-bold mb-lg">2. 사용하실 아바타를 선택하세요.</h2>
@@ -93,14 +94,14 @@ export default function ChooseAvatar({
             ))}
             <div
               className={`${
-                uploadImage
+                fileUrl
                   ? 'border-dark-purple'
                   : 'border-default hover:border-dark-gray hover:bg-light-background'
               }  w-lg h-lg border-3 inline-block overflow-x-hidden overflow-y-hidden`}
             >
-              {uploadImage ? (
+              {fileUrl ? (
                 <Image
-                  src={uploadImage}
+                  src={fileUrl}
                   priority={true}
                   alt="avatar"
                   width={100}
