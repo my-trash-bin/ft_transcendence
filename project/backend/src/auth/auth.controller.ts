@@ -7,13 +7,16 @@ import {
   Post,
   Request,
   Response,
+  UnprocessableEntityException,
   UseGuards,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import {
+  ApiForbiddenResponse,
   ApiOperation,
   ApiProperty,
   ApiUnauthorizedResponse,
+  ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
 import {
   Request as ExpressRequest,
@@ -127,7 +130,11 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: '2FA 로그인 용' })
-  @ApiUnauthorizedResponse({ description: 'incorrect 2fa password' })
+  @ApiUnauthorizedResponse({ description: '유효하지 않은 Jwt 토큰' })
+  @ApiForbiddenResponse({ description: 'Jwt의 Phase가 2fa가 아닙니다.' })
+  @ApiUnprocessableEntityResponse({
+    description: '2차 인증 비밀번호가 일치하지 않습니다.',
+  })
   @UseGuards(JwtGuard, PhaseGuard)
   @Phase('2fa')
   @Post('2fa')
@@ -142,12 +149,13 @@ export class AuthController {
       id,
       body.password,
     );
-    if (jwtPayload) {
-      this.setCookie(res, jwtPayload);
-      this.welcome(res, type);
-    } else {
-      res.status(401).end();
+    if (!jwtPayload) {
+      throw new UnprocessableEntityException(
+        '2차 인증 비밀번호가 일치하지 않습니다.',
+      );
     }
+    this.setCookie(res, jwtPayload);
+    this.welcome(res, type);
   }
 
   private setCookie(res: ExpressResponse, jwtPayload: JwtPayload) {
