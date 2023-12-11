@@ -623,15 +623,14 @@ export class EventsService {
     isItemMode: boolean,
   ) {
     const invitation = this.activeInvitations.get(inviterId);
-
     if (!invitation) {
+      client.emit('gameInvitationExpired');
       return;
     }
-
     this.activeInvitations.delete(inviterId);
-
     const inviterSocket = invitation.inviterSocket;
     if (inviterSocket) {
+      console.log('handleAcceptMatch: inviterSocket이 있음');
       this.createGameRoom(client, inviterSocket, isItemMode);
     } else {
       client.emit('friendIsOffline');

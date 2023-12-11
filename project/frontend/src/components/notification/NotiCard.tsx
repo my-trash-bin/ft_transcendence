@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useCallback, useContext } from 'react';
-import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { useRouter } from 'next/navigation';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { getGameSocket } from '../pong/gameSocket';
-import { c } from '@/app/_internal/util/c';
 
 interface NotiCardProps {
   isRead: boolean;
@@ -16,26 +14,14 @@ export const NotiCard: React.FC<NotiCardProps> = ({ content }) => {
     'bg-white border-3 border-default rounded-md hover:bg-light-background';
   const alignCSS = 'flex items-center relative p-sm';
   let obj = JSON.parse(content);
-  const [showToast, setShowToast] = useState(false);
   const [isHovered, setHovered] = useState(false);
-  const [isInvited, setIsInvited] = useState(true);
+  const [isInvited, setIsInvited] = useState(false);
   const { api } = useContext(ApiContext);
   const route = useRouter();
   const sourceId = obj.sourceId;
   const sourceName = obj.sourceName;
   const mode = obj.mode;
   const socket = getGameSocket();
-
-  useEffect(() => {
-    const handleCancelInvite = () => {
-      setIsInvited(false);
-      console.log('canceledInvite');
-    };
-    socket.on('canceledInvite', handleCancelInvite);
-    return () => {
-      socket.off('canceledInvite', handleCancelInvite);
-    };
-  }, [socket]);
 
   function handleMouseEnter() {
     setHovered(true);
@@ -53,6 +39,57 @@ export const NotiCard: React.FC<NotiCardProps> = ({ content }) => {
       console.error('Error friend:', error);
     }
   }, [api, sourceId]);
+
+  const [showInvitationExpiredToast, setShowInvitationExpiredToast] =
+    useState(false);
+
+  useEffect(() => {
+    const handleGameInvitationExpired = () => {
+      if (!showInvitationExpiredToast) {
+        console.log('gameInvitationExpired');
+        setShowInvitationExpiredToast(true);
+        setTimeout(() => setShowInvitationExpiredToast(false), 2000);
+      }
+    };
+    if (isInvited) {
+      socket.on('gameInvitationExpired', handleGameInvitationExpired);
+    }
+    return () => {
+      if (isInvited) {
+        socket.off('gameInvitationExpired', handleGameInvitationExpired);
+      }
+    };
+  }, [
+    socket,
+    isInvited,
+    setIsInvited,
+    setShowInvitationExpiredToast,
+    showInvitationExpiredToast,
+  ]);
+
+  // useEffect(() => {
+  //   if (showInvitationExpiredToast) {
+  //     setTimeout(() => setShowInvitationExpiredToast(false), 2000);
+  //   }
+  // }, [showInvitationExpiredToast, setShowInvitationExpiredToast]);
+
+  useEffect(() => {
+    // const handleCancelInvite = () => {
+    //   setIsInvited(false);
+    //   console.log('canceledInvite');
+    // };
+    const handleGoPong = () => {
+      route.push('/pong');
+    };
+
+    // socket.on('canceledInvite', handleCancelInvite);
+    socket.on('GoPong', handleGoPong);
+
+    return () => {
+      // socket.off('canceledInvite', handleCancelInvite);
+      socket.off('GoPong', handleGoPong);
+    };
+  }, [socket, route]);
 
   let notificationContent;
   let hoverContent;
@@ -79,49 +116,50 @@ export const NotiCard: React.FC<NotiCardProps> = ({ content }) => {
       hoverContent = '게임 참여하기';
       handlerFunction = () => {
         console.log('isInvited', isInvited);
-        if (isInvited) {
-          if (mode === 'normal') {
-            socket.emit('acceptNormalMatch', sourceId);
-            route.push('/pong');
-          } else {
-            socket.emit('acceptItemMatch', sourceId);
-            route.push('/pong');
-          }
+        if (mode === 'normal') {
+          socket.emit('acceptNormalMatch', sourceId);
         } else {
-          setShowToast(true);
-          setTimeout(() => setShowToast(false), 3000);
+          socket.emit('acceptItemMatch', sourceId);
         }
-      }
+        setIsInvited(true);
+        // if (isInvited) {
+        // } else {
+        //   setShowInvitationExpiredToast(true);
+        //   setTimeout(() => setShowInvitationExpiredToast(false), 3000);
+        // }
+      };
       break;
     default:
-      return null; // Handle unknown type or return a default component
+      return null;
   }
+
+  console.log(`showInvitationExpiredToast: ${showInvitationExpiredToast}`);
 
   return (
     <>
-    {showToast && (
-      <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 px-4 py-2 bg-black text-white rounded-md z-50">
-        초대가 취소되었습니다.
-      </div>
-    )}
-    <div
-      className={`group ${sizeCSS} ${colorCSS} ${alignCSS}`}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      onClick={() => handlerFunction()}
-    >
-      <div className={`relative ${isHovered ? 'hidden' : 'block'} `}>
-        <strong>{sourceName}</strong>
-        {notificationContent}
-      </div>
+      {showInvitationExpiredToast && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 px-4 py-2 bg-default text-dark-purple-interactive rounded-sm w-[150px] h-[40px] z-50">
+          만료된 초대입니다.
+        </div>
+      )}
       <div
-        className={`absolute text-lg font-semibold  ${
-          isHovered ? 'block' : 'hidden'
-        } bg-light-purple p-2`}
+        className={`group ${sizeCSS} ${colorCSS} ${alignCSS}`}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onClick={() => handlerFunction()}
       >
-        {hoverContent}
+        <div className={`relative ${isHovered ? 'hidden' : 'block'} `}>
+          <strong>{sourceName}</strong>
+          {notificationContent}
+        </div>
+        <div
+          className={`absolute text-lg font-semibold  ${
+            isHovered ? 'block' : 'hidden'
+          } bg-light-purple p-2`}
+        >
+          {hoverContent}
+        </div>
       </div>
-    </div>
     </>
   );
 };
