@@ -4,7 +4,11 @@ import { messageType } from '@/components/dm/message/MessageContent';
 import { getSocket } from '@/lib/Socket';
 import { useEffect } from 'react';
 
-export const useSocket = (type: any, setMessages: any) => {
+export const useSocket = (
+  type: any,
+  setMessages: any,
+  channelId: string | undefined,
+) => {
   useEffect(() => {
     const socket = getSocket();
     const localMe = localStorage.getItem('me');
@@ -30,21 +34,30 @@ export const useSocket = (type: any, setMessages: any) => {
       });
 
       socket.on('kickBanPromote', (res) => {
+        console.dir(res);
         if (
           res.data.actionType === 'KICK' ||
           res.data.actionType === 'BANNED'
         ) {
-          if (res.data.targetUser.id === me.id) {
+          if (
+            res.data.targetUser.id === me.id &&
+            channelId === res.data.channelId
+          ) {
             alert('채널에서 강퇴당했습니다.');
-            console.log(res);
             location.href = '/channel';
           }
-        } else if (res.data.actionType === 'PROMOTE') {
+        } else if (
+          res.data.actionType === 'PROMOTE' &&
+          channelId === res.data.channelId
+        ) {
           if (res.data.targetUser.id === me.id) {
             alert('채널에서 관리자가 되었습니다.');
           }
         } else {
-          if (res.data.targetUser.id === me.id) {
+          if (
+            res.data.targetUser.id === me.id &&
+            channelId === res.data.channelId
+          ) {
             alert('채널에서 뮤트 되었습니다.');
           }
         }
