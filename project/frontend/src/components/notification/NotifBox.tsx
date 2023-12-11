@@ -70,13 +70,7 @@ export function NotifBox({
         {data &&
           data.map((val) => {
             if (showAll || !val.isRead) {
-              return (
-                <NotiCard
-                  key={val.id}
-                  isRead={val.isRead}
-                  content={val.contentJson}
-                />
-              );
+              return <NotiCard key={val.id} content={val.contentJson} />;
             }
             return null;
           })}
