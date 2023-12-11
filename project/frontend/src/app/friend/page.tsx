@@ -1,5 +1,5 @@
 'use client';
-import withAuth from '@/components/auth/Auth';
+import withFriendAuth from '@/components/auth/FriendAuth';
 import { useState } from 'react';
 import { BlockCardList } from '../../components/friend/BlockCardList';
 import { FriendCardList } from '../../components/friend/FriendCardList';
@@ -66,4 +66,4 @@ function FriendPage() {
   );
 }
 
-export default withAuth(FriendPage);
+export default withFriendAuth(FriendPage);
