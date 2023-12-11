@@ -1,10 +1,11 @@
 'use client';
 import { ApiContext } from '@/app/_internal/provider/ApiContext';
+import faAuth from '@/components/auth/2FaAuth';
 import { Button } from '@/components/common/Button';
 import { useRouter } from 'next/navigation';
 import { useCallback, useContext, useState } from 'react';
 
-export default function TwofactorPage() {
+function TwofactorPage() {
   const { api } = useContext(ApiContext);
   const router = useRouter();
   const [password, setPassword] = useState('');
@@ -67,3 +68,5 @@ export default function TwofactorPage() {
     }
   }
 }
+
+export default faAuth(TwofactorPage);

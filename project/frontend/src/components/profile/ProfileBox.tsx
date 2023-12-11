@@ -38,7 +38,7 @@ export function ProfileBox() {
     [me, 'fetchHistory'],
     useCallback(
       async () =>
-        unwrap(await api.pongLogControllerGetUserGameHistories(me.id)),
+        unwrap(await api.pongLogControllerGetUserGameHistories(me?.id)),
       [api, me],
     ),
   );

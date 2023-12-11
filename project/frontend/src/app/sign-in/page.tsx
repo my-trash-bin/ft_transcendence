@@ -1,5 +1,6 @@
 'use client';
 
+import signInAuth from '@/components/auth/SignInAuth';
 import RegisterUser from '@/components/sign-in/RegisterUser';
 import { useCallback, useState } from 'react';
 import ChooseAvatar from '../../components/sign-in/ChooseAvatar';
@@ -12,7 +13,7 @@ const avatars: string[] = [
   '/avatar/avatar-small.svg',
 ];
 
-export default function SignInPage() {
+function SignInPage() {
   const [nickname, setNickname] = useState('');
   const [avatar, setAvatar] = useState('');
 
@@ -47,3 +48,5 @@ export default function SignInPage() {
     </div>
   );
 }
+
+export default signInAuth(SignInPage);
