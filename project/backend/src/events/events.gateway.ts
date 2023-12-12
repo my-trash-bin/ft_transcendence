@@ -90,13 +90,13 @@ export class EventsGateway
 
   @SubscribeMessage('leaveGameBoard')
   async handleLeaveGameBoard(@ConnectedSocket() client: Socket) {
-    this.logger.log(`Client left game board: ${client.id}`);
+    console.log('handleLeaveGameBoard');
     await this.eventsService.finalizeGame(client);
   }
 
   async handleDisconnect(client: Socket) {
-    this.logger.log(`Client disconnected: ${client.id}`);
     await this.eventsService.finalizeGame(client);
+    console.log('handleDisconnect');
     this.eventsService.handleDisconnect(client);
   }
 
