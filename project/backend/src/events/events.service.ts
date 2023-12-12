@@ -728,7 +728,7 @@ export class EventsService {
 
     setTimeout(() => {
       console.log('Game starting...');
-      pong.startGameLoop(); // 가정: Pong 클래스에 게임을 시작하는 메서드가 있다고 가정
+      pong.startGameLoop();
     }, 3000);
 
     pong.onGameUpdate.on('gameState', (gameState: GameState) => {
