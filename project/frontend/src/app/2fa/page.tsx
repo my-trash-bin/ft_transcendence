@@ -9,7 +9,6 @@ function TwofactorPage() {
   const { api } = useContext(ApiContext);
   const router = useRouter();
   const [password, setPassword] = useState('');
-  const [isError, setIsError] = useState(false);
   function handlePassword(e: React.ChangeEvent<HTMLInputElement>) {
     setPassword(e.target.value);
   }
@@ -28,10 +27,12 @@ function TwofactorPage() {
         router.push('/friend');
       }
     } catch (error: any) {
-      if (error.status === 401) {
-        alert('비밀번호 오류입니다. 다시 입력하세요!');
-      } else {
-        setIsError(true);
+      if (error.status === 422) {
+        alert('비밀번호 오류입니다. 다시 입력하세요.');
+      } else if (error.status === 401) {
+        alert('JWT가 올바르지 않습니다.');
+      } else if (error.status === 403) {
+        alert('JWT Phase가 올바르지 않습니다.');
       }
       console.error('Error 2fa login:', error);
     }
@@ -46,26 +47,22 @@ function TwofactorPage() {
     </div>
   );
   function render() {
-    if (isError) {
-      return <div>알 수 없는 에러입니다.</div>;
-    } else {
-      return (
-        <div className="flex flex-col">
-          <input
-            type="password"
-            placeholder="인증 비밀번호를 입력하세요."
-            value={password}
-            onChange={handlePassword}
-            className="ml-md mr-md border-2 border-gray p-[2px]"
-          />
-          <div className="self-end mt-xl">
-            <Button onClick={handleSubmitClick} disabled={!password}>
-              다음으로
-            </Button>
-          </div>
+    return (
+      <div className="flex flex-col">
+        <input
+          type="password"
+          placeholder="인증 비밀번호를 입력하세요."
+          value={password}
+          onChange={handlePassword}
+          className="ml-md mr-md border-2 border-gray p-[2px]"
+        />
+        <div className="self-end mt-xl">
+          <Button onClick={handleSubmitClick} disabled={!password}>
+            다음으로
+          </Button>
         </div>
-      );
-    }
+      </div>
+    );
   }
 }
 
