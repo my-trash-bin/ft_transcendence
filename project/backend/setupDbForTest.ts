@@ -140,7 +140,7 @@ function mfaPasswordHash(password: string): Promise<string> {
   return new Promise<string>((resolve, reject) => {
     scrypt(password, salt, 32, (err, buffer) => {
       if (err) reject(err);
-      else resolve(buffer.toString());
+      else resolve(buffer.toString('base64'));
     });
   });
 }

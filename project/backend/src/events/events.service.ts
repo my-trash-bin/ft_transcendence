@@ -271,14 +271,14 @@ export class EventsService {
       throw new WsException(result.error!.message);
     }
 
-    this.handleUserLeaveChannel(type, channelId, idOf(userId));
-
     const eventName = GateWayEvents.Leave;
     const data: LeavingChannelResponseDto = result.data!;
     this.broadcastToChannel(type, channelId, [], eventName, {
       type: eventName,
       data,
     });
+
+    this.handleUserLeaveChannel(type, channelId, idOf(userId));
   }
 
   private getChannel(type?: string, channelId?: ChannelId) {

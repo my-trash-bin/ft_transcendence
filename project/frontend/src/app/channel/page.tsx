@@ -1,5 +1,5 @@
 'use client';
-import withAuth from '@/components/auth/Auth';
+import withAuth from '@/components/auth/withAuth';
 import { AllChannelList } from '@/components/channel/AllChannelList';
 import { ChannelInput } from '@/components/channel/ChannelInput';
 import { MyChannelList } from '@/components/channel/MyChannelList';
@@ -44,4 +44,4 @@ function ChannelHome() {
   );
 }
 
-export default withAuth(ChannelHome);
+export default withAuth(ChannelHome, 'chat');

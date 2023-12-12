@@ -1,8 +1,22 @@
+import { ApiContext } from '@/app/_internal/provider/ApiContext';
+import { avatarToUrl } from '@/app/_internal/util/avatarToUrl';
 import Image from 'next/image';
-import { useCallback, useContext, useState } from 'react';
-import { ApiContext } from '../../app/_internal/provider/ApiContext';
+import {
+  ChangeEvent,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { ModalLayout } from '../channel/modals/ModalLayout';
 import { Button } from '../common/Button';
+import {
+  AvailableImageTypes,
+  FileResult,
+  isOkOnReadAsArrayBuffer,
+  requsetUpload,
+  validateAvatarImageFile,
+} from '../sign-in/ChooseAvatar';
 import { SelectAvatar } from '../sign-in/SelectAvatar';
 
 const avatars: string[] = [
@@ -25,47 +39,95 @@ export const AvatarEditModal: React.FC<ModalProfileProps> = ({
   fetchData,
 }) => {
   const { api } = useContext(ApiContext);
-  const [selectedAvatar, setSelectedAvatar] = useState<string>(() => '');
-  const [uploadImage, setUploadImage] = useState<any>(null);
+  const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
+  const [uploadImage, setUploadImage] = useState<string | null>(null);
+  const [loadFileResult, setLoadFileResult] = useState<FileResult | null>(null);
+  const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const fileInputElement = event.target;
+    const targetFiles = fileInputElement.files;
 
-  const handleFileChange = async (event: any) => {
-    const selectedFile = event.target.files[0];
-    if (!selectedFile) {
-      alert('Please select a file.');
+    if (targetFiles === null || targetFiles.length === 0) {
+      console.error(`targetFiles X`);
       return;
     }
+
+    const selectedFile = targetFiles[0];
+
+    const errMsg = validateAvatarImageFile(selectedFile);
+
+    if (errMsg) {
+      alert(errMsg);
+      return;
+    }
+
     const reader = new FileReader();
+
     reader.onload = (e) => {
-      if (e.target) {
-        setUploadImage(e.target.result);
+      const resultArrayBuffer = e.target?.result;
+      if (!isOkOnReadAsArrayBuffer(resultArrayBuffer)) {
+        console.error(
+          `브라우저 파일 로드 결과가 어레이버퍼가 아님: ${resultArrayBuffer}`,
+        );
+        return;
       }
+
+      setLoadFileResult({
+        result: resultArrayBuffer,
+        type: selectedFile.type,
+      });
     };
-    reader.readAsDataURL(selectedFile);
-    await callApi(selectedFile);
+
+    reader.onerror = (error) => {
+      console.error(error);
+    };
+
+    reader.readAsArrayBuffer(selectedFile);
   };
 
-  async function callApi(selectedFile: any) {
+  const callApi = async function (fileResult: FileResult) {
     try {
-      const response = await fetch('/api/v1/avatar/upload', {
-        method: 'POST',
-        body: selectedFile,
-        headers: {
-          'Content-Type': selectedFile.type,
-        },
-      });
+      const response = await requsetUpload(fileResult);
+      const jsonData = await response.json();
       if (response.ok) {
-        console.log('Upload image successfully');
-        const responseData = await response.json();
-        setSelectedAvatar(responseData.filePath);
+        const { filePath } = jsonData;
+        console.log(`Uploaded image successfully: ${filePath}`);
+        setUploadImage(filePath);
       } else {
-        console.error('Error uploading file...');
+        const { message, error, statusCode } = jsonData;
+        console.error(`callApi's response not ok: `, response);
+        alert(message || '아바타 이미지 업로드에 실패했습니다');
       }
     } catch (error) {
-      console.error('Error uploading file:', error);
+      console.error('Fail to callApi: ', error);
     }
-  }
+  };
+  // Input 태그를 통해 이미지가 브라우저까지 업로드에 성공시 호출
+  useEffect(() => {
+    async function uploadToServer(fileResult: FileResult) {
+      try {
+        await callApi(fileResult);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoadFileResult(null);
+      }
+    }
+    if (loadFileResult) {
+      uploadToServer(loadFileResult);
+    }
+  }, [loadFileResult]);
+
+  // 위 useEffect에 의해 트리거 되어 서버에 업로드 성공시 호출
+  useEffect(() => {
+    if (uploadImage) {
+      setSelectedAvatar(uploadImage);
+    }
+  }, [uploadImage]);
 
   const updateProfile = useCallback(async () => {
+    if (!selectedAvatar) {
+      return;
+    }
     try {
       await api.usersControllerUpdate({
         profileImageUrl: selectedAvatar,
@@ -76,6 +138,18 @@ export const AvatarEditModal: React.FC<ModalProfileProps> = ({
       console.error('Error saving changes:', error);
     }
   }, [api, onClose, fetchData, selectedAvatar]);
+
+  const onClickUploadAvatar = () => {
+    if (uploadImage) {
+      setSelectedAvatar(uploadImage);
+    }
+  };
+
+  const uploadAvatarBoxClassName =
+    (uploadImage && selectedAvatar === uploadImage
+      ? 'border-dark-purple'
+      : 'border-default hover:border-dark-gray hover:bg-light-background') +
+    ' w-lg h-lg border-3 inline-block overflow-x-hidden overflow-y-hidden';
 
   return (
     <ModalLayout
@@ -96,26 +170,21 @@ export const AvatarEditModal: React.FC<ModalProfileProps> = ({
                 onClick={() => setSelectedAvatar(avatar)}
               />
             ))}
-            <div
-              className={`${
-                uploadImage
-                  ? 'border-dark-purple'
-                  : 'border-default hover:border-dark-gray hover:bg-light-background'
-              }  w-lg h-lg border-3 inline-block overflow-x-hidden overflow-y-hidden`}
-            >
-              {uploadImage ? (
+            <div className={uploadAvatarBoxClassName}>
+              {uploadImage && (
                 <Image
-                  src={uploadImage}
+                  src={avatarToUrl(uploadImage)}
                   priority={true}
                   alt="avatar"
                   width={100}
                   height={100}
+                  onClick={onClickUploadAvatar}
                 />
-              ) : null}
+              )}
             </div>
             <input
               type="file"
-              accept="image/jpg,image/png,image/jpeg,image/gif"
+              accept={AvailableImageTypes.join(' ')}
               name="profile_img"
               className="text-md"
               onChange={handleFileChange}

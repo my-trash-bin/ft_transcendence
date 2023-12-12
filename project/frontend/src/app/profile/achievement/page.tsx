@@ -1,5 +1,5 @@
 'use client';
-import withAuth from '@/components/auth/Auth';
+import withAuth from '@/components/auth/withAuth';
 import { AchievementArticle } from '../../../components/profile/achievement/AchievementArticle';
 
 function ProfilePage() {
@@ -10,4 +10,4 @@ function ProfilePage() {
   );
 }
 
-export default withAuth(ProfilePage);
+export default withAuth(ProfilePage, 'profile');

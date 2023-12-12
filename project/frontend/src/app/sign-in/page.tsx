@@ -1,6 +1,6 @@
 'use client';
 
-import signInAuth from '@/components/auth/SignInAuth';
+import withAuth from '@/components/auth/withAuth';
 import RegisterUser from '@/components/sign-in/RegisterUser';
 import { useCallback, useState } from 'react';
 import ChooseAvatar from '../../components/sign-in/ChooseAvatar';
@@ -14,8 +14,8 @@ const avatars: string[] = [
 ];
 
 function SignInPage() {
-  const [nickname, setNickname] = useState('');
-  const [avatar, setAvatar] = useState('');
+  const [nickname, setNickname] = useState(() => '');
+  const [avatar, setAvatar] = useState(() => '');
 
   const handleNicknameSubmit = useCallback(
     (newNickname: string) => {
@@ -49,4 +49,4 @@ function SignInPage() {
   );
 }
 
-export default signInAuth(SignInPage);
+export default withAuth(SignInPage, 'signIn');

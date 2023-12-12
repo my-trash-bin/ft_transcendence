@@ -1,10 +1,9 @@
 'use client';
 // ../../game/page.tsx
-import withAuth from '@/components/auth/Auth';
-import React from 'react';
+import withAuth from '@/components/auth/withAuth';
 import { Title } from '@/components/common/Title';
-import { GameFinishModal } from '@/components/game/GameFinishModal';
 import ButtonComponent from '@/components/game/GameButton';
+import { GameFinishModal } from '@/components/game/GameFinishModal';
 import { Ranking } from '../../components/game/Ranking';
 import useStore from '../../components/pong/Update';
 
@@ -32,13 +31,10 @@ function GamePage() {
         </div>
       </div>
       {gameOver && (
-        <GameFinishModal
-          isOpen={gameOver}
-          onClose={handleCloseModal}
-        />
+        <GameFinishModal isOpen={gameOver} onClose={handleCloseModal} />
       )}
     </div>
   );
 }
 
-export default withAuth(GamePage);
+export default withAuth(GamePage, 'game');
