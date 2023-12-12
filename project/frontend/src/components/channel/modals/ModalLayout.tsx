@@ -6,7 +6,7 @@ type ModalLayoutProps = {
   width: string;
   height: string;
   closeModal: () => void;
-  zValue?: number; // Change the type to number
+  zValue?: number;
 };
 
 export const ModalLayout = ({
@@ -29,7 +29,7 @@ export const ModalLayout = ({
         style={{
           width: width,
           height: height,
-          zIndex: setZ, // Set the zIndex directly in the inline style
+          zIndex: setZ,
         }}
         className="fixed top-1/2 left-1/2 rounded-[5px] border-3 border-dark-purple transform -translate-x-1/2 -translate-y-1/2 bg-default"
       >
