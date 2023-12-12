@@ -2,7 +2,7 @@
 
 import { avatarToUrl } from '@/app/_internal/util/avatarToUrl';
 import Portal from '@/components/common/Portal';
-import FriendInvite from '@/components/game/FriendInvite';
+import FriendInvite from '@/components/game/InviteModal';
 import { ProfileModal } from '@/components/profile/ProfileModal';
 import Image from 'next/image';
 import { useState } from 'react';

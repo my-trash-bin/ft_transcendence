@@ -271,14 +271,14 @@ export class EventsService {
       throw new WsException(result.error!.message);
     }
 
-    this.handleUserLeaveChannel(type, channelId, idOf(userId));
-
     const eventName = GateWayEvents.Leave;
     const data: LeavingChannelResponseDto = result.data!;
     this.broadcastToChannel(type, channelId, [], eventName, {
       type: eventName,
       data,
     });
+
+    this.handleUserLeaveChannel(type, channelId, idOf(userId));
   }
 
   private getChannel(type?: string, channelId?: ChannelId) {
@@ -533,7 +533,6 @@ export class EventsService {
 
       q.delete(player1);
       q.delete(player2);
-
       this.createGameRoom(player1, player2, itemMode);
     }
   }
@@ -588,6 +587,7 @@ export class EventsService {
       return;
     }
 
+    client.emit('waitingFriend');
     this.alarmInvited(idOf(userId), idOf(friendId), isItemMode);
 
     this.activeInvitations.set(friendId, {
@@ -623,13 +623,11 @@ export class EventsService {
     isItemMode: boolean,
   ) {
     const invitation = this.activeInvitations.get(inviterId);
-
     if (!invitation) {
+      client.emit('gameInvitationExpired');
       return;
     }
-
     this.activeInvitations.delete(inviterId);
-
     const inviterSocket = invitation.inviterSocket;
     if (inviterSocket) {
       this.createGameRoom(client, inviterSocket, isItemMode);

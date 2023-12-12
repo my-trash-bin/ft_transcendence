@@ -1,6 +1,6 @@
 import { ApiContext } from '@/app/_internal/provider/ApiContext';
-import { useContext, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useContext, useEffect } from 'react';
 
 export default function withChannelAuth(Component: any) {
   return function WrappedComponent(props: any) {
@@ -11,7 +11,15 @@ export default function withChannelAuth(Component: any) {
       const validateAndCheckParticipation = async () => {
         try {
           const res = await api.usersControllerMyProfile();
-          localStorage.setItem('me', JSON.stringify(res.data.me));
+          if (res.data.phase === 'register') {
+            router.replace('/sign-in');
+          } else if (res.data.phase === 'complete') {
+            localStorage.setItem('me', JSON.stringify(res.data.me));
+            router.replace('/friend');
+          } else if (res.data.phase === '2fa') {
+            router.replace('/2fa');
+            console.log(`스토리지저장: ${res.data.me}`);
+          }
 
           const participationRes: any =
             await api.channelControllerIsParticipated(props.params.channelId);
@@ -20,15 +28,15 @@ export default function withChannelAuth(Component: any) {
           }
         } catch (e: any) {
           if (e?.error?.type === 'participant') {
-            router.replace('/channel'); // window.location.href = '/channel';
+            router.replace('/channel'); // router.replace('/channel';
           }
 
           if (e?.error?.statusCode === 401 || e?.error?.statusCode == 403)
-            router.replace('/'); // window.location.href = '/';
+            router.replace('/'); // router.replace('/';
         }
       };
       if (router) {
-      validateAndCheckParticipation();
+        validateAndCheckParticipation();
       }
     }, [api, router, props.channelId, props.params.channelId]);
 

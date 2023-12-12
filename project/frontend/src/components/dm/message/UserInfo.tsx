@@ -14,19 +14,18 @@ export function UserInfo({
   targetId: string;
 }>) {
   return (
-    <div className="h-[80px] w-[95%] border-b border-default relative">
-      <div className="w-[45px] h-[50px] absolute left-[30px] top-[20px]">
-        <Image
-          alt="userImage"
-          src={avatarToUrl(imageUri)}
-          width={35}
-          height={40}
-        />
-      </div>
-      <p className="top-[10px] left-[100px] text-[22px] absolute">
-        {username}
+    <div className="h-[80px] w-[95%] border-b border-default flex flex-row">
+      <Image
+        alt="userImage"
+        src={avatarToUrl(imageUri)}
+        width={35}
+        height={40}
+        className="ml-[20px]"
+      />
+      <div className="ml-[20px] self-center">
+        <p className="top-[10px] left-[100px] text-[22px]">{username}</p>
         <LiveStatus targetId={targetId} />
-      </p>
+      </div>
     </div>
   );
 }

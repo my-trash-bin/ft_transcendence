@@ -1,5 +1,5 @@
 'use client';
-import loginAuth from '@/components/auth/LoginAuth';
+import withAuth from '@/components/auth/withAuth';
 import Navbar from '@/components/common/Navbar';
 import FriendAvatar from '@/components/friend/utils/FriendAvatar';
 
@@ -34,4 +34,4 @@ function Page() {
   );
 }
 
-export default loginAuth(Page);
+export default withAuth(Page, 'root');

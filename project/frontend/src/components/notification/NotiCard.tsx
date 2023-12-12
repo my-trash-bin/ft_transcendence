@@ -13,27 +13,14 @@ export const NotiCard: React.FC<NotiCardProps> = ({ content }) => {
     'bg-white border-3 border-default rounded-md hover:bg-light-background';
   const alignCSS = 'flex items-center relative p-sm';
   let obj = JSON.parse(content);
-  const [showToast, setShowToast] = useState(false);
   const [showFriendToast, setShowFriendToast] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [isInvited, setIsInvited] = useState(true);
   const { api } = useContext(ApiContext);
   const route = useRouter();
   const sourceId = obj.sourceId;
   const sourceName = obj.sourceName;
   const mode = obj.mode;
   const socket = getGameSocket();
-
-  useEffect(() => {
-    const handleCancelInvite = () => {
-      setIsInvited(false);
-      console.log('canceledInvite');
-    };
-    socket.on('canceledInvite', handleCancelInvite);
-    return () => {
-      socket.off('canceledInvite', handleCancelInvite);
-    };
-  }, [socket]);
 
   function handleMouseEnter() {
     setIsHovered(true);
@@ -53,6 +40,16 @@ export const NotiCard: React.FC<NotiCardProps> = ({ content }) => {
       console.error('Error friend:', error);
     }
   }, [api, sourceId]);
+
+  useEffect(() => {
+    const handleGoPong = () => {
+      route.push('/pong');
+    };
+    socket.on('GoPong', handleGoPong);
+    return () => {
+      socket.off('GoPong', handleGoPong);
+    };
+  }, [socket, route]);
 
   let notificationContent;
   let hoverContent;
@@ -78,32 +75,18 @@ export const NotiCard: React.FC<NotiCardProps> = ({ content }) => {
       notificationContent = `가 1대1 게임을 요청했습니다.`;
       hoverContent = '게임 참여하기';
       handlerFunction = () => {
-        console.log('isInvited', isInvited);
-        if (isInvited) {
-          if (mode === 'normal') {
-            socket.emit('acceptNormalMatch', sourceId);
-            route.push('/pong');
-          } else {
-            socket.emit('acceptItemMatch', sourceId);
-            route.push('/pong');
-          }
-        } else {
-          setShowToast(true);
-          setTimeout(() => setShowToast(false), 3000);
+        if (mode === 'normal') {
+          socket.emit('acceptNormalMatch', sourceId);
+        } else if (mode === 'item') {
+          socket.emit('acceptItemMatch', sourceId);
         }
       };
       break;
     default:
-      return null; // Handle unknown type or return a default component
+      return null;
   }
-
   return (
     <>
-      {showToast && (
-        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 px-4 py-2 bg-black text-white rounded-md z-50">
-          초대가 취소되었습니다.
-        </div>
-      )}
       {showFriendToast && (
         <div className="fixed w-[300px] h-[100px] left-1/2 transform -translate-x-1/2 -translate-y-[430%] flex justify-center items-center bg-default border-3 border-dark-purple text-dark-purple rounded-md z-50">
           {sourceName}님과 친구가 되었습니다!
