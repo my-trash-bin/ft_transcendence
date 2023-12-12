@@ -41,7 +41,11 @@ import { channelMessageDtoSelect } from './dto/channel-message.dto';
 import { ChannelRelationDto } from './dto/channel-relation.dto';
 import { ChannelWithAllInfoDto } from './dto/channel-with-all-info.dto';
 import { ChannelWithMembersDto } from './dto/channel-with-members.dto';
-import { ChannelDto, channelDtoSelect } from './dto/channel.dto';
+import {
+  ChannelDto,
+  channelDtoSelect,
+  prismaChannelSelect,
+} from './dto/channel.dto';
 import { JoinedChannelInfoDto } from './dto/joined-channel-info.dto';
 import { LeavingChannelResponseDto } from './dto/leave-channel-response.dto';
 
@@ -118,7 +122,17 @@ export class ChannelService {
         select: {
           memberType: true,
           mutedUntil: true,
-          channel: true,
+          channel: {
+            select: {
+              ...prismaChannelSelect,
+              messages: {
+                select: {
+                  messageJson: true,
+                },
+                take: 1,
+              },
+            },
+          },
         },
       });
     return prismaChannelRelations.map((el) => new ChannelRelationDto(el));
