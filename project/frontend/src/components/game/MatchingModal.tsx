@@ -1,13 +1,11 @@
 import Image from 'next/image';
 import React, { useEffect } from 'react';
 import Modal from 'react-modal';
-import useStore from '../pong/Update';
 import { getGameSocket } from '../pong/gameSocket';
 import useMatching from '../common/useMatching';
 
 const MatchingModal: React.FC = () => {
   const socket = getGameSocket();
-  const { setIsPlayer1 } = useStore();
   const { isMatchingOpen, gameMode, closeMatching } = useMatching();
 
   const handleModalClose = () => {

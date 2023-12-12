@@ -713,6 +713,7 @@ export class EventsService {
         this.handleOffGame(data.player2Id);
       },
     );
+
     this.handleOnGame(idOf(player1Id), pong);
     this.handleOnGame(idOf(player2Id), pong);
 
@@ -726,7 +727,22 @@ export class EventsService {
       player2.emit('gameUpdate', gameState);
     });
 
+    let cancelGame = false;
+
+    player1.on('leaveGameBoard', () => {
+      cancelGame = true;
+    });
+
+    player2.on('leaveGameBoard', () => {
+      cancelGame = true;
+    });
+
     setTimeout(() => {
+      if (cancelGame) {
+        console.log('Game canceled');
+        // todo : 게임 점수 페널티
+        return;
+      }
       console.log('Game starting...');
       pong.startGameLoop();
     }, 3000);
@@ -736,7 +752,6 @@ export class EventsService {
       player2.emit('gameUpdate', gameState);
     });
   }
-
 
   handlePaddleMove(client: UserSocket, directionIsUp: boolean) {
     const userId = client.data.userId as string | undefined;
@@ -801,8 +816,19 @@ export class EventsService {
     if (!pong.getGameState().gameStart) {
       pong.setGameStart();
     }
+
+    // 게임 상태 업데이트: 나간 플레이어의 상대방 점수를 10점으로 설정
+    const gameState = pong.getGameState();
+    if (client.id === pong.player1SocketId) {
+      gameState.score2 = 10;
+    } else {
+      gameState.score1 = 10;
+    }
+    gameState.gameOver = true;
+
+    // 게임 상태를 데이터베이스에 저장
+    await this.storeGameStateToDB(gameState, pong);
     pong.setGameOver();
-    await this.storeGameStateToDB(pong.getGameState(), pong);
 
     // 상대방에게 연결 종료 알림
     const opponentSocketId =
