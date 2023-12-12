@@ -130,6 +130,11 @@ export class ChannelService {
                   messageJson: true,
                 },
                 take: 1,
+                orderBy: [
+                  {
+                    sentAt: 'desc',
+                  },
+                ],
               },
             },
           },
