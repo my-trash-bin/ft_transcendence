@@ -130,6 +130,11 @@ export class ChannelService {
                   messageJson: true,
                 },
                 take: 1,
+                orderBy: [
+                  {
+                    sentAt: 'desc',
+                  },
+                ],
               },
             },
           },
@@ -638,7 +643,7 @@ export class ChannelService {
           throw new ServiceError('뮤트 상태의 유저입니다.', 400);
         }
 
-        return await prisma.channelMessage.create({
+        const result = await prisma.channelMessage.create({
           data: {
             channelId: channelId.value,
             memberId: userId.value,
@@ -658,6 +663,11 @@ export class ChannelService {
             },
           },
         });
+        await prisma.channel.update({
+          where: { id: channelId.value },
+          data: { lastActiveAt: new Date() },
+        });
+        return result;
       });
       return newServiceOkResponse(result);
     } catch (error) {
