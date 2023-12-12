@@ -14,6 +14,7 @@ interface ExtendedGameState extends GameState {
   setIsPlayer1: (isPlayer1: boolean) => void;
   setGameState: (newState: GameState) => void;
   setGameOver: (gameOver: boolean) => void;
+  setGameScore: (score1: number, score2: number) => void;
   player1Info: PlayerInfo;
   player2Info: PlayerInfo;
   setplayer1Info: (playerInfo: PlayerInfo) => void;
@@ -42,6 +43,7 @@ const useStore = create<ExtendedGameState>((set) => ({
   setIsPlayer1: (isPlayer1) => set({ isPlayer1 }),
   setGameState: (newState) => set({ ...newState }),
   setGameOver: (gameOver) => set({ gameOver }),
+  setGameScore: (score1, score2) => set({ score1, score2 }),
   setplayer1Info: (playerInfo) => set({ player1Info: playerInfo }),
   setplayer2Info: (playerInfo) => set({ player2Info: playerInfo }),
 }));

@@ -56,7 +56,7 @@ const useAuthRedirect = (pageType: PageType) => {
   const { isLoading } = useQuery('auth', api.usersControllerMyProfile, {
     onSuccess: (data) => {
       const { id, phase, me } = data.data;
-      console.log(id, phase, me);
+      // console.log(id, phase, me);
       if (phase === 'complete' && me !== undefined) {
         localStorage.setItem(LocalStorageMeKey, JSON.stringify(me));
       } else {
