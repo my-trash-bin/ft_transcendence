@@ -14,15 +14,12 @@ const InviteModal = () => {
 
   const size = 'py-sm px-lg w-[498px] h-[308px]';
   const textCSS = 'text-dark-purple text-h2';
-  const alignCSS = 'items-center justify-center';
+  const alignCSS = 'flex flex-col items-center justify-center gap-xl';
   const positionCSS = 'mx-auto';
 
   const hoverCSS = 'cursor-pointer';
-  const txtPos = 'text-center mt-[80px]';
   const buttonCSS =
-    'bg-dark-purple-interactive rounded-md \
-  text-light-gray-interactive text-h2 \
-  w-lg mt-[65pt] ml-[250pt]';
+    'bg-dark-purple-interactive rounded-md text-light-gray-interactive text-h2 w-lg self-end';
 
   let content = gameMode === 'normal' ? '일반' : '아이템';
 
@@ -33,17 +30,19 @@ const InviteModal = () => {
       width="500px"
       height="300px"
     >
-      <div className={`${textCSS} ${alignCSS} ${positionCSS} ${size} z-[20]`}>
-        <div className="flex flex-row mt-[80px] items-center justify-center">
-          <p className={`${txtPos}`}>
-            {content} 게임으로 친구를 초대하였습니다.
-          </p>
+      <div className={`${textCSS} ${alignCSS} ${positionCSS} ${size}`}>
+        <div className={`flex flex-row gap-md`}>
           <Image
             src="/images/octo-loading.gif"
-            width={50}
-            height={50}
+            width={80}
+            height={80}
             alt="loading"
           />
+          <p className="text-left">
+            {content}모드 게임에서
+            <br />
+            친구의 응답을 기다리고 있습니다.
+          </p>
         </div>
         <button
           className={`${buttonCSS} ${hoverCSS}`}
