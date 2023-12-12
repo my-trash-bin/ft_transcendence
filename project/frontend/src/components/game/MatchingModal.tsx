@@ -1,44 +1,32 @@
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import React, { useEffect } from 'react';
 import Modal from 'react-modal';
 import useStore from '../pong/Update';
 import { getGameSocket } from '../pong/gameSocket';
+import useMatching from '../common/useMatching';
 
-interface MatchingModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  mode: 'normal' | 'item';
-}
-
-const MatchingModal: React.FC<MatchingModalProps> = ({
-  isOpen,
-  onClose,
-  mode,
-}) => {
-  const router = useRouter();
+const MatchingModal: React.FC = () => {
   const socket = getGameSocket();
   const { setIsPlayer1 } = useStore();
+  const { isMatchingOpen, gameMode, closeMatching } = useMatching();
 
   useEffect(() => {
-    const handleGoPong = () => {
-      onClose();
-      router.push('/pong');
-    };
-
     const handlePlayerRole = (role: string) => {
       setIsPlayer1(role === 'player1');
       console.log('playerRole', role);
       socket.off('playerRole', handlePlayerRole);
     };
-
-    socket.on('GoPong', handleGoPong);
     socket.on('playerRole', handlePlayerRole);
     return () => {
-      socket.off('GoPong', handleGoPong);
       socket.off('playerRole', handlePlayerRole);
     };
-  }, [onClose, router, setIsPlayer1, socket]);
+  }, [socket, setIsPlayer1]);
+
+  const handleModalClose = () => {
+    socket.emit('cancelMatch', gameMode);
+    console.log('cancelMatch');
+    closeMatching();
+  };
 
   const bgCSS = 'bg-default rounded-md';
   const size = 'py-sm px-lg w-[498px] h-[308px]';
@@ -54,12 +42,12 @@ const MatchingModal: React.FC<MatchingModalProps> = ({
   text-light-gray-interactive text-h2 \
   w-lg mt-[65pt] ml-[250pt]';
 
-  let content = mode === 'normal' ? '일반' : '아이템';
+  let content = gameMode === 'normal' ? '일반' : '아이템';
 
   return (
     <Modal
-      isOpen={isOpen}
-      onRequestClose={onClose}
+      isOpen={isMatchingOpen}
+      onRequestClose={handleModalClose}
       shouldCloseOnOverlayClick={false}
       className="bg-transparent"
     >
@@ -75,7 +63,7 @@ const MatchingModal: React.FC<MatchingModalProps> = ({
             alt="loading"
           />
         </div>
-        <button className={`${buttonCSS} ${hoverCSS}`} onClick={onClose}>
+        <button className={`${buttonCSS} ${hoverCSS}`} onClick={handleModalClose}>
           닫기
         </button>
       </div>

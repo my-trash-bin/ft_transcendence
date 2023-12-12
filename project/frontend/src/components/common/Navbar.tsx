@@ -7,25 +7,28 @@ import { getGameSocket } from '../pong/gameSocket';
 import useFriendInviteStore from './FriendInvite';
 import Logo from './Logo';
 import NavIcon from './NavIcon';
+import useMatching from './useMatching';
+import MatchingModal from '../game/MatchingModal';
 
 const Navbar = () => {
   const [showInvitationExpiredToast, setShowInvitationExpiredToast] =
     useState(false);
   const [showOfflineToast, setShowOfflineToast] = useState(false);
-  const { isInviteOpen, closeAndNavigate } = useFriendInviteStore();
+  const { isInviteOpen, closeInvite } = useFriendInviteStore();
+  const { isMatchingOpen } = useMatching();
   const socket = getGameSocket();
   const router = useRouter();
 
   useEffect(() => {
     const handleGoPong = () => {
-      closeAndNavigate();
+      closeInvite();
       router.push('/pong');
     };
     socket.on('GoPong', handleGoPong);
     return () => {
       socket.off('GoPong', handleGoPong);
     };
-  }, [closeAndNavigate, socket, router]);
+  }, [closeInvite, socket, router]);
 
   useEffect(() => {
     const handleGameInvitationExpired = () => {
@@ -60,6 +63,9 @@ const Navbar = () => {
       )}
       {isInviteOpen && (
         <InviteModal />
+      )}
+      { isMatchingOpen && (
+        <MatchingModal />
       )}
       <nav
         className={
