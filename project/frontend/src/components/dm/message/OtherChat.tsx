@@ -1,8 +1,8 @@
 'use client';
 
 import { avatarToUrl } from '@/app/_internal/util/avatarToUrl';
+import useFriendInviteStore from '@/components/common/FriendInvite';
 import Portal from '@/components/common/Portal';
-import FriendInvite from '@/components/game/InviteModal';
 import { ProfileModal } from '@/components/profile/ProfileModal';
 import Image from 'next/image';
 import { useState } from 'react';
@@ -24,18 +24,22 @@ export function OtherChat({
   targetNickname: string;
 }>) {
   const timeAMPM = formatAMPM(time);
+  const [gameModeLocal, setGameModeLocal] = useState<'normal' | 'item'>(
+    'normal',
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isInviteOpen, setIsInviteOpen] = useState(false);
-  const [gameMode, setGameMode] = useState<'normal' | 'item'>('normal');
+  const { setIsInviteOpen, setGameMode } = useFriendInviteStore();
 
+  const toggleGameMode = () => {
+    const newMode = gameModeLocal === 'normal' ? 'item' : 'normal';
+    setGameModeLocal(newMode);
+    setGameMode(newMode);
+  };
   const handleModalClose = () => {
     setIsModalOpen(false);
   };
   const handleModalOpen = () => {
     setIsModalOpen(true);
-  };
-  const handleInviteClose = () => {
-    setIsInviteOpen(false);
   };
   const handleInviteOpen = () => {
     setIsInviteOpen(true);
@@ -48,12 +52,7 @@ export function OtherChat({
           onClose={handleModalClose}
           targetId={targetId}
           openInvite={handleInviteOpen}
-          setGameMode={setGameMode}
-        />
-        <FriendInvite
-          isOpen={isInviteOpen}
-          onClose={handleInviteClose}
-          mode={gameMode}
+          setGameMode={toggleGameMode}
         />
       </Portal>
       <div className="flex flex-row pl-[3%] mb-[1.5%] items-center">

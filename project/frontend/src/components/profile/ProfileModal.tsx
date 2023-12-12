@@ -14,7 +14,7 @@ import { GameInviteButtons } from '../game/GameInviteButtons';
 import { TextBox } from './TextBox';
 import { CardType, HistoryCard } from './history/HistoryCard';
 
-interface ModalProfileProps {
+interface ProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
   targetId: string;
@@ -23,13 +23,11 @@ interface ModalProfileProps {
   setGameMode: React.Dispatch<SetStateAction<'normal' | 'item'>>;
 }
 
-export const ProfileModal: React.FC<ModalProfileProps> = ({
+export const ProfileModal: React.FC<ProfileModalProps> = ({
   isOpen,
   onClose,
   targetId,
   refetchPage,
-  openInvite,
-  setGameMode,
 }) => {
   const { api } = useContext(ApiContext);
   const router = useRouter();
@@ -141,11 +139,7 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
         </Button>
       );
     return (
-      <GameInviteButtons
-        content={content}
-        isModal={true}
-        friendId={targetId}
-      />
+      <GameInviteButtons content={content} isModal={true} friendId={targetId} />
     );
   }
 
@@ -177,7 +171,7 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
       await api.userFollowControllerFollowUser({ targetUser: targetId });
       console.log('Friend successfully');
       refetchUserInfo();
-      refetchPage ? refetchPage() : null;
+      refetchPage?.();
     } catch (error) {
       console.error('Error friend:', error);
     }
@@ -187,7 +181,7 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
       await api.userFollowControllerUnfollowUser({ targetUser: targetId });
       console.log('Unfriend successfully');
       refetchUserInfo();
-      refetchPage ? refetchPage() : null;
+      refetchPage?.();
     } catch (error) {
       console.error('Error unfriend:', error);
     }
@@ -197,7 +191,7 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
       await api.userFollowControllerUnBlockUser({ targetUser: targetId });
       console.log('UnBlock successfully');
       refetchUserInfo();
-      refetchPage ? refetchPage() : null;
+      refetchPage?.();
     } catch (error) {
       console.error('Error unblock:', error);
     }
@@ -207,14 +201,14 @@ export const ProfileModal: React.FC<ModalProfileProps> = ({
       await api.userFollowControllerBlockUser({ targetUser: targetId });
       console.log('Block successfully');
       refetchUserInfo();
-      refetchPage ? refetchPage() : null;
+      refetchPage?.();
     } catch (error) {
       console.error('Error block:', error);
     }
   }, [api, targetId, refetchUserInfo, refetchPage]);
 
   function renderHistory() {
-    if (historyData && historyData.records) {
+    if (historyData?.records) {
       const historyCards = historyData.records
         .slice(0, 3)
         .map((history: any) => (

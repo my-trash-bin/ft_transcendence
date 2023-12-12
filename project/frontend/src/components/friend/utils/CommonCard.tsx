@@ -1,8 +1,8 @@
+import useFriendInviteStore from '@/components/common/FriendInvite';
 import { LiveStatus } from '@/components/common/LiveStatus';
 import { ProfileModal } from '@/components/profile/ProfileModal';
 import { ReactNode, useState } from 'react';
 import FriendAvatar from './FriendAvatar';
-import useFriendInviteStore from '@/components/common/FriendInvite';
 
 interface CommonCardProps {
   readonly children: ReactNode;
@@ -19,12 +19,14 @@ export function CommonCard({
   id,
   refetch,
 }: CommonCardProps) {
-  const [gameMode, setGameModeLocal] = useState<'normal' | 'item'>('normal');
+  const [gameModeLocal, setGameModeLocal] = useState<'normal' | 'item'>(
+    'normal',
+  );
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const { setIsInviteOpen, setGameMode } = useFriendInviteStore();
 
   const toggleGameMode = () => {
-    const newMode = gameMode === 'normal' ? 'item' : 'normal';
+    const newMode = gameModeLocal === 'normal' ? 'item' : 'normal';
     setGameModeLocal(newMode);
     setGameMode(newMode);
   };
