@@ -689,64 +689,52 @@ export class EventsService {
     this.server.to(player1.id).emit('playerRole', 'player1');
     this.server.to(player2.id).emit('playerRole', 'player2');
 
-    // player 정보 알림, 게임 초기화
+    // 클라이언트가 준비되면 게임 초기화
     const player1Id = player1.data.userId as string;
     const player2Id = player2.data.userId as string;
 
-    // 클라이언트가 준비되면 게임 초기화
-    const onClientReady = (clientId: string) => {
-      if (clientId === player1.id || clientId === player2.id) {
-        this.emitPlayerInfo(player1Id, player2Id, roomName);
-        player1.off('clientReady', onClientReady);
-        player2.off('clientReady', onClientReady);
-      }
-    };
+    // Pong 인스턴스 생성
+    const pong = new Pong(
+      this.prismaService,
+      player1Id,
+      player2Id,
+      player1.id,
+      player2.id,
+      mode,
+      (data: {
+        player1Id: UserId;
+        player2Id: UserId;
+        player1Score: number;
+        player2Score: number;
+        isPlayer1win: boolean;
+      }) => {
+        this.endGame(data);
+        this.handleOffGame(data.player1Id);
+        this.handleOffGame(data.player2Id);
+      },
+    );
+    this.handleOnGame(idOf(player1Id), pong);
+    this.handleOnGame(idOf(player2Id), pong);
 
-    player1.on('clientReady', onClientReady);
-    player2.on('clientReady', onClientReady);
+    player1.on('clientReady', (gameState: GameState) => {
+      this.emitPlayerInfo(player1Id, player2Id, roomName);
+      player1.emit('gameUpdate', gameState);
+    });
 
-
-    // 게임 나가는 경우 처리
-    let gameCancelled = false;
-    const handleDisconnect = () => {
-      gameCancelled = true;
-      player1.leave(roomName);
-      player2.leave(roomName);
-      this.server.to(player1.id).emit('opponentDisconnected');
-      this.server.to(player2.id).emit('opponentDisconnected');
-    };
-
-    player1.once('leaveGameBoard', handleDisconnect);
-    player2.once('leaveGameBoard', handleDisconnect);
+    player2.on('clientReady', (gameState: GameState) => {
+      this.emitPlayerInfo(player1Id, player2Id, roomName);
+      player2.emit('gameUpdate', gameState);
+    });
 
     setTimeout(() => {
-      if (gameCancelled) return;
-      const pong = new Pong(
-        this.prismaService,
-        player1Id,
-        player2Id,
-        player1.id,
-        player2.id,
-        mode,
-        (data: {
-          player1Id: UserId;
-          player2Id: UserId;
-          player1Score: number;
-          player2Score: number;
-          isPlayer1win: boolean;
-        }) => {
-          this.endGame(data);
-          this.handleOffGame(data.player1Id);
-          this.handleOffGame(data.player2Id);
-        },
-      );
-      pong.onGameUpdate.on('gameState', (gameState: GameState) => {
-        player1.emit('gameUpdate', gameState);
-        player2.emit('gameUpdate', gameState);
-      });
-      this.handleOnGame(idOf(player1Id), pong);
-      this.handleOnGame(idOf(player2Id), pong);
+      console.log('Game starting...');
+      pong.startGameLoop(); // 가정: Pong 클래스에 게임을 시작하는 메서드가 있다고 가정
     }, 3000);
+
+    pong.onGameUpdate.on('gameState', (gameState: GameState) => {
+      player1.emit('gameUpdate', gameState);
+      player2.emit('gameUpdate', gameState);
+    });
   }
 
 

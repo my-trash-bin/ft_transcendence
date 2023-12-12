@@ -63,6 +63,11 @@ function Board() {
   };
   usePaddleMovement();
 
+  /* --------------------- 게임 업데이트 --------------------- */
+  useEffect(() => {
+    socket.emit('clientReady', socket.id);
+  }, [socket]);
+
   /* --------------------- 게임 중단 --------------------- */
   const handleDisconnect = useCallback(() => {
     console.log('opponentDisconnected');

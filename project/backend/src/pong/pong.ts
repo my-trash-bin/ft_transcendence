@@ -75,7 +75,6 @@ export class Pong {
     };
     this.gameInit();
     this.onGameUpdate.emit('gameState', this.gameState);
-    this.startGameLoop();
   }
 
   setGameStart() {
@@ -103,7 +102,7 @@ export class Pong {
     this.gameState.isItemMode = mode;
   }
 
-  private startGameLoop() {
+  startGameLoop() {
     console.log('startGameLoop');
     if (this.gameState.gameOver) {
       return;
