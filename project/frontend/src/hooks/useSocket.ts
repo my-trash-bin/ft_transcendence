@@ -8,6 +8,7 @@ export const useSocket = (
   type: any,
   setMessages: any,
   channelId: string | undefined,
+  targetName: string | undefined,
 ) => {
   useEffect(() => {
     const socket = getSocket();
@@ -16,11 +17,16 @@ export const useSocket = (
 
     if (type === messageType.DM) {
       socket.on(`directMessage`, (res) => {
-        setMessages((messages: any) => [...messages, res]);
+        if (
+          res.data.member.nickname === targetName ||
+          res.data.member.nickname === me?.nickname
+        )
+          setMessages((messages: any) => [...messages, res]);
       });
     } else {
       socket.on(`channelMessage`, (res) => {
-        setMessages((messages: any) => [...messages, res]);
+        if (res.data.channelId === channelId)
+          setMessages((messages: any) => [...messages, res]);
       });
       socket.on('leave', (res) => {
         if (res.data.member.id === me?.id) {

@@ -53,7 +53,7 @@ export function MessageContent({
   const messageEndRef = useRef<HTMLDivElement>(null);
 
   useInitMessage(type, setMessages, channelId, targetName);
-  useSocket(type, setMessages, channelId);
+  useSocket(type, setMessages, channelId, targetName);
 
   useEffect(() => {
     messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
