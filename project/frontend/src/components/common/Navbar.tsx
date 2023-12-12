@@ -9,6 +9,7 @@ import Logo from './Logo';
 import NavIcon from './NavIcon';
 import useMatching from './useMatching';
 import MatchingModal from '../game/MatchingModal';
+import useStore from '../pong/Update';
 
 const Navbar = () => {
   const [showInvitationExpiredToast, setShowInvitationExpiredToast] =
@@ -18,6 +19,19 @@ const Navbar = () => {
   const { isMatchingOpen, closeMatching } = useMatching();
   const socket = getGameSocket();
   const router = useRouter();
+  const { setIsPlayer1 } = useStore();
+  
+  useEffect(() => {
+    const handlePlayerRole = (role: string) => {
+      setIsPlayer1(role === 'player1');
+      console.log('playerRole', role);
+      socket.off('playerRole', handlePlayerRole);
+    };
+    socket.on('playerRole', handlePlayerRole);
+    return () => {
+      socket.off('playerRole', handlePlayerRole);
+    };
+  }, [socket, setIsPlayer1]);
 
   useEffect(() => {
     const handleGoPong = () => {

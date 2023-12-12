@@ -1,26 +1,16 @@
 import Image from 'next/image';
-import { useEffect } from 'react';
 import { ModalLayout } from '../channel/modals/ModalLayout';
 import useFriendInviteStore from '../common/FriendInvite';
-import useStore from '../pong/Update';
 import { getGameSocket } from '../pong/gameSocket';
 
 const InviteModal = () => {
   const socket = getGameSocket();
-  const { setIsPlayer1 } = useStore();
   const { isInviteOpen, gameMode, closeInvite } = useFriendInviteStore();
-
-  useEffect(() => {
-    const handlePlayerRole = (role: string) => {
-      setIsPlayer1(role === 'player1');
-      console.log('playerRole', role);
-      socket.off('playerRole', handlePlayerRole);
-    };
-    socket.on('playerRole', handlePlayerRole);
-    return () => {
-      socket.off('playerRole', handlePlayerRole);
-    };
-  }, [socket, setIsPlayer1]);
+  const handleModalClose = () => {
+    socket.emit('cancelInvite', gameMode);
+    console.log('cancelInvite');
+    closeInvite();
+  };
 
   const size = 'py-sm px-lg w-[498px] h-[308px]';
   const textCSS = 'text-dark-purple text-h2';
@@ -55,7 +45,7 @@ const InviteModal = () => {
             alt="loading"
           />
         </div>
-        <button className={`${buttonCSS} ${hoverCSS}`} onClick={closeInvite}>
+        <button className={`${buttonCSS} ${hoverCSS}`} onClick={handleModalClose}>
           닫기
         </button>
       </div>

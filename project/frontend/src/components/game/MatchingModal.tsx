@@ -10,18 +10,6 @@ const MatchingModal: React.FC = () => {
   const { setIsPlayer1 } = useStore();
   const { isMatchingOpen, gameMode, closeMatching } = useMatching();
 
-  useEffect(() => {
-    const handlePlayerRole = (role: string) => {
-      setIsPlayer1(role === 'player1');
-      console.log('playerRole', role);
-      socket.off('playerRole', handlePlayerRole);
-    };
-    socket.on('playerRole', handlePlayerRole);
-    return () => {
-      socket.off('playerRole', handlePlayerRole);
-    };
-  }, [socket, setIsPlayer1]);
-
   const handleModalClose = () => {
     socket.emit('cancelMatch', gameMode);
     console.log('cancelMatch');
