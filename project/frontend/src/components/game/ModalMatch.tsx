@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useEffect } from 'react';
 import Modal from 'react-modal';
@@ -47,7 +48,7 @@ const MatchingModal: React.FC<MatchingModalProps> = ({
   const positionCSS = 'mx-auto mt-[200px]';
 
   const hoverCSS = 'cursor-pointer';
-  const txtPos = 'text-center mt-[80px]';
+  const txtPos = 'text-center ';
   const buttonCSS =
     'bg-dark-purple-interactive rounded-md \
   text-light-gray-interactive text-h2 \
@@ -65,8 +66,14 @@ const MatchingModal: React.FC<MatchingModalProps> = ({
       <div
         className={`${textCSS} ${alignCSS} ${positionCSS} ${borderCSS} ${size} ${bgCSS}`}
       >
-        <div className={`${txtPos}`}>
-          <p>{content} 매칭이 진행중입니다.</p>
+        <div className="flex flex-row mt-[80px] items-center justify-center">
+          <p className={`${txtPos}`}>{content} 매칭이 진행중입니다.</p>
+          <Image
+            src="/images/octo-loading.gif"
+            width={50}
+            height={50}
+            alt="loading"
+          />
         </div>
         <button className={`${buttonCSS} ${hoverCSS}`} onClick={onClose}>
           닫기

@@ -1,13 +1,14 @@
-import React, { useEffect } from 'react';
+import Image from 'next/image';
+import { useEffect } from 'react';
 import { ModalLayout } from '../channel/modals/ModalLayout';
+import useFriendInviteStore from '../common/FriendInvite';
 import useStore from '../pong/Update';
 import { getGameSocket } from '../pong/gameSocket';
-import useFriendInviteStore from '../common/FriendInvite';
 
 const InviteModal = () => {
   const socket = getGameSocket();
   const { setIsPlayer1 } = useStore();
-  const {isInviteOpen, gameMode, closeInvite} = useFriendInviteStore();
+  const { isInviteOpen, gameMode, closeInvite } = useFriendInviteStore();
 
   useEffect(() => {
     const handlePlayerRole = (role: string) => {
@@ -43,8 +44,16 @@ const InviteModal = () => {
       height="300px"
     >
       <div className={`${textCSS} ${alignCSS} ${positionCSS} ${size} `}>
-        <div className={`${txtPos}`}>
-          <p>{content} 게임으로 친구를 초대하였습니다.</p>
+        <div className="flex flex-row mt-[80px] items-center justify-center">
+          <p className={`${txtPos}`}>
+            {content} 게임으로 친구를 초대하였습니다.
+          </p>
+          <Image
+            src="/images/octo-loading.gif"
+            width={50}
+            height={50}
+            alt="loading"
+          />
         </div>
         <button className={`${buttonCSS} ${hoverCSS}`} onClick={closeInvite}>
           닫기
