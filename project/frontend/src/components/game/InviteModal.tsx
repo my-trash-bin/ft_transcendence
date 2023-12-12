@@ -33,7 +33,7 @@ const InviteModal = () => {
       width="500px"
       height="300px"
     >
-      <div className={`${textCSS} ${alignCSS} ${positionCSS} ${size} `}>
+      <div className={`${textCSS} ${alignCSS} ${positionCSS} ${size} z-[20]`}>
         <div className="flex flex-row mt-[80px] items-center justify-center">
           <p className={`${txtPos}`}>
             {content} 게임으로 친구를 초대하였습니다.
@@ -45,7 +45,10 @@ const InviteModal = () => {
             alt="loading"
           />
         </div>
-        <button className={`${buttonCSS} ${hoverCSS}`} onClick={handleModalClose}>
+        <button
+          className={`${buttonCSS} ${hoverCSS}`}
+          onClick={handleModalClose}
+        >
           닫기
         </button>
       </div>
