@@ -15,20 +15,21 @@ const Navbar = () => {
     useState(false);
   const [showOfflineToast, setShowOfflineToast] = useState(false);
   const { isInviteOpen, closeInvite } = useFriendInviteStore();
-  const { isMatchingOpen } = useMatching();
+  const { isMatchingOpen, closeMatching } = useMatching();
   const socket = getGameSocket();
   const router = useRouter();
 
   useEffect(() => {
     const handleGoPong = () => {
       closeInvite();
+      closeMatching();
       router.push('/pong');
     };
     socket.on('GoPong', handleGoPong);
     return () => {
       socket.off('GoPong', handleGoPong);
     };
-  }, [closeInvite, socket, router]);
+  }, [closeInvite, closeMatching, socket, router]);
 
   useEffect(() => {
     const handleGameInvitationExpired = () => {
