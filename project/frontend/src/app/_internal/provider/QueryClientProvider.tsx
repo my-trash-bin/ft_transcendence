@@ -16,6 +16,7 @@ const queryClientConfig: QueryClientConfig = {
           error?.error?.statusCode === 401 ||
           error?.error?.statusCode === 403
         ) {
+          localStorage.removeItem('me');
           location.href = '/';
         }
         // throw error;
