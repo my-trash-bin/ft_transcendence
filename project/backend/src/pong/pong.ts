@@ -78,6 +78,10 @@ export class Pong {
     this.startGameLoop();
   }
 
+  setGameStart() {
+    this.gameState.gameStart = true;
+  }
+  
   setGameOver() {
     this.gameState.gameOver = true;
   }

@@ -114,7 +114,7 @@ export class EventsService {
   async handleDisconnect(client: Socket) {
     const userId = client.data.userId as string | undefined;
     if (userId) {
-      this.removeClientAtSocketMap(idOf(client.id), idOf(userId)); // 소켓의 접속 해제를 반영
+      this.removeClientAtSocketMap(idOf(client.id), idOf(userId));
     }
   }
 
@@ -678,11 +678,7 @@ export class EventsService {
     this.server.to(roomName).emit('player2Info', player2Info);
   }
 
-  private createGameRoom(
-    player1: Socket,
-    player2: Socket,
-    mode: boolean,
-  ): void {
+  private createGameRoom(player1: Socket, player2: Socket, mode: boolean): void {
     // 룸 생성 및 클라이언트 추가
     const roomName = uuidv4();
     player1.join(roomName);
@@ -693,9 +689,23 @@ export class EventsService {
     this.server.to(player1.id).emit('playerRole', 'player1');
     this.server.to(player2.id).emit('playerRole', 'player2');
 
+    let gameCancelled = false;
+
+    const handleDisconnect = () => {
+      gameCancelled = true;
+      player1.leave(roomName);
+      player2.leave(roomName);
+      this.server.to(player1.id).emit('opponentDisconnected');
+      this.server.to(player2.id).emit('opponentDisconnected');
+    };
+
+    player1.once('leaveGameBoard', handleDisconnect);
+    player2.once('leaveGameBoard', handleDisconnect);
+
     setTimeout(() => {
-      const player1Id = player1.data.userId as string; // string | undefined
-      const player2Id = player2.data.userId as string; // string | undefined
+      if (gameCancelled) return;
+      const player1Id = player1.data.userId as string;
+      const player2Id = player2.data.userId as string;
       const pong = new Pong(
         this.prismaService,
         player1Id,
@@ -724,6 +734,7 @@ export class EventsService {
       this.handleOnGame(idOf(player2Id), pong);
     }, 3000);
   }
+
 
   handlePaddleMove(client: UserSocket, directionIsUp: boolean) {
     const userId = client.data.userId as string | undefined;
@@ -781,16 +792,14 @@ export class EventsService {
 
   async finalizeGame(client: UserSocket) {
     const pong = this.pongMap.get(client.data.userId);
-
     if (pong === undefined) {
+      console.log('finalizeGame: pong이 없음');
       return;
     }
-
+    if (!pong.getGameState().gameStart) {
+      pong.setGameStart();
+    }
     pong.setGameOver();
-    if (pong.getGameState().gameStart) {
-      return;
-    }
-
     await this.storeGameStateToDB(pong.getGameState(), pong);
 
     // 상대방에게 연결 종료 알림
@@ -798,10 +807,8 @@ export class EventsService {
       client.id === pong.player1SocketId
         ? pong.player2SocketId
         : pong.player1SocketId;
-    this.server.to(opponentSocketId).emit('opponentDisconnected', {
-      userId: client.data.userId,
-      opponentId: opponentSocketId,
-    });
+    this.server.to(opponentSocketId).emit('opponentDisconnected');
+    console.log('opponentId', opponentSocketId);
 
     this.pongMap.delete(pong.player1Id);
     this.pongMap.delete(pong.player2Id);

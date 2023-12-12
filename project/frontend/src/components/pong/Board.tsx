@@ -60,9 +60,23 @@ function Board() {
   const handleImagesLoaded = () => {
     setImagesLoaded(true);
   };
-
   usePaddleMovement();
 
+  /* --------------------- 게임 중단 --------------------- */
+  const handleDisconnect = useCallback(() => {
+    console.log('opponentDisconnected');
+    router.push('/game');
+    useStore.setState({ gameOver: true });
+  }, [router]);
+
+  useEffect(() => {
+    socket.on('opponentDisconnected', handleDisconnect);
+    return () => {
+      socket.off('opponentDisconnected');
+    };
+  }, [socket, handleDisconnect]);
+
+  /* --------------------- 게임 업데이트 --------------------- */
   const handleGameUpdate = useCallback(
     (gameState: GameState) => {
       if (!gameState.gameStart) {
@@ -86,14 +100,20 @@ function Board() {
     };
   }, [socket, handleGameUpdate]);
 
+  /* --------------------- 게임 나가는 상황 추적 --------------------- */
+
   useEffect(() => {
     return () => {
+      console.log('leaveGameBoard');
       socket.emit('leaveGameBoard');
     };
   }, [socket]);
 
+  /* --------------------- 플레이어 정보 업데이트 --------------------- */
+
   const handlePlayerInfo = useCallback(
     (info: PlayerInfo, playerNumber: number) => {
+      console.log('playerInfo', info, playerNumber);
       if (
         playerNumber === 1 &&
         (player1Info.nickname !== info.nickname ||
@@ -112,9 +132,9 @@ function Board() {
   );
 
   useEffect(() => {
+    console.log('playerInfo', player1Info, player2Info);
     const handlePlayer1Info = (info: PlayerInfo) => handlePlayerInfo(info, 1);
     const handlePlayer2Info = (info: PlayerInfo) => handlePlayerInfo(info, 2);
-
     socket.on('player1Info', handlePlayer1Info);
     socket.on('player2Info', handlePlayer2Info);
 
@@ -123,6 +143,8 @@ function Board() {
       socket.off('player2Info', handlePlayer2Info);
     };
   }, [socket, handlePlayerInfo]);
+
+  /* --------------------- 아이템 이미지 로딩 --------------------- */
 
   useEffect(() => {
     if (isItemMode) {
