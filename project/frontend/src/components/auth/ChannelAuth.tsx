@@ -11,11 +11,15 @@ export default function withChannelAuth(Component: any) {
       const validateAndCheckParticipation = async () => {
         try {
           const res = await api.usersControllerMyProfile();
-          if (res.data.phase === 'register') window.location.href = '/sign-in';
-          else if (res.data.phase === 'complete')
-            window.location.href = '/friend';
-          else if (res.data.phase === '2fa') window.location.href = '/2fa';
-          localStorage.setItem('me', JSON.stringify(res.data.me));
+          if (res.data.phase === 'register') {
+            router.replace('/sign-in');
+          } else if (res.data.phase === 'complete') {
+            localStorage.setItem('me', JSON.stringify(res.data.me));
+            router.replace('/friend');
+          } else if (res.data.phase === '2fa') {
+            router.replace('/2fa');
+            console.log(`스토리지저장: ${res.data.me}`);
+          }
 
           const participationRes: any =
             await api.channelControllerIsParticipated(props.params.channelId);
@@ -24,11 +28,11 @@ export default function withChannelAuth(Component: any) {
           }
         } catch (e: any) {
           if (e?.error?.type === 'participant') {
-            router.replace('/channel'); // window.location.href = '/channel';
+            router.replace('/channel'); // router.replace('/channel';
           }
 
           if (e?.error?.statusCode === 401 || e?.error?.statusCode == 403)
-            router.replace('/'); // window.location.href = '/';
+            router.replace('/'); // router.replace('/';
         }
       };
       if (router) {

@@ -1,5 +1,5 @@
 'use client';
-import withAuth from '@/components/auth/Auth';
+import withAuth from '@/components/auth/withAuth';
 import { HistoryArticle } from '../../../components/profile/history/HistoryArticle';
 
 function HistoryPage() {
@@ -10,4 +10,4 @@ function HistoryPage() {
   );
 }
 
-export default withAuth(HistoryPage);
+export default withAuth(HistoryPage, 'history');

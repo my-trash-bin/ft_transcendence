@@ -1,5 +1,5 @@
 'use client';
-import withAuth from '@/components/auth/Auth';
+import withAuth from '@/components/auth/withAuth';
 import Navbar from '../../components/common/Navbar';
 import Pong from '../../components/pong/Board';
 
@@ -16,4 +16,4 @@ function FriendHome() {
   );
 }
 
-export default withAuth(FriendHome);
+export default withAuth(FriendHome, 'friend');

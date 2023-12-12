@@ -11,13 +11,16 @@ export default function withDmAuth(Component: any) {
       const validateAndCheckParticipation = async () => {
         try {
           const res = await api.usersControllerMyProfile();
-          localStorage.setItem('me', JSON.stringify(res.data.me));
 
-          if (res.data.phase === 'register') window.location.href = '/sign-in';
-          else if (res.data.phase === 'complete')
-            window.location.href = '/friend';
-          else if (res.data.phase === '2fa') window.location.href = '/2fa';
-
+          if (res.data.phase === 'register') {
+            router.replace('/sign-in');
+          } else if (res.data.phase === 'complete') {
+            console.log('스토리지 저장', res.data.me);
+            localStorage.setItem('me', JSON.stringify(res.data.me));
+            router.replace('/friend');
+          } else if (res.data.phase === '2fa') {
+            router.replace('/2fa');
+          }
           const canSend: any = await api.dmControllerCanSendDm(
             props.params.username,
           );

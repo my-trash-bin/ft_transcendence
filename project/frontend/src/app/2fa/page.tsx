@@ -1,6 +1,6 @@
 'use client';
 import { ApiContext } from '@/app/_internal/provider/ApiContext';
-import faAuth from '@/components/auth/2FaAuth';
+import withAuth from '@/components/auth/withAuth';
 import { Button } from '@/components/common/Button';
 import { useRouter } from 'next/navigation';
 import { useCallback, useContext, useState } from 'react';
@@ -69,4 +69,4 @@ function TwofactorPage() {
   }
 }
 
-export default faAuth(TwofactorPage);
+export default withAuth(TwofactorPage, '2fa');

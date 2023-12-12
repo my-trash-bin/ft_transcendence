@@ -1,5 +1,5 @@
 'use client';
-import withChannelAuth from '@/components/auth/ChannelAuth';
+import withAuth from '@/components/auth/withAuth';
 import { AllChannelList } from '@/components/channel/AllChannelList';
 import { ChannelInput } from '@/components/channel/ChannelInput';
 import { ChannleMessageBox } from '@/components/channel/ChannelMessageBox';
@@ -51,4 +51,4 @@ function ChannelHome({ params }: Readonly<{ params: { channelId: string } }>) {
   );
 }
 
-export default withChannelAuth(ChannelHome);
+export default withAuth(ChannelHome, 'root');

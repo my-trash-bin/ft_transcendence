@@ -1,8 +1,8 @@
 'use client';
-import withAuth from '@/components/auth/Auth';
-import { ProfileBox } from '../../components/profile/ProfileBox';
+import withAuth from '@/components/auth/withAuth';
 import { AchievementBox } from '../../components/profile/achievement/AchievementBox';
 import { HistoryBox } from '../../components/profile/history/HistoryBox';
+import { ProfileBox } from '../../components/profile/ProfileBox';
 
 function ProfilePage() {
   return (
@@ -18,4 +18,4 @@ function ProfilePage() {
   );
 }
 
-export default withAuth(ProfilePage);
+export default withAuth(ProfilePage, 'profile');
