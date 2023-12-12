@@ -29,6 +29,7 @@ const InviteModal = () => {
       closeModal={closeInvite}
       width="500px"
       height="300px"
+      zValue={30}
     >
       <div className={`${textCSS} ${alignCSS} ${positionCSS} ${size}`}>
         <div className={`flex flex-row gap-md`}>
