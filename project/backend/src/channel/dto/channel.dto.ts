@@ -69,6 +69,18 @@ export class ChannelDto {
   }
 }
 
+export const prismaChannelSelect = {
+  id: true,
+  title: true,
+  isPublic: true,
+  password: true,
+  createdAt: true,
+  lastActiveAt: true,
+  ownerId: true,
+  memberCount: true,
+  maximumMemberCount: true,
+};
+
 export const channelDtoSelect = {
   id: true,
   title: true,
