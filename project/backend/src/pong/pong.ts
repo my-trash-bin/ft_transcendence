@@ -81,7 +81,7 @@ export class Pong {
   setGameStart() {
     this.gameState.gameStart = true;
   }
-  
+
   setGameOver() {
     this.gameState.gameOver = true;
   }
@@ -249,7 +249,7 @@ export class Pong {
     this.checkGameOver();
   }
 
-  private gameInit() {
+  gameInit() {
     this.resetPosition();
     this.gameState.pongItem = { x: 0, y: 0, type: 0 };
   }

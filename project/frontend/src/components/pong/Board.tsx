@@ -53,6 +53,7 @@ function Board() {
     player2Info,
     setplayer1Info,
     setplayer2Info,
+    setGameScore,
   } = useStore();
   const socket = getGameSocket();
   const router = useRouter();
@@ -114,6 +115,7 @@ function Board() {
   const handlePlayerInfo = useCallback(
     (info: PlayerInfo, playerNumber: number) => {
       console.log('playerInfo', info, playerNumber);
+      setGameScore(0, 0);
       if (
         playerNumber === 1 &&
         (player1Info.nickname !== info.nickname ||
@@ -128,11 +130,10 @@ function Board() {
         setplayer2Info(info);
       }
     },
-    [player1Info, player2Info, setplayer1Info, setplayer2Info],
+    [player1Info, player2Info, setplayer1Info, setplayer2Info, setGameScore],
   );
 
   useEffect(() => {
-    console.log('playerInfo', player1Info, player2Info);
     const handlePlayer1Info = (info: PlayerInfo) => handlePlayerInfo(info, 1);
     const handlePlayer2Info = (info: PlayerInfo) => handlePlayerInfo(info, 2);
     socket.on('player1Info', handlePlayer1Info);
