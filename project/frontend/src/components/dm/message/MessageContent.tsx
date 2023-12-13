@@ -44,14 +44,13 @@ export function MessageContent({
   myNickname,
   targetName,
 }: Readonly<{
-  channelId?: string;
+  channelId: string;
   type: messageType;
   myNickname: string;
   targetName?: string;
 }>) {
   const [messages, setMessages] = useState<MessageContentInterface[]>([]);
   const messageEndRef = useRef<HTMLDivElement>(null);
-
   useInitMessage(type, setMessages, channelId, targetName);
   useSocket(type, setMessages, channelId, targetName);
 

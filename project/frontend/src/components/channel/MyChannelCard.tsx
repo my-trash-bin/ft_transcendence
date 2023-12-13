@@ -23,12 +23,18 @@ export function MyChannelCard({
         <div className="flex flex-col h-[100%] justify-between">
           <div className="flex flex-row justify-between items-center">
             <p className="text-h3 text-left">{channelName}</p>
-            {date ? <p className="text-[12px] text-right ">{dateView}</p> : ''}
+            {messageShortcut ? (
+              <p className="text-[12px] text-right ">{dateView}</p>
+            ) : (
+              ''
+            )}
           </div>
           <div className="flex flex-row justify-between items-center">
             {messageShortcut ? (
               <p className="text-[13px] text-left text-slate-500">
-                {messageShortcut}
+                {messageShortcut.length >= 30
+                  ? messageShortcut.slice(0, 30) + '...'
+                  : messageShortcut}
               </p>
             ) : (
               <p className="text-[13px] text-left text-slate-500">
