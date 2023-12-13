@@ -729,6 +729,7 @@ export class EventsService {
 
     let cancelGame = false;
 
+    // if a player leaves the game board, get panalty
     player1.on('leaveGameBoard', async () => {
       cancelGame = true;
       const gameState = pong.getGameState();
