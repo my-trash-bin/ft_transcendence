@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import usePaddleMovement from './KeyHandle';
 import useStore from './Update';
+import { motion, useAnimation } from 'framer-motion';
 import {
   BALL_SIZE,
   BOARD_HEIGHT,
@@ -62,6 +63,16 @@ function Board() {
     setImagesLoaded(true);
   };
   usePaddleMovement();
+
+  const ballControls = useAnimation();
+
+  useEffect(() => {
+    ballControls.start({
+      x: isPlayer1 ? BOARD_WIDTH - PADDLE_WIDTH - 10 - ball.x : ball.x,
+      y: ball.y,
+      transition: { duration: 0.067 } // approximately 1000/15 ms
+    });
+  }, [ball.x, ball.y, isPlayer1, ballControls]);
 
   /* --------------------- 게임 업데이트 --------------------- */
   useEffect(() => {
@@ -208,6 +219,7 @@ function Board() {
               top: `${pongItem.y}px`,
             }}
           >
+            {/* 아이템 */}
             <div
               className="absolute"
               style={{
@@ -229,8 +241,8 @@ function Board() {
           </div>
         )}
         {/* 공 */}
-        <div
-          className={`absolute rounded-full ${ballColor}`}
+        <motion.div
+          className={`absolute rounded-full ${ballColor} z-[10]`}
           style={{
             width: BALL_SIZE,
             height: BALL_SIZE,
@@ -239,8 +251,8 @@ function Board() {
               : `${ball.x}px`,
             top: `${ball.y}px`,
           }}
+          animate={ballControls}
         />
-
         {/*
           paddle type = 3 -> paddle height = SMALL_PADDLE_HEIGHT
           paddle type = 0 -> paddle height = PADDLE_HEIGHT
