@@ -938,11 +938,8 @@ export class EventsService {
 
     this.logger.verbose(`finalizeGame 성공: isPlayer1win is ${isPlayer1win}`);
 
-    // // 게임 상태를 데이터베이스에 저장
-    // await this.storeGameStateToDB(gameState, pong);
-
+    // 상대방에게 연결종료 알림
     const opponentSocketId = pong.player1SocketId === cliendId ? pong.player2SocketId : pong.player1SocketId;
-    // // 상대방에게 연결 종료 알림
     this.server.to(opponentSocketId).emit('opponentDisconnected');
     console.log('opponentId', opponentSocketId);
 
