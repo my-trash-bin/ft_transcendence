@@ -83,12 +83,20 @@ export class Pong {
   }
 
   setGameOver(isPlayer1win: boolean, byPlayerOut = false) {
-    if (byPlayerOut) {
-      if (isPlayer1win) {
-        this.gameState.score2 = -1;
-      } else {
-        this.gameState.score1 = -1;
-      }
+    // if (byPlayerOut) {
+    //   // -1로 변하는 로직은 삭제
+    //   if (isPlayer1win) {
+    //     this.gameState.score2 = -1;
+    //   } else {
+    //     this.gameState.score1 = -1;
+    //   }
+    // }
+    if (isPlayer1win) {
+      this.gameState.score1 = GAME_OVER;
+      // this.gameState.score2 = -1;
+    } else {
+      this.gameState.score2 = GAME_OVER;
+      // this.gameState.score1 = -1;
     }
     this.gameState.gameOver = true;
   }
