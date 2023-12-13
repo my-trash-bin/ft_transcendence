@@ -8,11 +8,11 @@ export const useDm = (username: string) => {
   const router = useRouter();
   const profileApi = api.usersControllerMyProfile;
   const dmApi = api.dmControllerCanSendDm;
-  const data = useQueries([
+  const data: any = useQueries([
     { queryKey: 'profile', queryFn: profileApi },
     { queryKey: 'dm', queryFn: () => dmApi(username), cacheTime: 0 },
   ]);
-  const isLoading = data.some((d) => d.isLoading);
+  const isLoading = data.some((d: any) => d.isLoading);
   useEffect(() => {
     if (!isLoading) {
       const me = data[0].data;
@@ -30,5 +30,6 @@ export const useDm = (username: string) => {
 
   return {
     isLoading: isLoading,
+    channelId: data[1].data?.data.channelId,
   };
 };

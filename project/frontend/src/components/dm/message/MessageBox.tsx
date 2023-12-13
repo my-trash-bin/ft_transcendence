@@ -1,12 +1,18 @@
+import { unwrap } from '@/api/unwrap';
+import { ApiContext } from '@/app/_internal/provider/ApiContext';
 import { useCallback, useContext } from 'react';
 import { useQuery } from 'react-query';
 import { MessageContent, messageType } from './MessageContent';
 import { MessageSendBox } from './MessageSendBox';
-import { ApiContext } from '@/app/_internal/provider/ApiContext';
 import { UserInfo } from './UserInfo';
-import { unwrap } from '@/api/unwrap';
 
-export function MessageBox({ username }: { readonly username: string }) {
+export function MessageBox({
+  username,
+  channelId,
+}: {
+  readonly username: string;
+  readonly channelId: string;
+}) {
   const { api } = useContext(ApiContext);
   const { isLoading, isError, data } = useQuery(
     'userByNickanme',
@@ -33,6 +39,7 @@ export function MessageBox({ username }: { readonly username: string }) {
         type={messageType.DM}
         myNickname={me?.nickname}
         targetName={username}
+        channelId={channelId}
       />
       <MessageSendBox type={messageType.DM} targetUserId={data.id} />
     </>

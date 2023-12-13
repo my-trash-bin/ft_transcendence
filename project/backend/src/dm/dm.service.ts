@@ -16,6 +16,7 @@ import {
   createPrismaErrorMessage,
   isUniqueConstraintError,
 } from '../util/prismaError';
+import { DmInfo } from './dto/dm-info';
 import { MessageWithMemberDto } from './dto/message-with-member';
 
 @Injectable()
@@ -242,16 +243,18 @@ export class DmService {
       const targetUser = await this.prisma.user.findUniqueOrThrow({
         where: { nickname },
       });
-      if (!targetUser) return false;
+      if (!targetUser) return new DmInfo(false, '');
       const blockList = await this.getBlockUserList(userId);
       const isBlock = blockList.find((el) => el.followeeId === targetUser.id);
-      if (isBlock) return false;
-      return true;
+      if (isBlock) return new DmInfo(false, '');
+      /// get channelId
+      const channelInfo = await this.findOrCraeteDmChannel(
+        idOf(userId),
+        idOf(targetUser.id),
+      );
+      return new DmInfo(true, channelInfo.data!.id);
     } catch (error) {
-      if (error instanceof PrismaClientKnownRequestError) {
-        return false;
-      }
-      return false;
+      return new DmInfo(false, '');
     }
   }
 

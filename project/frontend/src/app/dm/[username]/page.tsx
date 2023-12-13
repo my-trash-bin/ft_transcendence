@@ -8,9 +8,9 @@ import { getSocket } from '@/lib/Socket';
 import Image from 'next/image';
 import { useState } from 'react';
 
-const getRenderData = (params: any) => {
+const getRenderData = (params: any, channelId: string) => {
   if (params.hasOwnProperty('username'))
-    return <MessageBox username={params.username} />;
+    return <MessageBox username={params.username} channelId={channelId} />;
   else
     return (
       <Image
@@ -23,7 +23,10 @@ const getRenderData = (params: any) => {
     );
 };
 
-function DmPage({ params }: Readonly<{ params: { username: string } }>) {
+function DmPage({
+  params,
+  channelId,
+}: Readonly<{ params: { username: string }; channelId: string }>) {
   const [searchUsername, setSearchUsername] = useState('');
 
   const userSearchCallback = (searchUsername: string) => {
@@ -34,8 +37,7 @@ function DmPage({ params }: Readonly<{ params: { username: string } }>) {
     getSocket().emit('createDmChannel', {
       info: { nickname: params.username },
     });
-
-  const data = getRenderData(params);
+  const data = getRenderData(params, channelId);
 
   return (
     <>
