@@ -2,6 +2,7 @@ import { useRouter } from 'next/navigation';
 import React, { useCallback, useContext, useState } from 'react';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { getGameSocket } from '../pong/gameSocket';
+import useNewFriend from './NewFriendToast';
 
 interface NotiCardProps {
   content: string;
@@ -13,7 +14,7 @@ export const NotiCard: React.FC<NotiCardProps> = ({ content }) => {
     'bg-white border-3 border-default rounded-md hover:bg-light-background';
   const alignCSS = 'flex items-center relative p-sm';
   let obj = JSON.parse(content);
-  const [showFriendToast, setShowFriendToast] = useState(false);
+  const { openNewFriend, closeNewFriend, setFriendName } = useNewFriend();
   const [isHovered, setIsHovered] = useState(false);
   const { api } = useContext(ApiContext);
   const route = useRouter();
@@ -33,13 +34,14 @@ export const NotiCard: React.FC<NotiCardProps> = ({ content }) => {
   const requestFriend = useCallback(async () => {
     try {
       await api.userFollowControllerFollowUser({ targetUser: sourceId });
-      setShowFriendToast(true);
-      setTimeout(() => setShowFriendToast(false), 2000);
+      setFriendName(sourceName);
+      openNewFriend();
+      setTimeout(() => closeNewFriend(), 2000);
       console.log('Friend successfully');
     } catch (error) {
       console.error('Error friend:', error);
     }
-  }, [api, sourceId]);
+  }, [api, sourceId, openNewFriend, closeNewFriend, sourceName, setFriendName]);
 
   let notificationContent;
   let hoverContent;
@@ -77,11 +79,6 @@ export const NotiCard: React.FC<NotiCardProps> = ({ content }) => {
   }
   return (
     <>
-      {showFriendToast && (
-        <div className="fixed w-[300px] h-[100px] left-1/2 transform -translate-x-1/2 -translate-y-[430%] flex justify-center items-center bg-default border-3 border-dark-purple text-dark-purple rounded-md z-50">
-          {sourceName}님과 친구가 되었습니다!
-        </div>
-      )}
       <div
         className={`group ${sizeCSS} ${colorCSS} ${alignCSS}`}
         onMouseEnter={handleMouseEnter}

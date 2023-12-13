@@ -3,9 +3,10 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import InviteModal from '../game/InviteModal';
 import MatchingModal from '../game/MatchingModal';
+import useNewFriend from '../notification/NewFriendToast';
 import { Notification } from '../notification/Notification';
-import { getGameSocket } from '../pong/gameSocket';
 import useStore from '../pong/Update';
+import { getGameSocket } from '../pong/gameSocket';
 import useFriendInviteStore from './FriendInvite';
 import Logo from './Logo';
 import NavIcon from './NavIcon';
@@ -14,9 +15,10 @@ import useMatching from './useMatching';
 const Navbar = () => {
   const [showInvitationExpiredToast, setShowInvitationExpiredToast] =
     useState(false);
-  const [showOfflineToast, setShowOfflineToast] = useState(false);
-  const { isInviteOpen, closeInvite } = useFriendInviteStore();
+  const { isNewFriendOpen, friendName } = useNewFriend();
   const { isMatchingOpen, closeMatching } = useMatching();
+  const { isInviteOpen, closeInvite } = useFriendInviteStore();
+  const [showOfflineToast, setShowOfflineToast] = useState(false);
   const socket = getGameSocket();
   const router = useRouter();
   const { setIsPlayer1 } = useStore();
@@ -75,17 +77,16 @@ const Navbar = () => {
     };
   }, [socket, setShowInvitationExpiredToast, showInvitationExpiredToast]);
 
+  const css =
+    'fixed w-[300px] h-[100px] left-1/2 p-sm transform -translate-x-1/2 translate-y-1/2 flex justify-center items-center bg-default border-3 border-dark-purple text-dark-purple rounded-md z-50 text-h3';
   return (
     <>
       {showInvitationExpiredToast && (
-        <div className="fixed w-[300px] h-[100px] left-1/2 top-1/4 flex justify-center items-center bg-default border-3 border-dark-purple text-dark-purple rounded-md z-50 text-h2">
-          만료된 초대장이에요!
-        </div>
+        <div className={css}>만료된 초대장이에요!</div>
       )}
-      {showOfflineToast && (
-        <div className="fixed w-[300px] h-[100px] left-1/2 top-1/4 flex justify-center items-center bg-default border-3 border-dark-purple text-dark-purple rounded-md z-50 text-h3">
-          친구가 오프라인이에요 ㅠ
-        </div>
+      {showOfflineToast && <div className={css}>친구가 오프라인이에요 ㅠ</div>}
+      {isNewFriendOpen && (
+        <div className={css}>{friendName}님과 친구가 되었습니다!</div>
       )}
       {isInviteOpen && <InviteModal />}
       {isMatchingOpen && <MatchingModal />}
