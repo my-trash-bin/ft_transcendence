@@ -1,22 +1,16 @@
 import { messageType } from '@/components/dm/message/MessageContent';
 import { getSocket } from '@/lib/Socket';
+import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 const handleDirectMessage = (
   socket: any,
   setMessages: any,
-  targetName: string | undefined,
+  channelId: string,
 ) => {
-  const localMe = localStorage.getItem('me');
-  const me = localMe ? JSON.parse(localMe) : null;
-
   socket.on(`directMessage`, (res: any) => {
-    if (
-      res.data.member.nickname === targetName ||
-      res.data.member.nickname === me?.nickname
-    ) {
+    if (res.data.channelId === channelId)
       setMessages((messages: any) => [...messages, res]);
-    }
   });
 };
 
@@ -36,11 +30,12 @@ const handleLeave = (
   socket: any,
   setMessages: any,
   meId: string | undefined,
+  router: any,
 ) => {
   socket.on('leave', (res: any) => {
     if (res.data.member.id === meId) {
       alert('채널에서 나갔습니다.');
-      location.href = '/channel';
+      router.replace('/channel');
     } else {
       setMessages((messages: any) => [...messages, res]);
     }
@@ -55,9 +50,9 @@ const handleJoin = (socket: any, setMessages: any) => {
 
 const handleKickBanPromote = (
   socket: any,
-  setMessages: any,
   meId: string | undefined,
   channelId: string | undefined,
+  router: any,
 ) => {
   socket.on('kickBanPromote', (res: any) => {
     const targetUserId = res.data.targetUser.id;
@@ -65,7 +60,7 @@ const handleKickBanPromote = (
     if (res.data.actionType === 'KICK' || res.data.actionType === 'BANNED') {
       if (targetUserId === meId && channelId === res.data.channelId) {
         alert('채널에서 강퇴당했습니다.');
-        location.href = '/channel';
+        router.replace('/channel');
       }
     } else if (
       res.data.actionType === 'PROMOTE' &&
@@ -86,21 +81,21 @@ const handleKickBanPromote = (
 export const useSocket = (
   type: any,
   setMessages: any,
-  channelId: string | undefined,
+  channelId: string,
   targetName: string | undefined,
 ) => {
+  const router = useRouter();
   useEffect(() => {
     const socket = getSocket();
     const localMe = localStorage.getItem('me');
     const me = localMe ? JSON.parse(localMe) : null;
-
     if (type === messageType.DM) {
-      handleDirectMessage(socket, setMessages, targetName);
+      handleDirectMessage(socket, setMessages, channelId);
     } else {
       handleChannelMessage(socket, setMessages, channelId);
-      handleLeave(socket, setMessages, me?.id);
+      handleLeave(socket, setMessages, me?.id, router);
       handleJoin(socket, setMessages);
-      handleKickBanPromote(socket, setMessages, me?.id, channelId);
+      handleKickBanPromote(socket, me?.id, channelId, router);
     }
 
     return () => {
@@ -113,5 +108,5 @@ export const useSocket = (
         socket.off('kickBanPromote');
       }
     };
-  }, [type, setMessages, channelId, targetName]);
+  }, [type, setMessages, channelId, targetName, router]);
 };
