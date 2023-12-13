@@ -4,7 +4,7 @@ WORKDIR /usr/src/app
 
 COPY project/backend .
 
-RUN npm install && npm run build && npm install --omit=dev
+RUN npm install && npx prisma generate && npm run build && npm install --omit=dev
 
 EXPOSE 80 4242
 
