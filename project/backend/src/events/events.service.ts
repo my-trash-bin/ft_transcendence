@@ -19,6 +19,7 @@ import { UserDto } from '../users/dto/user.dto';
 import { UsersService } from '../users/users.service';
 import { DmChannelInfoType } from './event-response.dto';
 import { UserSocket } from './events.gateway';
+import { start } from 'repl';
 
 export enum ChannelRoomType {
   NORMAL = 'normal',
@@ -516,7 +517,7 @@ export class EventsService {
     channel.delete(userId.value); // 스스로 방에서 나가거나, 쫓겨나거나
   }
 
-  /**
+  /*
    * 게임 코드 영역
    */
 
@@ -652,7 +653,7 @@ export class EventsService {
           id: playerId,
         },
       });
-      console.log(prismaUser);
+      // console.log(prismaUser);
       return {
         nickname: prismaUser.nickname,
         avatarUrl: prismaUser.profileImageUrl ?? '',
@@ -728,27 +729,14 @@ export class EventsService {
     });
 
     let cancelGame = false;
-
-    player1.on('leaveGameBoard', async () => {
-      cancelGame = true;
-      const gameState = pong.getGameState();
-      gameState.score2 = 10;
-      player2.emit('gameUpdate', gameState);
-      await this.storeGameStateToDB(gameState, pong);
-    });
-
-    player2.on('leaveGameBoard', async () => {
-      cancelGame = true;
-      const gameState = pong.getGameState();
-      gameState.score1 = 10;
-      player1.emit('gameUpdate', gameState);
-      await this.storeGameStateToDB(gameState, pong);
-    });
-
+    let startGame = false;
     setTimeout(() => {
       if (cancelGame) {
         console.log('Game canceled');
         return;
+      }
+      if (!startGame) {
+        startGame = true;
       }
       console.log('Game starting...');
       pong.startGameLoop();
@@ -758,6 +746,33 @@ export class EventsService {
       player1.emit('gameUpdate', gameState);
       player2.emit('gameUpdate', gameState);
     });
+
+    player1.on('leaveGameBoard', async () => {
+      cancelGame = true;
+      const gameState = pong.getGameState();
+      if (!gameState.gameOver) {
+        gameState.score2 = 10;
+        player2.emit('gameUpdate', gameState);
+        if (!startGame) {
+          await this.storeGameStateToDB(gameState, pong);
+          startGame = true;
+        }
+      }
+    });
+
+    player2.on('leaveGameBoard', async () => {
+      cancelGame = true;
+      const gameState = pong.getGameState();
+      if (!gameState.gameOver) {
+        gameState.score1 = 10;
+        player1.emit('gameUpdate', gameState);
+        if (!startGame) {
+          await this.storeGameStateToDB(gameState, pong);
+          startGame = true;
+        }
+      }
+    });
+
   }
 
   handlePaddleMove(client: UserSocket, directionIsUp: boolean) {
@@ -806,7 +821,6 @@ export class EventsService {
         isPlayer1win: gameState.score1 > gameState.score2,
       });
       this.logger.log('Game state saved to DB');
-      console.log();
     } catch (error) {
       this.logger.error('Failed to save game state to DB:', error);
     }
@@ -822,19 +836,19 @@ export class EventsService {
       pong.setGameStart();
     }
 
-    // 게임 상태 업데이트: 나간 플레이어의 상대방 점수를 10점으로 설정
+    // 게임 상태 업데이트: 게임중에 나간 플레이어의 상대방 점수를 10점으로 설정
     const gameState = pong.getGameState();
     if (!gameState.gameOver) {
       if (client.id === pong.player1SocketId) {
         gameState.score2 = 10;
+        client.emit('gameUpdate', gameState);
       } else {
         gameState.score1 = 10;
+        client.emit('gameUpdate', gameState);
       }
       gameState.gameOver = true;
     }
-    
-    // 게임 상태를 데이터베이스에 저장
-    await this.storeGameStateToDB(gameState, pong);
+
     pong.setGameOver();
 
     // 상대방에게 연결 종료 알림
