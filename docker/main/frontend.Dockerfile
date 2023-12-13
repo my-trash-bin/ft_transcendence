@@ -14,7 +14,7 @@ WORKDIR /usr/src/app
 
 COPY project/frontend .
 
-RUN npm install && npm run build && npm install --omit=dev
+RUN npm install && npx prisma generate && npm run build && npm install --omit=dev
 
 EXPOSE 80
 
