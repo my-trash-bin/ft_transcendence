@@ -824,13 +824,15 @@ export class EventsService {
 
     // 게임 상태 업데이트: 나간 플레이어의 상대방 점수를 10점으로 설정
     const gameState = pong.getGameState();
-    if (client.id === pong.player1SocketId) {
-      gameState.score2 = 10;
-    } else {
-      gameState.score1 = 10;
+    if (!gameState.gameOver) {
+      if (client.id === pong.player1SocketId) {
+        gameState.score2 = 10;
+      } else {
+        gameState.score1 = 10;
+      }
+      gameState.gameOver = true;
     }
-    gameState.gameOver = true;
-
+    
     // 게임 상태를 데이터베이스에 저장
     await this.storeGameStateToDB(gameState, pong);
     pong.setGameOver();

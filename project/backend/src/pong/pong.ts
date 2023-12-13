@@ -84,6 +84,7 @@ export class Pong {
   setGameOver() {
     this.gameState.gameOver = true;
   }
+  
   private makeItemRandomPosition(): boolean {
     // item position = 200 ~ 600, 150 ~ 400
     const x = Math.floor(Math.random() * (600 - 150 + 1)) + 150;
