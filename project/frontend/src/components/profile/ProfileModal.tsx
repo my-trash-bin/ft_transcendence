@@ -263,7 +263,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
     }
 
     return (
-      <div className="p-xl flex flex-col gap-md z-[10]">
+      <div className="p-xl flex flex-col gap-md">
         <div className="flex felx-row gap-xl">
           <div className="flex flex-col items-center gap-md">
             <FriendAvatar imageUrl={userInfoData.imageUrl} size={80} />

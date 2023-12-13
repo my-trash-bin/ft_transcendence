@@ -7,6 +7,7 @@ type ModalLayoutProps = {
   height: string;
   closeModal: () => void;
   zValue?: number;
+  outFocus?: boolean;
 };
 
 export const ModalLayout = ({
@@ -16,20 +17,32 @@ export const ModalLayout = ({
   height,
   children,
   zValue,
+  outFocus = false,
 }: PropsWithChildren<ModalLayoutProps>) => {
-  const setZ = zValue ?? 20;
-
+  const myZ = zValue ?? 20;
+  const outZ = myZ - 5;
   const modalData = isOpen ? (
     <>
       <div
-        className="fixed inset-0 z-10 bg-[#f3f0f8] opacity-50"
-        onClick={closeModal}
+        style={{ zIndex: outZ }}
+        className={`fixed inset-0 bg-[#f3f0f8] opacity-50 ${
+          outFocus ? 'pointer-events-none' : ''
+        }`}
+        onClick={(e) => {
+          // console.log('hi');
+          e.stopPropagation();
+          e.preventDefault();
+          if (!outFocus) {
+            // console.log('bye');
+            closeModal();
+          }
+        }}
       />
       <div
         style={{
           width: width,
           height: height,
-          zIndex: setZ,
+          zIndex: myZ,
         }}
         className="fixed top-1/2 left-1/2 rounded-[5px] border-3 border-dark-purple transform -translate-x-1/2 -translate-y-1/2 bg-default"
       >
