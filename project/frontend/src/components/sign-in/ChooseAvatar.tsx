@@ -3,7 +3,7 @@
 import { ApiContext } from '@/app/_internal/provider/ApiContext';
 import { avatarToUrl } from '@/app/_internal/util/avatarToUrl';
 import Image from 'next/image';
-import { useContext, useEffect, useState } from 'react';
+import { ChangeEvent, useContext, useEffect, useState } from 'react';
 import { Button } from '../common/Button';
 import { SelectAvatar } from './SelectAvatar';
 
