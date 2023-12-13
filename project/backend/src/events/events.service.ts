@@ -729,18 +729,27 @@ export class EventsService {
 
     let cancelGame = false;
 
-    player1.on('leaveGameBoard', () => {
+    player1.on('leaveGameBoard', async () => {
       cancelGame = true;
+      const gameState = pong.getGameState();
+      gameState.score1 = 0;
+      gameState.score2 = 10;
+      player2.emit('gameUpdate', gameState);
+      await this.storeGameStateToDB(gameState, pong);
     });
 
-    player2.on('leaveGameBoard', () => {
+    player2.on('leaveGameBoard', async () => {
       cancelGame = true;
+      const gameState = pong.getGameState();
+      gameState.score1 = 10;
+      gameState.score2 = 0;
+      player1.emit('gameUpdate', gameState);
+      await this.storeGameStateToDB(gameState, pong);
     });
 
     setTimeout(() => {
       if (cancelGame) {
         console.log('Game canceled');
-        // todo : 게임 점수 페널티
         return;
       }
       console.log('Game starting...');
@@ -770,11 +779,9 @@ export class EventsService {
     }
 
     if (!inGame.getGameState().gameStart) {
-      return; // 정상적임
+      return;
     }
-
     const isPlayer1 = userId === inGame.player1Id;
-
     inGame.handlePaddleMove(directionIsUp, isPlayer1);
   }
 
