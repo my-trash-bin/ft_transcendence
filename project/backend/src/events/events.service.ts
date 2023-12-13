@@ -19,7 +19,6 @@ import { UserDto } from '../users/dto/user.dto';
 import { UsersService } from '../users/users.service';
 import { DmChannelInfoType } from './event-response.dto';
 import { UserSocket } from './events.gateway';
-import { start } from 'repl';
 
 export enum ChannelRoomType {
   NORMAL = 'normal',
@@ -28,8 +27,8 @@ export enum ChannelRoomType {
 
 type ChannelRoomTypeKey = string;
 type ChannelIdKey = string;
-type UserIdKey = string;
-type ClientIdKey = string;
+type UserIdKey = string; // 유저 아이디(uuid)
+type ClientIdKey = string; // 소켓아이디
 type ChannelRecordType = Record<ChannelIdKey, Set<UserIdKey>>;
 
 export enum EnumUserStatus {
@@ -52,10 +51,11 @@ export class EventsService {
   private channels!: Record<ChannelRoomTypeKey, ChannelRecordType>;
   private socketMap = new Map<UserIdKey, UserSocket[]>(); // 소켓맵은 이곳에서 초기화 상태
 
-  private pongMap = new Map<string, Pong>();
-  private activeInvitations = new Map<string, InvitationType>();
+  private pongMap = new Map<UserIdKey, Pong>();
+  private activeInvitations = new Map<UserIdKey, InvitationType>();
   private normalMatchQueue = new Set<Socket>();
   private itemMatchQueue = new Set<Socket>();
+  private readyUsers = new Map<UserIdKey, UserSocket>();
 
   constructor(
     private prismaService: PrismaService,
@@ -522,6 +522,33 @@ export class EventsService {
    */
 
   tryMatch(client: UserSocket, itemMode: boolean) {
+    const userId = client.data.userId as string | undefined;
+    if (!userId) {
+      this.logger.log(`$tryMatch 실패: no userId client ${client.id}`);
+      client.emit('GoPong', {
+        ok: false,
+        msg: 'userId가 없습니다.',
+        clientIds: [client.id],
+      });
+      return; // 방어 코드
+    }
+    if (this.pongMap.has(userId) || this.readyUsers.has(userId)) {
+      this.logger.log(
+        `tryMatch 실패: on게임 || on대기열 ${[
+          this.pongMap.has(userId),
+          this.readyUsers.has(userId),
+        ]}`,
+      );
+      client.emit('GoPong', {
+        ok: false,
+        msg: '게임중이거나 이미 대기열에 포함되어 있습니다.',
+        clientIds: [client.id],
+      });
+      return; // 이미 게임중이거나, 대기열에있음
+    }
+    this.logger.log(`tryMatch 등록: ${client.id}`);
+
+    this.readyUsers.set(userId, client);
     const q = itemMode ? this.itemMatchQueue : this.normalMatchQueue;
     q.add(client);
 
@@ -532,8 +559,6 @@ export class EventsService {
       const player1 = playersIterator.next().value;
       const player2 = playersIterator.next().value;
 
-      q.delete(player1);
-      q.delete(player2);
       this.createGameRoom(player1, player2, itemMode);
     }
   }
@@ -679,28 +704,41 @@ export class EventsService {
     this.server.to(roomName).emit('player2Info', player2Info);
   }
 
-  private createGameRoom(player1: Socket, player2: Socket, mode: boolean): void {
+  private createGameRoom(
+    player1: Socket,
+    player2: Socket,
+    mode: boolean,
+  ): void {
     // 룸 생성 및 클라이언트 추가
     const roomName = uuidv4();
     player1.join(roomName);
     player2.join(roomName);
-    this.server.to(roomName).emit('GoPong', { room: roomName });
-
-    // playerRole 알림
-    this.server.to(player1.id).emit('playerRole', 'player1');
-    this.server.to(player2.id).emit('playerRole', 'player2');
 
     // 클라이언트가 준비되면 게임 초기화
     const player1Id = player1.data.userId as string;
     const player2Id = player2.data.userId as string;
 
+    const player1SocketId = player1.id;
+    const player2SocketId = player2.id;
+
+    this.server.to(roomName).emit('GoPong', {
+      ok: true,
+      msg: '룸생성',
+      clientIds: [player1SocketId, player2SocketId],
+    });
+
+    // playerRole 알림
+    this.server.to(player1.id).emit('playerRole', 'player1');
+    this.server.to(player2.id).emit('playerRole', 'player2');
+
+    const q = mode ? this.itemMatchQueue : this.normalMatchQueue;
     // Pong 인스턴스 생성
     const pong = new Pong(
       this.prismaService,
       player1Id,
       player2Id,
-      player1.id,
-      player2.id,
+      player1SocketId,
+      player2SocketId,
       mode,
       (data: {
         player1Id: UserId;
@@ -715,8 +753,15 @@ export class EventsService {
       },
     );
 
+    // 1. 먼저 pongMap에 각각 set한다.
     this.handleOnGame(idOf(player1Id), pong);
     this.handleOnGame(idOf(player2Id), pong);
+
+    // 2. 게임에 참여하게 된 각 유저를 큐와 대기 유저 목록에서 제거한다.
+    q.delete(player1);
+    q.delete(player2);
+    this.readyUsers.delete(player1Id);
+    this.readyUsers.delete(player2Id);
 
     player1.on('clientReady', (gameState: GameState) => {
       this.emitPlayerInfo(player1Id, player2Id, roomName);
@@ -772,7 +817,6 @@ export class EventsService {
         }
       }
     });
-
   }
 
   handlePaddleMove(client: UserSocket, directionIsUp: boolean) {
@@ -826,41 +870,72 @@ export class EventsService {
     }
   }
 
+  async removeClientFromQueueOrInvitationOrGame(client: UserSocket) {
+    const userId = client.data.userId as string;
+    const clientId = client.id;
+    const readyUserClient = this.readyUsers.get(userId);
+    const pongGame = this.pongMap.get(userId);
+    const invitation = this.activeInvitations.get(userId);
+
+    this.logger.verbose(`사라져라.... ${client.data.userId}`);
+    this.logger.verbose(`readyUserClient ${readyUserClient}`);
+    this.logger.verbose(`pongGame ${pongGame}`);
+    this.logger.verbose(`invitation ${invitation}`);
+
+    if (readyUserClient?.id === clientId) {
+      // 대기열에서 내보내기
+      const removed1 = this.itemMatchQueue.delete(readyUserClient);
+      const removed2 = this.normalMatchQueue.delete(readyUserClient);
+      this.readyUsers.delete(userId);
+      this.logger.verbose(`대기열에서 내보니기 성공`);
+    } else if (invitation?.inviterSocket?.id === clientId) {
+      // 초대장 끝내기
+      this.logger.verbose(`초대장 끝내야함`);
+    } else if (
+      [pongGame?.player1SocketId, pongGame?.player2SocketId].includes(clientId)
+    ) {
+      await this.finalizeGame(client);
+    }
+  }
+
   async finalizeGame(client: UserSocket) {
+    // 1. leaveGameBoard 수신시
+    // 2. handleDisconnect 이벤트시
+    // client의 패배로 결정
+    const userId = client.data.userId as string;
+    const cliendId = client.id;
     const pong = this.pongMap.get(client.data.userId);
-    if (pong === undefined) {
-      console.log('finalizeGame: pong이 없음');
-      return;
+
+    if (
+      pong === undefined ||
+      ![pong.player1SocketId, pong.player2SocketId].includes(cliendId)
+    ) {
+      return; // 해당 소켓이 진행중이던 게임 없음
     }
+
+    // const [meSocketId, opponentSocketId] =
+    //   pong.player1Id === userId
+    //     ? [pong.player1SocketId, pong.player2SocketId]
+    //     : [pong.player2SocketId, pong.player1SocketId];
+
     if (!pong.getGameState().gameStart) {
-      pong.setGameStart();
+      pong.setGameStart(); // 스타트 상태로 강제 전환인듯
     }
 
-    // 게임 상태 업데이트: 게임중에 나간 플레이어의 상대방 점수를 10점으로 설정
-    const gameState = pong.getGameState();
-    if (!gameState.gameOver) {
-      if (client.id === pong.player1SocketId) {
-        gameState.score2 = 10;
-        client.emit('gameUpdate', gameState);
-      } else {
-        gameState.score1 = 10;
-        client.emit('gameUpdate', gameState);
-      }
-      gameState.gameOver = true;
-    }
+    const isPlayer1win = userId !== pong.player1Id;
+    pong.setGameOver(isPlayer1win, true);
 
-    pong.setGameOver();
+    this.logger.verbose(`finalizeGame 성공: isPlayer1win is ${isPlayer1win}`);
 
-    // 상대방에게 연결 종료 알림
-    const opponentSocketId =
-      client.id === pong.player1SocketId
-        ? pong.player2SocketId
-        : pong.player1SocketId;
-    this.server.to(opponentSocketId).emit('opponentDisconnected');
-    console.log('opponentId', opponentSocketId);
+    // // 게임 상태를 데이터베이스에 저장
+    // await this.storeGameStateToDB(gameState, pong);
 
-    this.pongMap.delete(pong.player1Id);
-    this.pongMap.delete(pong.player2Id);
+    // // 상대방에게 연결 종료 알림
+    // this.server.to(opponentSocketId).emit('opponentDisconnected');
+    // console.log('opponentId', opponentSocketId);
+
+    // this.pongMap.delete(pong.player1Id);
+    // this.pongMap.delete(pong.player2Id);
   }
 
   async endGame(data: {

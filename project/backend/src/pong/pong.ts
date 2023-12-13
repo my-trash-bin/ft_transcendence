@@ -36,6 +36,7 @@ export class Pong {
 
   private gameState: GameState;
   private player1Won: boolean;
+  private counter = 0;
   constructor(
     private readonly prisma: PrismaService,
     public readonly player1Id: string,
@@ -81,7 +82,14 @@ export class Pong {
     this.gameState.gameStart = true;
   }
 
-  setGameOver() {
+  setGameOver(isPlayer1win: boolean, byPlayerOut = false) {
+    if (byPlayerOut) {
+      if (isPlayer1win) {
+        this.gameState.score2 = -1;
+      } else {
+        this.gameState.score1 = -1;
+      }
+    }
     this.gameState.gameOver = true;
   }
   
@@ -99,17 +107,11 @@ export class Pong {
     return false;
   }
 
-  setIsItemMode(mode: boolean) {
-    this.gameState.isItemMode = mode;
-  }
-
   startGameLoop() {
     console.log('startGameLoop');
     if (this.gameState.gameOver) {
       return;
     }
-
-    this.setIsItemMode(this.IsItemMode);
 
     const interval = setInterval(async () => {
       if (this.updateGameLogic()) {
@@ -119,7 +121,7 @@ export class Pong {
           player2Id: idOf(this.player2Id),
           player1Score: this.gameState.score1,
           player2Score: this.gameState.score2,
-          isPlayer1win: this.gameState.score1 > this.gameState.score2,
+          isPlayer1win: this.gameState.score1 >= GAME_OVER,
         });
       }
     }, 1000 / 60);
@@ -162,24 +164,20 @@ export class Pong {
     }
   }
 
-  private counter = 0;
-
   private updateGameLogic(): boolean {
     // 공의 위치 업데이트
     this.moveBall();
 
+    // 경계 체크 및 처리 => updateScore && resetPosition && checkGameOver
+    this.checkBoundaries();
+
     // 아이템 충돌 체크
     this.checkItemCollision();
-
-    // 경계 체크 및 처리
-    this.checkBoundaries();
 
     // 패들 충돌 처리
     this.checkPaddleCollisions();
 
-    // 게임 업데이트
-    this.onGameUpdate.emit('gameState', this.gameState);
-
+    // 아이템 생성
     this.counter++;
     if (this.IsItemMode) {
       // item
@@ -187,6 +185,9 @@ export class Pong {
         this.makeItemRandomPosition();
       }
     }
+
+    // 게임 업데이트
+    this.onGameUpdate.emit('gameState', this.gameState);
 
     return this.gameState.gameOver;
   }
@@ -209,26 +210,13 @@ export class Pong {
     }
   }
 
-  private doubleScore() {
-    if (this.gameState.ball.x < 4) {
-      this.gameState.score2 += 2;
-      this.gameState.paddle1.type = 0;
-    } else {
-      this.gameState.score1 += 2;
-      this.gameState.paddle2.type = 0;
-    }
-  }
-
   private updateScore() {
-    if (this.gameState.ball.type === 2) {
-      this.doubleScore();
-      return;
-    }
+    const plusScore = this.gameState.ball.type === 2 ? 2 : 1;
     if (this.gameState.ball.x < 4) {
-      this.gameState.score2++;
+      this.gameState.score2 += plusScore;
       this.gameState.paddle1.type = 0;
     } else {
-      this.gameState.score1++;
+      this.gameState.score1 += plusScore;
       this.gameState.paddle2.type = 0;
     }
   }
@@ -270,16 +258,10 @@ export class Pong {
   private checkGameOver() {
     if (
       !this.gameState.gameOver &&
-      (this.gameState.score1 >= GAME_OVER || this.gameState.score2 >= GAME_OVER)
+      Math.max(this.gameState.score1, this.gameState.score2) >= GAME_OVER
     ) {
-      if (this.gameState.score1 >= GAME_OVER) {
-        this.gameState.score1 = GAME_OVER;
-      }
-      if (this.gameState.score2 >= GAME_OVER) {
-        this.gameState.score2 = GAME_OVER;
-      }
-      this.gameState.gameOver = true;
-      this.player1Won = this.gameState.score1 === GAME_OVER;
+      const isPlayer1win = this.gameState.score1 >= GAME_OVER;
+      this.setGameOver(isPlayer1win);
       this.gameState.pongItem = { x: 0, y: 0, type: 0 };
       this.onGameUpdate.emit('gameState', this.gameState);
     }
