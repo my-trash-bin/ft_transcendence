@@ -30,6 +30,7 @@ const InviteModal = () => {
       width="500px"
       height="300px"
       zValue={30}
+      outFocus={true}
     >
       <div className={`${textCSS} ${alignCSS} ${positionCSS} ${size}`}>
         <div className={`flex flex-row gap-md`}>

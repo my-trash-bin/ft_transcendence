@@ -32,7 +32,7 @@ export function LiveStatus({ targetId }: { targetId: string }) {
 
   const handleStatus = useCallback(
     (data: { status: string; userId: string }) => {
-      console.log('status', data.status, 'userId', data.userId);
+      // console.log('status', data.status, 'userId', data.userId);
       if (targetId === data.userId && isValidStatus(data.status)) {
         setActive(data.status as EnumUserStatus);
       }
