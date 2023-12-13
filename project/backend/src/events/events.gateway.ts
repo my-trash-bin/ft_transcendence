@@ -85,6 +85,8 @@ export class EventsGateway
       this.logger.error(`핸드쉐이크 실패: client.id ${client.id}`);
       client.emit(GateWayEvents.Exception, { msg });
       client.disconnect();
+    } finally {
+      this.eventsService.debugData();
     }
   }
 
@@ -109,7 +111,7 @@ export class EventsGateway
     @MessageBody() data: UserStatusDto,
   ) {
     const { userId } = data;
-    this.logger.debug(`userStatusRequest: ${userId}`);
+    // this.logger.debug(`userStatusRequest: ${userId}`);
     this.eventsService.handleUserStatusRequest(client, idOf(userId));
   }
 

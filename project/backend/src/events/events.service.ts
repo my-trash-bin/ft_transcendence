@@ -520,7 +520,6 @@ export class EventsService {
   /*
    * 게임 코드 영역
    */
-
   tryMatch(client: UserSocket, itemMode: boolean) {
     const userId = client.data.userId as string | undefined;
     if (!userId) {
@@ -638,9 +637,22 @@ export class EventsService {
     }
   }
 
+  // 매칭을 취소하거나, 게임에 들어갔을때, 큐에서 꺼내는 동작을 추상화한다.
+  removeFromQueue(clients: UserSocket[], itemMode?: boolean) {
+    const qs =
+      itemMode === undefined
+        ? [this.itemMatchQueue, this.normalMatchQueue]
+        : itemMode === true
+        ? [this.itemMatchQueue]
+        : [this.normalMatchQueue];
+    clients.forEach((client) => {
+      qs.forEach((q) => q.delete(client));
+      this.readyUsers.delete(client.data.userId as string);
+    });
+  }
+
   handleCancelMatch(client: UserSocket, itemMode: boolean) {
-    const q = itemMode ? this.itemMatchQueue : this.normalMatchQueue;
-    q.delete(client);
+    this.removeFromQueue([client], itemMode);
   }
 
   handleAcceptMatch(
@@ -758,10 +770,7 @@ export class EventsService {
     this.handleOnGame(idOf(player2Id), pong);
 
     // 2. 게임에 참여하게 된 각 유저를 큐와 대기 유저 목록에서 제거한다.
-    q.delete(player1);
-    q.delete(player2);
-    this.readyUsers.delete(player1Id);
-    this.readyUsers.delete(player2Id);
+    this.removeFromQueue([player1, player2], mode);
 
     player1.on('clientReady', (gameState: GameState) => {
       this.emitPlayerInfo(player1Id, player2Id, roomName);
@@ -884,9 +893,7 @@ export class EventsService {
 
     if (readyUserClient?.id === clientId) {
       // 대기열에서 내보내기
-      const removed1 = this.itemMatchQueue.delete(readyUserClient);
-      const removed2 = this.normalMatchQueue.delete(readyUserClient);
-      this.readyUsers.delete(userId);
+      this.removeFromQueue([readyUserClient]);
       this.logger.verbose(`대기열에서 내보니기 성공`);
     } else if (invitation?.inviterSocket?.id === clientId) {
       // 초대장 끝내기
@@ -959,5 +966,14 @@ export class EventsService {
       status: this.getUserStatus(targetUserId),
       userId: targetUserId.value,
     });
+  }
+
+  debugData() {
+    this.logger.error('-------------tryMatch 디버깅---------');
+    this.logger.error('pongMap');
+    this.logger.verbose([...this.pongMap.keys()]);
+    this.logger.error('readyUsers');
+    this.logger.verbose([...this.readyUsers.keys()]);
+    this.logger.error('=====================================');
   }
 }
