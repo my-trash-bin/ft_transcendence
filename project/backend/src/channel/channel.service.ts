@@ -14,21 +14,21 @@ import { PrismaService } from '../base/prisma.service';
 import { ChannelId, UserId } from '../common/Id';
 import { ServiceError } from '../common/ServiceError';
 import {
+  ServiceResponse,
   newServiceFailPrismaUnKnownResponse,
   newServiceFailResponse,
   newServiceFailUnhandledResponse,
   newServiceOkResponse,
-  ServiceResponse,
 } from '../common/ServiceResponse';
 import { DmService } from '../dm/dm.service';
 import { MessageWithMemberDto } from '../dm/dto/message-with-member';
 import { UserDto, userDtoSelect } from '../users/dto/user.dto';
 import {
-  createPrismaErrorMessage,
   IsForeignKeyConstraintFailError,
+  IsRecordToUpdateNotFoundError,
+  createPrismaErrorMessage,
   isPrismaUnknownError,
   isRecordNotFoundError,
-  IsRecordToUpdateNotFoundError,
   isUniqueConstraintError,
 } from '../util/prismaError';
 import { ChangeMemberStatusResultDto } from './dto/change-member-status-result.dto';
@@ -964,11 +964,11 @@ export class ChannelService {
   }
 
   private getMutedDateTime() {
-    const THREE_MINUTE = 3;
+    const ONE_MINUTE = 1;
     const SECONDS_IN_MINUTES = 60;
     const MILLI_SECONDS_IN_SECONDS = 1000;
     return new Date(
-      Date.now() + THREE_MINUTE * SECONDS_IN_MINUTES * MILLI_SECONDS_IN_SECONDS,
+      Date.now() + ONE_MINUTE * SECONDS_IN_MINUTES * MILLI_SECONDS_IN_SECONDS,
     );
   }
 

@@ -80,7 +80,7 @@ export function OtherChat({
             ''
           )}
           <p
-            className={`p-[2%] text-center text-white inline-block max-w-[35%] rounded-[20px]
+            className={`p-[2%] text-left text-white inline-block max-w-[35%] rounded-[20px]
                 break-words bg-chat-color1 self-start min-w-[10%]`}
           >
             {message}
