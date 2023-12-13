@@ -114,7 +114,7 @@ export class EventsService {
   async handleDisconnect(client: Socket) {
     const userId = client.data.userId as string | undefined;
     if (userId) {
-      this.removeClientAtSocketMap(idOf(client.id), idOf(userId)); // 소켓의 접속 해제를 반영
+      this.removeClientAtSocketMap(idOf(client.id), idOf(userId));
     }
   }
 
@@ -678,11 +678,7 @@ export class EventsService {
     this.server.to(roomName).emit('player2Info', player2Info);
   }
 
-  private createGameRoom(
-    player1: Socket,
-    player2: Socket,
-    mode: boolean,
-  ): void {
+  private createGameRoom(player1: Socket, player2: Socket, mode: boolean): void {
     // 룸 생성 및 클라이언트 추가
     const roomName = uuidv4();
     player1.join(roomName);
@@ -693,36 +689,68 @@ export class EventsService {
     this.server.to(player1.id).emit('playerRole', 'player1');
     this.server.to(player2.id).emit('playerRole', 'player2');
 
-    setTimeout(() => {
-      const player1Id = player1.data.userId as string; // string | undefined
-      const player2Id = player2.data.userId as string; // string | undefined
-      const pong = new Pong(
-        this.prismaService,
-        player1Id,
-        player2Id,
-        player1.id,
-        player2.id,
-        mode,
-        (data: {
-          player1Id: UserId;
-          player2Id: UserId;
-          player1Score: number;
-          player2Score: number;
-          isPlayer1win: boolean;
-        }) => {
-          this.endGame(data);
-          this.handleOffGame(data.player1Id);
-          this.handleOffGame(data.player2Id);
-        },
-      );
+    // 클라이언트가 준비되면 게임 초기화
+    const player1Id = player1.data.userId as string;
+    const player2Id = player2.data.userId as string;
+
+    // Pong 인스턴스 생성
+    const pong = new Pong(
+      this.prismaService,
+      player1Id,
+      player2Id,
+      player1.id,
+      player2.id,
+      mode,
+      (data: {
+        player1Id: UserId;
+        player2Id: UserId;
+        player1Score: number;
+        player2Score: number;
+        isPlayer1win: boolean;
+      }) => {
+        this.endGame(data);
+        this.handleOffGame(data.player1Id);
+        this.handleOffGame(data.player2Id);
+      },
+    );
+
+    this.handleOnGame(idOf(player1Id), pong);
+    this.handleOnGame(idOf(player2Id), pong);
+
+    player1.on('clientReady', (gameState: GameState) => {
       this.emitPlayerInfo(player1Id, player2Id, roomName);
-      pong.onGameUpdate.on('gameState', (gameState: GameState) => {
-        player1.emit('gameUpdate', gameState);
-        player2.emit('gameUpdate', gameState);
-      });
-      this.handleOnGame(idOf(player1Id), pong);
-      this.handleOnGame(idOf(player2Id), pong);
+      player1.emit('gameUpdate', gameState);
+    });
+
+    player2.on('clientReady', (gameState: GameState) => {
+      this.emitPlayerInfo(player1Id, player2Id, roomName);
+      player2.emit('gameUpdate', gameState);
+    });
+
+    let cancelGame = false;
+
+    player1.on('leaveGameBoard', () => {
+      cancelGame = true;
+    });
+
+    player2.on('leaveGameBoard', () => {
+      cancelGame = true;
+    });
+
+    setTimeout(() => {
+      if (cancelGame) {
+        console.log('Game canceled');
+        // todo : 게임 점수 페널티
+        return;
+      }
+      console.log('Game starting...');
+      pong.startGameLoop();
     }, 3000);
+
+    pong.onGameUpdate.on('gameState', (gameState: GameState) => {
+      player1.emit('gameUpdate', gameState);
+      player2.emit('gameUpdate', gameState);
+    });
   }
 
   handlePaddleMove(client: UserSocket, directionIsUp: boolean) {
@@ -781,27 +809,34 @@ export class EventsService {
 
   async finalizeGame(client: UserSocket) {
     const pong = this.pongMap.get(client.data.userId);
-
     if (pong === undefined) {
+      console.log('finalizeGame: pong이 없음');
       return;
     }
+    if (!pong.getGameState().gameStart) {
+      pong.setGameStart();
+    }
 
+    // 게임 상태 업데이트: 나간 플레이어의 상대방 점수를 10점으로 설정
+    const gameState = pong.getGameState();
+    if (client.id === pong.player1SocketId) {
+      gameState.score2 = 10;
+    } else {
+      gameState.score1 = 10;
+    }
+    gameState.gameOver = true;
+
+    // 게임 상태를 데이터베이스에 저장
+    await this.storeGameStateToDB(gameState, pong);
     pong.setGameOver();
-    if (pong.getGameState().gameStart) {
-      return;
-    }
-
-    await this.storeGameStateToDB(pong.getGameState(), pong);
 
     // 상대방에게 연결 종료 알림
     const opponentSocketId =
       client.id === pong.player1SocketId
         ? pong.player2SocketId
         : pong.player1SocketId;
-    this.server.to(opponentSocketId).emit('opponentDisconnected', {
-      userId: client.data.userId,
-      opponentId: opponentSocketId,
-    });
+    this.server.to(opponentSocketId).emit('opponentDisconnected');
+    console.log('opponentId', opponentSocketId);
 
     this.pongMap.delete(pong.player1Id);
     this.pongMap.delete(pong.player2Id);

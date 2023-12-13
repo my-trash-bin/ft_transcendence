@@ -64,12 +64,18 @@ export class ChannelRelationDto {
   })
   memberType!: ChannelMemberType;
 
+  @ApiProperty({
+    example: '안녕 나는 메세지라고해!',
+    description: '채널 메시지 1개',
+  })
+  message!: string;
+
   constructor({
     channel,
     mutedUntil,
     memberType,
   }: {
-    channel: Channel;
+    channel: Channel & { messages: { messageJson: string }[] };
     mutedUntil: Date;
     memberType: ChannelMemberType;
   }) {
@@ -83,5 +89,6 @@ export class ChannelRelationDto {
     this.maximumMemberCount = channel.maximumMemberCount;
     this.mutedUntil = mutedUntil;
     this.memberType = memberType;
+    this.message = channel.messages[0]?.messageJson ?? '';
   }
 }

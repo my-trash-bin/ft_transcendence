@@ -75,7 +75,10 @@ export class Pong {
     };
     this.gameInit();
     this.onGameUpdate.emit('gameState', this.gameState);
-    this.startGameLoop();
+  }
+
+  setGameStart() {
+    this.gameState.gameStart = true;
   }
 
   setGameOver() {
@@ -99,7 +102,7 @@ export class Pong {
     this.gameState.isItemMode = mode;
   }
 
-  private startGameLoop() {
+  startGameLoop() {
     console.log('startGameLoop');
     if (this.gameState.gameOver) {
       return;
@@ -245,7 +248,7 @@ export class Pong {
     this.checkGameOver();
   }
 
-  private gameInit() {
+  gameInit() {
     this.resetPosition();
     this.gameState.pongItem = { x: 0, y: 0, type: 0 };
   }
@@ -352,7 +355,7 @@ export class Pong {
     const paddleStrike =
       this.gameState.paddle1.type === 3 ? SMALL_PADDLE_STRIKE : PADDLE_STRIKE;
     const deltaY = Math.abs(ballY - paddleCenter);
-    if (this.gameState.pongItem.type === 1) {
+    if (this.gameState.ball.type === 1) {
       return deltaY < paddleHeight / paddleStrike
         ? SMASH_SPEED * 1.2
         : DEFAULT_SPEED;

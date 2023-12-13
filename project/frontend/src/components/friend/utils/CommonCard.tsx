@@ -1,5 +1,5 @@
+import useFriendInviteStore from '@/components/common/FriendInvite';
 import { LiveStatus } from '@/components/common/LiveStatus';
-import FriendInvite from '@/components/game/InviteModal';
 import { ProfileModal } from '@/components/profile/ProfileModal';
 import { ReactNode, useState } from 'react';
 import FriendAvatar from './FriendAvatar';
@@ -19,19 +19,23 @@ export function CommonCard({
   id,
   refetch,
 }: CommonCardProps) {
+  const [gameModeLocal, setGameModeLocal] = useState<'normal' | 'item'>(
+    'normal',
+  );
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isInviteOpen, setIsInviteOpen] = useState(false);
-  const [gameMode, setGameMode] = useState<'normal' | 'item'>('normal');
+  const { setIsInviteOpen, setGameMode } = useFriendInviteStore();
+
+  const toggleGameMode = () => {
+    const newMode = gameModeLocal === 'normal' ? 'item' : 'normal';
+    setGameModeLocal(newMode);
+    setGameMode(newMode);
+  };
 
   const handleProfileClose = () => {
     setIsProfileOpen(false);
   };
   const handleProfileOpen = () => {
     setIsProfileOpen(true);
-  };
-
-  const handleInviteClose = () => {
-    setIsInviteOpen(false);
   };
   const handleInviteOpen = () => {
     setIsInviteOpen(true);
@@ -55,12 +59,7 @@ export function CommonCard({
         targetId={id}
         refetchPage={refetch}
         openInvite={handleInviteOpen}
-        setGameMode={setGameMode}
-      />
-      <FriendInvite
-        isOpen={isInviteOpen}
-        onClose={handleInviteClose}
-        mode={gameMode}
+        setGameMode={toggleGameMode}
       />
     </div>
   );

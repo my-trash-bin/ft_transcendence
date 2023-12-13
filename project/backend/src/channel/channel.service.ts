@@ -41,7 +41,11 @@ import { channelMessageDtoSelect } from './dto/channel-message.dto';
 import { ChannelRelationDto } from './dto/channel-relation.dto';
 import { ChannelWithAllInfoDto } from './dto/channel-with-all-info.dto';
 import { ChannelWithMembersDto } from './dto/channel-with-members.dto';
-import { ChannelDto, channelDtoSelect } from './dto/channel.dto';
+import {
+  ChannelDto,
+  channelDtoSelect,
+  prismaChannelSelect,
+} from './dto/channel.dto';
 import { JoinedChannelInfoDto } from './dto/joined-channel-info.dto';
 import { LeavingChannelResponseDto } from './dto/leave-channel-response.dto';
 
@@ -118,7 +122,22 @@ export class ChannelService {
         select: {
           memberType: true,
           mutedUntil: true,
-          channel: true,
+          channel: {
+            select: {
+              ...prismaChannelSelect,
+              messages: {
+                select: {
+                  messageJson: true,
+                },
+                take: 1,
+                orderBy: [
+                  {
+                    sentAt: 'desc',
+                  },
+                ],
+              },
+            },
+          },
         },
       });
     return prismaChannelRelations.map((el) => new ChannelRelationDto(el));
@@ -624,7 +643,7 @@ export class ChannelService {
           throw new ServiceError('뮤트 상태의 유저입니다.', 400);
         }
 
-        return await prisma.channelMessage.create({
+        const result = await prisma.channelMessage.create({
           data: {
             channelId: channelId.value,
             memberId: userId.value,
@@ -644,6 +663,11 @@ export class ChannelService {
             },
           },
         });
+        await prisma.channel.update({
+          where: { id: channelId.value },
+          data: { lastActiveAt: new Date() },
+        });
+        return result;
       });
       return newServiceOkResponse(result);
     } catch (error) {

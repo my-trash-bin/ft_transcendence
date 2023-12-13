@@ -7,25 +7,43 @@ import { getGameSocket } from '../pong/gameSocket';
 import useFriendInviteStore from './FriendInvite';
 import Logo from './Logo';
 import NavIcon from './NavIcon';
+import useMatching from './useMatching';
+import MatchingModal from '../game/MatchingModal';
+import useStore from '../pong/Update';
 
 const Navbar = () => {
   const [showInvitationExpiredToast, setShowInvitationExpiredToast] =
     useState(false);
   const [showOfflineToast, setShowOfflineToast] = useState(false);
-  const { isInviteOpen, closeAndNavigate } = useFriendInviteStore();
+  const { isInviteOpen, closeInvite } = useFriendInviteStore();
+  const { isMatchingOpen, closeMatching } = useMatching();
   const socket = getGameSocket();
   const router = useRouter();
+  const { setIsPlayer1 } = useStore();
+  
+  useEffect(() => {
+    const handlePlayerRole = (role: string) => {
+      setIsPlayer1(role === 'player1');
+      console.log('playerRole', role);
+      socket.off('playerRole', handlePlayerRole);
+    };
+    socket.on('playerRole', handlePlayerRole);
+    return () => {
+      socket.off('playerRole', handlePlayerRole);
+    };
+  }, [socket, setIsPlayer1]);
 
   useEffect(() => {
     const handleGoPong = () => {
-      closeAndNavigate();
+      closeInvite();
+      closeMatching();
       router.push('/pong');
     };
     socket.on('GoPong', handleGoPong);
     return () => {
       socket.off('GoPong', handleGoPong);
     };
-  }, [closeAndNavigate, socket, router]);
+  }, [closeInvite, closeMatching, socket, router]);
 
   useEffect(() => {
     const handleGameInvitationExpired = () => {
@@ -60,6 +78,9 @@ const Navbar = () => {
       )}
       {isInviteOpen && (
         <InviteModal />
+      )}
+      { isMatchingOpen && (
+        <MatchingModal />
       )}
       <nav
         className={

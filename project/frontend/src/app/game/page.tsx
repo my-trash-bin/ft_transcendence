@@ -21,7 +21,7 @@ function GamePage() {
       <div className="w-[100%] h-[100%] bg-light-background rounded-lg">
         <div className="flex flex-row w-[100%]">
           <div className="flex flex-col items-center max-w-4xl mx-auto">
-            <section className="flex justify-between w-[700px] py-xl">
+            <section className="flex justify-center items-center gap-[130px] m-[30px]">
               <ButtonComponent mode="normal" />
               <ButtonComponent mode="item" />
             </section>

@@ -1,24 +1,26 @@
-import { Api } from '@/api/api';
+import { unwrap } from '@/api/unwrap';
+import { ApiContext } from '@/app/_internal/provider/ApiContext';
 import { useCallback, useContext } from 'react';
 import { useQuery } from 'react-query';
 import { MyChannelCard } from './MyChannelCard';
-import { ApiContext } from '@/app/_internal/provider/ApiContext';
-import { unwrap } from '@/api/unwrap';
 
 function getRenderData(channelData: any, searchChannel: string) {
   const filteredData = channelData?.filter((channel: any) =>
     channel.title.includes(searchChannel),
   );
-
-  return filteredData?.map((channel: any) => (
-    <MyChannelCard
-      key={channel.id}
-      id={channel.id}
-      channelName={channel.title}
-      max={channel.maximumMemberCount}
-      now={channel.memberCount}
-    />
-  ));
+  return filteredData?.map((channel: any) => {
+    return (
+      <MyChannelCard
+        key={channel.id}
+        id={channel.id}
+        channelName={channel.title}
+        messageShortcut={channel.message}
+        date={new Date(channel.lastActiveAt)}
+        max={channel.maximumMemberCount}
+        now={channel.memberCount}
+      />
+    );
+  });
 }
 
 export function MyChannelList({
