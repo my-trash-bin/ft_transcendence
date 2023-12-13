@@ -733,7 +733,6 @@ export class EventsService {
     player1.on('leaveGameBoard', async () => {
       cancelGame = true;
       const gameState = pong.getGameState();
-      gameState.score1 = 0;
       gameState.score2 = 10;
       player2.emit('gameUpdate', gameState);
       await this.storeGameStateToDB(gameState, pong);
@@ -743,7 +742,6 @@ export class EventsService {
       cancelGame = true;
       const gameState = pong.getGameState();
       gameState.score1 = 10;
-      gameState.score2 = 0;
       player1.emit('gameUpdate', gameState);
       await this.storeGameStateToDB(gameState, pong);
     });
