@@ -355,7 +355,7 @@ export class Pong {
     const paddleStrike =
       this.gameState.paddle1.type === 3 ? SMALL_PADDLE_STRIKE : PADDLE_STRIKE;
     const deltaY = Math.abs(ballY - paddleCenter);
-    if (this.gameState.pongItem.type === 1) {
+    if (this.gameState.ball.type === 1) {
       return deltaY < paddleHeight / paddleStrike
         ? SMASH_SPEED * 1.2
         : DEFAULT_SPEED;
