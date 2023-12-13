@@ -25,15 +25,11 @@ export const ModalLayout = ({
     <>
       <div
         style={{ zIndex: outZ }}
-        className={`fixed inset-0 bg-[#f3f0f8] opacity-50 ${
-          outFocus ? 'pointer-events-none' : ''
-        }`}
+        className={`fixed inset-0 bg-[#f3f0f8] opacity-50`}
         onClick={(e) => {
-          // console.log('hi');
           e.stopPropagation();
           e.preventDefault();
           if (!outFocus) {
-            // console.log('bye');
             closeModal();
           }
         }}
