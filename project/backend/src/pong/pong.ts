@@ -16,7 +16,7 @@ const SMASH_SPEED = 8;
 const PADDLE_STRIKE = 4;
 const PADDLE_MOVE_STEP = 20;
 const ITEM_SIZE = 100;
-const GAME_OVER = 10;
+const GAME_OVER = 7;
 
 export interface GameState {
   ball: { x: number; y: number; type: number };
@@ -92,7 +92,7 @@ export class Pong {
     }
     this.gameState.gameOver = true;
   }
-  
+
   private makeItemRandomPosition(): boolean {
     // item position = 200 ~ 600, 150 ~ 400
     const x = Math.floor(Math.random() * (600 - 150 + 1)) + 150;

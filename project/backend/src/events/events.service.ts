@@ -19,7 +19,7 @@ import { UserDto } from '../users/dto/user.dto';
 import { UsersService } from '../users/users.service';
 import { DmChannelInfoType } from './event-response.dto';
 import { UserSocket } from './events.gateway';
-
+const GAME_OVER = 7;
 export enum ChannelRoomType {
   NORMAL = 'normal',
   DM = 'dm',
@@ -796,7 +796,7 @@ export class EventsService {
       cancelGame = true;
       const gameState = pong.getGameState();
       if (!gameState.gameOver) {
-        gameState.score2 = 10;
+        gameState.score2 = GAME_OVER;
         player2.emit('gameUpdate', gameState);
         if (!startGame) {
           await this.storeGameStateToDB(gameState, pong);
@@ -809,7 +809,7 @@ export class EventsService {
       cancelGame = true;
       const gameState = pong.getGameState();
       if (!gameState.gameOver) {
-        gameState.score1 = 10;
+        gameState.score1 = GAME_OVER;
         player1.emit('gameUpdate', gameState);
         if (!startGame) {
           await this.storeGameStateToDB(gameState, pong);
