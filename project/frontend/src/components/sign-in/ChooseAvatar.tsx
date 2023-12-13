@@ -116,7 +116,7 @@ export default function ChooseAvatar({
     } catch (error) {
       console.error('Fail to callApi: ', error);
     }
-  }, [selectedFile, callApi]);
+  };
 
   const onClickUploadAvatar = () => {
     if (uploadImage) {
