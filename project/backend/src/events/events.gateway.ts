@@ -245,7 +245,7 @@ export class EventsGateway
     @MessageBody() inviteeId: string,
   ) {
     console.log('cancelInvite == ', inviteeId);
-    this.eventsService.handleCancelInvite(client, inviteeId);
+    this.eventsService.handleCancelInvite(client);
   }
 
   // 초대 수락 처리

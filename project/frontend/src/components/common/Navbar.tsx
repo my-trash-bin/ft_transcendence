@@ -5,8 +5,8 @@ import InviteModal from '../game/InviteModal';
 import MatchingModal from '../game/MatchingModal';
 import useNewFriend from '../notification/NewFriendToast';
 import { Notification } from '../notification/Notification';
-import useStore from '../pong/Update';
 import { getGameSocket } from '../pong/gameSocket';
+import useStore from '../pong/Update';
 import useFriendInviteStore from './FriendInvite';
 import Logo from './Logo';
 import NavIcon from './NavIcon';
@@ -18,7 +18,7 @@ const Navbar = () => {
   const { isNewFriendOpen, friendName } = useNewFriend();
   const { isMatchingOpen, closeMatching } = useMatching();
   const { isInviteOpen, closeInvite } = useFriendInviteStore();
-  const [showOfflineToast, setShowOfflineToast] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(() => '');
   const socket = getGameSocket();
   const router = useRouter();
   const { setIsPlayer1 } = useStore();
@@ -67,13 +67,13 @@ const Navbar = () => {
       }
     };
     socket.on('gameInvitationExpired', handleGameInvitationExpired);
-    socket.on('friendOffline', () => {
-      setShowOfflineToast(true);
-      setTimeout(() => setShowOfflineToast(false), 2000);
+    socket.on('failToInvite', (data: { msg: string }) => {
+      setErrorMessage(data.msg ?? '초대가 실패했습니다.');
+      setTimeout(() => setErrorMessage(() => ''), 2000);
     });
     return () => {
       socket.off('gameInvitationExpired', handleGameInvitationExpired);
-      socket.off('friendOffline');
+      socket.off('failToInvite');
     };
   }, [socket, setShowInvitationExpiredToast, showInvitationExpiredToast]);
 
@@ -84,7 +84,7 @@ const Navbar = () => {
       {showInvitationExpiredToast && (
         <div className={css}>만료된 초대장이에요!</div>
       )}
-      {showOfflineToast && <div className={css}>친구가 오프라인이에요 ㅠ</div>}
+      {errorMessage && <div className={css}>{errorMessage}</div>}
       {isNewFriendOpen && (
         <div className={css}>{friendName}님과 친구가 되었습니다!</div>
       )}
