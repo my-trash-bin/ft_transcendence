@@ -38,9 +38,9 @@ export enum EnumUserStatus {
 }
 
 type InvitationType = {
-  inviterId: string;
-  inviterSocket: Socket;
-  inviteeSocket: Socket | undefined;
+  inviterSocket: UserSocket;
+  inviteeId: UserIdKey;
+  isItemMode: boolean;
 };
 
 @Injectable()
@@ -520,23 +520,19 @@ export class EventsService {
   /*
    * 게임 코드 영역
    */
-
   tryMatch(client: UserSocket, itemMode: boolean) {
-    const userId = client.data.userId as string | undefined;
-    if (!userId) {
-      this.logger.log(`$tryMatch 실패: no userId client ${client.id}`);
-      client.emit('GoPong', {
-        ok: false,
-        msg: 'userId가 없습니다.',
-        clientIds: [client.id],
-      });
-      return; // 방어 코드
-    }
-    if (this.pongMap.has(userId) || this.readyUsers.has(userId)) {
+    const userId = client.data.userId as string;
+
+    if (
+      this.pongMap.has(userId) ||
+      this.readyUsers.has(userId) ||
+      this.activeInvitations.has(userId)
+    ) {
       this.logger.log(
-        `tryMatch 실패: on게임 || on대기열 ${[
+        `tryMatch 실패: on게임 || on대기열 || on초대장 ${[
           this.pongMap.has(userId),
           this.readyUsers.has(userId),
+          this.activeInvitations.has(userId),
         ]}`,
       );
       client.emit('GoPong', {
@@ -544,8 +540,9 @@ export class EventsService {
         msg: '게임중이거나 이미 대기열에 포함되어 있습니다.',
         clientIds: [client.id],
       });
-      return; // 이미 게임중이거나, 대기열에있음
+      return; // 이미 게임중이거나, 대기열에있음 (초대 포함)
     }
+
     this.logger.log(`tryMatch 등록: ${client.id}`);
 
     this.readyUsers.set(userId, client);
@@ -606,41 +603,72 @@ export class EventsService {
     const mode = isItemMode ? 'item' : 'normal';
 
     console.log('handleInviteMatch', userId, friendId, eventName, mode);
-    const friendSocket = this.findSocketByUserId(friendId);
 
-    if (!friendSocket) {
-      client.emit('friendOffline');
+    if (
+      this.pongMap.has(userId) ||
+      this.readyUsers.has(userId) ||
+      this.activeInvitations.has(userId)
+    ) {
+      this.logger.log(
+        `tryMatch 실패: on게임 || on대기열 || on초대장 ${[
+          this.pongMap.has(userId),
+          this.readyUsers.has(userId),
+          this.activeInvitations.has(userId),
+        ]}`,
+      );
+      client.emit('failToInvite', {
+        msg: '이미 게임중이거나 대기열에 포함되어 있습니다.',
+      });
+      return; // 이미 게임중이거나, 대기열에있음
+    }
+
+    const friendSockets = this.socketMap.get(friendId);
+    if (!friendSockets || friendSockets.length === 0) {
+      client.emit('failToInvite', { msg: '친구가 오프라인이에요 ㅠ' });
       return;
     }
 
+    this.logger.log(`handleInviteMatch 등록: ${client.id}`);
+    // 기다리기 시작, 해당 유저의 모든 소켓에 알림 전달됨.
     client.emit('waitingFriend');
     this.alarmInvited(idOf(userId), idOf(friendId), isItemMode);
 
-    this.activeInvitations.set(friendId, {
-      inviterId: userId,
+    this.activeInvitations.set(userId, {
       inviterSocket: client,
-      inviteeSocket: friendSocket,
+      inviteeId: friendId,
+      isItemMode,
     });
   }
 
-  handleCancelInvite(client: UserSocket, inviteeId: string) {
+  handleCancelInvite(client: UserSocket) {
     const userId = client.data.userId as string;
     const eventName = 'canceledInvite';
 
-    const invitation = this.activeInvitations.get(inviteeId);
+    const invitation = this.activeInvitations.get(userId);
     if (invitation) {
-      this.activeInvitations.delete(inviteeId);
-
-      const inviteeSocket = invitation.inviteeSocket;
-      if (inviteeSocket) {
-        inviteeSocket.emit(eventName, { userId });
-      }
+      this.activeInvitations.delete(userId);
+      this.broadcastToUserClients(idOf(invitation.inviteeId), eventName, {
+        userId,
+      });
     }
   }
 
+  // 매칭을 취소하거나, 게임에 들어갔을때, 큐에서 꺼내는 동작을 추상화한다.
+  removeFromQueue(clients: UserSocket[], itemMode?: boolean) {
+    const qs =
+      itemMode === undefined
+        ? [this.itemMatchQueue, this.normalMatchQueue]
+        : itemMode === true
+        ? [this.itemMatchQueue]
+        : [this.normalMatchQueue];
+    clients.forEach((client) => {
+      qs.forEach((q) => q.delete(client));
+      this.readyUsers.delete(client.data.userId as string);
+    });
+  }
+
   handleCancelMatch(client: UserSocket, itemMode: boolean) {
-    const q = itemMode ? this.itemMatchQueue : this.normalMatchQueue;
-    q.delete(client);
+    this.removeFromQueue([client], itemMode);
   }
 
   handleAcceptMatch(
@@ -654,19 +682,7 @@ export class EventsService {
       return;
     }
     this.activeInvitations.delete(inviterId);
-    const inviterSocket = invitation.inviterSocket;
-    if (inviterSocket) {
-      this.createGameRoom(client, inviterSocket, isItemMode);
-    } else {
-      client.emit('friendIsOffline');
-    }
-  }
-
-  private findSocketByUserId(userId: string): Socket | undefined {
-    const sockets = this.socketMap.get(userId);
-    if (sockets) {
-      return sockets[0];
-    }
+    this.createGameRoom(client, invitation.inviterSocket, isItemMode);
   }
 
   private async fetchPlayerInfo(
@@ -758,10 +774,7 @@ export class EventsService {
     this.handleOnGame(idOf(player2Id), pong);
 
     // 2. 게임에 참여하게 된 각 유저를 큐와 대기 유저 목록에서 제거한다.
-    q.delete(player1);
-    q.delete(player2);
-    this.readyUsers.delete(player1Id);
-    this.readyUsers.delete(player2Id);
+    this.removeFromQueue([player1, player2], mode);
 
     player1.on('clientReady', (gameState: GameState) => {
       this.emitPlayerInfo(player1Id, player2Id, roomName);
@@ -884,9 +897,7 @@ export class EventsService {
 
     if (readyUserClient?.id === clientId) {
       // 대기열에서 내보내기
-      const removed1 = this.itemMatchQueue.delete(readyUserClient);
-      const removed2 = this.normalMatchQueue.delete(readyUserClient);
-      this.readyUsers.delete(userId);
+      this.removeFromQueue([readyUserClient]);
       this.logger.verbose(`대기열에서 내보니기 성공`);
     } else if (invitation?.inviterSocket?.id === clientId) {
       // 초대장 끝내기
@@ -959,5 +970,14 @@ export class EventsService {
       status: this.getUserStatus(targetUserId),
       userId: targetUserId.value,
     });
+  }
+
+  debugData() {
+    this.logger.error('-------------tryMatch 디버깅---------');
+    this.logger.error('pongMap');
+    this.logger.verbose([...this.pongMap.keys()]);
+    this.logger.error('readyUsers');
+    this.logger.verbose([...this.readyUsers.keys()]);
+    this.logger.error('=====================================');
   }
 }
