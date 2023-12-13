@@ -14,8 +14,8 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChangeActionType } from '../channel/channel.service';
-import { idOf } from '../common/Id';
 import { GateWayEvents } from '../common/gateway-events.enum';
+import { idOf } from '../common/Id';
 import {
   ChannelIdentityDto,
   CreateDmChannelDto,
@@ -95,8 +95,11 @@ export class EventsGateway
   }
 
   async handleDisconnect(client: Socket) {
-    await this.eventsService.finalizeGame(client);
-    console.log('handleDisconnect');
+    const userId = client.data.userId as string | undefined;
+    if (userId === undefined) {
+      return; // 별도 처리 불필요.
+    }
+    await this.eventsService.removeClientFromQueueOrInvitationOrGame(client);
     this.eventsService.handleDisconnect(client);
   }
 
@@ -223,11 +226,13 @@ export class EventsGateway
   }
 
   @SubscribeMessage('cancelMatch')
-  async handleCancelMatch(@ConnectedSocket() client: UserSocket, @MessageBody() mode: string) {
+  async handleCancelMatch(
+    @ConnectedSocket() client: UserSocket,
+    @MessageBody() mode: string,
+  ) {
     if (mode === 'normal') {
       this.eventsService.handleCancelMatch(client, false);
-    }
-    else if (mode === 'item') {
+    } else if (mode === 'item') {
       this.eventsService.handleCancelMatch(client, true);
     }
   }
@@ -235,7 +240,7 @@ export class EventsGateway
   @SubscribeMessage('cancelInvite')
   async handleCancelInvite(
     @ConnectedSocket() client: UserSocket,
-    @MessageBody() inviteeId: string
+    @MessageBody() inviteeId: string,
   ) {
     console.log('cancelInvite == ', inviteeId);
     this.eventsService.handleCancelInvite(client, inviteeId);

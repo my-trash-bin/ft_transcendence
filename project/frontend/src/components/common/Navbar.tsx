@@ -2,14 +2,14 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import InviteModal from '../game/InviteModal';
+import MatchingModal from '../game/MatchingModal';
 import { Notification } from '../notification/Notification';
 import { getGameSocket } from '../pong/gameSocket';
+import useStore from '../pong/Update';
 import useFriendInviteStore from './FriendInvite';
 import Logo from './Logo';
 import NavIcon from './NavIcon';
 import useMatching from './useMatching';
-import MatchingModal from '../game/MatchingModal';
-import useStore from '../pong/Update';
 
 const Navbar = () => {
   const [showInvitationExpiredToast, setShowInvitationExpiredToast] =
@@ -20,7 +20,7 @@ const Navbar = () => {
   const socket = getGameSocket();
   const router = useRouter();
   const { setIsPlayer1 } = useStore();
-  
+
   useEffect(() => {
     const handlePlayerRole = (role: string) => {
       setIsPlayer1(role === 'player1');
@@ -34,10 +34,21 @@ const Navbar = () => {
   }, [socket, setIsPlayer1]);
 
   useEffect(() => {
-    const handleGoPong = () => {
+    const handleGoPong = (data: {
+      ok: boolean;
+      msg?: string;
+      clientIds?: string[];
+    }) => {
+      if (!data.clientIds || !data.clientIds.includes(socket.id)) {
+        return;
+      }
+      if (data.ok) {
+        router.push('/pong');
+      } else {
+        alert(`요청이 실패했습니다.: ${data.msg ?? '알수없는 사유'}`);
+      }
       closeInvite();
       closeMatching();
-      router.push('/pong');
     };
     socket.on('GoPong', handleGoPong);
     return () => {
@@ -76,12 +87,8 @@ const Navbar = () => {
           친구가 오프라인이에요 ㅠ
         </div>
       )}
-      {isInviteOpen && (
-        <InviteModal />
-      )}
-      { isMatchingOpen && (
-        <MatchingModal />
-      )}
+      {isInviteOpen && <InviteModal />}
+      {isMatchingOpen && <MatchingModal />}
       <nav
         className={
           'flex flex-col w-[80px] min-h-[750px] h-[inherit] bg-default items-center'

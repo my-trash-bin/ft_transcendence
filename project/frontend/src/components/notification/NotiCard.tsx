@@ -1,5 +1,5 @@
 import { useRouter } from 'next/navigation';
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { getGameSocket } from '../pong/gameSocket';
 
@@ -40,16 +40,6 @@ export const NotiCard: React.FC<NotiCardProps> = ({ content }) => {
       console.error('Error friend:', error);
     }
   }, [api, sourceId]);
-
-  useEffect(() => {
-    const handleGoPong = () => {
-      route.push('/pong');
-    };
-    socket.on('GoPong', handleGoPong);
-    return () => {
-      socket.off('GoPong', handleGoPong);
-    };
-  }, [socket, route]);
 
   let notificationContent;
   let hoverContent;
