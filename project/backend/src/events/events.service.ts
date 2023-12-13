@@ -584,7 +584,7 @@ export class EventsService {
       friendId,
       JSON.stringify({
         type: eventName,
-        sourceId: friendId.value,
+        sourceId: myId.value,
         sourceName: myPrismaUser.nickname,
         mode: isItemMode ? 'item' : 'normal',
       }),
@@ -622,10 +622,17 @@ export class EventsService {
       return; // 이미 게임중이거나, 대기열에있음
     }
 
+    if (this.pongMap.has(friendId)) {
+      client.emit('failToInvite', {
+        msg: '해당 유저는 이미 게임중입니다.', // 대기열에 포함된 상대에게의 초대까지는 허용.
+      });
+      return;
+    }
+
     const friendSockets = this.socketMap.get(friendId);
     if (!friendSockets || friendSockets.length === 0) {
       client.emit('failToInvite', { msg: '친구가 오프라인이에요 ㅠ' });
-      return;
+      return; // 오프라인도 당연히 불허
     }
 
     this.logger.log(`handleInviteMatch 등록: ${client.id}`);
