@@ -18,6 +18,15 @@ export const TextBox: React.FC<TextBoxProps> = ({
   const textSize = isModal ? 'text-xl' : 'text-h3 leading-[2]';
   const gapSize = isModal ? 'gap-sm' : 'gap.md';
   const roundedRatio = ratio?.toFixed(1);
+
+  function statusMessageShort(statusMessage: string) {
+    if (statusMessage.length > 40) {
+      return statusMessage.slice(0, 40) + '...';
+    } else {
+      return statusMessage;
+    }
+  }
+
   return (
     <div className={`${gapSize} flex flex-col font-mayo leading-loose`}>
       <p className={`${textSize} text-dark-purple`}>
@@ -27,7 +36,9 @@ export const TextBox: React.FC<TextBoxProps> = ({
       </p>
       <p className={`text-md text-dark-gray`}>
         상태메세지 <br />
-        {statusMessage === '' ? 'no status message' : statusMessage}
+        {statusMessage === ''
+          ? 'no status message'
+          : statusMessageShort(statusMessage)}
       </p>
     </div>
   );

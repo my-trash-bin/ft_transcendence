@@ -8,7 +8,6 @@ import { useQuery } from 'react-query';
 import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { ModalLayout } from '../channel/modals/ModalLayout';
 import { LiveStatus } from '../common/LiveStatus';
-import { Loading } from '../common/Loading';
 import { LongCard } from '../common/LongCard';
 import { GameInviteButtons } from '../game/GameInviteButtons';
 import { TextBox } from './TextBox';
@@ -248,12 +247,14 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
       width="400px"
       height="500px"
     >
-      {renderProfileContent()}
+      <div className="flex justify-center items-center w-[100%] h-[100%]">
+        {renderProfileContent()}
+      </div>
     </ModalLayout>
   );
 
   function renderProfileContent() {
-    if (userInfoLoading || historyLoading) return <Loading width={300} />;
+    if (userInfoLoading || historyLoading) return <p>로딩중입니다...</p>;
 
     if (userInfoError || historyError) {
       return <p>Error loading profile data.</p>;
@@ -263,7 +264,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
     }
 
     return (
-      <div className="p-xl flex flex-col gap-md">
+      <div className="p-xl flex flex-col gap-md justify-center items-center">
         <div className="flex felx-row gap-xl">
           <div className="flex flex-col items-center gap-md">
             <FriendAvatar imageUrl={userInfoData.imageUrl} size={80} />
