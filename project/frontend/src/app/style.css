@@ -4,7 +4,9 @@
 
 @font-face {
   font-family: 'sejong';
-  src: url('/fonts/KingSejongInstitute-Regular.otf') format('truetype');
+  src: url('/fonts/KingSejongInstitute-Regular.otf');
+  font-weight: normal;
+  font-style: normal;
 }
 
 @font-face {

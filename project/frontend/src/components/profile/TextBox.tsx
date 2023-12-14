@@ -34,6 +34,12 @@ export const TextBox: React.FC<TextBoxProps> = ({
         <br />
         전적 : {win}승 {lose}패 {roundedRatio}%
       </p>
+      <p className="font-sejong">sejong</p>
+      <p className="font-taebaek">taebaek</p>
+      <p className="font-jeonju">jeonju</p>
+      <p className="font-danjo">danjo</p>
+      <p className="font-mayo">mayo</p>
+      <p className="font-agro">agro</p>
       <p className={`text-md text-dark-gray`}>
         상태메세지 <br />
         {statusMessage === ''
