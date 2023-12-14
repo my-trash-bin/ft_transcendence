@@ -46,20 +46,29 @@ export class UserFollowController {
     if (!result.ok) {
       throw new BadRequestException(result!.error?.message);
     }
-    try {
-      await this.notificationService.create(
-        idOf(dto.targetUser),
-        JSON.stringify({
-          type: 'newFriend',
-          sourceId: (req.user as JwtPayloadPhaseComplete).id.value,
-          sourceName: result.data!.follower.nickname,
-        }),
-      );
-      this.logger.log(`친구 요청 성공 후, 노티 생성 성공`);
-    } catch (error) {
-      this.logger.error(`친구 요청 성공 후, 노티 생성시 에러: ${error}`);
+    if (result.data?.isNewRecord!) {
+      try {
+        await this.notificationService.create(
+          idOf(dto.targetUser),
+          JSON.stringify({
+            type: 'newFriend',
+            sourceId: (req.user as JwtPayloadPhaseComplete).id.value,
+            sourceName: result.data?.follower.nickname!,
+          }),
+        );
+        this.logger.log(`친구 요청 성공 후, 노티 생성 성공`);
+      } catch (error) {
+        this.logger.error(`친구 요청 성공 후, 노티 생성시 에러: ${error}`);
+      }
+    } else {
+      this.logger.log(`기존친구에 대한 요청으로, 노티 생성X`);
     }
-    return result!.data;
+    return {
+      isBlock: result.data?.isBlock!,
+      followOrBlockedAt: result.data?.followOrBlockedAt!,
+      follower: result.data?.follower!,
+      followee: result.data?.followee!,
+    };
   }
 
   @Post('block')
@@ -73,7 +82,12 @@ export class UserFollowController {
     if (!result.ok) {
       throw new BadRequestException(result!.error?.message);
     }
-    return result!.data;
+    return {
+      isBlock: result.data?.isBlock!,
+      followOrBlockedAt: result.data?.followOrBlockedAt!,
+      follower: result.data?.follower!,
+      followee: result.data?.followee!,
+    };
   }
 
   @Post('unfriend')
@@ -115,7 +129,6 @@ export class UserFollowController {
   @UseGuards(JwtGuard, PhaseGuard)
   @Phase('complete')
   async findRelationships(@Request() req: ExpressRequest) {
-    console.log('findRelationships', req.user);
     const userId = (req.user as JwtPayloadPhaseComplete).id;
     const result = await this.userFollowService.findByUsers(userId);
     return result.map((el) => new UserFollowDto(el));
@@ -164,7 +177,6 @@ export class UserFollowController {
     dto: TargetUserDto,
     isBlock: boolean,
   ) {
-    console.log('createOrUpdate', req.user, dto);
     const userId = (req.user as JwtPayloadPhaseComplete).id;
     const targetUserId = dto.targetUser;
     if (userId.value === targetUserId) {
@@ -182,7 +194,6 @@ export class UserFollowController {
     dto: TargetUserDto,
     isBlock: boolean,
   ) {
-    console.log('createOrUpdate', req.user, dto);
     const userId = (req.user as JwtPayloadPhaseComplete).id;
     const targetUserId = dto.targetUser;
     await this.userFollowService.remove(
