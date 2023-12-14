@@ -15,9 +15,13 @@ export enum ChannelType {
 export function CreateChannelModal({
   isOpen,
   closeModal,
+  setShowSuccessToast,
+  setShowFailToast,
 }: {
   isOpen: boolean;
   closeModal: () => void;
+  setShowSuccessToast: (set: boolean) => void;
+  setShowFailToast: (set: boolean) => void;
 }) {
   const [channelType, setChannelType] = useState(ChannelType.PUBLIC);
   const [isValid, setIsValid] = useState(false);
@@ -45,11 +49,13 @@ export function CreateChannelModal({
   };
   const mutation = useMutation(api.channelControllerCreate, {
     onSuccess: () => {
-      alert('채널 생성에 성공했습니다.');
+      setShowSuccessToast(true);
+      setTimeout(() => setShowSuccessToast(false), 2000);
       closeAndChangeTypePublic();
     },
     onError: () => {
-      alert('채널 생성에 실패했습니다.');
+      setShowSuccessToast(true);
+      setTimeout(() => setShowSuccessToast(false), 2000);
     },
   });
 
@@ -69,6 +75,7 @@ export function CreateChannelModal({
           };
     mutation.mutate(channelCreateData);
   };
+
   return (
     <ModalLayout
       isOpen={isOpen}
@@ -95,7 +102,6 @@ export function CreateChannelModal({
             />
             <ChannelCreateContent
               channelType={channelType}
-              isValid={isValid}
               setIsValid={setIsValid}
               inputTitle={inputTitle}
               setInputTitle={setInputTitle}
