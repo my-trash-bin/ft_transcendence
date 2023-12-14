@@ -523,21 +523,16 @@ export class EventsService {
   tryMatch(client: UserSocket, itemMode: boolean) {
     const userId = client.data.userId as string;
 
-    if (
-      this.pongMap.has(userId) ||
-      this.readyUsers.has(userId) ||
-      this.activeInvitations.has(userId)
-    ) {
+    if (this.pongMap.has(userId) || this.readyUsers.has(userId)) {
       this.logger.log(
-        `tryMatch 실패: on게임 || on대기열 || on초대장 ${[
+        `tryMatch 실패: on게임 || on대기열(초대상태 포함) ${[
           this.pongMap.has(userId),
           this.readyUsers.has(userId),
-          this.activeInvitations.has(userId),
         ]}`,
       );
       client.emit('GoPong', {
         ok: false,
-        msg: '게임중이거나 이미 대기열에 포함되어 있습니다.',
+        msg: '게임중이거나 이미 대기열(초대상태 포함)에 있습니다.',
         clientIds: [client.id],
       });
       return; // 이미 게임중이거나, 대기열에있음 (초대 포함)
@@ -604,20 +599,15 @@ export class EventsService {
 
     console.log('handleInviteMatch', userId, friendId, eventName, mode);
 
-    if (
-      this.pongMap.has(userId) ||
-      this.readyUsers.has(userId) ||
-      this.activeInvitations.has(userId)
-    ) {
+    if (this.pongMap.has(userId) || this.readyUsers.has(userId)) {
       this.logger.log(
-        `tryMatch 실패: on게임 || on대기열 || on초대장 ${[
+        `tryMatch 실패: on게임 || on대기열(초대상태 포함) ${[
           this.pongMap.has(userId),
           this.readyUsers.has(userId),
-          this.activeInvitations.has(userId),
         ]}`,
       );
       client.emit('failToInvite', {
-        msg: '이미 게임중이거나 대기열에 포함되어 있습니다.',
+        msg: '이미 게임중이거나 대기열에 있습니다.(초대상태 포함)',
       });
       return; // 이미 게임중이거나, 대기열에있음
     }
@@ -640,6 +630,7 @@ export class EventsService {
     client.emit('waitingFriend');
     this.alarmInvited(idOf(userId), idOf(friendId), isItemMode);
 
+    this.readyUsers.set(userId, client);
     this.activeInvitations.set(userId, {
       inviterSocket: client,
       inviteeId: friendId,
@@ -654,9 +645,10 @@ export class EventsService {
     const invitation = this.activeInvitations.get(userId);
     if (invitation) {
       this.activeInvitations.delete(userId);
+      this.readyUsers.delete(userId);
       this.broadcastToUserClients(idOf(invitation.inviteeId), eventName, {
         userId,
-      });
+      }); // 프론트에서 canceledInvite 소켓 이벤트를 사용하고 있진 않음
     }
   }
 
@@ -689,6 +681,7 @@ export class EventsService {
       return;
     }
     this.activeInvitations.delete(inviterId);
+    this.readyUsers.delete(inviterId);
     this.createGameRoom(client, invitation.inviterSocket, isItemMode);
   }
 
@@ -701,7 +694,6 @@ export class EventsService {
           id: playerId,
         },
       });
-      // console.log(prismaUser);
       return {
         nickname: prismaUser.nickname,
         avatarUrl: prismaUser.profileImageUrl ?? '',
@@ -754,7 +746,6 @@ export class EventsService {
     this.server.to(player1.id).emit('playerRole', 'player1');
     this.server.to(player2.id).emit('playerRole', 'player2');
 
-    const q = mode ? this.itemMatchQueue : this.normalMatchQueue;
     // Pong 인스턴스 생성
     const pong = new Pong(
       this.prismaService,
@@ -946,7 +937,10 @@ export class EventsService {
     this.logger.verbose(`finalizeGame 성공: isPlayer1win is ${isPlayer1win}`);
 
     // 상대방에게 연결종료 알림
-    const opponentSocketId = pong.player1SocketId === cliendId ? pong.player2SocketId : pong.player1SocketId;
+    const opponentSocketId =
+      pong.player1SocketId === cliendId
+        ? pong.player2SocketId
+        : pong.player1SocketId;
     this.server.to(opponentSocketId).emit('opponentDisconnected');
     console.log('opponentId', opponentSocketId);
 

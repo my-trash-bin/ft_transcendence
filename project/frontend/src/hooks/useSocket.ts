@@ -73,7 +73,7 @@ const handleKickBanPromote = (
       targetUserId === meId &&
       channelId === res.data.channelId
     ) {
-      alert('채널에서 음소거 되었습니다. 3분동안 메세지를 보낼 수 없습니다.');
+      alert('채널에서 음소거 되었습니다. 1분동안 메세지를 보낼 수 없습니다.');
     }
   });
 };

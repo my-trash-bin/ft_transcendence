@@ -14,15 +14,16 @@ export const GameFinishModal: React.FC<ModalProfileProps> = ({
   isOpen,
   onClose,
 }) => {
+  const { isPlayer1, player1Info, player2Info, score1, score2, deleteIsPlayer1 } = useStore();
+  const userLayout = 'flex flex-col justify-center items-center';
   const handleClose = () => {
+    deleteIsPlayer1();
     onClose();
   };
-  const { isPlayer1, player1Info, player2Info, score1, score2 } = useStore();
-  const userLayout = 'flex flex-col justify-center items-center';
   return (
     <ModalLayout
       isOpen={isOpen}
-      closeModal={onClose}
+      closeModal={handleClose}
       width="600px"
       height="300px"
     >

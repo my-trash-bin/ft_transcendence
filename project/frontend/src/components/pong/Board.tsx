@@ -2,6 +2,7 @@ import { avatarToUrl } from '@/app/_internal/util/avatarToUrl';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import useNotAllowedPong from '../game/notAllowedPong';
 import usePaddleMovement from './KeyHandle';
 import useStore from './Update';
 import {
@@ -16,7 +17,6 @@ import {
   SMALL_PADDLE_HEIGHT,
 } from './gameConstants';
 import { getGameSocket } from './gameSocket';
-import useNotAllowedPong from '../game/notAllowedPong';
 
 const usePaddleHeight = (type: number) => {
   return useMemo(() => {
@@ -73,7 +73,7 @@ function Board() {
 
   useEffect(() => {
     if (isPlayer1 === undefined) {
-      router.push('/game');
+      router.replace('/game');
       OpenToast();
     }
   }, [isPlayer1, router, OpenToast]);
@@ -81,7 +81,8 @@ function Board() {
   /* --------------------- 게임 중단 --------------------- */
   const handleDisconnect = useCallback(() => {
     console.log('opponentDisconnected');
-    router.push('/game');
+    // todo: 게임 중단 처리
+    router.replace('/game');
     useStore.setState({ gameOver: true });
   }, [router]);
 
@@ -102,7 +103,7 @@ function Board() {
       } else {
         console.log('gameOver');
         setGameState(gameState);
-        router.push('/game');
+        router.replace('/game');
         useStore.setState({ gameOver: true });
       }
     },
