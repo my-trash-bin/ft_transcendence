@@ -3,6 +3,7 @@ import {
   Get,
   Logger,
   Param,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -11,6 +12,7 @@ import { Request as ExpressRequest } from 'express';
 import { JwtPayloadPhaseComplete } from '../auth/auth.service';
 import { JwtGuard } from '../auth/jwt.guard';
 import { Phase, PhaseGuard } from '../auth/phase.guard';
+import { MessagePaginationDto } from '../channel/dto/message-pagination.dto';
 import { DmService } from './dm.service';
 import { DmChannelMessageDto } from './dto/dm-list.dto';
 import { MessageWithMemberDto } from './dto/message-with-member';
@@ -43,12 +45,16 @@ export class DmController {
   })
   async getDMChannelMessages(
     @Param('nickname') nickname: string,
+    @Query() dto: MessagePaginationDto,
     @Request() req: ExpressRequest,
   ) {
     const userId = (req.user as JwtPayloadPhaseComplete).id;
+    const { cursorTimestamp, pageSize } = dto;
     const res = await this.dmService.getDMChannelMessagesByNickname(
       userId,
       nickname || '',
+      cursorTimestamp,
+      pageSize,
     );
     return res!.data;
   }
