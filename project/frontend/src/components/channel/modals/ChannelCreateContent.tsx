@@ -4,7 +4,6 @@ import { inputValidator } from './InputValidator';
 
 export const ChannelCreateContent = ({
   channelType,
-  isValid,
   setIsValid,
   inputTitle,
   inputPassword,
@@ -14,7 +13,6 @@ export const ChannelCreateContent = ({
   setInputSize,
 }: {
   channelType: ChannelType;
-  isValid: boolean;
   setIsValid: (arg: boolean) => void;
   inputTitle: string;
   inputPassword: string;
