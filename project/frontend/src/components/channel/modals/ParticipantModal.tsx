@@ -91,7 +91,7 @@ export function ParticipantModal({
       </div>
       <ModalButtons
         modalStateFunctions={modalStateFunctions}
-        authority={myAuthority}
+        ownerId={ownerId}
         targetChannelId={channelId}
         closeModal={closeModal}
       />

@@ -2,7 +2,7 @@ import { getSocket } from '@/lib/Socket';
 import Image from 'next/image';
 export function ModalButtons({
   modalStateFunctions,
-  authority,
+  ownerId,
   targetChannelId,
   closeModal,
 }: {
@@ -11,7 +11,7 @@ export function ModalButtons({
     setModalSetting: () => void;
     setModalAdd: () => void;
   };
-  authority: string;
+  ownerId: string;
   targetChannelId: string;
   closeModal: () => void;
 }) {
@@ -19,11 +19,12 @@ export function ModalButtons({
     getSocket().emit('leave', { channelId: targetChannelId });
     closeModal();
   };
-
+  const localMe = localStorage.getItem('me');
+  const me = localMe ? JSON.parse(localMe) : null;
   return (
     <div className="flex flex-row justify-between mt-[15px] pr-[30px] pl-[30px]">
       <button onClick={modalStateFunctions.setModalSetting}>
-        {authority === 'ADMINISTRATOR' ? (
+        {ownerId === me.id ? (
           <Image
             alt="channel setting button"
             src="/icon/setting.svg"
