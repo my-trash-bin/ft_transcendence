@@ -87,7 +87,7 @@ const Navbar = () => {
   return (
     <>
       {isOpen && (
-        <div className= {css}>게임에 참가하지 않았어요!</div>
+        <div className= {css}>게임이 시작되지 않았어요!</div>
       )}
       {showInvitationExpiredToast && (
         <div className={css}>만료된 초대장이에요!</div>
