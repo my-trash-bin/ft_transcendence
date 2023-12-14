@@ -11,10 +11,10 @@ import useFriendInviteStore from './FriendInvite';
 import Logo from './Logo';
 import NavIcon from './NavIcon';
 import useMatching from './useMatching';
+import useNotAllowedPong from '../game/notAllowedPong';
 
 const Navbar = () => {
-  const [showInvitationExpiredToast, setShowInvitationExpiredToast] =
-    useState(false);
+  const [showInvitationExpiredToast, setShowInvitationExpiredToast] = useState(false);
   const { isNewFriendOpen, friendName } = useNewFriend();
   const { isMatchingOpen, closeMatching } = useMatching();
   const { isInviteOpen, closeInvite } = useFriendInviteStore();
@@ -22,6 +22,7 @@ const Navbar = () => {
   const socket = getGameSocket();
   const router = useRouter();
   const { setIsPlayer1 } = useStore();
+  const { isOpen, closeToast } = useNotAllowedPong();
 
   useEffect(() => {
     const handlePlayerRole = (role: string) => {
@@ -34,6 +35,10 @@ const Navbar = () => {
       socket.off('playerRole', handlePlayerRole);
     };
   }, [socket, setIsPlayer1]);
+
+  useEffect(() => {
+    setTimeout(() => closeToast(), 2000);
+  }, [isOpen, closeToast]);
 
   useEffect(() => {
     const handleGoPong = (data: {
@@ -81,6 +86,9 @@ const Navbar = () => {
     'fixed w-[300px] h-[100px] left-1/2 p-sm transform -translate-x-1/2 translate-y-1/2 flex justify-center items-center bg-default border-3 border-dark-purple text-dark-purple rounded-md z-50 text-h3';
   return (
     <>
+      {isOpen && (
+        <div className= {css}>pong 게임을 하고있지 않아요!</div>
+      )}
       {showInvitationExpiredToast && (
         <div className={css}>만료된 초대장이에요!</div>
       )}
