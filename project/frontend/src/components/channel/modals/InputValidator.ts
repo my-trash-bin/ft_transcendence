@@ -1,5 +1,5 @@
 export const inputValidator = (identifier: string, value: string): boolean => {
-  const specialCharRegex = /[!@#$%^&*(),.?":{}|<> ]/;
+  const specialCharRegex = /[!@#$%^&*(),.?":{}|<>]/;
 
   switch (identifier) {
     case 'title':

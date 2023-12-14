@@ -54,8 +54,8 @@ export function CreateChannelModal({
       closeAndChangeTypePublic();
     },
     onError: () => {
-      setShowSuccessToast(true);
-      setTimeout(() => setShowSuccessToast(false), 2000);
+      setShowFailToast(true);
+      setTimeout(() => setShowFailToast(false), 2000);
     },
   });
 

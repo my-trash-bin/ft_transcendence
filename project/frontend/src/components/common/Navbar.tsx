@@ -6,8 +6,8 @@ import MatchingModal from '../game/MatchingModal';
 import useNotAllowedPong from '../game/notAllowedPong';
 import useNewFriend from '../notification/NewFriendToast';
 import { Notification } from '../notification/Notification';
-import { getGameSocket } from '../pong/gameSocket';
 import useStore from '../pong/Update';
+import { getGameSocket } from '../pong/gameSocket';
 import useFriendInviteStore from './FriendInvite';
 import Logo from './Logo';
 import NavIcon from './NavIcon';
@@ -40,7 +40,7 @@ const Navbar = () => {
   useEffect(() => {
     const handlePlayerRole = (role: string) => {
       setIsPlayer1(role === 'player1');
-      console.log('playerRole', role);
+      // console.log('playerRole', role);
       socket.off('playerRole', handlePlayerRole);
     };
     socket.on('playerRole', handlePlayerRole);

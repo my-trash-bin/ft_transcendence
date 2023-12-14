@@ -5,7 +5,7 @@ export function NavbarLayout({ children }: { readonly children: ReactNode }) {
   return (
     <div className="flex flex-row w-[inherit] h-[inherit]">
       <Navbar />
-      <div className="w-[900px] h-[750px] m-auto font-sejong">{children}</div>
+      <div className="w-[900px] h-[750px] m-auto font-jeonju">{children}</div>
     </div>
   );
 }
