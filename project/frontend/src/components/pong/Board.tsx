@@ -130,7 +130,7 @@ function Board() {
 
   const handlePlayerInfo = useCallback(
     (info: PlayerInfo, playerNumber: number) => {
-      console.log('playerInfo', info, playerNumber);
+      // console.log('playerInfo', info, playerNumber);
       setGameScore(0, 0);
       if (
         playerNumber === 1 &&
