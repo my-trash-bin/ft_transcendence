@@ -12,6 +12,7 @@ import Logo from './Logo';
 import NavIcon from './NavIcon';
 import useMatching from './useMatching';
 import useNotAllowedPong from '../game/notAllowedPong';
+import useToast from './useToast';
 
 const Navbar = () => {
   const [showInvitationExpiredToast, setShowInvitationExpiredToast] = useState(false);
@@ -23,6 +24,7 @@ const Navbar = () => {
   const router = useRouter();
   const { setIsPlayer1 } = useStore();
   const { isOpen, closeToast } = useNotAllowedPong();
+  const { isBan, isFull, closeIsBan, closeIsFull } = useToast();
 
   useEffect(() => {
     const handlePlayerRole = (role: string) => {
@@ -39,6 +41,14 @@ const Navbar = () => {
   useEffect(() => {
     setTimeout(() => closeToast(), 2000);
   }, [isOpen, closeToast]);
+
+  useEffect(() => {
+    setTimeout(() => closeIsBan(), 2000);
+  }, [isBan, closeIsBan]);
+
+  useEffect(() => {
+    setTimeout(() => closeIsFull(), 2000);
+  }, [isFull, closeIsFull]);
 
   useEffect(() => {
     const handleGoPong = (data: {
@@ -86,6 +96,12 @@ const Navbar = () => {
     'fixed w-[300px] h-[100px] left-1/2 p-sm transform -translate-x-1/2 translate-y-1/2 flex justify-center items-center bg-default border-3 border-dark-purple text-dark-purple rounded-md z-50 text-h3';
   return (
     <>
+      {isBan && (
+        <div className={css}>방장이 거부합니다 ㅠ</div>
+      )}
+      {isFull && (
+        <div className={css}>방에 더이상 자리가 없어요!</div>
+      )}
       {isOpen && (
         <div className= {css}>게임이 시작되지 않았어요!</div>
       )}
