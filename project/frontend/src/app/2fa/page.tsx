@@ -2,6 +2,7 @@
 import { ApiContext } from '@/app/_internal/provider/ApiContext';
 import withAuth from '@/components/auth/withAuth';
 import { Button } from '@/components/common/Button';
+import useToast from '@/components/common/useToast';
 import { useRouter } from 'next/navigation';
 import { useCallback, useContext, useState } from 'react';
 
@@ -9,6 +10,7 @@ function TwofactorPage() {
   const { api } = useContext(ApiContext);
   const router = useRouter();
   const [password, setPassword] = useState('');
+  const { openIsInvalidPassword } = useToast();
   function handlePassword(e: React.ChangeEvent<HTMLInputElement>) {
     setPassword(e.target.value);
   }
@@ -28,7 +30,7 @@ function TwofactorPage() {
       }
     } catch (error: any) {
       if (error.status === 422) {
-        alert('비밀번호 오류입니다. 다시 입력하세요.');
+        openIsInvalidPassword();
       } else if (error.status === 401) {
         alert('JWT가 올바르지 않습니다.');
       } else if (error.status === 403) {
@@ -36,7 +38,7 @@ function TwofactorPage() {
       }
       console.error('Error 2fa login:', error);
     }
-  }, [api, password, router]);
+  }, [api, password, router, openIsInvalidPassword]);
 
   return (
     <div className="min-h-screen flex items-center justify-center font-sejong">

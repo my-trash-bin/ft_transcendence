@@ -1,16 +1,26 @@
 import { getSocket } from '@/lib/Socket';
 import { ChannelButton } from './ChannelButton';
+import useToast from '../common/useToast';
 export function SelectPenalty({
   channelId,
   memberId,
 }: Readonly<{ channelId: string; memberId: string }>) {
+  const { openIsKickUser, openIsBanUser, openIsMuteUser, openIsPromoteUser } = useToast();
   const kickBanPromote = (actionType: string) => {
     getSocket().emit('kickBanPromote', {
       actionType,
       channelId,
       memberId,
     });
-    alert(actionType);
+    if (actionType === 'KICK') {
+      openIsKickUser();
+    } else if (actionType === 'BANNED') {
+      openIsBanUser();
+    } else if (actionType === 'MUTE') {
+      openIsMuteUser();
+    } else if (actionType === 'PROMOTE') {
+      openIsPromoteUser();
+    }
   };
 
   const handleKick = (e: any) => kickBanPromote('KICK');

@@ -8,6 +8,7 @@ import { useMutation } from 'react-query';
 import { ChannelButton } from '../ChannelButton';
 import { ChannelSelector } from './ChannelSelector';
 import { inputValidator } from './InputValidator';
+import useToast from '@/components/common/useToast';
 
 export enum ChannelType {
   PUBLIC = 'public',
@@ -34,6 +35,7 @@ export function SettingModal({
   const [passwordValid, setPasswordValid] = useState(
     channelType !== ChannelType.PROTECTED,
   );
+  const { openSuccessChangeChannnal, openFailChangeChannnal } = useToast();
 
   const channelTypeChangeEvent = (channelType: ChannelType) => {
     switch (channelType) {
@@ -56,10 +58,10 @@ export function SettingModal({
   const mutation = useMutation(api.channelControllerChannelUpdate, {
     onSuccess: () => {
       closeModal();
-      alert('채널 설정 변경에 성공했습니다.');
+      openSuccessChangeChannnal();
     },
     onError: () => {
-      alert('채널 설정 변경에 실패했습니다.');
+      openFailChangeChannnal();
     },
   });
 

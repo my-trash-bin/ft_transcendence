@@ -4,6 +4,7 @@ import { getSocket } from '@/lib/Socket';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { messageType } from './MessageContent';
+import useToast from '@/components/common/useToast';
 
 export function MessageSendBox({
   channelId,
@@ -15,11 +16,12 @@ export function MessageSendBox({
   targetUserId?: string;
 }) {
   const [message, setMessage] = useState<string>('');
+  const { openIsMute } = useToast();
   useEffect(() => {
     const socket = getSocket();
     socket.on('exception', (data: any) => {
       if (data.message === '뮤트 상태의 유저입니다.') {
-        alert('뮤트 상태의 유저입니다.');
+        openIsMute();
       }
     });
     return () => {

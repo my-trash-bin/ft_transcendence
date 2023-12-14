@@ -1,3 +1,4 @@
+import useToast from '@/components/common/useToast';
 import { messageType } from '@/components/dm/message/MessageContent';
 import { getSocket } from '@/lib/Socket';
 import { useRouter } from 'next/navigation';
@@ -26,6 +27,16 @@ const handleChannelMessage = (
   });
 };
 
+export const useSocket = (
+  type: any,
+  setMessages: any,
+  channelId: string,
+  targetName: string | undefined,
+) => {
+  const router = useRouter();
+  const { openIsOut, openIsKick, openIsBan, openIsMute, openIsPromote } = useToast();
+
+
 const handleLeave = (
   socket: any,
   setMessages: any,
@@ -34,7 +45,7 @@ const handleLeave = (
 ) => {
   socket.on('leave', (res: any) => {
     if (res.data.member.id === meId) {
-      alert('채널에서 나갔습니다.');
+      openIsOut();
       router.replace('/channel');
     } else {
       setMessages((messages: any) => [...messages, res]);
@@ -42,49 +53,46 @@ const handleLeave = (
   });
 };
 
-const handleJoin = (socket: any, setMessages: any) => {
-  socket.on('join', (res: any) => {
-    setMessages((messages: any) => [...messages, res]);
-  });
-};
+  const handleJoin = (socket: any, setMessages: any) => {
+    socket.on('join', (res: any) => {
+      setMessages((messages: any) => [...messages, res]);
+    });
+  };
 
-const handleKickBanPromote = (
-  socket: any,
-  meId: string | undefined,
-  channelId: string | undefined,
-  router: any,
-) => {
-  socket.on('kickBanPromote', (res: any) => {
-    const targetUserId = res.data.targetUser.id;
+  const handleKickBanPromote = (
+    socket: any,
+    meId: string | undefined,
+    channelId: string | undefined,
+    router: any,
+  ) => {
+    socket.on('kickBanPromote', (res: any) => {
+      const targetUserId = res.data.targetUser.id;
 
-    if (res.data.actionType === 'KICK' || res.data.actionType === 'BANNED') {
-      if (targetUserId === meId && channelId === res.data.channelId) {
-        alert('채널에서 강퇴당했습니다.');
-        router.replace('/channel');
+      if (res.data.actionType === 'KICK' || res.data.actionType === 'BANNED') {
+        if (targetUserId === meId && channelId === res.data.channelId) {
+          if (res.data.actionType === 'KICK') {
+            openIsKick();
+          } else {
+            openIsBan();
+          }
+          router.replace('/channel');
+        }
+      } else if (
+        res.data.actionType === 'PROMOTE' &&
+        channelId === res.data.channelId &&
+        targetUserId === meId
+      ) {
+        openIsPromote();
+      } else if (
+        res.data.actionType === 'MUTE' &&
+        targetUserId === meId &&
+        channelId === res.data.channelId
+      ) {
+        openIsMute();
       }
-    } else if (
-      res.data.actionType === 'PROMOTE' &&
-      channelId === res.data.channelId &&
-      targetUserId === meId
-    ) {
-      alert('채널에서 관리자가 되었습니다.');
-    } else if (
-      res.data.actionType === 'MUTE' &&
-      targetUserId === meId &&
-      channelId === res.data.channelId
-    ) {
-      alert('채널에서 음소거 되었습니다. 1분동안 메세지를 보낼 수 없습니다.');
-    }
-  });
-};
+    });
+  };
 
-export const useSocket = (
-  type: any,
-  setMessages: any,
-  channelId: string,
-  targetName: string | undefined,
-) => {
-  const router = useRouter();
   useEffect(() => {
     const socket = getSocket();
     const localMe = localStorage.getItem('me');

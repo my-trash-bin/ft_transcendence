@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCallback, useContext, useState } from 'react';
 import { ModalLayout } from './ModalLayout';
+import useToast from '@/components/common/useToast';
 
 export function EnterPasswordModal({
   isModalOpen,
@@ -14,6 +15,7 @@ export function EnterPasswordModal({
   targetChannelId: string;
 }>) {
   const { api } = useContext(ApiContext);
+  const { openIsBan, openIsInvalidPassword } = useToast();
   const router = useRouter();
   const closeModal = () => {
     setIsModalOpen(false);
@@ -36,11 +38,11 @@ export function EnterPasswordModal({
     } catch (error: any) {
       console.error('Error participate channel:', error);
       if (error?.error.message === '밴된 유저는 채널에 들어갈 수 없습니다.')
-        alert('해당 채널에서 BAN된 유저입니다.');
+        openIsBan();
       else if (error?.error.message === '올바른 비밀번호 입력이 필요합니다.')
-        alert('비밀번호를 다시 입력해주세요.');
+        openIsInvalidPassword();
     }
-  }, [api, targetChannelId, password, router]);
+  }, [api, targetChannelId, password, router, openIsBan, openIsInvalidPassword]);
 
   return (
     <ModalLayout
