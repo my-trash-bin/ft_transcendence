@@ -43,7 +43,7 @@ function SignInPage() {
     );
 
   return (
-    <div className="min-h-screen flex items-center justify-center font-sejong">
+    <div className="min-h-screen flex items-center justify-center font-jeonju">
       {nickname === '' ? getNicknameComponent : getAvatarComponent}
     </div>
   );

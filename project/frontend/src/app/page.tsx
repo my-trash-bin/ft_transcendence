@@ -7,7 +7,7 @@ function Page() {
   const CSS =
     'bg-default-interactive rounded-md w-xl h-md ' +
     'border-3 border-dark-purple ' +
-    'text-dark-purple font-bold text-h2 text-center font-sejong align-text-middle ' +
+    'text-dark-purple font-bold text-h2 text-center font-jeonju align-text-middle ' +
     'cursor-pointer transition-all duration-300 ease-in-out hover:shadow-custom hover:-translate-y-[0.148rem] ' +
     'flex justify-center items-center';
   return (

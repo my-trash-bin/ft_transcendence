@@ -39,7 +39,7 @@ function TwofactorPage() {
   }, [api, password, router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center font-sejong">
+    <div className="min-h-screen flex items-center justify-center font-jeonju">
       <div className="w-2xl h-[400px] bg-light-background rounded-lg flex flex-col justify-center items-center">
         <h2 className="font-bold mb-xl">2차 인증 비밀번호를 입력하세요.</h2>
         {render()}
