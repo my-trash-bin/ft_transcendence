@@ -22,7 +22,7 @@ export const useDm = (username: string) => {
       else if (me?.data.phase === 'complete')
         localStorage.setItem('me', JSON.stringify(me.data.me));
       else if (me?.data.phase === '2fa') router.replace('/2fa');
-      if (!dm?.data) {
+      if (!dm?.data.canSend) {
         router.replace('/dm');
       }
     }
