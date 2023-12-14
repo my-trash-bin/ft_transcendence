@@ -675,10 +675,23 @@ export class EventsService {
     inviterId: string,
     isItemMode: boolean,
   ) {
+    const userId = client.data.userId as string;
     const invitation = this.activeInvitations.get(inviterId);
     if (!invitation) {
-      client.emit('gameInvitationExpired');
-      return;
+      client.emit('failToAccepInvitation', { msg: '만료된 초대장이에요!' });
+      return; // 만료된 초대장
+    }
+    if (this.pongMap.has(userId) || this.readyUsers.has(userId)) {
+      this.logger.log(
+        `tryMatch 실패: on게임 || on대기열(초대상태 포함) ${[
+          this.pongMap.has(userId),
+          this.readyUsers.has(userId),
+        ]}`,
+      );
+      client.emit('failToAccepInvitation', {
+        msg: '이미 게임중이거나 대기열에 있습니다.(초대상태 포함)',
+      });
+      return; // 이미 게임중이거나, 대기열에있음
     }
     this.activeInvitations.delete(inviterId);
     this.readyUsers.delete(inviterId);
@@ -978,5 +991,10 @@ export class EventsService {
     this.logger.error('readyUsers');
     this.logger.verbose([...this.readyUsers.keys()]);
     this.logger.error('=====================================');
+  }
+
+  noti(id: UserId, data: any) {
+    const eventName = 'noti';
+    this.broadcastToUserClients(id, eventName, data);
   }
 }

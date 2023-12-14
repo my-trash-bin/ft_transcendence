@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCallback, useContext } from 'react';
 import { ModalLayout } from './ModalLayout';
+import useToast from '@/components/common/useToast';
 
 export function ParticipationModal({
   isModalOpen,
@@ -22,6 +23,7 @@ export function ParticipationModal({
   const closeModal = () => {
     setIsModalOpen(false);
   };
+  const { openIsBan, openIsFull } = useToast();
 
   const participateChannel = useCallback(async () => {
     try {
@@ -35,10 +37,10 @@ export function ParticipationModal({
       setMyChannel(true);
     } catch (error: any) {
       if (error?.error.message === '밴된 유저는 채널에 들어갈 수 없습니다.') {
-        alert('해당 채널에서 BAN된 유저입니다.');
+        openIsBan();
         setIsModalOpen(false);
       } else if (error?.error.message === '최대 사용자 수 초과') {
-        alert('channel에 맴버가 꽉 찼습니다.');
+        openIsFull();
         setIsModalOpen(false);
       }
     }
@@ -49,6 +51,8 @@ export function ParticipationModal({
     router,
     setIsModalOpen,
     setMyChannel,
+    openIsBan,
+    openIsFull,
   ]);
 
   return (
