@@ -39,9 +39,28 @@ export class UserFollowService {
       followOrBlockedAt: Date;
       follower: UserDto;
       followee: UserDto;
+      isNewRecord: boolean;
     }>
   > {
     try {
+      const prevRecord = await this.prismaService.userFollow.findUnique({
+        where: {
+          followerId_followeeId: {
+            followerId: followerId.value,
+            followeeId: followeeId.value,
+          },
+          isBlock: isBlock,
+        },
+        select: {
+          follower: true,
+          followee: true,
+          isBlock: true,
+          followOrBlockedAt: true,
+        },
+      });
+      if (prevRecord !== null) {
+        return newServiceOkResponse({ isNewRecord: false, ...prevRecord });
+      }
       const result = await this.prismaService.userFollow.upsert({
         where: {
           followerId_followeeId: {
@@ -72,27 +91,21 @@ export class UserFollowService {
             isBlock: false,
           },
         });
-        const friends = await this.prismaService.userFollow.findMany({
-          where: {
-            followerId: followerId.value,
-            isBlock: false,
-          },
-        });
-        this.logger.debug(friends);
-        const result = await this.achievementService.checkGrantAchievement([
-          {
-            userId: followerId,
-            eventType: 'newFriend',
-            eventValue: count,
-          },
-        ]);
+        const grantAchievementResult =
+          await this.achievementService.checkGrantAchievement([
+            {
+              userId: followerId,
+              eventType: 'newFriend',
+              eventValue: count,
+            },
+          ]);
         this.logger.verbose(
           `친구 요청 성공 후(${count}), 업적 부여 체크: ${JSON.stringify(
-            result,
+            grantAchievementResult,
           )}`,
         );
       }
-      return newServiceOkResponse(result);
+      return newServiceOkResponse({ isNewRecord: true, ...result });
     } catch (error) {
       if (
         IsRecordToUpdateNotFoundError(error) ||
