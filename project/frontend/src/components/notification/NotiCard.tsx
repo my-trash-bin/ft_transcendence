@@ -9,7 +9,6 @@ interface NotiCardProps {
 }
 
 export const NotiCard: React.FC<NotiCardProps> = ({ content }) => {
-  const [friendRequest, setFriendRequest] = useState(false);
   const sizeCSS = 'h-[60px] text-md';
   const colorCSS =
     'bg-white border-3 border-default rounded-md hover:bg-light-background';
@@ -34,26 +33,15 @@ export const NotiCard: React.FC<NotiCardProps> = ({ content }) => {
 
   const requestFriend = useCallback(async () => {
     try {
-      if (!friendRequest) {
-        await api.userFollowControllerFollowUser({ targetUser: sourceId });
-        setFriendName(sourceName);
-        openNewFriend();
-        setTimeout(() => closeNewFriend(), 2000);
-        console.log('Friend successfully');
-        setFriendRequest(true);
-      }
+      await api.userFollowControllerFollowUser({ targetUser: sourceId });
+      setFriendName(sourceName);
+      openNewFriend();
+      setTimeout(() => closeNewFriend(), 2000);
+      console.log('Friend successfully');
     } catch (error) {
       console.error('Error friend:', error);
     }
-  }, [
-    api,
-    sourceId,
-    openNewFriend,
-    closeNewFriend,
-    sourceName,
-    setFriendName,
-    friendRequest,
-  ]);
+  }, [api, sourceId, openNewFriend, closeNewFriend, sourceName, setFriendName]);
 
   let notificationContent;
   let hoverContent;
