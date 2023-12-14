@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -35,6 +36,7 @@ import { JoinedChannelInfoDto } from './dto/joined-channel-info.dto';
 import { KickBanPromoteMuteRequestDto } from './dto/kick-ban-promote-mute-request.dto';
 import { LeavingChannelResponseDto } from './dto/leave-channel-response.dto';
 import { LeaveChannelDto } from './dto/leave-channel.dto';
+import { MessagePaginationDto } from './dto/message-pagination.dto';
 import { ParticipateChannelDto } from './dto/participate-channel.dto';
 import { UpdateChannelDto } from './dto/update-channel.dto';
 import { ChannelType } from './enums/channel-type.enum';
@@ -192,12 +194,16 @@ export class ChannelController {
   @Phase('complete')
   async getChannelMessages(
     @Param('channelId') channelId: string,
+    @Query() dto: MessagePaginationDto,
     @Request() req: ExpressRequest,
   ) {
     const userId = (req.user as JwtPayloadPhaseComplete).id;
+    const { cursorTimestamp, pageSize } = dto;
     const result = await this.channelService.getChannelMessages(
       channelId,
       userId,
+      cursorTimestamp,
+      pageSize,
     );
     if (!result.ok) {
       throw new HttpException(result.error!.message, result.error!.statusCode);
