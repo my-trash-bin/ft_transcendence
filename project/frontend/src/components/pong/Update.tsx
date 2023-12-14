@@ -10,7 +10,7 @@ import {
 } from './gameConstants';
 
 interface ExtendedGameState extends GameState {
-  isPlayer1: boolean;
+  isPlayer1?: boolean;
   setIsPlayer1: (isPlayer1: boolean) => void;
   setGameState: (newState: GameState) => void;
   setGameOver: (gameOver: boolean) => void;
@@ -34,7 +34,6 @@ const useStore = create<ExtendedGameState>((set) => ({
   score2: 0,
   gameOver: false,
   gameStart: false,
-  isPlayer1: true,
   isItemMode: false,
   pongItem: { x: 0, y: 0, type: 0 },
   player1Info: { nickname: '', avatarUrl: '' },

@@ -16,6 +16,7 @@ import {
   SMALL_PADDLE_HEIGHT,
 } from './gameConstants';
 import { getGameSocket } from './gameSocket';
+import useNotAllowedPong from '../game/notAllowedPong';
 
 const usePaddleHeight = (type: number) => {
   return useMemo(() => {
@@ -67,6 +68,15 @@ function Board() {
   useEffect(() => {
     socket.emit('clientReady', socket.id);
   }, [socket]);
+
+  const { OpenToast } = useNotAllowedPong();
+
+  useEffect(() => {
+    if (isPlayer1 === undefined) {
+      router.push('/game');
+      OpenToast();
+    }
+  }, [isPlayer1, router, OpenToast]);
 
   /* --------------------- 게임 중단 --------------------- */
   const handleDisconnect = useCallback(() => {
