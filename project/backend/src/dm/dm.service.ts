@@ -215,7 +215,11 @@ export class DmService {
 
       //filter block user
       result = result.filter((el: any) => {
-        const isBlock = blockList.find((block) => block.followeeId === el.id);
+        const otherUserId =
+          el.member1Id === userId ? el.member2Id : el.member1Id;
+        const isBlock = blockList.find(
+          (block) => block.followeeId === otherUserId,
+        );
         if (isBlock) return false;
         else return true;
       });
