@@ -47,7 +47,6 @@ function Board() {
     score1,
     score2,
     isPlayer1,
-    deleteIsPlayer1,
     setGameState,
     pongItem,
     isItemMode,
@@ -123,10 +122,9 @@ function Board() {
   useEffect(() => {
     return () => {
       console.log('leaveGameBoard');
-      deleteIsPlayer1();
       socket.emit('leaveGameBoard');
     };
-  }, [socket, deleteIsPlayer1]);
+  }, [socket]);
 
   /* --------------------- 플레이어 정보 업데이트 --------------------- */
 
