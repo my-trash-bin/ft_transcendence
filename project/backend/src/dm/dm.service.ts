@@ -130,7 +130,12 @@ export class DmService {
   async getDMChannelMessagesByNickname(
     userId: UserId,
     nickname: string,
+    cursorTimestamp: Date | undefined,
+    pageSize: number | undefined,
   ): Promise<ServiceResponse<any[]>> {
+    this.logger.verbose(
+      `getDMChannelMessagesByNickname: ${[userId.value, nickname]}`,
+    );
     try {
       const targetUser = await this.prisma.user.findUniqueOrThrow({
         where: { nickname },
@@ -145,11 +150,15 @@ export class DmService {
       if (!channelResult.ok) {
         return { ok: false, error: channelResult.error };
       }
+      const whereClause = cursorTimestamp
+        ? { createdAt: { lt: cursorTimestamp } }
+        : {};
       const result = await this.prisma.$transaction(
         async (prismaTransaction) => {
           const channelId = channelResult.data!.id;
           return await prismaTransaction.dMMessage.findMany({
             where: {
+              ...whereClause,
               channelId,
             },
             include: {
@@ -158,11 +167,13 @@ export class DmService {
               },
             },
             orderBy: {
-              sentAt: 'asc',
+              sentAt: 'desc',
             },
+            take: pageSize,
           });
         },
       );
+      result.reverse();
       return newServiceOkResponse(
         result.map((el) => {
           return {
