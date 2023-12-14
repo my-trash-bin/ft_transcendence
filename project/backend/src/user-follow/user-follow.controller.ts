@@ -21,6 +21,7 @@ import { JwtPayloadPhaseComplete } from '../auth/auth.service';
 import { JwtGuard } from '../auth/jwt.guard';
 import { Phase, PhaseGuard } from '../auth/phase.guard';
 import { idOf } from '../common/Id';
+import { EventsService } from '../events/events.service';
 import { NotificationService } from '../notification/notification.service';
 import { TargetUserDto } from './dto/create-user-follow.dto';
 import { UserFollowDto } from './dto/user-follow.dto';
@@ -33,6 +34,7 @@ export class UserFollowController {
   constructor(
     private readonly userFollowService: UserFollowService,
     private readonly notificationService: NotificationService,
+    private readonly eventsSerivce: EventsService,
   ) {}
 
   @Post('request')
@@ -48,7 +50,7 @@ export class UserFollowController {
     }
     if (result.data?.isNewRecord!) {
       try {
-        await this.notificationService.create(
+        const notiData = await this.notificationService.create(
           idOf(dto.targetUser),
           JSON.stringify({
             type: 'newFriend',
@@ -56,6 +58,7 @@ export class UserFollowController {
             sourceName: result.data?.follower.nickname!,
           }),
         );
+        this.eventsSerivce.noti(idOf(dto.targetUser), notiData);
         this.logger.log(`친구 요청 성공 후, 노티 생성 성공`);
       } catch (error) {
         this.logger.error(`친구 요청 성공 후, 노티 생성시 에러: ${error}`);

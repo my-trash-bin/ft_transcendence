@@ -979,4 +979,9 @@ export class EventsService {
     this.logger.verbose([...this.readyUsers.keys()]);
     this.logger.error('=====================================');
   }
+
+  noti(id: UserId, data: any) {
+    const eventName = 'noti';
+    this.broadcastToUserClients(id, eventName, data);
+  }
 }
