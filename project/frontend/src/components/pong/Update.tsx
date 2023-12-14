@@ -12,6 +12,7 @@ import {
 interface ExtendedGameState extends GameState {
   isPlayer1?: boolean;
   setIsPlayer1: (isPlayer1: boolean) => void;
+  deleteIsPlayer1: () => void;
   setGameState: (newState: GameState) => void;
   setGameOver: (gameOver: boolean) => void;
   setGameScore: (score1: number, score2: number) => void;
@@ -40,6 +41,7 @@ const useStore = create<ExtendedGameState>((set) => ({
   player2Info: { nickname: '', avatarUrl: '' },
 
   setIsPlayer1: (isPlayer1) => set({ isPlayer1 }),
+  deleteIsPlayer1: () => set({ isPlayer1: undefined }),
   setGameState: (newState) => set({ ...newState }),
   setGameOver: (gameOver) => set({ gameOver }),
   setGameScore: (score1, score2) => set({ score1, score2 }),
