@@ -803,7 +803,7 @@ export class ChannelService {
     try {
       const blockList = await this.dmService.getBlockUserList(userId.value);
       const whereClause = cursorTimestamp
-        ? { createdAt: { lt: cursorTimestamp } }
+        ? { sentAt: { lt: cursorTimestamp } }
         : {};
       let result = await this.prismaService.channelMessage.findMany({
         where: {

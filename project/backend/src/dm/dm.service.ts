@@ -151,7 +151,7 @@ export class DmService {
         return { ok: false, error: channelResult.error };
       }
       const whereClause = cursorTimestamp
-        ? { createdAt: { lt: cursorTimestamp } }
+        ? { sentAt: { lt: cursorTimestamp } }
         : {};
       const result = await this.prisma.$transaction(
         async (prismaTransaction) => {

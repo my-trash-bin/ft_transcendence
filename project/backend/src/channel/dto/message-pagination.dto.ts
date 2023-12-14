@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform, Type } from 'class-transformer';
+import { Type } from 'class-transformer';
 import { IsDateString, IsInt, IsOptional, Min } from 'class-validator';
 
 export class MessagePaginationDto {
@@ -11,8 +11,7 @@ export class MessagePaginationDto {
   })
   @IsOptional()
   @IsDateString()
-  @Transform(({ value }) => (value ? new Date(value) : undefined))
-  cursorTimestamp?: Date;
+  cursorTimestamp?: string;
 
   @ApiProperty({
     description: '페이지당 메시지 수',

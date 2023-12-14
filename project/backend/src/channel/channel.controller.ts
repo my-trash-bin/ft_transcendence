@@ -202,7 +202,7 @@ export class ChannelController {
     const result = await this.channelService.getChannelMessages(
       channelId,
       userId,
-      cursorTimestamp,
+      cursorTimestamp ? new Date(cursorTimestamp) : undefined,
       pageSize,
     );
     if (!result.ok) {

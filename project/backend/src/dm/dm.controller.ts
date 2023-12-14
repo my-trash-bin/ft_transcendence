@@ -53,7 +53,7 @@ export class DmController {
     const res = await this.dmService.getDMChannelMessagesByNickname(
       userId,
       nickname || '',
-      cursorTimestamp,
+      cursorTimestamp ? new Date(cursorTimestamp) : undefined,
       pageSize,
     );
     return res!.data;
