@@ -2,7 +2,7 @@ import useToast from '@/components/common/useToast';
 import { messageType } from '@/components/dm/message/MessageContent';
 import { getSocket } from '@/lib/Socket';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 
 const handleDirectMessage = (
   socket: any,
@@ -34,24 +34,22 @@ export const useSocket = (
   targetName: string | undefined,
 ) => {
   const router = useRouter();
-  const { openIsOut, openIsKick, openIsBan, openIsMute, openIsPromote } = useToast();
+  const { openIsOut, openIsKick, openIsBan, openIsMute, openIsPromote } =
+    useToast();
 
-
-const handleLeave = (
-  socket: any,
-  setMessages: any,
-  meId: string | undefined,
-  router: any,
-) => {
-  socket.on('leave', (res: any) => {
-    if (res.data.member.id === meId) {
-      openIsOut();
-      router.replace('/channel');
-    } else {
-      setMessages((messages: any) => [...messages, res]);
-    }
-  });
-};
+  const handleLeave = useCallback(
+    (socket: any, setMessages: any, meId: string | undefined, router: any) => {
+      socket.on('leave', (res: any) => {
+        if (res.data.member.id === meId) {
+          openIsOut();
+          router.replace('/channel');
+        } else {
+          setMessages((messages: any) => [...messages, res]);
+        }
+      });
+    },
+    [openIsOut],
+  );
 
   const handleJoin = (socket: any, setMessages: any) => {
     socket.on('join', (res: any) => {
@@ -59,39 +57,45 @@ const handleLeave = (
     });
   };
 
-  const handleKickBanPromote = (
-    socket: any,
-    meId: string | undefined,
-    channelId: string | undefined,
-    router: any,
-  ) => {
-    socket.on('kickBanPromote', (res: any) => {
-      const targetUserId = res.data.targetUser.id;
+  const handleKickBanPromote = useCallback(
+    (
+      socket: any,
+      meId: string | undefined,
+      channelId: string | undefined,
+      router: any,
+    ) => {
+      socket.on('kickBanPromote', (res: any) => {
+        const targetUserId = res.data.targetUser.id;
 
-      if (res.data.actionType === 'KICK' || res.data.actionType === 'BANNED') {
-        if (targetUserId === meId && channelId === res.data.channelId) {
-          if (res.data.actionType === 'KICK') {
-            openIsKick();
-          } else {
-            openIsBan();
+        if (
+          res.data.actionType === 'KICK' ||
+          res.data.actionType === 'BANNED'
+        ) {
+          if (targetUserId === meId && channelId === res.data.channelId) {
+            if (res.data.actionType === 'KICK') {
+              openIsKick();
+            } else {
+              openIsBan();
+            }
+            router.replace('/channel');
           }
-          router.replace('/channel');
+        } else if (
+          res.data.actionType === 'PROMOTE' &&
+          channelId === res.data.channelId &&
+          targetUserId === meId
+        ) {
+          openIsPromote();
+        } else if (
+          res.data.actionType === 'MUTE' &&
+          targetUserId === meId &&
+          channelId === res.data.channelId
+        ) {
+          openIsMute();
         }
-      } else if (
-        res.data.actionType === 'PROMOTE' &&
-        channelId === res.data.channelId &&
-        targetUserId === meId
-      ) {
-        openIsPromote();
-      } else if (
-        res.data.actionType === 'MUTE' &&
-        targetUserId === meId &&
-        channelId === res.data.channelId
-      ) {
-        openIsMute();
-      }
-    });
-  };
+      });
+    },
+    [openIsBan, openIsKick, openIsMute, openIsPromote],
+  );
 
   useEffect(() => {
     const socket = getSocket();
@@ -116,5 +120,13 @@ const handleLeave = (
         socket.off('kickBanPromote');
       }
     };
-  }, [type, setMessages, channelId, targetName, router]);
+  }, [
+    type,
+    setMessages,
+    channelId,
+    targetName,
+    router,
+    handleKickBanPromote,
+    handleLeave,
+  ]);
 };
