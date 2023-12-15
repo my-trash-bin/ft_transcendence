@@ -1,8 +1,7 @@
-import useToast from '@/components/common/useToast';
 import { messageType } from '@/components/dm/message/MessageContent';
 import { getSocket } from '@/lib/Socket';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 
 const handleDirectMessage = (
   socket: any,
@@ -27,6 +26,58 @@ const handleChannelMessage = (
   });
 };
 
+const handleLeave = (
+  socket: any,
+  setMessages: any,
+  meId: string | undefined,
+  router: any,
+) => {
+  socket.on('leave', (res: any) => {
+    if (res.data.member.id === meId) {
+      alert('채널에서 나갔습니다.');
+      router.replace('/channel');
+    } else {
+      setMessages((messages: any) => [...messages, res]);
+    }
+  });
+};
+
+const handleJoin = (socket: any, setMessages: any) => {
+  socket.on('join', (res: any) => {
+    setMessages((messages: any) => [...messages, res]);
+  });
+};
+
+const handleKickBanPromote = (
+  socket: any,
+  meId: string | undefined,
+  channelId: string | undefined,
+  router: any,
+) => {
+  socket.on('kickBanPromote', (res: any) => {
+    const targetUserId = res.data.targetUser.id;
+
+    if (res.data.actionType === 'KICK' || res.data.actionType === 'BANNED') {
+      if (targetUserId === meId && channelId === res.data.channelId) {
+        alert('채널에서 강퇴당했습니다.');
+        router.replace('/channel');
+      }
+    } else if (
+      res.data.actionType === 'PROMOTE' &&
+      channelId === res.data.channelId &&
+      targetUserId === meId
+    ) {
+      alert('채널에서 관리자가 되었습니다.');
+    } else if (
+      res.data.actionType === 'MUTE' &&
+      targetUserId === meId &&
+      channelId === res.data.channelId
+    ) {
+      alert('채널에서 음소거 되었습니다. 1분동안 메세지를 보낼 수 없습니다.');
+    }
+  });
+};
+
 export const useSocket = (
   type: any,
   setMessages: any,
@@ -34,69 +85,6 @@ export const useSocket = (
   targetName: string | undefined,
 ) => {
   const router = useRouter();
-  const { openIsOut, openIsKick, openIsBan, openIsMute, openIsPromote } =
-    useToast();
-
-  const handleLeave = useCallback(
-    (socket: any, setMessages: any, meId: string | undefined, router: any) => {
-      socket.on('leave', (res: any) => {
-        if (res.data.member.id === meId) {
-          openIsOut();
-          router.replace('/channel');
-        } else {
-          setMessages((messages: any) => [...messages, res]);
-        }
-      });
-    },
-    [openIsOut],
-  );
-
-  const handleJoin = (socket: any, setMessages: any) => {
-    socket.on('join', (res: any) => {
-      setMessages((messages: any) => [...messages, res]);
-    });
-  };
-
-  const handleKickBanPromote = useCallback(
-    (
-      socket: any,
-      meId: string | undefined,
-      channelId: string | undefined,
-      router: any,
-    ) => {
-      socket.on('kickBanPromote', (res: any) => {
-        const targetUserId = res.data.targetUser.id;
-
-        if (
-          res.data.actionType === 'KICK' ||
-          res.data.actionType === 'BANNED'
-        ) {
-          if (targetUserId === meId && channelId === res.data.channelId) {
-            if (res.data.actionType === 'KICK') {
-              openIsKick();
-            } else {
-              openIsBan();
-            }
-            router.replace('/channel');
-          }
-        } else if (
-          res.data.actionType === 'PROMOTE' &&
-          channelId === res.data.channelId &&
-          targetUserId === meId
-        ) {
-          openIsPromote();
-        } else if (
-          res.data.actionType === 'MUTE' &&
-          targetUserId === meId &&
-          channelId === res.data.channelId
-        ) {
-          openIsMute();
-        }
-      });
-    },
-    [openIsBan, openIsKick, openIsMute, openIsPromote],
-  );
-
   useEffect(() => {
     const socket = getSocket();
     const localMe = localStorage.getItem('me');
@@ -120,13 +108,5 @@ export const useSocket = (
         socket.off('kickBanPromote');
       }
     };
-  }, [
-    type,
-    setMessages,
-    channelId,
-    targetName,
-    router,
-    handleKickBanPromote,
-    handleLeave,
-  ]);
+  }, [type, setMessages, channelId, targetName, router]);
 };

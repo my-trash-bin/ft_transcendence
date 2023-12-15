@@ -11,14 +11,14 @@ export function UserStateAnnounce({
     <>
       {userState === UserState.LEAVE ? (
         <p
-          className="w-[480px] h-[25px] bg-light-background rounded-md
+          className="w-[460px] h-[25px] bg-light-background rounded-md
          text-dark-gray self-center text-center text-[15px] mb-[10px]"
         >
           {nickname} 님이 나갔습니다.
         </p>
       ) : (
         <p
-          className="w-[480px] h-[25px] bg-light-background rounded-md
+          className="w-[460px] h-[25px] bg-light-background rounded-md
           text-dark-gray self-center text-center text-[15px] mb-[10px]"
         >
           {nickname} 님이 들어왔습니다.
