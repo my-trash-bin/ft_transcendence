@@ -935,13 +935,8 @@ export class EventsService {
       return; // 해당 소켓이 진행중이던 게임 없음
     }
 
-    // const [meSocketId, opponentSocketId] =
-    //   pong.player1Id === userId
-    //     ? [pong.player1SocketId, pong.player2SocketId]
-    //     : [pong.player2SocketId, pong.player1SocketId];
-
     if (!pong.getGameState().gameStart) {
-      pong.setGameStart(); // 스타트 상태로 강제 전환인듯
+      pong.setGameStart();
     }
 
     const isPlayer1win = userId !== pong.player1Id;
