@@ -3,20 +3,26 @@ import { EventEmitter } from 'events';
 import { PrismaService } from '../base/prisma.service';
 import { idOf, UserId } from '../common/Id';
 
-// 게임 상수
+// 게임 보드
 const BOARD_WIDTH = 800;
 const BOARD_HEIGHT = 500;
+const GAME_OVER = 7;
+
+// 패들
 const PADDLE_WIDTH = 10;
 const PADDLE_HEIGHT = 80;
 const SMALL_PADDLE_HEIGHT = 50;
 const SMALL_PADDLE_STRIKE = 2;
+
+// 공
 const BALL_SIZE = 15;
-const DEFAULT_SPEED = 3;
-const SMASH_SPEED = 8;
+const DEFAULT_SPEED = 6;
+const SMASH_SPEED = 12;
 const PADDLE_STRIKE = 4;
 const PADDLE_MOVE_STEP = 20;
+
+// 아이템
 const ITEM_SIZE = 100;
-const GAME_OVER = 7;
 
 export interface GameState {
   ball: { x: number; y: number; type: number };
