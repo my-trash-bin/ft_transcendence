@@ -41,7 +41,6 @@ export class Pong {
   readonly onGameUpdate = new EventEmitter();
 
   private gameState: GameState;
-  private player1Won: boolean;
   private counter = 0;
   constructor(
     private readonly prisma: PrismaService,
@@ -62,7 +61,6 @@ export class Pong {
     this.player2Id = player2Id;
     this.player1SocketId = player1SocketId;
     this.player2SocketId = player2SocketId;
-    this.player1Won = false;
 
     this.gameState = {
       ball: {
