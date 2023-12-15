@@ -3,7 +3,6 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import InviteModal from '../game/InviteModal';
 import MatchingModal from '../game/MatchingModal';
-import useNotAllowedPong from '../game/notAllowedPong';
 import useNewFriend from '../notification/NewFriendToast';
 import { Notification } from '../notification/Notification';
 import useStore from '../pong/Update';
@@ -22,7 +21,6 @@ const Navbar = () => {
   const socket = getGameSocket();
   const router = useRouter();
   const { setIsPlayer1 } = useStore();
-  const { isOpen, closeToast } = useNotAllowedPong();
   const { message, closeMessage } = useToast();
 
   useEffect(() => {
@@ -36,10 +34,6 @@ const Navbar = () => {
       socket.off('playerRole', handlePlayerRole);
     };
   }, [socket, setIsPlayer1]);
-
-  useEffect(() => {
-    setTimeout(() => closeToast(), 2000);
-  }, [isOpen, closeToast]);
 
   useEffect(() => {
     setTimeout(() => closeMessage(), 2000);
@@ -88,7 +82,6 @@ const Navbar = () => {
   return (
     <>
       {message && <div className={css}>{message}</div>}
-      {isOpen && <div className={css}>게임이 시작되지 않았어요!</div>}
       {errorMessage && <div className={css}>{errorMessage}</div>}
       {isNewFriendOpen && (
         <div className={css}>{friendName}님과 친구가 되었습니다!</div>
