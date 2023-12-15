@@ -34,7 +34,7 @@ export const useSocket = (
   targetName: string | undefined,
 ) => {
   const router = useRouter();
-  const { openIsOut, openIsKick, openIsBan, openIsMute, openIsPromote } = useToast();
+  const { openMessage } = useToast();
 
 
 const handleLeave = (
@@ -45,7 +45,7 @@ const handleLeave = (
 ) => {
   socket.on('leave', (res: any) => {
     if (res.data.member.id === meId) {
-      openIsOut();
+      openMessage('채널에서 나갔습니다!');
       router.replace('/channel');
     } else {
       setMessages((messages: any) => [...messages, res]);
@@ -71,9 +71,9 @@ const handleLeave = (
       if (res.data.actionType === 'KICK' || res.data.actionType === 'BANNED') {
         if (targetUserId === meId && channelId === res.data.channelId) {
           if (res.data.actionType === 'KICK') {
-            openIsKick();
+            openMessage('방장이 나가라고 합니다!');
           } else {
-            openIsBan();
+            openMessage('방장이 채널에서 차단했습니다!');
           }
           router.replace('/channel');
         }
@@ -82,13 +82,13 @@ const handleLeave = (
         channelId === res.data.channelId &&
         targetUserId === meId
       ) {
-        openIsPromote();
+        openMessage('관리자가 되었습니다!');
       } else if (
         res.data.actionType === 'MUTE' &&
         targetUserId === meId &&
         channelId === res.data.channelId
       ) {
-        openIsMute();
+        openMessage('방장이 1분간 조용히 하래요 ㅠ');
       }
     });
   };

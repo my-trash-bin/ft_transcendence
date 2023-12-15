@@ -1,6 +1,6 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import { use, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import InviteModal from '../game/InviteModal';
 import MatchingModal from '../game/MatchingModal';
 import useNotAllowedPong from '../game/notAllowedPong';
@@ -23,19 +23,7 @@ const Navbar = () => {
   const router = useRouter();
   const { setIsPlayer1 } = useStore();
   const { isOpen, closeToast } = useNotAllowedPong();
-  const { isBan, isFull, closeIsBan, closeIsFull,
-    isInvalidPassword, closeIsInvalidPassword,
-    isSuccessChangeChannnal, closeSuccessChangeChannnal,
-    isFailChangeChannnal, closeFailChangeChannnal,
-    isMute, closeIsMute,
-    isOut, closeIsOut,
-    isKick, closeIsKick,
-    isPromote, closeIsPromote,
-    isKickUser, closeIsKickUser,
-    isBanUser, closeIsBanUser,
-    isMuteUser, closeIsMuteUser,
-    isPromoteUser, closeIsPromoteUser,
-   } = useToast();
+  const { message, closeMessage } = useToast();
 
   useEffect(() => {
     const handlePlayerRole = (role: string) => {
@@ -54,56 +42,8 @@ const Navbar = () => {
   }, [isOpen, closeToast]);
 
   useEffect(() => {
-    setTimeout(() => closeIsBan(), 2000);
-  }, [isBan, closeIsBan]);
-
-  useEffect(() => {
-    setTimeout(() => closeIsFull(), 2000);
-  }, [isFull, closeIsFull]);
-
-  useEffect(() => {
-    setTimeout(() => closeIsMute(), 2000);
-  }, [isMute, closeIsMute]);
-
-  useEffect(() => {
-    setTimeout(() => closeIsInvalidPassword(), 2000);
-  }, [isInvalidPassword, closeIsInvalidPassword]);
-
-  useEffect(() => {
-    setTimeout(() => closeSuccessChangeChannnal(), 2000);
-  }, [isSuccessChangeChannnal, closeSuccessChangeChannnal]);
-
-  useEffect(() => {
-    setTimeout(() => closeFailChangeChannnal(), 2000);
-  }, [isFailChangeChannnal, closeFailChangeChannnal]);
-
-  useEffect(() => {
-    setTimeout(() => closeIsOut(), 2000);
-  }, [isOut, closeIsOut]);
-
-  useEffect(() => {
-    setTimeout(() => closeIsKick(), 2000);
-  }, [isKick, closeIsKick]);
-
-  useEffect(() => {
-    setTimeout(() => closeIsPromote(), 2000);
-  }, [isPromote, closeIsPromote]);
-
-  useEffect(() => {
-    setTimeout(() => closeIsKickUser(), 2000);
-  }, [isKickUser, closeIsKickUser]);
-
-  useEffect(() => {
-    setTimeout(() => closeIsBanUser(), 2000);
-  }, [isBanUser, closeIsBanUser]);
-
-  useEffect(() => {
-    setTimeout(() => closeIsMuteUser(), 2000);
-  }, [isMuteUser, closeIsMuteUser]);
-
-  useEffect(() => {
-    setTimeout(() => closeIsPromoteUser(), 2000);
-  }, [isPromoteUser, closeIsPromoteUser]);
+    setTimeout(() => closeMessage(), 2000);
+  }, [message, closeMessage]);
 
   useEffect(() => {
     const handleGoPong = (data: {
@@ -147,19 +87,7 @@ const Navbar = () => {
     'fixed w-[300px] h-[100px] left-1/2 p-sm transform -translate-x-1/2 translate-y-1/2 flex justify-center items-center bg-default border-3 border-dark-purple text-dark-purple rounded-md z-50 text-h3';
   return (
     <>
-      {isBan && <div className={css}>방장이 거부합니다 ㅠ</div>}
-      {isKick && <div className={css}>방장이 나가라고 합니다!</div>}
-      {isPromote && <div className={css}>관리자가 되었습니다!</div>}
-      {isKickUser && <div className={css}>유저를 내보냈습니다!</div>}
-      {isBanUser && <div className={css}>유저를 차단했습니다!</div>}
-      {isMuteUser && <div className={css}>유저의 입을 1분간 막았습니다!</div>}
-      {isPromoteUser && <div className={css}>유저를 관리자로 만들었습니다!</div>}
-      {isOut && <div className={css}>채널에서 나갔습니다!</div>}
-      {isMute && <div className={css}>방장이 1분간 조용히 하래요 ㅠ</div>}
-      {isSuccessChangeChannnal && <div className={css}>방을 변경했습니다!</div>}
-      {isFailChangeChannnal && <div className={css}>방 변경에 실패했습니다!</div>}
-      {isInvalidPassword && <div className={css}>비밀번호가 틀렸습니다!</div>}
-      {isFull && <div className={css}>방에 더이상 자리가 없어요!</div>}
+      {message && <div className={css}>{message}</div>}
       {isOpen && <div className={css}>게임이 시작되지 않았어요!</div>}
       {errorMessage && <div className={css}>{errorMessage}</div>}
       {isNewFriendOpen && (

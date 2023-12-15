@@ -16,12 +16,12 @@ export function MessageSendBox({
   targetUserId?: string;
 }) {
   const [message, setMessage] = useState<string>('');
-  const { openIsMute } = useToast();
+  const { openMessage } = useToast();
   useEffect(() => {
     const socket = getSocket();
     socket.on('exception', (data: any) => {
       if (data.message === '뮤트 상태의 유저입니다.') {
-        openIsMute();
+        openMessage('방장이 1분간 조용히 하래요 ㅠ');
       }
     });
     return () => {
