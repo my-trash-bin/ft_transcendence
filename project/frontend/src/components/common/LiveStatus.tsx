@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 export enum EnumUserStatus {
   ONLINE = 'online',
   OFFLINE = 'offline',
-  ONGAME = 'on game',
+  ONGAME = 'ongame',
 }
 
 const USER_STATUS_EVENT_NAME = 'userStatus';
