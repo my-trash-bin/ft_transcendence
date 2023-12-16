@@ -1,8 +1,8 @@
-import { useEffect } from 'react';
-import { useRouter } from 'next/router';
 import useToast from '@/components/common/useToast';
 import { messageType } from '@/components/dm/message/MessageContent';
 import { getSocket } from '@/lib/Socket';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export const useSocket = (
   type: messageType,
