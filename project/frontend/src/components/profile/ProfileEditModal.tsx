@@ -45,6 +45,7 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
       fetchData();
       onClose();
     } catch (error) {
+      alert(`${error.error.message}`);
       console.error('Error saving changes:', error);
     }
   }, [api, newData, onClose, fetchData]);
@@ -57,7 +58,9 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
       onClose();
     } catch (error: any) {
       if (error.status === 400) {
-        openMessage('비밀번호는 6-12자의 영문, 숫자, 하이픈(-), 언더스코어(_)만 사용 가능합니다');
+        openMessage(
+          '비밀번호는 6-12자의 영문, 숫자, 하이픈(-), 언더스코어(_)만 사용 가능합니다',
+        );
       }
       console.error('Error send password:', error);
     }
