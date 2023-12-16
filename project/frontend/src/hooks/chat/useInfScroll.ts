@@ -6,7 +6,7 @@ import {
 } from '@/components/dm/message/MessageContent';
 import { useCallback, useContext, useEffect } from 'react';
 
-const DEFAULT_PAGE_SIZE = 10;
+export const DEFAULT_PAGE_SIZE = 10;
 export default function useInfScroll(
   messageStartRef: any,
   setMessages: (arg: any) => void,
@@ -23,6 +23,8 @@ export default function useInfScroll(
   const loadMoreMessages = useCallback(async () => {
     if (messages.length === 0) return;
     const lastCursor = messages[0].data.sentAt;
+    console.log('loadMoreMessages');
+    console.log('lastCursor', lastCursor);
     const queryRequest: QueryParamsType = {
       pageSize: DEFAULT_PAGE_SIZE,
       cursorTimestamp: lastCursor,

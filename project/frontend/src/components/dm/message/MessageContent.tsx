@@ -76,11 +76,13 @@ export function MessageContent({
   );
   useEffect(() => {
     setMessages(initData);
-  }, [initData]);
+  }, [initData, channelId]);
   useEffect(() => {
     scrollTargetRef.current?.scrollIntoView({ behavior: 'auto' });
   }, [messages]);
   render.isSocketRender = false;
+  console.log('messages : ', messages);
+  console.log('initmessage : ', initData);
   return (
     <div className="w-[95%] h-[610px] pt-[20px] bg-chat-color2 rounded-[10px] flex flex-col overflow-y-scroll mt-sm">
       <div ref={messageStartRef} />
