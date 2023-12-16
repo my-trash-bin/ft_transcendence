@@ -15,7 +15,7 @@ export function EnterPasswordModal({
   targetChannelId: string;
 }>) {
   const { api } = useContext(ApiContext);
-  const { openIsBan, openIsInvalidPassword } = useToast();
+  const { openMessage } = useToast();
   const router = useRouter();
   const closeModal = () => {
     setIsModalOpen(false);
@@ -38,11 +38,11 @@ export function EnterPasswordModal({
     } catch (error: any) {
       console.error('Error participate channel:', error);
       if (error?.error.message === '밴된 유저는 채널에 들어갈 수 없습니다.')
-        openIsBan();
+        openMessage('방장이 거부합니다 ㅠ');
       else if (error?.error.message === '올바른 비밀번호 입력이 필요합니다.')
-        openIsInvalidPassword();
+        openMessage('비밀번호가 틀렸어요!');
     }
-  }, [api, targetChannelId, password, router, openIsBan, openIsInvalidPassword]);
+  }, [api, targetChannelId, password, router, openMessage]);
 
   return (
     <ModalLayout

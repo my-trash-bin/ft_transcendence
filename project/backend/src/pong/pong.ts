@@ -3,20 +3,26 @@ import { EventEmitter } from 'events';
 import { PrismaService } from '../base/prisma.service';
 import { idOf, UserId } from '../common/Id';
 
-// 게임 상수
+// 게임 보드
 const BOARD_WIDTH = 800;
 const BOARD_HEIGHT = 500;
+const GAME_OVER = 7;
+
+// 패들
 const PADDLE_WIDTH = 10;
 const PADDLE_HEIGHT = 80;
 const SMALL_PADDLE_HEIGHT = 50;
 const SMALL_PADDLE_STRIKE = 2;
+
+// 공
 const BALL_SIZE = 15;
-const DEFAULT_SPEED = 3;
-const SMASH_SPEED = 8;
+const DEFAULT_SPEED = 6;
+const SMASH_SPEED = 12;
 const PADDLE_STRIKE = 4;
 const PADDLE_MOVE_STEP = 20;
+
+// 아이템
 const ITEM_SIZE = 100;
-const GAME_OVER = 7;
 
 export interface GameState {
   ball: { x: number; y: number; type: number };
@@ -35,7 +41,6 @@ export class Pong {
   readonly onGameUpdate = new EventEmitter();
 
   private gameState: GameState;
-  private player1Won: boolean;
   private counter = 0;
   constructor(
     private readonly prisma: PrismaService,
@@ -56,7 +61,6 @@ export class Pong {
     this.player2Id = player2Id;
     this.player1SocketId = player1SocketId;
     this.player2SocketId = player2SocketId;
-    this.player1Won = false;
 
     this.gameState = {
       ball: {
@@ -83,20 +87,10 @@ export class Pong {
   }
 
   setGameOver(isPlayer1win: boolean, byPlayerOut = false) {
-    // if (byPlayerOut) {
-    //   // -1로 변하는 로직은 삭제
-    //   if (isPlayer1win) {
-    //     this.gameState.score2 = -1;
-    //   } else {
-    //     this.gameState.score1 = -1;
-    //   }
-    // }
     if (isPlayer1win) {
       this.gameState.score1 = GAME_OVER;
-      // this.gameState.score2 = -1;
     } else {
       this.gameState.score2 = GAME_OVER;
-      // this.gameState.score1 = -1;
     }
     this.gameState.gameOver = true;
   }

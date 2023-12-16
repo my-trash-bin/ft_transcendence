@@ -10,13 +10,13 @@ function TwofactorPage() {
   const { api } = useContext(ApiContext);
   const router = useRouter();
   const [password, setPassword] = useState('');
-  const { openIsInvalidPassword } = useToast();
+  const { openMessage } = useToast();
   function handlePassword(e: React.ChangeEvent<HTMLInputElement>) {
     setPassword(e.target.value);
   }
   const handleSubmitClick = useCallback(async () => {
     if (!password) {
-      alert('비밀번호가 입력되지 않았습니다.');
+      openMessage('비밀번호를 입력해주세요!');
       return;
     }
     try {
@@ -30,15 +30,15 @@ function TwofactorPage() {
       }
     } catch (error: any) {
       if (error.status === 422) {
-        openIsInvalidPassword();
+        openMessage('비밀번호가 틀렸습니다!');
       } else if (error.status === 401) {
-        alert('JWT가 올바르지 않습니다.');
+        openMessage('로그인이 필요합니다!');
       } else if (error.status === 403) {
-        alert('JWT Phase가 올바르지 않습니다.');
+        openMessage('이미 로그인 되어있습니다!');
       }
       console.error('Error 2fa login:', error);
     }
-  }, [api, password, router, openIsInvalidPassword]);
+  }, [api, password, router, openMessage]);
 
   return (
     <div className="min-h-screen flex items-center justify-center font-jeonju">

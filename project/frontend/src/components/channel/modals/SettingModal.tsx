@@ -35,7 +35,7 @@ export function SettingModal({
   const [passwordValid, setPasswordValid] = useState(
     channelType !== ChannelType.PROTECTED,
   );
-  const { openSuccessChangeChannnal, openFailChangeChannnal } = useToast();
+  const { openMessage } = useToast();
 
   const channelTypeChangeEvent = (channelType: ChannelType) => {
     switch (channelType) {
@@ -58,10 +58,10 @@ export function SettingModal({
   const mutation = useMutation(api.channelControllerChannelUpdate, {
     onSuccess: () => {
       closeModal();
-      openSuccessChangeChannnal();
+      openMessage('채널 설정 변경!');
     },
     onError: () => {
-      openFailChangeChannnal();
+      openMessage('채널 설정 변경에 실패했습니다!');
     },
   });
 

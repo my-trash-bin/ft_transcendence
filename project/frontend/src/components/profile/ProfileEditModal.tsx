@@ -5,6 +5,7 @@ import { ApiContext } from '../../app/_internal/provider/ApiContext';
 import { ModalLayout } from '../channel/modals/ModalLayout';
 import { Button } from '../common/Button';
 import { avatarToUrl } from '@/app/_internal/util/avatarToUrl';
+import useToast from '../common/useToast';
 
 interface ModalProfileProps {
   isOpen: boolean;
@@ -27,6 +28,7 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
   const [isChanged, setIsChanged] = useState(false);
   const [newData, setNewData] = useState<UserProfileDto>(defaultData);
   const [password, setPassword] = useState('');
+  const { openMessage } = useToast();
 
   useEffect(() => {
     setIsChanged(false);
@@ -43,7 +45,12 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
       fetchData();
       onClose();
     } catch (error) {
-      console.error('Error saving changes:', error);
+      if (error instanceof Error) {
+        alert(`${error.message}`);
+        console.error('Error saving changes:', error);
+      } else {
+        console.error('Non-Error type error:', error);
+      }
     }
   }, [api, newData, onClose, fetchData]);
 
@@ -55,7 +62,7 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
       onClose();
     } catch (error: any) {
       if (error.status === 400) {
-        alert(
+        openMessage(
           '비밀번호는 6-12자의 영문, 숫자, 하이픈(-), 언더스코어(_)만 사용 가능합니다',
         );
       }

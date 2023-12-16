@@ -11,8 +11,8 @@ export const PADDLE_STRIKE = 4;
 
 // 공
 export const BALL_SIZE = 15;
-export const DEFAULT_SPEED = 3;
-export const SMASH_SPEED = 8;
+export const DEFAULT_SPEED = 6;
+export const SMASH_SPEED = 12;
 
 // 아이템
 export const ITEM_SIZE = 100;

@@ -2,7 +2,6 @@ import { avatarToUrl } from '@/app/_internal/util/avatarToUrl';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import useNotAllowedPong from '../game/notAllowedPong';
 import usePaddleMovement from './KeyHandle';
 import useStore from './Update';
 import {
@@ -17,6 +16,7 @@ import {
   SMALL_PADDLE_HEIGHT,
 } from './gameConstants';
 import { getGameSocket } from './gameSocket';
+import useToast from '../common/useToast';
 
 const usePaddleHeight = (type: number) => {
   return useMemo(() => {
@@ -69,14 +69,14 @@ function Board() {
     socket.emit('clientReady', socket.id);
   }, [socket]);
 
-  const { OpenToast } = useNotAllowedPong();
+  const { openMessage } = useToast();
 
   useEffect(() => {
     if (isPlayer1 === undefined) {
       router.replace('/game');
-      OpenToast();
+      openMessage('게임이 시작되지 않았어요!');
     }
-  }, [isPlayer1, router, OpenToast]);
+  }, [isPlayer1, router, openMessage]);
 
   /* --------------------- 게임 중단 --------------------- */
   const handleDisconnect = useCallback(() => {

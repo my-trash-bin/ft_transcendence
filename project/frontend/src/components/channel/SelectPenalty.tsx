@@ -5,7 +5,7 @@ export function SelectPenalty({
   channelId,
   memberId,
 }: Readonly<{ channelId: string; memberId: string }>) {
-  const { openIsKickUser, openIsBanUser, openIsMuteUser, openIsPromoteUser } = useToast();
+  const { openMessage } = useToast();
   const kickBanPromote = (actionType: string) => {
     getSocket().emit('kickBanPromote', {
       actionType,
@@ -13,13 +13,13 @@ export function SelectPenalty({
       memberId,
     });
     if (actionType === 'KICK') {
-      openIsKickUser();
+      openMessage('유저를 내보냈습니다!');
     } else if (actionType === 'BANNED') {
-      openIsBanUser();
+      openMessage('유저를 차단했습니다!');
     } else if (actionType === 'MUTE') {
-      openIsMuteUser();
+      openMessage('유저의 입을 1분간 막았습니다!');
     } else if (actionType === 'PROMOTE') {
-      openIsPromoteUser();
+      openMessage('유저를 관리자로 임명했습니다!');
     }
   };
 

@@ -1,9 +1,9 @@
 import { ApiContext } from '@/app/_internal/provider/ApiContext';
+import useToast from '@/components/common/useToast';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCallback, useContext } from 'react';
 import { ModalLayout } from './ModalLayout';
-import useToast from '@/components/common/useToast';
 
 export function ParticipationModal({
   isModalOpen,
@@ -23,7 +23,7 @@ export function ParticipationModal({
   const closeModal = () => {
     setIsModalOpen(false);
   };
-  const { openIsBan, openIsFull } = useToast();
+  const { openMessage } = useToast();
 
   const participateChannel = useCallback(async () => {
     try {
@@ -37,10 +37,10 @@ export function ParticipationModal({
       setMyChannel(true);
     } catch (error: any) {
       if (error?.error.message === '밴된 유저는 채널에 들어갈 수 없습니다.') {
-        openIsBan();
+        openMessage('방장이 거부합니다 ㅠ');
         setIsModalOpen(false);
       } else if (error?.error.message === '최대 사용자 수 초과') {
-        openIsFull();
+        openMessage('방에 더이상 자리가 없어요!');
         setIsModalOpen(false);
       }
     }
@@ -51,8 +51,7 @@ export function ParticipationModal({
     router,
     setIsModalOpen,
     setMyChannel,
-    openIsBan,
-    openIsFull,
+    openMessage,
   ]);
 
   return (
