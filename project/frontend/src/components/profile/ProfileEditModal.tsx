@@ -45,8 +45,12 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
       fetchData();
       onClose();
     } catch (error) {
-      alert(`${error.error.message}`);
-      console.error('Error saving changes:', error);
+      if (error instanceof Error) {
+        alert(`${error.message}`);
+        console.error('Error saving changes:', error);
+      } else {
+        console.error('Non-Error type error:', error);
+      }
     }
   }, [api, newData, onClose, fetchData]);
 
