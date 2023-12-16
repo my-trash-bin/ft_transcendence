@@ -1,5 +1,5 @@
-import { useInitMessage } from '@/hooks/useInitMessage';
-import { useSocket } from '@/hooks/useSocket';
+import useInfScroll from '@/hooks/chat/useInfScroll';
+import { useSocket } from '@/hooks/chat/useSocket';
 import { useEffect, useRef, useState } from 'react';
 import { MyChat } from './MyChat';
 import { OtherChat } from './OtherChat';
@@ -26,41 +26,69 @@ export interface MessageContentInterface {
 
 const isSystemMessage = (message: { type: string }) =>
   ['leave', 'join'].includes(message.type);
-const isMySessage = (
+const isMyMessage = (
   msg1: { data: { member: { nickname: string } } },
   msg2: { data: { member: { nickname: string } } },
 ) => msg1.data.member.nickname === msg2.data.member.nickname;
 const calIsFirst = (
-  mesaageList: { type: string; data: { member: { nickname: string } } }[],
+  messageList: { type: string; data: { member: { nickname: string } } }[],
   idx: number,
-) =>
-  idx === 0 ||
-  isSystemMessage(mesaageList[idx - 1]) ||
-  !isMySessage(mesaageList[idx - 1], mesaageList[idx]);
+): boolean => {
+  if (idx === 0) return true;
+  const targetIndex =
+    messageList[idx - 1].type === 'scroll-target' ? idx - 2 : idx - 1;
 
+  return (
+    isSystemMessage(messageList[targetIndex]) ||
+    !isMyMessage(messageList[targetIndex], messageList[idx])
+  );
+};
+
+let render = { isSocketRender: true };
 export function MessageContent({
   channelId,
   type,
   myNickname,
+  initData,
   targetName,
 }: Readonly<{
   channelId: string;
   type: messageType;
   myNickname: string;
+  initData: MessageContentInterface[];
   targetName?: string;
 }>) {
-  const [messages, setMessages] = useState<MessageContentInterface[]>([]);
-  const messageEndRef = useRef<HTMLDivElement>(null);
-  useInitMessage(type, setMessages, channelId, targetName);
-  useSocket(type, setMessages, channelId, targetName);
-
+  const [messages, setMessages] = useState<MessageContentInterface[]>(initData);
+  const [isLastPage, setIsLastPage] = useState<boolean>(false);
+  const scrollTargetRef = useRef<HTMLDivElement>(null);
+  const messageStartRef = useRef<HTMLDivElement>(null);
+  useSocket(type, setMessages, channelId, targetName, render);
+  useInfScroll(
+    messageStartRef,
+    setMessages,
+    messages,
+    type,
+    channelId,
+    isLastPage,
+    setIsLastPage,
+    render,
+    targetName,
+  );
   useEffect(() => {
-    messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    setMessages(initData);
+  }, [initData, channelId]);
+  useEffect(() => {
+    scrollTargetRef.current?.scrollIntoView({ behavior: 'auto' });
   }, [messages]);
-
+  render.isSocketRender = false;
+  console.log('messages : ', messages);
+  console.log('initmessage : ', initData);
   return (
     <div className="w-[95%] h-[610px] pt-[20px] bg-chat-color2 rounded-[10px] flex flex-col overflow-y-scroll mt-sm">
+      <div ref={messageStartRef} />
       {messages.map((message, idx) => {
+        if (message.type === 'scroll-target')
+          return <div key={crypto.randomUUID()} ref={scrollTargetRef} />;
         if (message.type === 'leave' || message.type === 'join') {
           return (
             <UserStateAnnounce
@@ -91,7 +119,6 @@ export function MessageContent({
           );
         }
       })}
-      <div ref={messageEndRef} />
     </div>
   );
 }

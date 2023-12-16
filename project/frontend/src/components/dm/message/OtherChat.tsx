@@ -55,10 +55,10 @@ export function OtherChat({
           setGameMode={toggleGameMode}
         />
       </Portal>
-      <div className="flex flex-row pl-[3%] mb-[1.5%] items-center">
+      <div className="flex flex-row pl-[3%] mb-[1.5%]">
         {isFirst === true ? (
           <button
-            className="w-[50px] h-[50px] mb-[10px]"
+            className="w-[50px] h-[50px] mb-[10px] self-start"
             onClick={handleModalOpen}
           >
             <Image
@@ -80,8 +80,8 @@ export function OtherChat({
             ''
           )}
           <p
-            className={`p-[2%] text-left text-white inline-block max-w-[35%] rounded-[20px]
-                break-words bg-chat-color1 self-start min-w-[10%]`}
+            className={`p-[2%] text-left text-white inline-block max-w-[200px] rounded-[20px]
+                break-words bg-chat-color1 self-start min-w-[30px]`}
           >
             {message}
           </p>

@@ -1,7 +1,4 @@
-import { unwrap } from '@/api/unwrap';
-import { ApiContext } from '@/app/_internal/provider/ApiContext';
-import { useCallback, useContext } from 'react';
-import { useQuery } from 'react-query';
+import useDirectMessage from '@/hooks/chat/useDirectMessage';
 import { MessageContent, messageType } from './MessageContent';
 import { MessageSendBox } from './MessageSendBox';
 import { UserInfo } from './UserInfo';
@@ -13,35 +10,32 @@ export function MessageBox({
   readonly username: string;
   readonly channelId: string;
 }) {
-  const { api } = useContext(ApiContext);
-  const { isLoading, isError, data } = useQuery(
-    'userByNickanme',
-    useCallback(
-      async () => unwrap(await api.usersControllerGetUsetByNickname(username)),
-      [api, username],
-    ),
+  const { isLoading, dmInfo, channelMessage } = useDirectMessage(
+    channelId,
+    username,
   );
 
-  if (isLoading) return <div>로딩중... 👾</div>;
-  if (isError || !data) return <p>알 수 없는 에러</p>;
+  if (isLoading || !dmInfo) return <div>로딩중... 👾</div>;
 
   const localMe = localStorage.getItem('me');
   const me = localMe ? JSON.parse(localMe) : null;
+  console.log(channelMessage);
   return (
     <>
       <UserInfo
-        imageUri={data.profileImageUrl}
-        username={data.nickname}
+        imageUri={dmInfo.profileImageUrl}
+        username={dmInfo.nickname}
         onActive={false}
-        targetId={data.id}
+        targetId={dmInfo.id}
       />
       <MessageContent
         type={messageType.DM}
         myNickname={me?.nickname}
         targetName={username}
         channelId={channelId}
+        initData={channelMessage}
       />
-      <MessageSendBox type={messageType.DM} targetUserId={data.id} />
+      <MessageSendBox type={messageType.DM} targetUserId={dmInfo.id} />
     </>
   );
 }

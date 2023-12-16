@@ -1,23 +1,39 @@
 import useToast from '@/components/common/useToast';
-import { messageType } from '@/components/dm/message/MessageContent';
+import {
+  MessageContentInterface,
+  messageType,
+} from '@/components/dm/message/MessageContent';
 import { getSocket } from '@/lib/Socket';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 export const useSocket = (
-  type: messageType,
+  type: any,
   setMessages: any,
   channelId: string,
   targetName: string | undefined,
+  render: object,
 ) => {
   const router = useRouter();
   const { openMessage } = useToast();
-
   useEffect(() => {
     const socket = getSocket();
     const localMe = localStorage.getItem('me');
     const me = localMe ? JSON.parse(localMe) : null;
 
+    const setMessageWithScrollTarget = (
+      render: any,
+      setMessages: any,
+      res: any,
+    ) => {
+      render.isSocketRender = true;
+      setMessages((prevState: MessageContentInterface[]) => {
+        const prevData = prevState.filter(
+          (data) => data.type !== 'scroll-target',
+        );
+        return [...prevData, res, { type: 'scroll-target' }];
+      });
+    };
 
     const handleDirectMessage = (
       socket: any,
@@ -26,7 +42,7 @@ export const useSocket = (
     ) => {
       socket.on(`directMessage`, (res: any) => {
         if (res.data.channelId === channelId)
-          setMessages((messages: any) => [...messages, res]);
+          setMessageWithScrollTarget(render, setMessages, res);
       });
     };
 
@@ -37,7 +53,7 @@ export const useSocket = (
     ) => {
       socket.on(`channelMessage`, (res: any) => {
         if (res.data.channelId === channelId) {
-          setMessages((messages: any) => [...messages, res]);
+          setMessageWithScrollTarget(render, setMessages, res);
         }
       });
     };
@@ -53,14 +69,14 @@ export const useSocket = (
           openMessage('채널에서 나갔습니다!');
           router.replace('/channel');
         } else {
-          setMessages((messages: any) => [...messages, res]);
+          setMessageWithScrollTarget(render, setMessages, res);
         }
       });
     };
 
     const handleJoin = (socket: any, setMessages: any) => {
       socket.on('join', (res: any) => {
-        setMessages((messages: any) => [...messages, res]);
+        setMessageWithScrollTarget(render, setMessages, res);
       });
     };
 
@@ -73,7 +89,10 @@ export const useSocket = (
       socket.on('kickBanPromote', (res: any) => {
         const targetUserId = res.data.targetUser.id;
 
-        if (res.data.actionType === 'KICK' || res.data.actionType === 'BANNED') {
+        if (
+          res.data.actionType === 'KICK' ||
+          res.data.actionType === 'BANNED'
+        ) {
           if (targetUserId === meId && channelId === res.data.channelId) {
             if (res.data.actionType === 'KICK') {
               openMessage('방장이 나가라고 합니다!');
@@ -112,5 +131,5 @@ export const useSocket = (
       socket.off('join');
       socket.off('kickBanPromote');
     };
-  }, [type, setMessages, channelId, router, openMessage, targetName]);
+  }, [type, setMessages, channelId, router, targetName, render, openMessage]);
 };
