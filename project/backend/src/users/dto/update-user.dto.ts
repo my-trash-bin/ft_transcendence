@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString, Matches } from 'class-validator';
+import { IsOptional, IsString, Matches, MaxLength } from 'class-validator';
 
 export class UpdateUserDto {
   @ApiPropertyOptional({
@@ -25,5 +25,6 @@ export class UpdateUserDto {
   @ApiPropertyOptional({ description: '프로필 상태 메세지', required: false })
   @IsOptional()
   @IsString()
+  @MaxLength(100)
   statusMessage?: string;
 }

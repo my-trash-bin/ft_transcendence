@@ -16,11 +16,11 @@ export class MessagePaginationDto {
   @ApiProperty({
     description: '페이지당 메시지 수',
     required: false,
-    default: 10,
     example: 10,
   })
   @Type(() => Number)
+  @IsOptional()
   @IsInt()
   @Min(1)
-  pageSize: number = 10;
+  pageSize?: number;
 }
