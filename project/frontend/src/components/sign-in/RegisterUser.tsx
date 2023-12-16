@@ -28,14 +28,14 @@ export default function RegisterUser({
     try {
       await api.authControllerRegister({ nickname, imageUrl });
       router.push('/friend');
-    } catch (error) {
+    } catch (error: any) {
+      error?.error?.message && alert(`${error?.error?.message}`);
       console.error('error', error);
     }
   }, [api, imageUrl, nickname, router]);
 
   return (
     <div className="w-xl h-xl bg-light-background border-2 border-dark-purple rounded-lg flex flex-col gap-xl justify-center items-start p-xl">
-      {/* <form encType="multipart/form-data"> */}
       <p className="font-semibold text-h3">선택한 닉네임: {nickname}</p>
       <div className="flex flex-row items-center">
         <p className="font-semibold text-h3">선택한 아바타: </p>
@@ -47,7 +47,6 @@ export default function RegisterUser({
           height={100}
         />
       </div>
-      {/* </form> */}
       <div className="self-end">
         <Button onClick={handleSubmitClick}>가입하기!</Button>
       </div>

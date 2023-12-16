@@ -1,3 +1,4 @@
+import useToast from '@/components/common/useToast';
 import {
   MessageContentInterface,
   messageType,
@@ -14,7 +15,7 @@ export const useSocket = (
   render: object,
 ) => {
   const router = useRouter();
-  // const { openMessage } = useToast();
+  const { openMessage } = useToast();
   useEffect(() => {
     const socket = getSocket();
     const localMe = localStorage.getItem('me');
@@ -65,7 +66,7 @@ export const useSocket = (
     ) => {
       socket.on('leave', (res: any) => {
         if (res.data.member.id === meId) {
-          // openMessage('채널에서 나갔습니다!');
+          openMessage('채널에서 나갔습니다!');
           router.replace('/channel');
         } else {
           setMessageWithScrollTarget(render, setMessages, res);
@@ -94,9 +95,9 @@ export const useSocket = (
         ) {
           if (targetUserId === meId && channelId === res.data.channelId) {
             if (res.data.actionType === 'KICK') {
-              // openMessage('방장이 나가라고 합니다!');
+              openMessage('방장이 나가라고 합니다!');
             } else {
-              // openMessage('방장이 채널에서 차단했습니다!');
+              openMessage('방장이 채널에서 차단했습니다!');
             }
             router.replace('/channel');
           }
@@ -105,13 +106,13 @@ export const useSocket = (
           channelId === res.data.channelId &&
           targetUserId === meId
         ) {
-          // openMessage('관리자가 되었습니다!');
+          openMessage('관리자가 되었습니다!');
         } else if (
           res.data.actionType === 'MUTE' &&
           targetUserId === meId &&
           channelId === res.data.channelId
         ) {
-          // openMessage('방장이 1분간 조용히 하래요 ㅠ');
+          openMessage('방장이 1분간 조용히 하래요 ㅠ');
         }
       });
     };
@@ -130,5 +131,5 @@ export const useSocket = (
       socket.off('join');
       socket.off('kickBanPromote');
     };
-  }, [type, setMessages, channelId, router, targetName, render]);
+  }, [type, setMessages, channelId, router, targetName, render, openMessage]);
 };
