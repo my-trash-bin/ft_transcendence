@@ -45,7 +45,7 @@ export const ProfileEditModal: React.FC<ModalProfileProps> = ({
       fetchData();
       onClose();
     } catch (error: any) {
-      alert(error?.error?.message ?? '유니크 체크에 실패했습니다.');
+      alert(error?.error?.message ?? '프로필 수정에 실패했습니다.');
     }
   }, [api, newData, onClose, fetchData]);
 
