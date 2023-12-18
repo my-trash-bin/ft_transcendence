@@ -65,18 +65,21 @@ export const useSocket = (
       router: any,
     ) => {
       socket.on('leave', (res: any) => {
-        if (res.data.member.id === meId) {
+        if (res.data.member.id === meId && res.data.channel.id === channelId) {
           openMessage('채널에서 나갔습니다!');
           router.replace('/channel');
         } else {
-          setMessageWithScrollTarget(render, setMessages, res);
+          if (res.data.channel.id === channelId)
+            setMessageWithScrollTarget(render, setMessages, res);
         }
       });
     };
 
     const handleJoin = (socket: any, setMessages: any) => {
       socket.on('join', (res: any) => {
-        setMessageWithScrollTarget(render, setMessages, res);
+        if (res.data.channel.id === channelId) {
+          setMessageWithScrollTarget(render, setMessages, res);
+        }
       });
     };
 
