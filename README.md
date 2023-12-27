@@ -4,7 +4,7 @@
 
 Click the image below if you want to see how the assignment works.  
 <a href="https://www.youtube.com/watch?v=xtRfaPgWszI">
-  <img src="IMG_0323.jpeg" alt="동영상 미리보기" width="300" height="200">
+  <img src="IMG_0323.jpeg" alt="동영상 미리보기" width="700">
 </a>
 
 
