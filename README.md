@@ -1,4 +1,6 @@
-[transcendence](https://www.youtube.com/watch?v=xtRfaPgWszI&list=PLxPsX1ZvNIHFHQ3DRV_nPvBCYaHoXx_Mp&index=1)
+<a href="https://www.youtube.com/watch?v=xtRfaPgWszI">
+  <img src="URL_동영상_썸네일_이미지" alt="동영상 미리보기">
+</a>
 
 # ft_transcendence
 
